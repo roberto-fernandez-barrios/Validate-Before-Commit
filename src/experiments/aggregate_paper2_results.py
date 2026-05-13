@@ -13,6 +13,11 @@ def aggregate_detection_results(input_csv: Path, output_csv: Path) -> pd.DataFra
         "dataset",
         "protocol",
         "detector",
+    ]
+
+    optional_group_cols = [
+        "q_feature_map",
+        "q_reps",
         "drift_type",
         "severity",
         "dim",
@@ -20,6 +25,8 @@ def aggregate_detection_results(input_csv: Path, output_csv: Path) -> pd.DataFra
         "alpha",
         "n_permutations",
     ]
+
+    group_cols.extend([c for c in optional_group_cols if c in df.columns])
 
     agg = (
         df.groupby(group_cols, dropna=False)
