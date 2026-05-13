@@ -79,6 +79,7 @@ def add_common_row(
     q_feature_map: str = "",
     q_reps: int = 0,
     n_qubits: int = 0,
+    q_input_scaling: str = "",
     gamma: float | str = "",
 ) -> None:
     rows.append(
@@ -94,6 +95,7 @@ def add_common_row(
             "q_feature_map": q_feature_map,
             "q_reps": q_reps,
             "n_qubits": n_qubits,
+            "q_input_scaling": q_input_scaling,
             "drift_type": drift_type,
             "severity": severity,
             "true_drift": int(true_drift),
@@ -206,6 +208,7 @@ def run(args: argparse.Namespace) -> Path:
                                 alpha=args.alpha,
                                 n_permutations=args.n_permutations,
                                 random_state=seed,
+                                input_scaling=args.q_input_scaling,
                             )
                             detector.fit(X_ref)
                             pred = detector.predict(X_cur)
@@ -226,6 +229,7 @@ def run(args: argparse.Namespace) -> Path:
                                 q_feature_map=pred.q_feature_map,
                                 q_reps=pred.q_reps,
                                 n_qubits=pred.n_qubits,
+                                q_input_scaling=pred.q_input_scaling,
                                 score=pred.score,
                                 threshold=pred.threshold,
                                 p_value=pred.p_value,
@@ -267,6 +271,12 @@ def build_parser() -> argparse.ArgumentParser:
         description="Paper 2 smoke test: classical and quantum MMD drift detectors."
     )
 
+    parser.add_argument(
+        "--q-input-scaling",
+        type=str,
+        default="atan_standard",
+        choices=["none", "atan_standard"],
+    )
     parser.add_argument("--outdir", type=str, default="results/raw/smoke_001")
     parser.add_argument("--dims", type=str, default="4,6")
     parser.add_argument("--window-size", type=int, default=128)

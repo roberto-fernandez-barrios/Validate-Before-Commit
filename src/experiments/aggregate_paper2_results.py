@@ -18,6 +18,7 @@ def aggregate_detection_results(input_csv: Path, output_csv: Path) -> pd.DataFra
     optional_group_cols = [
         "q_feature_map",
         "q_reps",
+        "q_input_scaling",
         "drift_type",
         "severity",
         "dim",
