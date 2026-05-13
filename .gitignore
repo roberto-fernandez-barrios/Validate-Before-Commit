@@ -1,0 +1,69 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.conda/
+*.egg-info/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Data
+data/raw/**
+data/processed/**
+data/splits/**
+!data/
+!data/raw/
+!data/processed/
+!data/splits/
+!data/**/.gitkeep
+
+# Results
+results/**
+!results/
+!results/**/
+!results/**/.gitkeep
+
+# Large artifacts
+*.pkl
+*.joblib
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.parquet
+
+# Papers / temporary builds
+manuscript/build/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
