@@ -17,9 +17,35 @@ def parse_csv_list(value: str, cast=str):
     return [cast(x.strip()) for x in value.split(",") if x.strip()]
 
 
-def load_numeric_csv(path: Path, label_col: str | None, max_rows: int | None) -> pd.DataFrame:
+def parse_label_values(value: str) -> set[str] | None:
+    values = {x.strip() for x in value.split(",") if x.strip()}
+    return values or None
+
+
+def load_numeric_csv(
+    path: Path,
+    label_col: str | None,
+    max_rows: int | None,
+    label_values: set[str] | None = None,
+) -> pd.DataFrame:
     df = pd.read_csv(path, nrows=max_rows)
     df.columns = [str(c).strip() for c in df.columns]
+
+    if label_values is not None:
+        if not label_col:
+            raise ValueError("--label-values-* requires --label-col")
+        if label_col not in df.columns:
+            raise ValueError(f"Label column '{label_col}' not found in {path}")
+
+        before = len(df)
+        labels = df[label_col].astype(str).str.strip()
+        df = df[labels.isin(label_values)].copy()
+        after = len(df)
+
+        print(f"[FILTER] {path.name}: {label_col} in {sorted(label_values)} -> {after}/{before} rows")
+
+        if after == 0:
+            raise ValueError(f"No rows left after filtering {path} with labels {sorted(label_values)}")
 
     if label_col and label_col in df.columns:
         df = df.drop(columns=[label_col])
@@ -133,6 +159,8 @@ def main() -> None:
     parser.add_argument("--data-ref", required=True)
     parser.add_argument("--data-cur", required=True)
     parser.add_argument("--label-col", default="Label")
+    parser.add_argument("--label-values-ref", default="")
+    parser.add_argument("--label-values-cur", default="")
     parser.add_argument("--dataset", default="cicids2017")
     parser.add_argument("--outdir", default="results/raw/paper2_cicids_smoke_001")
 
@@ -159,12 +187,14 @@ def main() -> None:
     seeds = parse_csv_list(args.seeds, int)
     detectors = parse_csv_list(args.detectors, str)
     q_feature_maps = parse_csv_list(args.q_feature_maps, str)
+    label_values_ref = parse_label_values(args.label_values_ref)
+    label_values_cur = parse_label_values(args.label_values_cur)
 
     print(f"[LOAD] reference: {data_ref_path}")
-    df_ref = load_numeric_csv(data_ref_path, args.label_col, args.max_rows)
+    df_ref = load_numeric_csv(data_ref_path, args.label_col, args.max_rows, label_values_ref)
 
     print(f"[LOAD] current:   {data_cur_path}")
-    df_cur = load_numeric_csv(data_cur_path, args.label_col, args.max_rows)
+    df_cur = load_numeric_csv(data_cur_path, args.label_col, args.max_rows, label_values_cur)
 
     df_ref, df_cur = align_columns(df_ref, df_cur)
 
