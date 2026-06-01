@@ -71,6 +71,17 @@ def sample_contiguous_window(
     return X[start:start + window_size]
 
 
+def sample_random_reference(
+    X: np.ndarray,
+    reference_size: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    if len(X) < reference_size:
+        raise ValueError(f"Need at least {reference_size} rows, available {len(X)}")
+    idx = rng.choice(len(X), size=reference_size, replace=False)
+    return X[idx]
+
+
 def sample_contiguous_stream(
     X: np.ndarray,
     n_windows: int,
@@ -160,6 +171,8 @@ def main() -> None:
 
     parser.add_argument("--dims", default="8")
     parser.add_argument("--window-size", type=int, default=256)
+    parser.add_argument("--reference-size", type=int, default=0)
+    parser.add_argument("--reference-mode", choices=["contiguous", "random"], default="random")
     parser.add_argument("--stride", type=int, default=0)
     parser.add_argument("--pre-windows", type=int, default=3)
     parser.add_argument("--post-windows", type=int, default=5)
@@ -177,6 +190,7 @@ def main() -> None:
     args = parser.parse_args()
 
     stride = args.stride if args.stride > 0 else args.window_size
+    reference_size = args.reference_size if args.reference_size > 0 else args.window_size
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -202,6 +216,7 @@ def main() -> None:
 
     print(f"[DATA] ref={X_ref_pool.shape} cur={X_cur_pool.shape} common_features={df_ref.shape[1]}")
     print(f"[STREAM] pre_windows={args.pre_windows} post_windows={args.post_windows} window_size={args.window_size} stride={stride}")
+    print(f"[REFERENCE] mode={args.reference_mode} reference_size={reference_size}")
 
     window_rows = []
 
@@ -209,7 +224,10 @@ def main() -> None:
         rng = np.random.default_rng(seed)
 
         for dim in dims:
-            X_ref_base_raw = sample_contiguous_window(X_ref_pool, args.window_size, rng)
+            if args.reference_mode == "random":
+                X_ref_base_raw = sample_random_reference(X_ref_pool, reference_size, rng)
+            else:
+                X_ref_base_raw = sample_contiguous_window(X_ref_pool, reference_size, rng)
 
             pre_raw, pre_start = sample_contiguous_stream(
                 X_ref_pool,
@@ -285,6 +303,8 @@ def main() -> None:
                     row = {
                         "dataset": args.dataset,
                         "protocol": "paper2_streaming_delay",
+                        "reference_mode": args.reference_mode,
+                        "reference_size": reference_size,
                         "seed": seed,
                         "detector": det_name,
                         "q_feature_map": fmap,
@@ -333,7 +353,8 @@ def main() -> None:
     win_df.to_csv(window_out, index=False)
 
     group_cols = [
-        "dataset", "protocol", "seed", "detector", "q_feature_map",
+        "dataset", "protocol", "reference_mode", "reference_size",
+        "seed", "detector", "q_feature_map",
         "q_input_scaling", "dim", "window_size", "stride", "alpha",
         "n_permutations", "pre_windows", "post_windows",
     ]
@@ -386,7 +407,7 @@ def main() -> None:
     seq_df.to_csv(sequence_out, index=False)
 
     summary_cols = [
-        "detector", "q_feature_map", "dim", "window_size", "stride",
+        "detector", "q_feature_map", "reference_mode", "reference_size", "dim", "window_size", "stride",
         "false_alarm_before_change_any", "false_alarm_rate_pre",
         "detected_after_change_any", "detection_rate_post",
         "detection_delay_windows", "runtime_sec_sum",
