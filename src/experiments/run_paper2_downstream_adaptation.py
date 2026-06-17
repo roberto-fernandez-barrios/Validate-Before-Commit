@@ -643,6 +643,24 @@ def main() -> None:
                     recovery_fraction=args.recovery_fraction,
                 )
 
+                adaptation_gain = float(np.mean(bal_acc_seq) - np.mean(no_adapt_bal_acc))
+                degradation_area = float(np.mean([max(o - s, 0.0) for s, o in zip(bal_acc_seq, oracle_bal_acc)]))
+
+                triggered_post = spec["trigger_delay"] is not None
+                false_alarm_any = bool(spec["false_alarm_any"])
+                adapted_any = spec["adaptation_start"] is not None
+
+                is_triggered_strategy = strategy not in {"no_adaptation", "oracle_adaptation"}
+
+                clean_downstream_adaptation = bool(
+                    is_triggered_strategy
+                    and triggered_post
+                    and not false_alarm_any
+                    and adaptation_gain > 0.0
+                )
+
+                clean_adaptation_gain = adaptation_gain if clean_downstream_adaptation else 0.0
+
                 by_seed_rows.append(
                     {
                         "dataset": args.dataset,
@@ -659,13 +677,15 @@ def main() -> None:
                         "adapt_size_per_class": args.adapt_size_per_class,
                         "post_balanced_accuracy_mean": float(np.mean(bal_acc_seq)),
                         "post_f1_mean": float(np.mean(f1_seq)),
-                        "degradation_area": float(np.mean([max(o - s, 0.0) for s, o in zip(bal_acc_seq, oracle_bal_acc)])),
-                        "adaptation_gain_vs_no_adapt": float(np.mean(bal_acc_seq) - np.mean(no_adapt_bal_acc)),
+                        "degradation_area": degradation_area,
+                        "adaptation_gain_vs_no_adapt": adaptation_gain,
+                        "clean_downstream_adaptation": clean_downstream_adaptation,
+                        "clean_adaptation_gain": clean_adaptation_gain,
                         "recovery_time": rec_time,
-                        "triggered_post": spec["trigger_delay"] is not None,
+                        "triggered_post": triggered_post,
                         "trigger_delay_windows": spec["trigger_delay"],
-                        "false_alarm_any": spec["false_alarm_any"],
-                        "adapted_any": spec["adaptation_start"] is not None,
+                        "false_alarm_any": false_alarm_any,
+                        "adapted_any": adapted_any,
                         "adaptation_start_window": spec["adaptation_start"],
                         "threshold": spec["threshold"],
                         "initial_fit_runtime_sec": initial_fit_runtime,
@@ -703,6 +723,8 @@ def main() -> None:
             degradation_area_mean=("degradation_area", "mean"),
             degradation_area_std=("degradation_area", "std"),
             adaptation_gain_vs_no_adapt_mean=("adaptation_gain_vs_no_adapt", "mean"),
+            clean_downstream_adaptation_rate=("clean_downstream_adaptation", "mean"),
+            clean_adaptation_gain_mean=("clean_adaptation_gain", "mean"),
             recovery_time_mean=("recovery_time", "mean"),
             triggered_post_rate=("triggered_post", "mean"),
             false_alarm_any_rate=("false_alarm_any", "mean"),
@@ -739,6 +761,8 @@ def main() -> None:
         "post_f1_mean",
         "degradation_area_mean",
         "adaptation_gain_vs_no_adapt_mean",
+        "clean_downstream_adaptation_rate",
+        "clean_adaptation_gain_mean",
         "recovery_time_mean",
         "triggered_post_rate",
         "false_alarm_any_rate",
