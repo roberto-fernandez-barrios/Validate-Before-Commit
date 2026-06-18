@@ -343,6 +343,15 @@ def main() -> None:
     parser.add_argument("--n-permutations", type=int, default=100)
 
     parser.add_argument("--detectors", type=str, default="mmd_rbf,qk_mmd")
+    parser.add_argument(
+        "--hybrid-policies",
+        type=str,
+        default="",
+        help=(
+            "Optional comma-separated hybrid trigger policies. "
+            "Supported: hybrid_or,hybrid_vote_2of3,hybrid_and."
+        ),
+    )
     parser.add_argument("--q-feature-maps", type=str, default="zz,pauli_xz")
     parser.add_argument("--q-reps", type=int, default=1)
     parser.add_argument("--q-input-scaling", type=str, default="atan_standard")
@@ -361,6 +370,7 @@ def main() -> None:
     seeds = parse_csv_list(args.seeds, int)
     severities = parse_csv_list(args.severities, float)
     detectors = parse_csv_list(args.detectors, str)
+    hybrid_policies = parse_csv_list(args.hybrid_policies, str)
     q_feature_maps = parse_csv_list(args.q_feature_maps, str)
 
     max_rows = args.max_rows if args.max_rows and args.max_rows > 0 else None
@@ -588,6 +598,99 @@ def main() -> None:
                         "threshold": info["threshold"],
                     }
                 )
+
+            if hybrid_policies:
+                required_hybrid_methods = [
+                    "mmd_rbf",
+                    "qk_mmd_zz",
+                    "qk_mmd_pauli_xz",
+                ]
+
+                missing_methods = [
+                    method
+                    for method in required_hybrid_methods
+                    if method not in detector_infos
+                ]
+
+                if missing_methods:
+                    print(
+                        "[HYBRID][SKIP] Missing detector methods for hybrid policies: "
+                        + ",".join(missing_methods)
+                    )
+                else:
+                    pre_alarm_matrix = {
+                        method: detector_infos[method]["pre_alarms"]
+                        for method in required_hybrid_methods
+                    }
+                    post_alarm_matrix = {
+                        method: detector_infos[method]["post_alarms"]
+                        for method in required_hybrid_methods
+                    }
+
+                    def combine_hybrid_alarms(policy: str, alarm_matrix: dict[str, list[bool]]) -> list[bool]:
+                        combined: list[bool] = []
+
+                        for i in range(len(next(iter(alarm_matrix.values())))):
+                            count = sum(bool(alarms[i]) for alarms in alarm_matrix.values())
+
+                            if policy == "hybrid_or":
+                                combined.append(count >= 1)
+                            elif policy == "hybrid_vote_2of3":
+                                combined.append(count >= 2)
+                            elif policy == "hybrid_and":
+                                combined.append(count == len(alarm_matrix))
+                            else:
+                                raise ValueError(
+                                    f"Unknown hybrid policy={policy}. "
+                                    "Supported: hybrid_or, hybrid_vote_2of3, hybrid_and."
+                                )
+
+                        return combined
+
+                    for hybrid_policy in hybrid_policies:
+                        pre_hybrid_alarms = combine_hybrid_alarms(
+                            hybrid_policy,
+                            pre_alarm_matrix,
+                        )
+                        post_hybrid_alarms = combine_hybrid_alarms(
+                            hybrid_policy,
+                            post_alarm_matrix,
+                        )
+
+                        pre_trigger = first_consecutive_trigger(
+                            pre_hybrid_alarms,
+                            args.consecutive_k,
+                        )
+                        post_trigger = first_consecutive_trigger(
+                            post_hybrid_alarms,
+                            args.consecutive_k,
+                        )
+
+                        adaptation_start = None
+                        if post_trigger is not None:
+                            adaptation_start = post_trigger + 1
+                            if adaptation_start >= args.post_windows:
+                                adaptation_start = None
+
+                        detector_runtime = float(
+                            sum(
+                                detector_infos[method]["runtime"]
+                                for method in required_hybrid_methods
+                            )
+                        )
+
+                        strategy_specs.append(
+                            {
+                                "strategy": f"{hybrid_policy}_triggered_adaptation",
+                                "detector": "hybrid",
+                                "q_feature_map": "mmd_rbf+zz+pauli_xz",
+                                "trigger_delay": post_trigger,
+                                "false_alarm_any": pre_trigger is not None,
+                                "adaptation_start": adaptation_start,
+                                "detector_runtime": detector_runtime,
+                                "threshold": np.nan,
+                            }
+                        )
 
             strategy_window_metrics: dict[str, list[dict[str, float]]] = {}
 
