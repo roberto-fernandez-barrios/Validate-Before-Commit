@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import energy_distance, ks_2samp
 from sklearn.decomposition import PCA
 from sklearn.metrics import balanced_accuracy_score, f1_score
 from sklearn.preprocessing import StandardScaler
@@ -155,6 +156,153 @@ def evaluate_model(model: SVC, X: np.ndarray, y: np.ndarray) -> dict[str, float]
     }
 
 
+class KsWindowDetector:
+    """Classical per-feature Kolmogorov-Smirnov window detector.
+
+    The score is the maximum or mean KS statistic across features.
+    Higher means stronger distribution shift.
+    """
+
+    def __init__(self, reduction: str = "max"):
+        self.reduction = reduction
+        self.X_ref: np.ndarray | None = None
+
+    def fit(self, X_ref: np.ndarray):
+        self.X_ref = np.asarray(X_ref, dtype=float)
+        return self
+
+    def score(self, X: np.ndarray) -> float:
+        if self.X_ref is None:
+            raise RuntimeError("Detector must be fitted before scoring.")
+
+        X = np.asarray(X, dtype=float)
+
+        stats = []
+        for j in range(self.X_ref.shape[1]):
+            stat = ks_2samp(
+                self.X_ref[:, j],
+                X[:, j],
+                alternative="two-sided",
+                mode="auto",
+            ).statistic
+            stats.append(float(stat))
+
+        stats = np.asarray(stats, dtype=float)
+
+        if self.reduction == "mean":
+            return float(np.mean(stats))
+
+        if self.reduction == "max":
+            return float(np.max(stats))
+
+        raise ValueError(f"Unknown KS reduction={self.reduction!r}")
+
+
+class JsdHistogramDetector:
+    """Classical histogram Jensen-Shannon divergence window detector.
+
+    Per feature, quantile bins are fitted on the reference window. The score is
+    the mean Jensen-Shannon divergence across features.
+    """
+
+    def __init__(self, n_bins: int = 20, eps: float = 1e-12):
+        self.n_bins = int(n_bins)
+        self.eps = float(eps)
+        self.edges_: list[np.ndarray] | None = None
+        self.ref_hist_: list[np.ndarray] | None = None
+
+    def _make_edges(self, x: np.ndarray) -> np.ndarray:
+        quantiles = np.linspace(0.0, 1.0, self.n_bins + 1)
+        edges = np.quantile(x, quantiles)
+        edges = np.unique(edges)
+
+        if len(edges) < 3:
+            center = float(np.mean(x))
+            span = float(np.std(x))
+            if span <= 0:
+                span = 1.0
+            edges = np.linspace(center - span, center + span, self.n_bins + 1)
+
+        edges = edges.astype(float)
+        edges[0] = -np.inf
+        edges[-1] = np.inf
+
+        return edges
+
+    def _hist(self, x: np.ndarray, edges: np.ndarray) -> np.ndarray:
+        counts, _ = np.histogram(x, bins=edges)
+        p = counts.astype(float) + self.eps
+        p /= p.sum()
+        return p
+
+    def fit(self, X_ref: np.ndarray):
+        X_ref = np.asarray(X_ref, dtype=float)
+
+        self.edges_ = []
+        self.ref_hist_ = []
+
+        for j in range(X_ref.shape[1]):
+            edges = self._make_edges(X_ref[:, j])
+            self.edges_.append(edges)
+            self.ref_hist_.append(self._hist(X_ref[:, j], edges))
+
+        return self
+
+    def score(self, X: np.ndarray) -> float:
+        if self.edges_ is None or self.ref_hist_ is None:
+            raise RuntimeError("Detector must be fitted before scoring.")
+
+        X = np.asarray(X, dtype=float)
+
+        values = []
+        for j, edges in enumerate(self.edges_):
+            p = self.ref_hist_[j]
+            q = self._hist(X[:, j], edges)
+            m = 0.5 * (p + q)
+
+            jsd = 0.5 * np.sum(p * np.log(p / m)) + 0.5 * np.sum(q * np.log(q / m))
+            values.append(float(jsd))
+
+        return float(np.mean(values))
+
+
+class EnergyWindowDetector:
+    """Classical per-feature energy-distance window detector.
+
+    The score is the mean or maximum energy distance across features.
+    Higher means stronger distribution shift.
+    """
+
+    def __init__(self, reduction: str = "mean"):
+        self.reduction = reduction
+        self.X_ref: np.ndarray | None = None
+
+    def fit(self, X_ref: np.ndarray):
+        self.X_ref = np.asarray(X_ref, dtype=float)
+        return self
+
+    def score(self, X: np.ndarray) -> float:
+        if self.X_ref is None:
+            raise RuntimeError("Detector must be fitted before scoring.")
+
+        X = np.asarray(X, dtype=float)
+
+        values = []
+        for j in range(self.X_ref.shape[1]):
+            values.append(float(energy_distance(self.X_ref[:, j], X[:, j])))
+
+        values = np.asarray(values, dtype=float)
+
+        if self.reduction == "mean":
+            return float(np.mean(values))
+
+        if self.reduction == "max":
+            return float(np.max(values))
+
+        raise ValueError(f"Unknown energy reduction={self.reduction!r}")
+
+
+
 def build_detector(method: str, args, seed: int):
     if method == "mmd_rbf":
         return MmdRbfDetector(
@@ -186,6 +334,15 @@ def build_detector(method: str, args, seed: int):
             random_state=seed,
             input_scaling=args.q_input_scaling,
         )
+
+    if method == "ks_max":
+        return KsWindowDetector(reduction=args.ks_reduction)
+
+    if method == "jsd":
+        return JsdHistogramDetector(n_bins=args.jsd_bins)
+
+    if method == "energy_distance":
+        return EnergyWindowDetector(reduction=args.energy_reduction)
 
     raise ValueError(f"Unknown method={method}")
 
@@ -246,6 +403,9 @@ def run_strategy(
         "mmd_rbf": 101,
         "qk_mmd_zz": 202,
         "qk_mmd_pauli_xz": 303,
+        "ks_max": 404,
+        "jsd": 505,
+        "energy_distance": 606,
     }
     rng = np.random.default_rng(seed + 10000 + method_seed_offsets[method])
 
@@ -398,6 +558,10 @@ def main() -> None:
 
     parser.add_argument("--seeds", type=str, default="1,2,3")
     parser.add_argument("--methods", type=str, default="mmd_rbf,qk_mmd_zz,qk_mmd_pauli_xz")
+
+    parser.add_argument("--ks-reduction", type=str, default="max", choices=["max", "mean"])
+    parser.add_argument("--jsd-bins", type=int, default=20)
+    parser.add_argument("--energy-reduction", type=str, default="mean", choices=["mean", "max"])
 
     parser.add_argument("--dim", type=int, default=8)
     parser.add_argument("--window-size", type=int, default=128)
