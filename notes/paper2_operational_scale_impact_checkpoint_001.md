@@ -33,6 +33,7 @@ A strong operational zone additionally requires:
 - `results\tables\paper2_operational_scale_impact_001\paper_table_operational_scale_by_method.csv`
 - `results\tables\paper2_operational_scale_impact_001\paper_table_quantum_operational_advantage_zones.csv`
 - `results\tables\paper2_operational_scale_impact_001\paper_table_quantum_strong_operational_zones.csv`
+- `results\tables\paper2_operational_scale_impact_001\paper_table_quantum_strict_operational_zones.csv`
 - `results\tables\paper2_operational_scale_impact_001\paper_table_operational_scale_paired_differences.csv`
 - `results\tables\paper2_operational_scale_impact_001\paper_table_operational_scale_key_paired_differences.csv`
 

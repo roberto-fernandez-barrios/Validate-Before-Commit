@@ -132,6 +132,15 @@ def main() -> None:
                     and additional_detected_flow_equiv_vs_mmd >= 100_000
                 )
 
+                # Strict zone for paper-facing claims:
+                # more monitoring coverage, no clean-gain loss, no false-alarm penalty,
+                # and large enough effect at scale.
+                quantum_strict_operational_zone = (
+                    quantum_strong_operational_zone
+                    and clean_gain_delta_vs_mmd >= 0.0
+                    and false_alarm_delta_vs_mmd <= 0.0
+                )
+
                 rows.append(
                     {
                         "severity": severity,
@@ -157,6 +166,7 @@ def main() -> None:
                         "false_alarm_flow_equiv_delta_vs_mmd": false_alarm_flow_equiv_delta_vs_mmd,
                         "quantum_candidate_zone": quantum_candidate_zone,
                         "quantum_strong_operational_zone": quantum_strong_operational_zone,
+                        "quantum_strict_operational_zone": quantum_strict_operational_zone,
                     }
                 )
 
@@ -193,6 +203,15 @@ def main() -> None:
     save_table(
         strong_zones,
         outdir / "paper_table_quantum_strong_operational_zones.csv",
+    )
+
+    strict_zones = scale_df[
+        scale_df["quantum_strict_operational_zone"]
+    ].copy()
+
+    save_table(
+        strict_zones,
+        outdir / "paper_table_quantum_strict_operational_zones.csv",
     )
 
     # Scale paired differences from statistical summary.
@@ -280,6 +299,7 @@ def main() -> None:
         f"- `{outdir / 'paper_table_operational_scale_by_method.csv'}`",
         f"- `{outdir / 'paper_table_quantum_operational_advantage_zones.csv'}`",
         f"- `{outdir / 'paper_table_quantum_strong_operational_zones.csv'}`",
+        f"- `{outdir / 'paper_table_quantum_strict_operational_zones.csv'}`",
         f"- `{outdir / 'paper_table_operational_scale_paired_differences.csv'}`",
         f"- `{outdir / 'paper_table_operational_scale_key_paired_differences.csv'}`",
         "",
