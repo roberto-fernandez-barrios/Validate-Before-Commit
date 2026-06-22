@@ -242,7 +242,12 @@ def run_strategy(
     args,
     seed: int,
 ) -> tuple[list[dict], dict]:
-    rng = np.random.default_rng(seed + 10000 + abs(hash(method)) % 100000)
+    method_seed_offsets = {
+        "mmd_rbf": 101,
+        "qk_mmd_zz": 202,
+        "qk_mmd_pauli_xz": 303,
+    }
+    rng = np.random.default_rng(seed + 10000 + method_seed_offsets[method])
 
     current_model = initial_model
     current_reference_severity = 0.0
