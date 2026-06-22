@@ -115,13 +115,18 @@ def main() -> None:
 
                 is_quantum = row["method"].startswith("QK-MMD")
 
+                # Candidate zone:
+                # QK-MMD must provide a non-trivial post-drift alarm persistence gain
+                # without materially hurting clean downstream gain or false alarms.
                 quantum_candidate_zone = (
                     is_quantum
-                    and post_alarm_delta_vs_mmd > 0.0
+                    and post_alarm_delta_vs_mmd >= 0.05
                     and clean_gain_delta_vs_mmd >= -0.01
                     and false_alarm_delta_vs_mmd <= 0.05
                 )
 
+                # Strong operational zone:
+                # The monitoring advantage must also become large at scale.
                 quantum_strong_operational_zone = (
                     quantum_candidate_zone
                     and additional_detected_flow_equiv_vs_mmd >= 100_000

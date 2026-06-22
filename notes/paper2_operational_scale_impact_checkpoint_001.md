@@ -41,7 +41,6 @@ A strong operational zone additionally requires:
 Strong quantum operational zones were found under the current criterion.
 
  severity         method  traffic_volume  post_alarm_delta_vs_mmd  additional_detected_flow_equiv_vs_mmd  clean_gain_delta_vs_mmd  false_alarm_delta_vs_mmd
-     0.10 QK-MMD PauliXZ       100000000                 0.001667                           1.666667e+05                -0.000039                  0.033333
      0.50 QK-MMD PauliXZ        10000000                 0.060000                           6.000000e+05                -0.005208                  0.033333
      0.50 QK-MMD PauliXZ       100000000                 0.060000                           6.000000e+06                -0.005208                  0.033333
      0.50      QK-MMD ZZ        10000000                 0.053333                           5.333333e+05                -0.005456                  0.033333
