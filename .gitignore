@@ -71,3 +71,7 @@ manuscript/build/
 # Paper 2 local raw datasets
 data/raw/unsw_nb15/
 data/processed/unsw_nb15/*.csv
+
+# Paper 2 local ToN-IoT datasets
+data/raw/ton_iot/
+data/processed/ton_iot_q1_gate/*.csv
