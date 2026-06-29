@@ -67,3 +67,7 @@ manuscript/build/
 *.out
 *.synctex.gz
 *.toc
+
+# Paper 2 local raw datasets
+data/raw/unsw_nb15/
+data/processed/unsw_nb15/*.csv
