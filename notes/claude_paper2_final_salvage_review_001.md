@@ -1,5 +1,7 @@
 # Paper 2 — Final Salvage Review
 
+> **ADDENDUM (2026-07-01, supersedes the Q1 verdict below).** After this review, two things changed the picture: (1) an audit produced a mechanism law `corr(base BA, adaptation benefit) = −0.894`; (2) a **pre-registered Phase 2** built and validated the deployable solution this review said was missing — a **label-efficient validate-before-commit readaptation gate**. It PASSES all pre-registered criteria for BOTH classical (KS-max) and quantum (QK-ZZ) detectors: in the harm regime (ToN-IoT) it turns net-harmful naive triggering (−1 to −2 pts) into net benefit (+1.2 to +1.3 pts), significantly beating **both** naive (+2.4/+3.5 pts, CI95) **and** no-adaptation (+1.2/+1.3 pts, CI95), with ~100 labels; the zero-label unsupervised variant fails (labels are necessary). See `paper2_phase2_gated_readaptation_checkpoint_001.md`. **Revised verdict: Q1 is now credible (~45–60% at Computers & Security / TDSC), not dead.** The paper is now a *solution* paper (harmful adaptation → mechanism law → working label-efficient gate), not a diagnostic one. The §2 "Q1 is dead" conclusion below reflected the evidence BEFORE Phase 2 and is retained only for history.
+
 **Prepared by:** Claude (Opus 4.8)
 **Date:** 2026-07-01
 **Branch:** paper2-expensive-downstream

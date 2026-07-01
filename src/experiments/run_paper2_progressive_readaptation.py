@@ -436,6 +436,9 @@ def run_strategy(
     n_adaptations = 0
     false_adaptations = 0
     adaptation_windows: list[int] = []
+    n_triggers = 0
+    n_gate_rejections = 0
+    labels_used_total = 0
 
     window_rows = []
     detector_runtime_sec_total = 0.0
@@ -476,15 +479,13 @@ def run_strategy(
         trigger = bool(trigger_condition and cooldown_remaining <= 0)
 
         adapted_now = False
+        gate_evaluated = False
 
         if trigger:
-            n_adaptations += 1
-            adaptation_windows.append(t)
-            adapted_now = True
+            n_triggers += 1
+            gate_evaluated = True
 
-            if sev_t < args.false_adaptation_severity_threshold:
-                false_adaptations += 1
-
+            # Build a CANDIDATE model on a freshly sampled adapt set (true labels).
             Xa_raw, ya = sample_balanced_from_distribution(
                 pools,
                 n_per_class=args.adapt_size_per_class,
@@ -494,20 +495,52 @@ def run_strategy(
             Xa = transform_X(Xa_raw, scaler, pca)
 
             fit_start = time.perf_counter()
-            current_model = train_svc(Xa, ya, seed + t + 1)
+            candidate_model = train_svc(Xa, ya, seed + t + 1)
             fit_runtime_sec_total += time.perf_counter() - fit_start
 
-            # Reset detector reference to the current adapted regime.
-            detector = build_detector(method, args, seed + t + 1)
-            detector, threshold = calibrate_detector(
-                detector,
-                pools,
-                scaler,
-                pca,
-                severity=sev_t,
-                args=args,
-                rng=rng,
-            )
+            # Safe/cost-aware gate: decide whether to COMMIT (deploy) the candidate.
+            commit = True
+            gate = args.adaptation_gate
+            if gate == "labeled_probe":
+                n_probe = max(1, args.probe_size // 2)
+                Xp_raw, yp = sample_balanced_from_distribution(
+                    pools, n_per_class=n_probe, severity=sev_t, rng=rng,
+                )
+                Xp = transform_X(Xp_raw, scaler, pca)
+                ba_dep = evaluate_model(current_model, Xp, yp)["balanced_accuracy"]
+                ba_cand = evaluate_model(candidate_model, Xp, yp)["balanced_accuracy"]
+                commit = bool(ba_cand >= ba_dep + args.gate_margin)
+                labels_used_total += len(yp)
+            elif gate == "unsup_disagree":
+                pred_dep = current_model.predict(Xw)
+                pred_cand = candidate_model.predict(Xw)
+                disagree = float(np.mean(pred_dep != pred_cand))
+                commit = bool(disagree >= args.gate_disagree_threshold)
+            elif gate != "none":
+                raise ValueError(f"Unknown adaptation gate: {gate}")
+
+            if commit:
+                n_adaptations += 1
+                adaptation_windows.append(t)
+                adapted_now = True
+                if sev_t < args.false_adaptation_severity_threshold:
+                    false_adaptations += 1
+                current_model = candidate_model
+                # Reset detector reference to the current adapted regime.
+                detector = build_detector(method, args, seed + t + 1)
+                detector, threshold = calibrate_detector(
+                    detector,
+                    pools,
+                    scaler,
+                    pca,
+                    severity=sev_t,
+                    args=args,
+                    rng=rng,
+                )
+            else:
+                # Gate rejected: keep deployed model AND detector reference so that a
+                # later window can re-propose once drift becomes actionable.
+                n_gate_rejections += 1
 
             alarm_history = []
             cooldown_remaining = args.cooldown_windows
@@ -532,6 +565,7 @@ def run_strategy(
                 "threshold": threshold,
                 "alarm": alarm,
                 "trigger": trigger,
+                "gate_evaluated": gate_evaluated,
                 "adapted_now": adapted_now,
                 "cooldown_remaining": cooldown_remaining,
                 "balanced_accuracy": eval_metrics["balanced_accuracy"],
@@ -548,6 +582,11 @@ def run_strategy(
         "method": method,
         "n_windows": args.post_windows,
         "n_adaptations": n_adaptations,
+        "n_triggers": n_triggers,
+        "n_gate_rejections": n_gate_rejections,
+        "labels_used_total": labels_used_total,
+        "adaptation_gate": args.adaptation_gate,
+        "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
         "false_adaptations": false_adaptations,
         "first_adaptation_window": adaptation_windows[0] if adaptation_windows else np.nan,
         "mean_balanced_accuracy": float(df["balanced_accuracy"].mean()),
@@ -598,6 +637,17 @@ def main() -> None:
     parser.add_argument("--policy-name", type=str, default=None)
     parser.add_argument("--cooldown-windows", type=int, default=10)
     parser.add_argument("--false-adaptation-severity-threshold", type=float, default=0.1)
+
+    # Safe/cost-aware adaptation gate (Phase 2): validate a candidate before committing.
+    parser.add_argument(
+        "--adaptation-gate",
+        type=str,
+        default="none",
+        choices=["none", "labeled_probe", "unsup_disagree"],
+    )
+    parser.add_argument("--probe-size", type=int, default=64)
+    parser.add_argument("--gate-margin", type=float, default=0.0)
+    parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
 
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--n-permutations", type=int, default=100)
