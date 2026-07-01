@@ -423,14 +423,6 @@ def run_strategy(
         rng=rng,
     )
 
-    policy_k = int(args.policy_k) if args.policy_k is not None else int(args.consecutive_k)
-    policy_n = int(args.policy_n) if args.policy_n is not None else int(args.consecutive_k)
-
-    if policy_k <= 0 or policy_n <= 0 or policy_k > policy_n:
-        raise ValueError(f"Invalid adaptation policy parameters: k={policy_k}, n={policy_n}")
-
-    policy_name = args.policy_name or f"{args.adaptation_policy}_k{policy_k}_n{policy_n}_cd{args.cooldown_windows}"
-
     alarm_history: list[bool] = []
     cooldown_remaining = 0
     n_adaptations = 0
@@ -461,19 +453,16 @@ def run_strategy(
         alarm = bool(score > threshold)
         alarm_history.append(alarm)
 
-        if len(alarm_history) > policy_n:
-            recent = alarm_history[-policy_n:]
+        if len(alarm_history) > args.consecutive_k:
+            recent = alarm_history[-args.consecutive_k:]
         else:
             recent = alarm_history
 
-        if args.adaptation_policy == "consecutive":
-            trigger_condition = len(recent) == policy_n and all(recent)
-        elif args.adaptation_policy == "k_of_n":
-            trigger_condition = len(recent) == policy_n and sum(bool(x) for x in recent) >= policy_k
-        else:
-            raise ValueError(f"Unknown adaptation policy: {args.adaptation_policy}")
-
-        trigger = bool(trigger_condition and cooldown_remaining <= 0)
+        trigger = (
+            len(recent) == args.consecutive_k
+            and all(recent)
+            and cooldown_remaining <= 0
+        )
 
         adapted_now = False
 
@@ -521,11 +510,6 @@ def run_strategy(
             {
                 "seed": seed,
                 "method": method,
-                "policy_name": policy_name,
-                "adaptation_policy": args.adaptation_policy,
-                "policy_k": policy_k,
-                "policy_n": policy_n,
-                "cooldown_windows": args.cooldown_windows,
                 "window_idx": t,
                 "severity_t": sev_t,
                 "score": score,
@@ -592,10 +576,6 @@ def main() -> None:
     parser.add_argument("--calibration-windows", type=int, default=20)
     parser.add_argument("--threshold-quantile", type=float, default=0.95)
     parser.add_argument("--consecutive-k", type=int, default=3)
-    parser.add_argument("--adaptation-policy", type=str, default="consecutive", choices=["consecutive", "k_of_n"])
-    parser.add_argument("--policy-k", type=int, default=None)
-    parser.add_argument("--policy-n", type=int, default=None)
-    parser.add_argument("--policy-name", type=str, default=None)
     parser.add_argument("--cooldown-windows", type=int, default=10)
     parser.add_argument("--false-adaptation-severity-threshold", type=float, default=0.1)
 
@@ -659,11 +639,6 @@ def main() -> None:
                 {
                     "seed": seed,
                     "method": "no_adaptation",
-                    "policy_name": args.policy_name or f"{args.adaptation_policy}_k{int(args.policy_k) if args.policy_k is not None else int(args.consecutive_k)}_n{int(args.policy_n) if args.policy_n is not None else int(args.consecutive_k)}_cd{args.cooldown_windows}",
-                    "adaptation_policy": args.adaptation_policy,
-                    "policy_k": int(args.policy_k) if args.policy_k is not None else int(args.consecutive_k),
-                    "policy_n": int(args.policy_n) if args.policy_n is not None else int(args.consecutive_k),
-                    "cooldown_windows": args.cooldown_windows,
                     "window_idx": t,
                     "severity_t": sev_t,
                     "balanced_accuracy": metrics["balanced_accuracy"],
@@ -713,18 +688,6 @@ def main() -> None:
             all_summary_rows.append(summary)
 
     window_df = pd.DataFrame(all_window_rows)
-    effective_policy_k = int(args.policy_k) if args.policy_k is not None else int(args.consecutive_k)
-    effective_policy_n = int(args.policy_n) if args.policy_n is not None else int(args.consecutive_k)
-    effective_policy_name = args.policy_name or f"{args.adaptation_policy}_k{effective_policy_k}_n{effective_policy_n}_cd{args.cooldown_windows}"
-
-    for _rows in (all_window_rows, all_summary_rows):
-        for _row in _rows:
-            _row.setdefault("policy_name", effective_policy_name)
-            _row.setdefault("adaptation_policy", args.adaptation_policy)
-            _row.setdefault("policy_k", effective_policy_k)
-            _row.setdefault("policy_n", effective_policy_n)
-            _row.setdefault("cooldown_windows", args.cooldown_windows)
-
     summary_df = pd.DataFrame(all_summary_rows)
 
     window_path = args.outdir / "paper2_progressive_readaptation_window_results.csv"
@@ -735,7 +698,7 @@ def main() -> None:
 
     agg = (
         summary_df
-        .groupby(["policy_name", "adaptation_policy", "policy_k", "policy_n", "cooldown_windows", "method"], dropna=False)
+        .groupby("method", dropna=False)
         .agg(
             n_seeds=("seed", "nunique"),
             mean_balanced_accuracy=("mean_balanced_accuracy", "mean"),
