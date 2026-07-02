@@ -22,6 +22,66 @@ Adaptive network intrusion detection systems (NIDS) retrain their classifiers to
 
 ---
 
+## 3. Method
+
+### 3.1 Adaptive readaptation as a sequential decision
+
+We consider a deployed binary classifier $h_0$ (benign vs. attack) monitoring a stream of traffic windows $W_1, W_2, \dots$ Each window $W_t$ is a set of flows with (at evaluation time) ground-truth labels; the deployed model degrades as the traffic distribution drifts. A drift monitor $D$ produces a score $s_t = D(W_t)$ measuring divergence of $W_t$ from a reference. The standard adaptive-NIDS loop is: raise an alarm when $s_t$ exceeds a threshold, and upon a confirmed alarm **retrain** the classifier on recent data. We make explicit that this loop conflates two questions:
+
+- **detection:** *has the distribution changed?* — answered by $D$;
+- **decision:** *will replacing $h$ with a model retrained on the current window improve accuracy?* — which $D$ does not answer.
+
+Let $h$ be the incumbent model and $h'$ a candidate retrained on the current regime. Adaptation is beneficial at $t$ iff $\mathrm{acc}(h', W_t) > \mathrm{acc}(h, W_t)$. Because $D$ measures distributional change rather than the sign of $\mathrm{acc}(h',\cdot)-\mathrm{acc}(h,\cdot)$, a detector-only policy commits every confirmed change, including changes for which retraining does not help. Our method (§3.4) inserts a decision step that estimates this sign before committing.
+
+### 3.2 Drift monitors
+
+We use two-sample drift monitors comparing a reference window (from the pre-drift regime) to the current window. Classical baselines: **Energy distance**, **RBF-MMD**, per-feature **Kolmogorov–Smirnov** (max reduction) and histogram **Jensen–Shannon** divergence. Quantum monitors: **quantum-kernel MMD** with **ZZ** and **Pauli-XZ** feature maps ($q_{\text{reps}}=1$, angle encoding with standardized `atan` scaling), the MMD being computed in the quantum-kernel-induced RKHS. All monitors expose a scalar score; thresholds are calibrated per detector on held-out calibration windows at a fixed quantile (0.95). The paper's claims are detector-agnostic; the quantum monitors are included as instruments and to test whether a more expressive kernel changes the decision (it does not, §5.3).
+
+### 3.3 Progressive-drift readaptation protocol
+
+Each stream has 100 post-drift windows. Window $t$ is a class-balanced sample in which each class is a mixture of the reference and current pools with mixing weight $\mathrm{sev}(t)$ ("severity"), ramped linearly from 0 to 1 over the first 80 windows and held at 1 thereafter, so drift arrives gradually. On a committed adaptation, the candidate is trained on a fresh balanced labeled sample from the current regime, and the detector reference is reset to the adapted regime. The trigger policy (alarm confirmation and cooldown) is held fixed across all gate conditions so that the decision gate is the only manipulated variable.
+
+### 3.4 The validate-before-commit gate
+
+Our contribution is a decision step interposed between the trigger and the model swap. On each confirmed trigger we retrain a candidate $h'$ as usual, but deploy it only if a cheap estimate says it improves on the incumbent $h$; otherwise we keep $h$ (and keep the detector reference, so a later window can re-propose once adaptation becomes worthwhile). We evaluate three gates:
+
+- **`none` (naive):** always commit — the standard loop.
+- **`labeled_probe`$(b,\varepsilon)$:** draw a small balanced labeled probe $P$ of $b$ flows from the current window; commit iff $\mathrm{BA}(h',P) \ge \mathrm{BA}(h,P) + \varepsilon$. The probe is the method's incremental labeling cost; we report $b\in\{32,64\}$, $\varepsilon=0$.
+- **`unsup_disagree`$(\tau)$:** commit iff the fraction of flows on which $h$ and $h'$ disagree on the *unlabeled* current window is $\ge \tau$ (a zero-label proxy for "adaptation would change decisions"); we report $\tau=0.15$.
+
+```
+Algorithm 1: Gated progressive readaptation (one stream)
+  h <- h0 ; D <- fit_reference(pre-drift) ; alarms <- [] ; cooldown <- 0
+  for t = 1..T:
+      W_t <- sample_window(sev(t))          # balanced, labeled
+      record BA(h, W_t)
+      s_t <- D.score(W_t) ; alarms.append(s_t > threshold)
+      trigger <- policy(alarms) and cooldown == 0
+      if trigger:
+          h' <- train(current-regime balanced labeled sample)      # candidate
+          commit <- gate(h, h', W_t)                               # Sec 3.4
+          if commit:
+              h <- h' ; D <- fit_reference(current-regime)         # deploy + reset
+          alarms <- [] ; cooldown <- C                             # applied either way
+      else:
+          cooldown <- max(0, cooldown - 1)
+  return {BA(h, W_t)}_t
+```
+
+The `labeled_probe` gate directly targets the quantity §3.1 identifies (the sign of $\mathrm{acc}(h')-\mathrm{acc}(h)$), estimated from $b$ labels; the `unsup_disagree` gate tests whether that estimate can be obtained without labels.
+
+### 3.5 Metrics
+
+Per window we record balanced accuracy (BA) and attack-class F1; per stream we average over the 100 windows, and per condition over seeds. We report **gain vs. no-adaptation** (the frozen $h_0$ baseline), **committed adaptations** and **labels used**. To quantify the headroom of the decision we define, per stream and detector, a **decision oracle** that abstains when adaptation hurts, $\mathrm{BA}_{\text{oracle}}=\mathbb{E}_{\text{seed}}\max(\mathrm{BA}_{\text{no-adapt}},\mathrm{BA}_{\text{detector}})$, and the **regret** of naive triggering $\mathrm{BA}_{\text{oracle}}-\mathrm{BA}_{\text{naive}}$, together with the **harm frequency** (fraction of streams on which adapting scored below no-adaptation). All comparisons use paired bootstrap 95% confidence intervals over seeds.
+
+## 4. Experimental protocol
+
+**Datasets and regimes.** CICIDS2017 (Tuesday reference → Wednesday, Friday-DDoS, Friday-PortScan, Thursday-WebAttacks), UNSW-NB15 (DoS, Reconnaissance) and ToN-IoT (Scanning), spanning benefit, marginal/mixed and harmful readaptation. Features are numeric, standardized and PCA-reduced to 8 dimensions; windows contain 128 flows.
+
+**Runs.** The regime taxonomy and detector operating points use 30 seeds (CICIDS) / 10 seeds (external medium). The Phase-2 gate evaluation uses **30 seeds** across three representative regimes (PortScan/benefit, UNSW-Reconnaissance/mixed, ToN-IoT-Scanning/harm) and two detectors (KS-max, QK-ZZ), with the trigger fixed at legacy confirmation ($k{=}3$ consecutive, cooldown 10). Fresh no-adaptation and naive baselines are generated within every run for paired comparison.
+
+**Pre-registration.** The gate family (`none`, `labeled_probe` at $b\in\{32,64\}$, `unsup_disagree` at $\tau{=}0.15$), the three regimes, the two detectors and the success criteria (benefit preservation, harm avoidance, mixed non-degradation, label efficiency, detector-invariance) were registered before the confirmatory 30-seed run; no gates, thresholds, datasets or regimes were added post hoc. A prior pre-registered policy grid (k-of-n confirmation and cooldown, no decision gate) is reported as a negative baseline (Appendix E).
+
 ## 5. Results
 
 We present results in logical, not chronological, order. Section 5.1 establishes that readaptation is beneficial on CICIDS2017 but *not* on the external benchmarks; 5.2 explains the pattern with a mechanistic law; 5.3 shows the detector — classical or quantum — is not the lever; 5.4 shows simple policies do not fix it; 5.5 presents the label-efficient gate that does; 5.6 reports robustness and controls.
