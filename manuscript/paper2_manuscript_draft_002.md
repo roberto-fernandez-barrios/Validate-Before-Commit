@@ -142,12 +142,14 @@ Adaptive network intrusion detection is usually framed as a detection problem: m
 
 ---
 
-## Main tables (data ready)
+## Main tables (rendered — Markdown + LaTeX in `results/tables/paper2_paper_tables_001/`)
 
-- **Table 1** — Regime taxonomy: per (dataset×regime) no-adaptation BA, best adaptation gain (BA and attack-F1), class (benefit/marginal/harm). Source: `paper2_metrics_ba_f1_summary_001/`.
-- **Table 2** — Phase 2 gate: per (regime×detector×gate) BA, gain, commits, labels; paired CI95 vs naive and vs no-adaptation. Source: `paper2_phase2_gated_readaptation_001/`.
-- **Table 3** — Oracle-regret and harm-frequency per regime/detector. Source: `paper2_oracle_regret_decision_001/`.
-- **Appendix** — QK operating points + paired CIs (CICIDS), UNSW/ToN-IoT full tables, Phase 1 policy grid, feature-map sensitivity, RF downstream, nuisance controls.
+- **Table 1** `table1_regime_taxonomy` — Regime taxonomy: per (dataset×regime) no-adaptation BA, best adaptation gain (BA and attack-F1), class. (→ §5.1, Fig. 1)
+- **Table 2** `table2_phase2_gate_summary` — Phase 2 gate: per (regime×detector×gate) BA, gain, commits, labels (30 seeds). (→ §5.5, Fig. 4)
+- **Table 3** `table3_phase2_paired_ci` — Phase 2 paired bootstrap CI95, gate vs naive and vs no-adaptation. In ToN-IoT the labeled-probe gate is significantly above both. (→ §5.5)
+- **Table 4** `table4_oracle_regret` — Decision oracle-regret and harm frequency per regime/detector; regret ~0 in pure-benefit regimes, 3.50 pts (ToN-IoT QK-ZZ). (→ §5.2, Fig. 3)
+- Regenerate with `python -m src.analysis.make_paper2_paper_tables`.
+- **Appendix tables** — QK operating points + paired CIs (CICIDS), UNSW/ToN-IoT full tables, Phase 1 policy grid, feature-map sensitivity, RF downstream, nuisance controls.
 
 ## Figures (rendered; `src/analysis/make_paper2_figures.py`)
 
