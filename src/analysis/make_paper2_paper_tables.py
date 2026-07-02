@@ -124,8 +124,29 @@ def t4_oracle_regret():
          "Table 4: Decision oracle-regret and harm frequency. Regret ~0 where adaptation always helps, largest where it hurts; the pattern is detector-invariant.")
 
 
+def t5_phase1_negative():
+    g = pd.read_csv(f"{T}/paper2_safe_readaptation_phase1_001/paper2_phase1_gate_summary.csv")
+    c = pd.read_csv(f"{T}/paper2_safe_readaptation_phase1_001/paper2_phase1_success_checks.csv")
+    crit = {"cicids_portscan": "A_benefit_preservation_portscan",
+            "ton_iot_scanning": "B_harm_avoidance_ton_iot",
+            "unsw_nb15_reconnaissance": "C_mixed_regime_non_degradation_unsw_recon"}
+    passed = dict(zip(c["criterion"], c["passed"]))
+    out = pd.DataFrame({
+        "Regime": g["regime_label"],
+        "No-adapt BA": pct1(g["noadapt_ba"]),
+        "Best safe policy": g["best_safe_policy"],
+        "Safe BA": pct1(g["best_safe_ba"]),
+        "Gain vs no-adapt (pts)": g["best_safe_gain"].round(2),
+        "Adapt. reduction vs legacy": g["best_safe_adaptation_reduction_vs_legacy"].round(1),
+        "Criterion met": [("yes" if passed.get(crit.get(r), False) else "no") for r in g["regime"]],
+    })
+    emit("table5_phase1_negative", out,
+         "Appendix Table: Pre-registered simple policies (k-of-n confirmation, cooldown) do not prevent harmful adaptation. Best safe policy per regime vs. no-adaptation and legacy; negative adaptation-reduction means MORE adaptations than legacy. Criteria A (benefit) and B (harm) fail.")
+
+
 if __name__ == "__main__":
     t1_taxonomy()
     t2_gate_summary()
     t3_gate_ci()
     t4_oracle_regret()
+    t5_phase1_negative()
