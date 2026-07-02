@@ -120,6 +120,28 @@ The findings are robust to the evaluation metric (the taxonomy and harmful-adapt
 
 ---
 
+## 6. Discussion
+
+**Detection is not decision.** The empirical core of this paper is that optimizing a drift *detector* optimizes the wrong object. A detector reports that the distribution moved; an adaptive NIDS needs to know whether retraining will help, and these come apart precisely when the deployed model is still good. Our mechanism analysis makes this concrete: adaptation benefit tracks deployed-model degradation at r = −0.89 (§5.2), so the same distributional shift is worth +19 balanced-accuracy points in one regime and −4 in another. No detector, however sensitive, can distinguish these cases from the window statistics alone — which is why classical and quantum-kernel monitors, and simple confirmation/cooldown policies built on them, all fail to prevent harm (§5.3–5.4).
+
+**Why retraining can hurt.** In our protocol the candidate is retrained on a balanced, correctly-labeled sample of the current regime — near-ideal conditions. It still degrades accuracy when the incumbent is strong, because retraining on a narrow current window replaces a broadly-generalized model with one fit to a shifting slice of traffic; the loss of generalization outweighs the gain from recency. This also bounds the generality of the harmful-adaptation finding in the *conservative* direction: real deployments retrain on noisier, label-scarce data, so harm can only be equal or worse, never an artifact of poor labels in our setup.
+
+**Why the gate works, and why a few labels are unavoidable.** The validate-before-commit gate succeeds because it estimates the one quantity the mechanism identifies — the sign of $\mathrm{acc}(h')-\mathrm{acc}(h)$ — directly, from a small labeled probe, and acts on it. It does not merely suppress adaptation: in the harmful regime it *beats* no-adaptation by committing the minority of genuinely beneficial updates while rejecting the harmful majority (§5.5). The failure of the zero-label `unsup_disagree` variant is informative rather than disappointing: model *disagreement* on unlabeled data measures how much retraining would change decisions, not whether those changes are correct, so it cannot recover the sign. A handful of labeled flows per confirmed drift — on the order of a hundred over a stream — is both necessary and sufficient. In operational NIDS, where analysts already label a small fraction of flagged traffic, this budget is realistic.
+
+**Practitioner guidance.** The results invert the usual deployment recipe. Rather than first choosing the most sensitive (or most expensive, e.g. quantum) detector and then wiring it to automatic retraining, a practitioner should (i) determine, on held-out labeled windows, whether their setting is in a benefit or harm regime — equivalently, whether the deployed model has headroom to lose — and (ii) gate every adaptation on a small labeled validation probe. Under this recipe the detector becomes a coarse scheduler whose exact identity is secondary; a 114× quantum monitoring overhead buys nothing once the decision, not the detection, is the bottleneck.
+
+**Relation to quantum-kernel drift monitoring.** This work began as an evaluation of quantum-kernel MMD as a superior drift trigger. That hypothesis is not supported: QK-MMD defines regime-dependent operating points on one dataset that do not replicate externally, and it does not change the adapt/no-adapt outcome. We report this honestly and repurpose the quantum monitors as one instrument among several, whose invariance under the gate is part of the evidence that the decision layer, not the similarity measure, is what matters.
+
+## 7. Limitations
+
+*(See the Limitations paragraph below; promote to a numbered section at submission.)*
+
+## 8. Conclusion
+
+Adaptive network intrusion detection is usually framed as a detection problem: monitor for drift, retrain when it fires. We showed that this framing is incomplete and sometimes harmful — across three benchmarks the value of readaptation ranges from strongly beneficial to net-negative, governed by deployed-model degradation rather than by distributional change, and invisible to the detector. Consequently, neither more expressive detectors (including quantum kernels) nor simple confirmation/cooldown policies prevent harmful adaptation. Recast as a cost-aware decision, the problem admits a simple, deployable solution: a validate-before-commit gate that retrains a candidate but deploys it only if a small labeled probe confirms an improvement. The gate preserves the benefit of adaptation where it helps, avoids harm where it does not, and significantly outperforms both naive triggering and never adapting — for a classical and a quantum detector alike — with roughly one hundred labeled flows. *When not to retrain* is as important as detecting drift, and a few labels, spent on the decision rather than the detector, are enough to know the difference.
+
+---
+
 ## Main tables (data ready)
 
 - **Table 1** — Regime taxonomy: per (dataset×regime) no-adaptation BA, best adaptation gain (BA and attack-F1), class (benefit/marginal/harm). Source: `paper2_metrics_ba_f1_summary_001/`.
