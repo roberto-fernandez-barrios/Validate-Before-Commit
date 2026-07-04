@@ -20,6 +20,11 @@ adapt/no-adapt decision, and delivers the deployable method + full manuscript dr
 5. **Robustness (post-registration):** label-efficiency frontier shows **~8 labels/drift already avoid harm**
    (plateau ~+1.1 by budget 32–64); benefit preserved across **three** benefit regimes (PortScan, Wednesday
    +16.3, DDoS +25.3).
+6. **Downstream generalization (four classifiers):** the r=−0.89 law holds for SVC-RBF, Random Forest,
+   LogReg and MLP; **net-harm is specific to the fragile SVC-RBF downstream** (RF/LogReg/MLP stay
+   non-negative on ToN-IoT), so the universal-harm hook is qualified; and the **gate is universally safe** —
+   across all 4 downstream × 3 regimes it never underperforms no-adaptation or naive triggering (§5.7, Table 6,
+   Fig 6). This removes a likely reviewer landmine and generalizes the two most defensible claims.
 
 ## What's in this branch (11 commits)
 - **Code:** `--adaptation-gate {none,labeled_probe,unsup_disagree}` in `run_paper2_progressive_readaptation.py`.
