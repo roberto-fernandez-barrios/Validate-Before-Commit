@@ -520,6 +520,11 @@ def run_strategy(
                     pools, n_per_class=n_probe, severity=probe_sev, rng=rng,
                 )
                 Xp = transform_X(Xp_raw, scaler, pca)
+                # Adversarial / noisy probe: an attacker (or faulty labeler) flips a
+                # fraction of the validation labels the gate relies on.
+                if args.probe_poison > 0.0:
+                    flip = rng.random(len(yp)) < args.probe_poison
+                    yp = np.where(flip, 1 - yp, yp)
                 ba_dep = evaluate_model(current_model, Xp, yp)["balanced_accuracy"]
                 ba_cand = evaluate_model(candidate_model, Xp, yp)["balanced_accuracy"]
                 commit = bool(ba_cand >= ba_dep + args.gate_margin)
@@ -602,6 +607,7 @@ def run_strategy(
         "adaptation_gate": args.adaptation_gate,
         "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
         "probe_lag": args.probe_lag if args.adaptation_gate == "labeled_probe" else 0,
+        "probe_poison": args.probe_poison if args.adaptation_gate == "labeled_probe" else 0.0,
         "gate_margin": args.gate_margin if args.adaptation_gate == "labeled_probe" else 0.0,
         "false_adaptations": false_adaptations,
         "first_adaptation_window": adaptation_windows[0] if adaptation_windows else np.nan,
@@ -663,6 +669,7 @@ def main() -> None:
     )
     parser.add_argument("--probe-size", type=int, default=64)
     parser.add_argument("--probe-lag", type=int, default=0)
+    parser.add_argument("--probe-poison", type=float, default=0.0)
     parser.add_argument("--gate-margin", type=float, default=0.0)
     parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
 
