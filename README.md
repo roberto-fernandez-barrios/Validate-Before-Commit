@@ -1,4 +1,4 @@
-# Knowing When Not to Retrain
+# Validate Before Commit
 
 **Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift**
 
@@ -130,8 +130,8 @@ this repository.
 This work is under review. Until a DOI is available, please cite the preprint/working paper:
 
 ```bibtex
-@unpublished{fernandezbarrios2026knowing,
-  title  = {Knowing When Not to Retrain: Label-Efficient Safe Readaptation for
+@unpublished{fernandezbarrios2026validate,
+  title  = {Validate Before Commit: Label-Efficient Safe Readaptation for
             Adaptive Network Intrusion Detection under Concept Drift},
   author = {Fern{\'a}ndez Barrios, Roberto and others},
   year   = {2026},
