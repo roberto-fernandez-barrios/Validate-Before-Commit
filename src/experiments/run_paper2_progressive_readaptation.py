@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from scipy.stats import energy_distance, ks_2samp
 from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score, f1_score
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
@@ -137,13 +140,20 @@ def transform_X(X: np.ndarray, scaler: StandardScaler, pca: PCA | None) -> np.nd
     return Xs
 
 
-def train_svc(X: np.ndarray, y: np.ndarray, seed: int) -> SVC:
-    model = SVC(
-        kernel="rbf",
-        gamma="scale",
-        class_weight="balanced",
-        random_state=seed,
-    )
+def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf"):
+    """Fit the downstream classifier. Name kept for backward compatibility."""
+    if model_type == "svc_rbf":
+        model = SVC(kernel="rbf", gamma="scale", class_weight="balanced", random_state=seed)
+    elif model_type == "random_forest":
+        model = RandomForestClassifier(
+            n_estimators=200, class_weight="balanced", random_state=seed, n_jobs=-1
+        )
+    elif model_type == "logreg":
+        model = LogisticRegression(class_weight="balanced", max_iter=1000, random_state=seed)
+    elif model_type == "mlp":
+        model = MLPClassifier(hidden_layer_sizes=(64,), max_iter=300, random_state=seed)
+    else:
+        raise ValueError(f"Unknown downstream model: {model_type}")
     model.fit(X, y)
     return model
 
@@ -495,7 +505,7 @@ def run_strategy(
             Xa = transform_X(Xa_raw, scaler, pca)
 
             fit_start = time.perf_counter()
-            candidate_model = train_svc(Xa, ya, seed + t + 1)
+            candidate_model = train_svc(Xa, ya, seed + t + 1, args.downstream_model)
             fit_runtime_sec_total += time.perf_counter() - fit_start
 
             # Safe/cost-aware gate: decide whether to COMMIT (deploy) the candidate.
@@ -580,6 +590,7 @@ def run_strategy(
     summary = {
         "seed": seed,
         "method": method,
+        "downstream_model": args.downstream_model,
         "n_windows": args.post_windows,
         "n_adaptations": n_adaptations,
         "n_triggers": n_triggers,
@@ -649,6 +660,13 @@ def main() -> None:
     parser.add_argument("--gate-margin", type=float, default=0.0)
     parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
 
+    parser.add_argument(
+        "--downstream-model",
+        type=str,
+        default="svc_rbf",
+        choices=["svc_rbf", "random_forest", "logreg", "mlp"],
+    )
+
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--n-permutations", type=int, default=100)
 
@@ -689,7 +707,7 @@ def main() -> None:
 
         scaler, pca, X_train = fit_transformer(X_train_raw, args.dim, seed)
 
-        initial_model = train_svc(X_train, y_train, seed)
+        initial_model = train_svc(X_train, y_train, seed, args.downstream_model)
 
         no_adapt_rows = []
 
