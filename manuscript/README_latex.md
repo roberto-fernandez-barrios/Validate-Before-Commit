@@ -4,11 +4,18 @@
 bibliography (`references.bib`), the six result tables (`tables/*.tex`), and the figures (`../docs/img/*.png`,
 via `\graphicspath{{../}}`).
 
+## Two targets
+- **`main_ieee.tex` (IEEEtran)** — primary target: **IEEE TNSM** (two-column, `figure*`/`table*`).
+- **`main.tex` (elsarticle)** — fallback: Expert Systems with Applications / JISA (single-column).
+
 ## Regenerate the LaTeX from source
 ```bash
-python -m src.analysis.make_paper2_latex_tables   # sanitized tables -> manuscript/tables/
-python -m src.analysis.make_paper2_latex          # manuscript/main.tex
+python -m src.analysis.make_paper2_latex_tables    # tables -> tables/ (Elsevier) and tables_ieee/ (IEEE)
+python -m src.analysis.make_paper2_latex ieee      # manuscript/main_ieee.tex   (TNSM, primary)
+python -m src.analysis.make_paper2_latex elsevier  # manuscript/main.tex        (fallback)
 ```
+Compile IEEE with `latexmk -pdf main_ieee.tex` (needs `IEEEtran.cls`, standard in TeX Live/MiKTeX).
+See `notes/paper2_venue_decision_002.md` for the venue decision and required submission statements.
 
 ## Compile (needs a TeX distribution: TeX Live / MiKTeX; elsarticle.cls is standard)
 ```bash

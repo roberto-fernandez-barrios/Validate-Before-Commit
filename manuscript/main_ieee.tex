@@ -1,29 +1,26 @@
-\documentclass[preprint,11pt]{elsarticle}
+\documentclass[journal]{IEEEtran}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{{../}}
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb}
-\usepackage{xcolor}
+\usepackage{cite}
 \usepackage[hidelinks]{hyperref}
-\journal{IEEE Transactions on Network and Service Management (or Elsevier fallback)}
 \begin{document}
-\begin{frontmatter}
 \title{Validate Before Commit: Label-Efficient Safe Readaptation for\\ Adaptive Network Intrusion Detection under Concept Drift}
-\author[a]{Roberto Fern\'andez Barrios\corref{cor}}
-\ead{roberto.fernandez.barrios@gmail.com}
-\cortext[cor]{Corresponding author.}
-\affiliation[a]{organization={TODO: Affiliation}, country={TODO}}
+\author{Roberto Fern\'andez Barrios%
+\thanks{R. Fern\'andez Barrios is with TODO: Affiliation (e-mail: roberto.fernandez.barrios@gmail.com).}}
+\markboth{IEEE Transactions on Network and Service Management}%
+{Fern\'andez Barrios: Validate Before Commit --- Label-Efficient Safe Readaptation for Adaptive NIDS}
+\maketitle
 \begin{abstract}
 Operational machine-learning intrusion detectors are periodically retrained to cope with concept drift, and the decision of \emph{when} to retrain is usually delegated to a drift detector. We show this is the wrong control variable. Whether retraining helps is governed almost entirely by how degraded the deployed model already is --- the benefit of adaptation correlates with no-adaptation accuracy at r $\approx$ $-$0.82 to $-$0.89 --- a quantity drift detectors, which only measure distributional change, cannot observe. Consequently the detector is not the operative lever, and drift-triggered retraining ranges, across three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT), from strongly beneficial to net-harmful: for a fragile classifier, not adapting outperforms every triggered strategy. We recast readaptation as a cost-aware operational decision and introduce a deployable, label-efficient \emph{validate-before-commit} gate: a candidate is retrained on each trigger but committed only if it beats the incumbent on a small labeled probe. The gate needs only tens of labeled flows (as few as ~8 per confirmed drift), tolerates validation labels up to 20 windows stale, and \emph{fails safe} under adversarial supervision --- never harmful even with 40\% of validation labels flipped. Under a pre-registered protocol with 30-seed 95\% confidence intervals it generalizes across two drift detectors and four downstream classifiers: it converts harm to net benefit (significantly beating naive triggering and never-adapting) and preserves the gain where retraining helps. Two ablations delimit the method --- simple confirmation/cooldown policies and a zero-label variant both fail. Results are reproducible from a public artifact.
 \end{abstract}
-% Highlights are submitted as a separate file (manuscript/highlights.md).
-\begin{keyword}
-adaptive intrusion detection \sep concept drift \sep safe model updating \sep
-label-efficient learning \sep retraining policy \sep network management
-\end{keyword}
-\end{frontmatter}
+\begin{IEEEkeywords}
+Adaptive intrusion detection, concept drift, safe model updating, label-efficient learning, retraining policy, network management.
+\end{IEEEkeywords}
+\IEEEpeerreviewmaketitle
 
 
 \section{Introduction}
@@ -149,13 +146,13 @@ We present results in logical, not chronological, order. Section 5.1 establishes
 \subsection{Readaptation is regime-dependent and sometimes harmful}
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig1_regime_spectrum.png}
+\includegraphics[width=\textwidth]{docs/img/fig1_regime_spectrum.png}
 \caption{Readaptation value is regime-dependent and sometimes harmful: best detector-triggered gain over no-adaptation per dataset and attack regime.}
 \label{fig:1}
-\end{figure}
-\input{tables/table1_regime_taxonomy.tex}
+\end{figure*}
+\input{tables_ieee/table1_regime_taxonomy.tex}
 Under progressive drift, an unadapted classifier degrades and triggered readaptation can recover much of the loss --- on CICIDS2017. Averaged over 30 seeds and 100 post-drift windows, the best detector-triggered strategy recovers +19.5 balanced-accuracy (BA) points over no-adaptation in the Friday-DDoS regime, +11.9 in Wednesday, +7.6 in WebAttacks and +6.2 in PortScan (Table~\ref{tab:table1_regime_taxonomy}, Fig.~\ref{fig:1}). This is the familiar picture that motivates adaptive NIDS.
 
 
@@ -165,29 +162,29 @@ The picture does not survive to independent data. On UNSW-NB15 the best recovery
 \subsection{The value of readaptation is governed by model degradation, not distribution change}
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig2_mechanism_law.png}
+\includegraphics[width=\textwidth]{docs/img/fig2_mechanism_law.png}
 \caption{The benefit of adaptation tracks deployed-model degradation (SVC-RBF, $r=-0.89$).}
 \label{fig:2}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.png}
+\includegraphics[width=\textwidth]{docs/img/fig2b_mechanism_law_pooled.png}
 \caption{The degradation--benefit law pooled across four downstream classifiers ($r=-0.82$, bootstrap 95\% CI).}
 \label{fig:2b}
-\end{figure}
+\end{figure*}
 Why does adaptation help enormously in one regime and hurt in another? The answer is not the amount of drift but the state of the deployed model. Across all seven regimes, the benefit of adaptation is almost perfectly predicted by the no-adaptation accuracy: \textbf{r = $-$0.89} between deployed-model BA and adaptation gain across the seven SVC-RBF regimes (Fig.~\ref{fig:2}), and \textbf{r = $-$0.82 (bootstrap CI95 [$-$0.95, $-$0.59], 16 model$\times$regime points)} when pooled across all four downstream classifiers (Fig.~\ref{fig:2b}). Where the deployed model has already collapsed (DDoS: 69.8\% without adaptation), retraining on a fresh window is a large gain; where it remains strong (ToN-IoT: 92.0\%), replacing a well-generalized model with a narrowly-fit current-window model is a net loss.
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.png}
+\includegraphics[width=\textwidth]{docs/img/fig3_oracle_regret.png}
 \caption{Decision oracle-regret grows with the fraction of streams on which adapting hurts.}
 \label{fig:3}
-\end{figure}
-\input{tables/table4_oracle_regret.tex}
+\end{figure*}
+\input{tables_ieee/table4_oracle_regret.tex}
 This exposes the core problem. Drift detectors answer \emph{"has the distribution changed?"}, but an adaptive NIDS needs \emph{"will retraining improve the classifier?"} --- and these are different questions. We quantify the gap with a decision-level oracle that, per stream, abstains when adaptation would hurt (holding the detector fixed). The resulting \emph{regret} of naive triggering is essentially zero where adaptation always helps (Wednesday, DDoS: 0.00 points, adaptation hurt on 0\% of streams) and largest where it hurts (ToN-IoT: 3.50 points for QK-ZZ, CI95 [0.96, 7.45], adaptation hurt on 80\% of streams), scaling monotonically with harm frequency (Table~\ref{tab:table4_oracle_regret}, Fig.~\ref{fig:3}). The headroom left by naive triggering is real and concentrated exactly where the deployed model is already good.
 
 
@@ -199,23 +196,23 @@ Because drift detectors are blind to model degradation, improving the detector c
 
 \subsection{Simple confirmation and cooldown policies do not prevent harm}
 
-\input{tables/table5_phase1_negative.tex}
+\input{tables_ieee/table5_phase1_negative.tex}
 If the decision is the lever, the natural fix is a smarter trigger policy. We pre-registered a grid of alarm-confirmation (k-of-n) and cooldown policies and evaluated them against fixed success criteria (preserve benefit in PortScan; avoid harm in ToN-IoT; do not degrade UNSW). None passed: in the harmful regime the tested policies remained far below no-adaptation and did not reduce adaptations relative to a conservative legacy baseline (Table~\ref{tab:table5_phase1_negative}; Appendix E). Confirmation and cooldown act on the \emph{persistence} of distributional change, which is exactly the signal that is uninformative about whether adaptation helps. This negative result motivates a policy that acts on the right quantity.
 
 
 \subsection{A label-efficient validate-before-commit gate resolves the problem}
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig4_phase2_gate.png}
+\includegraphics[width=\textwidth]{docs/img/fig4_phase2_gate.png}
 \caption{The validate-before-commit gate preserves benefit and avoids harm, identically for a classical (KS-max) and a quantum (QK-ZZ) detector.}
 \label{fig:4}
-\end{figure}
-\input{tables/table2_phase2_gate_summary.tex}
+\end{figure*}
+\input{tables_ieee/table2_phase2_gate_summary.tex}
 We introduce a decision gate that acts directly on estimated model improvement. On each drift trigger, a candidate model is retrained as usual, but it is \textbf{deployed only if it beats the incumbent on a small labeled probe} drawn from the current window (budget 32 or 64 flows); otherwise the incumbent is kept. We evaluate the gate against the same pre-registered criteria (30 seeds, 100 windows, legacy trigger fixed so the gate is the only variable) across the benefit (PortScan), mixed (UNSW Reconnaissance) and harmful (ToN-IoT) regimes, for both a classical (KS-max) and a quantum (QK-ZZ) detector (Table~\ref{tab:table2_phase2_gate_summary}, Fig.~\ref{fig:4}).
 
-\input{tables/table3_phase2_paired_ci.tex}
+\input{tables_ieee/table3_phase2_paired_ci.tex}
 The gate passes every criterion for both detectors. In the harmful regime it turns net-harmful naive triggering into net benefit: ToN-IoT gain moves from $-$1.36 (KS-max) and $-$3.69 (QK-ZZ) points to +0.93 and +1.06, \textbf{significantly above naive triggering} (+2.30 points, CI95 [1.15, 3.63] for KS-max; +4.74, [2.47, 7.69] for QK-ZZ; Table~\ref{tab:table3_phase2_paired_ci}) and, notably, \textbf{significantly above no-adaptation itself} (+0.93, [0.53, 1.36]; +1.06, [0.77, 1.40]) --- the gate does not merely stop adapting, it commits the minority of beneficial adaptations while rejecting the harmful majority. In the benefit regime it preserves the full gain (PortScan +8.3/+8.4 points, statistically indistinguishable from naive), and it does not degrade the mixed regime. The label cost is small: roughly 100--160 labeled flows over a 100-window stream at budget 32.
 
 
@@ -225,41 +222,41 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 \subsection{Gate robustness (post-registration)}
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig5_label_budget_curve.png}
+\includegraphics[width=\textwidth]{docs/img/fig5_label_budget_curve.png}
 \caption{Label-efficiency frontier: gain over no-adaptation versus probe budget; a small probe suffices to avoid harm.}
 \label{fig:5}
-\end{figure}
+\end{figure*}
 Five extensions beyond the pre-registered design (explicitly labeled as robustness, not part of the confirmatory claim) probe the gate's limits. \emph{Label efficiency:} sweeping the probe budget from 8 to 128 flows (KS-max, 30 seeds; Fig.~\ref{fig:5}) shows the gate is remarkably label-cheap --- in the harmful regime even the smallest budget avoids harm, ~8 labeled flows per confirmed drift ($\approx$23 per stream) already lifting ToN-IoT gain from $-$1.36 (naive) to +0.38, plateauing near +1.1 by budget 32--64; benefit-regime gain is flat at every budget. A few dozen labels, not hundreds, suffice. \emph{Benefit breadth:} beyond PortScan the gate preserves --- and slightly improves --- the benefit in the two strongest benefit regimes, Wednesday (naive +15.39 $\to$ +16.32) and DDoS (naive +24.81 $\to$ +25.27), never sacrificing benefit where adaptation helps, across three benefit regimes.
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig7_label_latency.png}
+\includegraphics[width=\textwidth]{docs/img/fig7_label_latency.png}
 \caption{Gate robustness to label latency: safe with validation labels up to 20 windows stale.}
 \label{fig:7}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig8_probe_poison.png}
+\includegraphics[width=\textwidth]{docs/img/fig8_probe_poison.png}
 \caption{The gate fails safe under adversarial validation labels (up to 40\% flipped).}
 \label{fig:8}
-\end{figure}
+\end{figure*}
 \emph{Label latency:} the probe need not be current. Drawing it from traffic labeled up to 20 windows in the past (Fig.~\ref{fig:7}) leaves the gate safe and effective at every lag --- in the harmful regime the gate holds at +0.9 to +1.1 (vs naive $-$1.36) for lags of 5, 10 and 20 windows, and the benefit regimes are essentially unchanged --- so the method tolerates realistic labeling delay rather than requiring instantaneous labels. \emph{Harm breadth:} the net-harm of naive triggering (with the fragile SVC-RBF downstream) is not confined to one ToN-IoT regime --- it also appears in ToN-IoT DDoS (naive \textbf{$-$16.81}) and Injection ($-$1.21), and the gate converts all three to net-positive (+1.26, +0.80, +0.93). \emph{Cost knob:} raising the commit margin $\varepsilon$ from 0 to 0.01--0.02 cuts committed adaptations by ~30\% (e.g. PortScan 3.1$\to$2.2 commits) at equal downstream gain, giving a simple operating characteristic that trades update frequency for benefit. \emph{Adversarial validation labels:} because the gate trusts a labeled probe, we test an attacker (or faulty labeler) that flips a fraction of the probe labels (Fig.~\ref{fig:8}). The gate fails safe: even with 40\% of validation labels corrupted --- near the point where the probe is pure noise --- it still avoids harm and still matches-or-beats naive triggering in every regime (ToN-IoT degrades gracefully from +0.93 to +0.32 but never goes negative; benefit and mixed regimes are essentially unchanged). Label noise perturbs the deployed and candidate estimates symmetrically, so it moves the gate along the naive-to-oracle line without pushing it below the safe baseline. \emph{Significance of the safety claim.} Paired bootstrap CIs in the harm regime confirm the guarantee is not noise: the gate significantly outperforms naive triggering under every label-latency and every probe-poison level tested (CI95 excludes zero), and in no robustness condition --- across downstream models, latencies or poison levels --- is it significantly \emph{worse} than either naive triggering or no-adaptation. Where the gate is not significantly better than naive (the robust downstream models, where naive is already non-harmful), it is statistically indistinguishable from it, i.e. never worse.
 
 
 \subsection{Generalization across downstream classifiers}
 
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig6_downstream_generalization.png}
+\includegraphics[width=\textwidth]{docs/img/fig6_downstream_generalization.png}
 \caption{Generalization across four downstream classifiers: net-harm is specific to SVC-RBF; the gate is safe for all.}
 \label{fig:6}
-\end{figure}
-\input{tables/table6_downstream_generalization.tex}
+\end{figure*}
+\input{tables_ieee/table6_downstream_generalization.tex}
 To test whether the phenomenon and the solution depend on the downstream model, we repeat the three regimes with the KS-max trigger for four downstream classifiers --- SVC-RBF, random forest, logistic regression and MLP (20 seeds; Table~\ref{tab:table6_downstream_generalization}, Fig.~\ref{fig:6}). Three findings stand out, and we report them plainly because they refine the headline.
 
 
@@ -313,10 +310,10 @@ Adaptive network intrusion detection is usually framed as a detection problem: m
 
 
 
-\section*{Data availability}
+\section*{Data Availability}
 The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed here.
 Code and a reproducibility guide are released as a public artifact.
 
-\bibliographystyle{elsarticle-num}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}

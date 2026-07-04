@@ -1,15 +1,20 @@
-"""Convert the Markdown manuscript into a compilable Elsevier (elsarticle) LaTeX document.
+"""Convert the Markdown manuscript into a compilable LaTeX document.
 
-Ports Abstract + sections 1-8 to LaTeX, preserving \\cite{} commands, converting Markdown
-emphasis/headers/lists/code-fences and Unicode symbols to LaTeX, and injecting figure and table floats at
-their first in-text mention. Writes manuscript/main.tex. Requires the sanitized tables in
-manuscript/tables/ and the figures in docs/img/.
+Two targets:
+  elsevier (default) -> manuscript/main.tex        (elsarticle; ESWA / JISA fallbacks)
+  ieee               -> manuscript/main_ieee.tex   (IEEEtran; IEEE TNSM / TDSC primary target)
+
+Usage: python -m src.analysis.make_paper2_latex [elsevier|ieee]
+
+Ports Abstract + sections 1-8, preserves \\cite{}, converts Markdown/Unicode to LaTeX, and injects figure
+and table floats at their first in-text mention. Needs the tables in manuscript/tables{,_ieee}/ and figures
+in docs/img/.
 """
 from __future__ import annotations
 import re
+import sys
 
 MD = "manuscript/paper2_manuscript_draft_002.md"
-OUT = "manuscript/main.tex"
 
 FIGS = {
     "1":  ("docs/img/fig1_regime_spectrum.png",
@@ -31,10 +36,10 @@ FIGS = {
     "8":  ("docs/img/fig8_probe_poison.png",
            "The gate fails safe under adversarial validation labels (up to 40\\% flipped)."),
 }
-TABS = {
-    "1": "tables/table1_regime_taxonomy.tex", "2": "tables/table2_phase2_gate_summary.tex",
-    "3": "tables/table3_phase2_paired_ci.tex", "4": "tables/table4_oracle_regret.tex",
-    "5": "tables/table5_phase1_negative.tex", "6": "tables/table6_downstream_generalization.tex",
+TAB_FILES = {
+    "1": "table1_regime_taxonomy.tex", "2": "table2_phase2_gate_summary.tex",
+    "3": "table3_phase2_paired_ci.tex", "4": "table4_oracle_regret.tex",
+    "5": "table5_phase1_negative.tex", "6": "table6_downstream_generalization.tex",
 }
 TAB_LABEL = {
     "1": "tab:table1_regime_taxonomy", "2": "tab:table2_phase2_gate_summary",
@@ -78,30 +83,29 @@ def inline(t):
     return t
 
 
-def fig_float(n):
+def fig_float(n, env, width):
     path, cap = FIGS[n]
-    return (f"\n\\begin{{figure}}[t]\n\\centering\n\\includegraphics[width=\\linewidth]{{{path}}}\n"
-            f"\\caption{{{cap}}}\n\\label{{fig:{n}}}\n\\end{{figure}}\n")
+    return (f"\n\\begin{{{env}}}[t]\n\\centering\n\\includegraphics[width={width}]{{{path}}}\n"
+            f"\\caption{{{cap}}}\n\\label{{fig:{n}}}\n\\end{{{env}}}\n")
 
 
-def floats_for(block):
+def floats_for(block, env, width, tab_dir):
     out = ""
     for n in dict.fromkeys(re.findall(r"Figs?\.?~?\s*([0-9]+b?)", block)):
         if n in FIGS and n not in placed_figs:
-            placed_figs.add(n); out += fig_float(n)
+            placed_figs.add(n); out += fig_float(n, env, width)
     for n in dict.fromkeys(re.findall(r"Table~?\s*([0-9]+)", block)):
-        if n in TABS and n not in placed_tabs:
-            placed_tabs.add(n); out += f"\\input{{{TABS[n]}}}\n"
+        if n in TAB_FILES and n not in placed_tabs:
+            placed_tabs.add(n); out += f"\\input{{{tab_dir}/{TAB_FILES[n]}}}\n"
     return out
 
 
-def convert_body(md):
-    """Convert the section-1..8 body (a markdown string) to LaTeX."""
+def convert_body(md, env, width, tab_dir):
     lines = md.split("\n")
     out, i = [], 0
     while i < len(lines):
         ln = lines[i]
-        if ln.startswith("```"):  # code fence -> verbatim (Algorithm 1)
+        if ln.startswith("```"):
             out.append("\\begin{verbatim}")
             i += 1
             while i < len(lines) and not lines[i].startswith("```"):
@@ -110,37 +114,24 @@ def convert_body(md):
             i += 1
             continue
         if ln.startswith("### "):
-            title = re.sub(r"^###\s+\d[\w.]*\s*", "", ln).strip()
-            out.append("\n\\subsection{" + inline(title) + "}")
-            i += 1
-            continue
+            out.append("\n\\subsection{" + inline(re.sub(r"^###\s+\d[\w.]*\s*", "", ln).strip()) + "}")
+            i += 1; continue
         if ln.startswith("## "):
-            title = re.sub(r"^##\s+\d[\w.]*\s*", "", ln).strip()
-            out.append("\n\\section{" + inline(title) + "}")
-            i += 1
-            continue
-        if re.match(r"^\s*[-*]\s+", ln):  # bullet list
+            out.append("\n\\section{" + inline(re.sub(r"^##\s+\d[\w.]*\s*", "", ln).strip()) + "}")
+            i += 1; continue
+        if re.match(r"^\s*[-*]\s+", ln):
             out.append("\\begin{itemize}")
             while i < len(lines) and re.match(r"^\s*[-*]\s+", lines[i]):
-                item = re.sub(r"^\s*[-*]\s+", "", lines[i])
-                out.append("  \\item " + inline(item))
-                i += 1
-            out.append("\\end{itemize}")
-            continue
-        if re.match(r"^\s*\d+\.\s+", ln):  # numbered list
+                out.append("  \\item " + inline(re.sub(r"^\s*[-*]\s+", "", lines[i]))); i += 1
+            out.append("\\end{itemize}"); continue
+        if re.match(r"^\s*\d+\.\s+", ln):
             out.append("\\begin{enumerate}")
             while i < len(lines) and re.match(r"^\s*\d+\.\s+", lines[i]):
-                item = re.sub(r"^\s*\d+\.\s+", "", lines[i])
-                out.append("  \\item " + inline(item))
-                i += 1
-            out.append("\\end{enumerate}")
-            continue
+                out.append("  \\item " + inline(re.sub(r"^\s*\d+\.\s+", "", lines[i]))); i += 1
+            out.append("\\end{enumerate}"); continue
         if ln.strip() == "" or ln.strip() == "---":
-            out.append("")
-            i += 1
-            continue
-        # normal paragraph: inject floats for first mentions, then the text
-        out.append(floats_for(ln).rstrip("\n"))
+            out.append(""); i += 1; continue
+        out.append(floats_for(ln, env, width, tab_dir).rstrip("\n"))
         out.append(inline(ln))
         i += 1
     return "\n".join(out)
@@ -148,69 +139,107 @@ def convert_body(md):
 
 def section(md, start, end):
     a = md.index(start)
-    b = md.index(end, a)
-    return md[a:b]
+    return md[a:md.index(end, a)]
 
 
-def main():
-    md = open(MD, encoding="utf-8").read()
-    abstract_md = section(md, "## Abstract", "## Contributions").split("\n", 2)[2].strip()
-    abstract = inline(abstract_md.replace("\n", " "))
-    body_md = section(md, "## 1. Introduction", "## Main tables")
-    body = convert_body(body_md)
-
-    doc = r"""\documentclass[preprint,11pt]{elsarticle}
+ELSEVIER_HEAD = r"""\documentclass[preprint,11pt]{elsarticle}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\graphicspath{{../}}   % main.tex lives in manuscript/; figures are at repo-root docs/img/
+\graphicspath{{../}}
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
-
-\journal{Computers \& Security}
-
+\journal{IEEE Transactions on Network and Service Management (or Elsevier fallback)}
 \begin{document}
 \begin{frontmatter}
-
-\title{Validate Before Commit: Label-Efficient Safe Readaptation for\\
-Adaptive Network Intrusion Detection under Concept Drift}
-
+\title{__TITLE__}
 \author[a]{Roberto Fern\'andez Barrios\corref{cor}}
 \ead{roberto.fernandez.barrios@gmail.com}
 \cortext[cor]{Corresponding author.}
-% \author[a]{Co-Author Name}
 \affiliation[a]{organization={TODO: Affiliation}, country={TODO}}
-
 \begin{abstract}
-""" + abstract + r"""
+__ABSTRACT__
 \end{abstract}
-
-% Highlights are submitted as a separate file (see manuscript/highlights.md).
-
+% Highlights are submitted as a separate file (manuscript/highlights.md).
 \begin{keyword}
 adaptive intrusion detection \sep concept drift \sep safe model updating \sep
-label-efficient learning \sep retraining policy \sep network security
+label-efficient learning \sep retraining policy \sep network management
 \end{keyword}
-
 \end{frontmatter}
 
-""" + body + r"""
+"""
+
+IEEE_HEAD = r"""\documentclass[journal]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{../}}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\begin{document}
+\title{__TITLE__}
+\author{Roberto Fern\'andez Barrios%
+\thanks{R. Fern\'andez Barrios is with TODO: Affiliation (e-mail: roberto.fernandez.barrios@gmail.com).}}
+\markboth{IEEE Transactions on Network and Service Management}%
+{Fern\'andez Barrios: Validate Before Commit --- Label-Efficient Safe Readaptation for Adaptive NIDS}
+\maketitle
+\begin{abstract}
+__ABSTRACT__
+\end{abstract}
+\begin{IEEEkeywords}
+Adaptive intrusion detection, concept drift, safe model updating, label-efficient learning, retraining policy, network management.
+\end{IEEEkeywords}
+\IEEEpeerreviewmaketitle
+
+"""
+
+TITLE = "Validate Before Commit: Label-Efficient Safe Readaptation for\\\\ Adaptive Network Intrusion Detection under Concept Drift"
+
+TAIL_ELS = r"""
 
 \section*{Data availability}
-The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed
-here. Code and a reproducibility guide are released as a public artifact.
+The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed here.
+Code and a reproducibility guide are released as a public artifact.
 
 \bibliographystyle{elsarticle-num}
 \bibliography{references}
-
 \end{document}
 """
-    open(OUT, "w", encoding="utf-8").write(doc)
-    print("wrote", OUT)
-    print("figures placed:", sorted(placed_figs))
-    print("tables placed:", sorted(placed_tabs))
+
+TAIL_IEEE = r"""
+
+\section*{Data Availability}
+The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed here.
+Code and a reproducibility guide are released as a public artifact.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}
+"""
+
+
+def main():
+    target = (sys.argv[1] if len(sys.argv) > 1 else "elsevier").lower()
+    if target not in ("elsevier", "ieee"):
+        raise SystemExit("target must be 'elsevier' or 'ieee'")
+    if target == "ieee":
+        env, width, tab_dir, head, tail, out = "figure*", "\\textwidth", "tables_ieee", IEEE_HEAD, TAIL_IEEE, "manuscript/main_ieee.tex"
+    else:
+        env, width, tab_dir, head, tail, out = "figure", "\\linewidth", "tables", ELSEVIER_HEAD, TAIL_ELS, "manuscript/main.tex"
+
+    placed_figs.clear(); placed_tabs.clear()
+    md = open(MD, encoding="utf-8").read()
+    abstract = inline(section(md, "## Abstract", "## Contributions").split("\n", 2)[2].strip().replace("\n", " "))
+    body = convert_body(section(md, "## 1. Introduction", "## Main tables"), env, width, tab_dir)
+
+    doc = head.replace("__TITLE__", TITLE).replace("__ABSTRACT__", abstract) + body + tail
+    open(out, "w", encoding="utf-8").write(doc)
+    print("wrote", out, "| target:", target)
+    print("figures placed:", sorted(placed_figs), "| tables placed:", sorted(placed_tabs))
 
 
 if __name__ == "__main__":

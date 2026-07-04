@@ -20,15 +20,19 @@ CAP_PREFIX = re.compile(r"(\\caption\{)(?:Table \d+:\s*|Appendix Table:\s*)")
 
 def main():
     os.makedirs(DST, exist_ok=True)
+    os.makedirs(DST + "_ieee", exist_ok=True)
     for f in sorted(glob.glob(f"{SRC}/*.tex")):
         s = open(f, encoding="utf-8").read()
         for a, b in REPL:
             s = s.replace(a, b)
         s = CAP_PREFIX.sub(r"\1", s)
         s = s.replace(r"\begin{tabular}", "\\small\n\\begin{tabular}")  # keep wide tables in the margin
-        out = os.path.join(DST, os.path.basename(f))
-        open(out, "w", encoding="utf-8").write(s)
-        print("wrote", out)
+        base = os.path.basename(f)
+        open(os.path.join(DST, base), "w", encoding="utf-8").write(s)
+        # IEEE two-column: span both columns with table*
+        ieee = s.replace(r"\begin{table}", r"\begin{table*}").replace(r"\end{table}", r"\end{table*}")
+        open(os.path.join(DST + "_ieee", base), "w", encoding="utf-8").write(ieee)
+        print("wrote", base, "(elsevier + ieee)")
     # verify ascii-clean
     bad = {}
     for f in glob.glob(f"{DST}/*.tex"):
