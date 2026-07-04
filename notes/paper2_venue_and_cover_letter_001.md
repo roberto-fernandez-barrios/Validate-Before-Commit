@@ -1,5 +1,14 @@
 # Target venue, framing strategy, and cover-letter draft
 
+> **⚠ SUPERSEDED (2026-07): Computers & Security is RULED OUT.** Its Guide for Authors states an explicit
+> moratorium (since early 2024) on submissions that "feature AI or ML as significant components"; "applying an
+> AI/ML technique to system security ... will not be considered." Our paper is exactly that, so C&S would
+> desk-reject it. The v1 deep-research pick and the cover-letter draft below (addressed to C&S) are retained
+> only for the framing strategy, which mostly transfers. Re-target via `paper2_journal_search_prompt_002.md`
+> (ML-for-security aware). Leading replacement candidates: Expert Systems with Applications / Engineering
+> Applications of AI (applied-ML Q1), IEEE TNSM (security-ML Q1, operational reframe), JISA (fallback).
+
+
 Based on the deep-research venue search (2026-07). Full shortlist and metrics kept there; this note records
 the decision and the submission assets.
 
