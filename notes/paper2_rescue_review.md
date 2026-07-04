@@ -1,6 +1,5 @@
 # Paper 2 Rescue Review — QK-MMD Drift Detection in Adaptive IDS
 
-**Reviewer:** Claude Sonnet 4.6  
 **Date:** 2026-06-23  
 **Branch:** paper2-qkmmd-drift  
 **Scope:** Full repository audit — notes, scripts, result CSVs — for Q1 submission readiness
@@ -312,7 +311,7 @@ Target: IEEE TDSC or Computers & Security (Elsevier, CiteScore ~9). Before submi
 - Multiple notes checkpoints (previous session)
 
 **Files created this session:**
-- `notes/claude_paper2_rescue_review.md` — this file
+- `notes/paper2_rescue_review.md` — this file
 
 **No experiments were run. No existing files were modified. No commits were made.**
 

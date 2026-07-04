@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from scipy.stats import energy_distance, ks_2samp
 from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score, f1_score
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
@@ -137,13 +140,20 @@ def transform_X(X: np.ndarray, scaler: StandardScaler, pca: PCA | None) -> np.nd
     return Xs
 
 
-def train_svc(X: np.ndarray, y: np.ndarray, seed: int) -> SVC:
-    model = SVC(
-        kernel="rbf",
-        gamma="scale",
-        class_weight="balanced",
-        random_state=seed,
-    )
+def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf"):
+    """Fit the downstream classifier. Name kept for backward compatibility."""
+    if model_type == "svc_rbf":
+        model = SVC(kernel="rbf", gamma="scale", class_weight="balanced", random_state=seed)
+    elif model_type == "random_forest":
+        model = RandomForestClassifier(
+            n_estimators=200, class_weight="balanced", random_state=seed, n_jobs=-1
+        )
+    elif model_type == "logreg":
+        model = LogisticRegression(class_weight="balanced", max_iter=1000, random_state=seed)
+    elif model_type == "mlp":
+        model = MLPClassifier(hidden_layer_sizes=(64,), max_iter=300, random_state=seed)
+    else:
+        raise ValueError(f"Unknown downstream model: {model_type}")
     model.fit(X, y)
     return model
 
@@ -436,6 +446,9 @@ def run_strategy(
     n_adaptations = 0
     false_adaptations = 0
     adaptation_windows: list[int] = []
+    n_triggers = 0
+    n_gate_rejections = 0
+    labels_used_total = 0
 
     window_rows = []
     detector_runtime_sec_total = 0.0
@@ -476,15 +489,13 @@ def run_strategy(
         trigger = bool(trigger_condition and cooldown_remaining <= 0)
 
         adapted_now = False
+        gate_evaluated = False
 
         if trigger:
-            n_adaptations += 1
-            adaptation_windows.append(t)
-            adapted_now = True
+            n_triggers += 1
+            gate_evaluated = True
 
-            if sev_t < args.false_adaptation_severity_threshold:
-                false_adaptations += 1
-
+            # Build a CANDIDATE model on a freshly sampled adapt set (true labels).
             Xa_raw, ya = sample_balanced_from_distribution(
                 pools,
                 n_per_class=args.adapt_size_per_class,
@@ -494,20 +505,60 @@ def run_strategy(
             Xa = transform_X(Xa_raw, scaler, pca)
 
             fit_start = time.perf_counter()
-            current_model = train_svc(Xa, ya, seed + t + 1)
+            candidate_model = train_svc(Xa, ya, seed + t + 1, args.downstream_model)
             fit_runtime_sec_total += time.perf_counter() - fit_start
 
-            # Reset detector reference to the current adapted regime.
-            detector = build_detector(method, args, seed + t + 1)
-            detector, threshold = calibrate_detector(
-                detector,
-                pools,
-                scaler,
-                pca,
-                severity=sev_t,
-                args=args,
-                rng=rng,
-            )
+            # Safe/cost-aware gate: decide whether to COMMIT (deploy) the candidate.
+            commit = True
+            gate = args.adaptation_gate
+            if gate == "labeled_probe":
+                n_probe = max(1, args.probe_size // 2)
+                # Realistic label latency: the probe comes from traffic labeled `probe_lag`
+                # windows ago (its severity), not from the current window.
+                probe_sev = progressive_severity(max(0, t - args.probe_lag), args)
+                Xp_raw, yp = sample_balanced_from_distribution(
+                    pools, n_per_class=n_probe, severity=probe_sev, rng=rng,
+                )
+                Xp = transform_X(Xp_raw, scaler, pca)
+                # Adversarial / noisy probe: an attacker (or faulty labeler) flips a
+                # fraction of the validation labels the gate relies on.
+                if args.probe_poison > 0.0:
+                    flip = rng.random(len(yp)) < args.probe_poison
+                    yp = np.where(flip, 1 - yp, yp)
+                ba_dep = evaluate_model(current_model, Xp, yp)["balanced_accuracy"]
+                ba_cand = evaluate_model(candidate_model, Xp, yp)["balanced_accuracy"]
+                commit = bool(ba_cand >= ba_dep + args.gate_margin)
+                labels_used_total += len(yp)
+            elif gate == "unsup_disagree":
+                pred_dep = current_model.predict(Xw)
+                pred_cand = candidate_model.predict(Xw)
+                disagree = float(np.mean(pred_dep != pred_cand))
+                commit = bool(disagree >= args.gate_disagree_threshold)
+            elif gate != "none":
+                raise ValueError(f"Unknown adaptation gate: {gate}")
+
+            if commit:
+                n_adaptations += 1
+                adaptation_windows.append(t)
+                adapted_now = True
+                if sev_t < args.false_adaptation_severity_threshold:
+                    false_adaptations += 1
+                current_model = candidate_model
+                # Reset detector reference to the current adapted regime.
+                detector = build_detector(method, args, seed + t + 1)
+                detector, threshold = calibrate_detector(
+                    detector,
+                    pools,
+                    scaler,
+                    pca,
+                    severity=sev_t,
+                    args=args,
+                    rng=rng,
+                )
+            else:
+                # Gate rejected: keep deployed model AND detector reference so that a
+                # later window can re-propose once drift becomes actionable.
+                n_gate_rejections += 1
 
             alarm_history = []
             cooldown_remaining = args.cooldown_windows
@@ -532,6 +583,7 @@ def run_strategy(
                 "threshold": threshold,
                 "alarm": alarm,
                 "trigger": trigger,
+                "gate_evaluated": gate_evaluated,
                 "adapted_now": adapted_now,
                 "cooldown_remaining": cooldown_remaining,
                 "balanced_accuracy": eval_metrics["balanced_accuracy"],
@@ -546,8 +598,17 @@ def run_strategy(
     summary = {
         "seed": seed,
         "method": method,
+        "downstream_model": args.downstream_model,
         "n_windows": args.post_windows,
         "n_adaptations": n_adaptations,
+        "n_triggers": n_triggers,
+        "n_gate_rejections": n_gate_rejections,
+        "labels_used_total": labels_used_total,
+        "adaptation_gate": args.adaptation_gate,
+        "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
+        "probe_lag": args.probe_lag if args.adaptation_gate == "labeled_probe" else 0,
+        "probe_poison": args.probe_poison if args.adaptation_gate == "labeled_probe" else 0.0,
+        "gate_margin": args.gate_margin if args.adaptation_gate == "labeled_probe" else 0.0,
         "false_adaptations": false_adaptations,
         "first_adaptation_window": adaptation_windows[0] if adaptation_windows else np.nan,
         "mean_balanced_accuracy": float(df["balanced_accuracy"].mean()),
@@ -599,6 +660,26 @@ def main() -> None:
     parser.add_argument("--cooldown-windows", type=int, default=10)
     parser.add_argument("--false-adaptation-severity-threshold", type=float, default=0.1)
 
+    # Safe/cost-aware adaptation gate (Phase 2): validate a candidate before committing.
+    parser.add_argument(
+        "--adaptation-gate",
+        type=str,
+        default="none",
+        choices=["none", "labeled_probe", "unsup_disagree"],
+    )
+    parser.add_argument("--probe-size", type=int, default=64)
+    parser.add_argument("--probe-lag", type=int, default=0)
+    parser.add_argument("--probe-poison", type=float, default=0.0)
+    parser.add_argument("--gate-margin", type=float, default=0.0)
+    parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
+
+    parser.add_argument(
+        "--downstream-model",
+        type=str,
+        default="svc_rbf",
+        choices=["svc_rbf", "random_forest", "logreg", "mlp"],
+    )
+
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--n-permutations", type=int, default=100)
 
@@ -639,7 +720,7 @@ def main() -> None:
 
         scaler, pca, X_train = fit_transformer(X_train_raw, args.dim, seed)
 
-        initial_model = train_svc(X_train, y_train, seed)
+        initial_model = train_svc(X_train, y_train, seed, args.downstream_model)
 
         no_adapt_rows = []
 

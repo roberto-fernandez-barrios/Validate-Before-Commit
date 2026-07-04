@@ -316,7 +316,7 @@ Do not launch more CICIDS2017 experiments immediately.
 
 First:
 
-1. Ask Claude/reviewer to evaluate this updated checkpoint.
+1. Ask a reviewer to evaluate this updated checkpoint.
 2. Decide whether the target is Q2-now or Q1-later.
 3. If Q1-later, start an external dataset smoke, preferably UNSW-NB15 if available.
 4. If Q2-now, start writing the manuscript from the storyline.
@@ -330,8 +330,8 @@ Important notes:
 - notes/paper2_director_summary_001.md
 - notes/paper2_storyline_001.md
 - notes/paper2_second_dataset_plan_001.md
-- notes/claude_paper2_next_steps_review.md
-- notes/claude_paper2_rescue_review.md
+- notes/paper2_next_steps_review.md
+- notes/paper2_rescue_review.md
 - notes/paper2_feature_map_sensitivity_protocol_001.md
 - notes/paper2_feature_map_sensitivity_checkpoint_001.md
 - notes/paper2_thursday_webattacks_checkpoint_001.md

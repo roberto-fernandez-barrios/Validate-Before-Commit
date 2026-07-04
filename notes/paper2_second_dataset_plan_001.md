@@ -1,6 +1,5 @@
 # Paper 2 — Plan para Segundo Dataset
 
-**Prepared by:** Claude Sonnet 4.6  
 **Date:** 2026-06-26  
 **Estado del repositorio:** Solo CICIDS2017 disponible en `data/raw/`. No hay UNSW-NB15 ni CIC-IDS2018 descargados.
 

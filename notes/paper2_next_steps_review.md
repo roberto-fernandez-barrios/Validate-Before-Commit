@@ -1,6 +1,5 @@
 # Paper 2 — Next Steps Review
 
-**Reviewer:** Claude Sonnet 4.6  
 **Date:** 2026-06-26  
 **Branch:** paper2-expensive-downstream  
 **Postura:** Revisor Q1 escéptico
@@ -60,7 +59,7 @@ Esta versión es más larga pero cierra los tres ataques principales: dataset ú
 | `notes/paper2_director_summary_001.md` | Resumen para director: objetivo, experimentos por pregunta, resultados positivos/negativos, claim defendible, limitaciones, recomendación de venue y siguiente paso. |
 | `notes/paper2_storyline_001.md` | Estructura completa del paper: qué entra en cada sección, qué se corta, mapa resultado→sección. |
 | `notes/paper2_second_dataset_plan_001.md` | Plan detallado para segundo dataset: evaluación UNSW-NB15 vs CIC-IDS2018, escenarios, preprocesamiento, smoke test, comandos exactos, riesgos. |
-| `notes/claude_paper2_next_steps_review.md` | Este documento. |
+| `notes/paper2_next_steps_review.md` | Este documento. |
 
 ---
 
