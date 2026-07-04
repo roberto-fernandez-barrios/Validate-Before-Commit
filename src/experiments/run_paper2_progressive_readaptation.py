@@ -513,8 +513,11 @@ def run_strategy(
             gate = args.adaptation_gate
             if gate == "labeled_probe":
                 n_probe = max(1, args.probe_size // 2)
+                # Realistic label latency: the probe comes from traffic labeled `probe_lag`
+                # windows ago (its severity), not from the current window.
+                probe_sev = progressive_severity(max(0, t - args.probe_lag), args)
                 Xp_raw, yp = sample_balanced_from_distribution(
-                    pools, n_per_class=n_probe, severity=sev_t, rng=rng,
+                    pools, n_per_class=n_probe, severity=probe_sev, rng=rng,
                 )
                 Xp = transform_X(Xp_raw, scaler, pca)
                 ba_dep = evaluate_model(current_model, Xp, yp)["balanced_accuracy"]
@@ -598,6 +601,8 @@ def run_strategy(
         "labels_used_total": labels_used_total,
         "adaptation_gate": args.adaptation_gate,
         "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
+        "probe_lag": args.probe_lag if args.adaptation_gate == "labeled_probe" else 0,
+        "gate_margin": args.gate_margin if args.adaptation_gate == "labeled_probe" else 0.0,
         "false_adaptations": false_adaptations,
         "first_adaptation_window": adaptation_windows[0] if adaptation_windows else np.nan,
         "mean_balanced_accuracy": float(df["balanced_accuracy"].mean()),
@@ -657,6 +662,7 @@ def main() -> None:
         choices=["none", "labeled_probe", "unsup_disagree"],
     )
     parser.add_argument("--probe-size", type=int, default=64)
+    parser.add_argument("--probe-lag", type=int, default=0)
     parser.add_argument("--gate-margin", type=float, default=0.0)
     parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
 
