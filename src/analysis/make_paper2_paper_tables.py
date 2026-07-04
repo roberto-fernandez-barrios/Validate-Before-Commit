@@ -144,9 +144,32 @@ def t5_phase1_negative():
          "Appendix Table: Pre-registered simple policies (k-of-n confirmation, cooldown) do not prevent harmful adaptation. Best safe policy per regime vs. no-adaptation and legacy; negative adaptation-reduction means MORE adaptations than legacy. Criteria A (benefit) and B (harm) fail.")
 
 
+def t6_downstream_generalization():
+    f = "results/tables/paper2_phase2c_downstream_generalization_001/paper2_downstream_generalization.csv"
+    if not os.path.exists(f):
+        return
+    d = pd.read_csv(f)
+    dorder = {"svc_rbf": 0, "random_forest": 1, "logreg": 2, "mlp": 3}
+    rorder = {"portscan": 0, "unsw_recon": 1, "ton_scanning": 2}
+    d = d.assign(do=d.downstream.map(dorder), ro=d.regime.map(rorder)).sort_values(["do", "ro"])
+    dn = {"svc_rbf": "SVC-RBF", "random_forest": "Random Forest", "logreg": "LogReg", "mlp": "MLP"}
+    out = pd.DataFrame({
+        "Downstream": d["downstream"].map(dn),
+        "Regime": d["regime"].map(RNAME),
+        "No-adapt BA": pct1(d["noadapt_BA"]),
+        "Naive gain": d["naive_gain"].round(2),
+        "Gate gain": d["gate_gain"].round(2),
+        "Harm (naive<no-adapt)": d["harm_reproduced"].map({True: "yes", False: "no"}),
+        "Gate avoids harm": d["gate_avoids_harm"].map({True: "yes", False: "no"}),
+    })
+    emit("table6_downstream_generalization", out,
+         "Table 6: Generalization across downstream classifiers (KS-max, 20 seeds; SVC-RBF at 30). Net-harm (naive below no-adaptation) appears only for SVC-RBF on ToN-IoT; the mechanism law and the gate's safety hold for all four models.")
+
+
 if __name__ == "__main__":
     t1_taxonomy()
     t2_gate_summary()
     t3_gate_ci()
     t4_oracle_regret()
     t5_phase1_negative()
+    t6_downstream_generalization()
