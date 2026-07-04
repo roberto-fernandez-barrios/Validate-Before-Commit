@@ -115,10 +115,47 @@ def main():
         fig.savefig(f"{OUTF}/fig7_label_latency.pdf", bbox_inches="tight")
         plt.close(fig)
 
+    # ---- D: adversarial / noisy probe (poisoned validation labels) ----
+    rowsD = []
+    for reg in CORE:
+        na, naive = _base(reg)
+        for pois, tag in [(0.0, None), (0.1, "10"), (0.2, "20"), (0.4, "40")]:
+            if tag is None:
+                p = f"{RAW}/paper2_phase2_{reg}_ks_max_lp32/paper2_progressive_readaptation_by_seed.csv"
+            else:
+                p = f"{RAW}/paper2_phase2g_{reg}_poison{tag}/paper2_progressive_readaptation_by_seed.csv"
+            g, commits = _gain(p, na)
+            if g is None:
+                continue
+            rowsD.append(dict(regime=reg, probe_poison=pois, gate_gain=round(g, 2),
+                              naive_gain=round((naive - na) * 100, 2), commits=round(commits, 2),
+                              still_beats_naive=bool(g >= (naive - na) * 100 - EPS * 100),
+                              avoids_harm=bool(g >= -EPS * 100)))
+    D = pd.DataFrame(rowsD)
+    D.to_csv(f"{OUT}/paper2_gate_probe_poison.csv", index=False)
+    if len(D):
+        fig, ax = plt.subplots(figsize=(6, 3.8))
+        for reg in CORE:
+            d = D[D.regime == reg].sort_values("probe_poison")
+            if len(d):
+                ax.plot(d["probe_poison"] * 100, d["gate_gain"], "-o", color=RCOLOR[reg], label=RLABEL[reg], ms=5)
+                nv = D[(D.regime == reg) & (D.probe_poison == 0)]["naive_gain"]
+                if len(nv):
+                    ax.axhline(float(nv.iloc[0]), color=RCOLOR[reg], ls=":", lw=1, alpha=0.6)
+        ax.axhline(0, color="k", lw=0.8)
+        ax.set_xlabel("Poisoned probe labels (%)")
+        ax.set_ylabel("Gate gain vs no-adaptation (BA pts)")
+        ax.set_title("Gate under adversarial validation labels (dotted = naive)")
+        ax.legend(fontsize=8)
+        fig.savefig(f"{OUTF}/fig8_probe_poison.png", dpi=200, bbox_inches="tight")
+        fig.savefig(f"{OUTF}/fig8_probe_poison.pdf", bbox_inches="tight")
+        plt.close(fig)
+
     pd.set_option("display.width", 200)
     print("=== A: label latency ===\n", A.to_string(index=False))
     print("\n=== B: extra harm regimes (ToN-IoT DDoS/Injection, SVC) ===\n", B.to_string(index=False))
     print("\n=== C: commit-margin sweep ===\n", C.to_string(index=False))
+    print("\n=== D: adversarial/noisy probe ===\n", D.to_string(index=False))
 
 
 if __name__ == "__main__":

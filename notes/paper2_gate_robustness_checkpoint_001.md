@@ -37,6 +37,24 @@ Raising ε from 0 reduces commits at ~equal gain (operating characteristic):
 
 → ε≈0.01–0.02 is a sweet spot: ~30% fewer adaptations at equal benefit. The gate is a tunable policy.
 
+## D — Adversarial / noisy validation labels (Phase 2g) ✓ ELEVATES (security angle)
+An attacker (or faulty labeler) flips a fraction of the probe labels the gate trusts. Gate gain vs
+no-adaptation (SVC, KS, lp32, 20 seeds), `--probe-poison`:
+
+| regime | 0% | 10% | 20% | 40% | naive |
+|---|---:|---:|---:|---:|---:|
+| PortScan | +8.27 | +8.23 | +8.07 | +7.81 | +7.79 |
+| UNSW Recon | +1.13 | +1.36 | +1.24 | +1.06 | +0.92 |
+| ToN-IoT (harm) | +0.93 | +0.88 | +0.89 | +0.32 | −1.36 |
+
+→ **Fails safe.** `still_beats_naive` and `avoids_harm` = True in all 12 cells. Even at 40% flipped labels
+(near pure-noise 50%), the gate never goes negative and never below naive; ToN-IoT degrades gracefully
+(+0.93→+0.32). Label noise perturbs deployed and candidate BA estimates symmetrically, moving the gate
+along the naive→oracle line without pushing it below the safe baseline. This is a security-venue-aligned
+property ("safe readaptation under adversarial supervision") — elevates, not just defends. (Fig 8.)
+
+Also: mechanism law strengthened — pooled r=−0.82, CI95 [−0.95,−0.59] over 16 model×regime points (Fig 2b).
+
 ## Manuscript integration (done)
 Folded into §5.6 "Gate robustness (post-registration)" (5 bullets: label efficiency, benefit breadth,
 label latency, harm breadth, cost knob) + Fig 7; abstract + limitations updated (latency now modeled).
