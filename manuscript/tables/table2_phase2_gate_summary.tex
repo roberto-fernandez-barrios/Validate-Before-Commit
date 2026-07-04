@@ -1,0 +1,36 @@
+\begin{table}[t]
+\centering
+\caption{Phase 2 gate (30 seeds). The labeled-probe gate preserves benefit, avoids harm, and beats naive triggering; the zero-label variant fails.}
+\label{tab:table2_phase2_gate_summary}
+\small
+\begin{tabular}{lllllll}
+\toprule
+Regime & Detector & Policy & BA (\%) & Gain (pts) & Commits & Labels \\
+\midrule
+PortScan (benefit) & KS-max & gate-32 & 94.35 & 8.27 & 3.1 & 120 \\
+PortScan (benefit) & KS-max & gate-64 & 94.44 & 8.35 & 3.0 & 258 \\
+PortScan (benefit) & KS-max & naive & 93.87 & 7.79 & 3.5 & 0 \\
+PortScan (benefit) & KS-max & unsup-0 & 91.76 & 5.68 & 0.8 & 0 \\
+PortScan (benefit) & QK-ZZ & gate-32 & 94.46 & 8.37 & 3.8 & 157 \\
+PortScan (benefit) & QK-ZZ & gate-64 & 94.49 & 8.4 & 3.6 & 322 \\
+PortScan (benefit) & QK-ZZ & naive & 93.96 & 7.88 & 4.3 & 0 \\
+PortScan (benefit) & QK-ZZ & unsup-0 & 91.43 & 5.35 & 0.9 & 0 \\
+UNSW Recon (mixed) & KS-max & gate-32 & 84.59 & 1.13 & 2.6 & 101 \\
+UNSW Recon (mixed) & KS-max & gate-64 & 84.69 & 1.24 & 2.4 & 226 \\
+UNSW Recon (mixed) & KS-max & naive & 84.37 & 0.92 & 2.7 & 0 \\
+UNSW Recon (mixed) & KS-max & unsup-0 & 83.56 & 0.11 & 0.2 & 0 \\
+UNSW Recon (mixed) & QK-ZZ & gate-32 & 84.48 & 1.02 & 2.3 & 99 \\
+UNSW Recon (mixed) & QK-ZZ & gate-64 & 84.64 & 1.19 & 2.3 & 188 \\
+UNSW Recon (mixed) & QK-ZZ & naive & 84.46 & 1.0 & 2.7 & 0 \\
+UNSW Recon (mixed) & QK-ZZ & unsup-0 & 83.61 & 0.16 & 0.1 & 0 \\
+ToN-IoT (harm) & KS-max & gate-32 & 93.16 & 0.93 & 2.2 & 108 \\
+ToN-IoT (harm) & KS-max & gate-64 & 93.31 & 1.08 & 2.0 & 211 \\
+ToN-IoT (harm) & KS-max & naive & 90.86 & -1.36 & 2.6 & 0 \\
+ToN-IoT (harm) & KS-max & unsup-0 & 87.28 & -4.95 & 1.0 & 0 \\
+ToN-IoT (harm) & QK-ZZ & gate-32 & 93.28 & 1.06 & 2.4 & 117 \\
+ToN-IoT (harm) & QK-ZZ & gate-64 & 93.28 & 1.05 & 2.1 & 248 \\
+ToN-IoT (harm) & QK-ZZ & naive & 88.54 & -3.68 & 2.9 & 0 \\
+ToN-IoT (harm) & QK-ZZ & unsup-0 & 86.96 & -5.26 & 1.0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
