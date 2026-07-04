@@ -1,9 +1,8 @@
 # Paper 2 — Manuscript Skeleton (phenomenon-framed, ready to write)
 
-**Prepared by:** Claude (Opus 4.8)
 **Date:** 2026-07-01
 **Purpose:** Turn the recommended Route-1 story into a section-by-section writing guide. For each section: its narrative beat, the exact table/figure with source path, the key numbers to state, and draft bridge prose you can lift directly.
-**Companion notes:** `claude_paper2_final_salvage_review_001.md` (decision), `paper2_storyline_001.md` (earlier structure to cannibalize).
+**Companion notes:** `paper2_final_salvage_review_001.md` (decision), `paper2_storyline_001.md` (earlier structure to cannibalize).
 
 **Spine (put on a sticky note):**
 > Drift detectors answer *"did the distribution change?"*; adaptive IDS needs *"will retraining improve the classifier?"*. These are different questions. The gap between them makes drift-triggered readaptation range from strongly beneficial to actively harmful — and it is invisible to the detector, classical or quantum.

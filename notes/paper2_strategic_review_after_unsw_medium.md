@@ -1,6 +1,5 @@
 # Paper 2 — Strategic Review After UNSW-NB15 Medium
 
-**Prepared by:** Claude Sonnet 4.6  
 **Date:** 2026-06-29  
 **Branch:** paper2-expensive-downstream  
 **Trigger:** UNSW-NB15 medium (10 seeds, 100 windows, DoS + Reconnaissance) completed

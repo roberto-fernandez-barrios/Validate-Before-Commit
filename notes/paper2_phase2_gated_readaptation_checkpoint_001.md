@@ -1,6 +1,5 @@
 # Paper 2 — Phase 2 Gated Readaptation: Results Checkpoint
 
-**Prepared by:** Claude (Opus 4.8) · **Date:** 2026-07-01
 **Protocol:** pre-registered in `paper2_phase2_gated_readaptation_preregistration_001.md` (locked before this confirmatory run).
 **Verdict:** **PHASE 2 PASSES.** `results/tables/paper2_phase2_gated_readaptation_001/paper2_phase2_verdict.json` → `PHASE2_PASSES = true`, both detectors.
 

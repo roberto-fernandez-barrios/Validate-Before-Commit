@@ -1,6 +1,5 @@
 # Paper 2 — Safe-Readaptation Rescue Review
 
-**Prepared by:** Claude (Opus 4.8)
 **Date:** 2026-06-29
 **Branch:** paper2-expensive-downstream
 **Trigger:** Final external results in (UNSW-NB15 mixed, ToN-IoT Q1-gate failed). Request for a brutally honest, anti-anchored strategic review before committing to (or rejecting) a safe/cost-aware readaptation pivot.

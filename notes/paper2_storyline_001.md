@@ -1,6 +1,5 @@
 # Paper 2 — Storyline Propuesta
 
-**Prepared by:** Claude Sonnet 4.6  
 **Date:** 2026-06-26  
 **Objetivo:** Definir una estructura de paper coherente que evite el efecto "cúmulo de experimentos"
 

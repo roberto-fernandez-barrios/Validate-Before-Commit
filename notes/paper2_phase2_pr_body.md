@@ -56,4 +56,3 @@ net-harm is downstream-specific (stated); the confirmatory set is three regimes 
 - [ ] Convert Markdown → venue LaTeX (pandoc handles `\cite{}` + `references.bib`); adjust to author voice.
 - [ ] Optional: secondary appendix tables (feature-map, UNSW/ToN full).
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)

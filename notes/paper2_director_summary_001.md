@@ -1,6 +1,5 @@
 # Paper 2 — Director Summary
 
-**Prepared by:** Claude Sonnet 4.6  
 **Date:** 2026-06-26  
 **Branch:** paper2-expensive-downstream  
 **Status:** Pre-submission review — single dataset completed, second dataset pending

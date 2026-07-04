@@ -1,6 +1,5 @@
 # Paper 2 — Q1 Audit + Mechanism Law
 
-**Prepared by:** Claude (Opus 4.8) · **Date:** 2026-07-01
 **Trigger:** Two questions from the student: (1) does the oracle-regret / decision-framing work unlock Q1? (2) symmetrically to the naive-oracle trap I caught, could a *hidden* methodological flaw be *concealing* a Q1?
 **Method:** ran real audits on existing data (no new experiments), plus a code read of the retraining procedure.
 
@@ -64,7 +63,7 @@ Code (`run_paper2_progressive_readaptation.py:488–497`): on trigger, the model
 
 **Revised probabilities:** Q2 ~75–80% (up). Q1 as-is ~20–25% (up from ~10–20%, thanks to the mechanism law). Q1 ~40–50% **iff** a label-efficient decision policy works (see §4).
 
-*(This is a genuine, honest update to the flat "Q1 dead" in `claude_paper2_final_salvage_review_001.md` §2. The student's Socratic push was correct: the mechanism law is a real, general contribution that narrows the gap.)*
+*(This is a genuine, honest update to the flat "Q1 dead" in `paper2_final_salvage_review_001.md` §2. The student's Socratic push was correct: the mechanism law is a real, general contribution that narrows the gap.)*
 
 ---
 

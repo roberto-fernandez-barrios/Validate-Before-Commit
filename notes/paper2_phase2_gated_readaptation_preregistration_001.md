@@ -1,6 +1,5 @@
 # Paper 2 — Phase 2 Pre-Registration: Label-Efficient Gated Readaptation
 
-**Prepared by:** Claude (Opus 4.8) · **Date:** 2026-07-01
 **Status:** PRE-REGISTERED before the confirmatory run. Pipeline validated by smoke (energy detector, 3 seeds, 40 windows); this document locks the confirmatory design, success criteria, and stop rule BEFORE running the confirmatory seeds/detectors.
 **Motivation:** The mechanism law (`corr(base no-adapt BA, adaptation benefit) = −0.894`, see `paper2_q1_audit_and_mechanism_001.md`) says adaptation helps iff the deployed model has degraded. Phase 1's k-of-n/cooldown heuristics failed because they act on *distribution change*, not *model degradation*. Phase 2 tests a policy that gates adaptation on an explicit estimate of whether the candidate model is actually better — a **validate-before-commit** gate.
 

@@ -1,6 +1,5 @@
 # Paper 2 — Strategic Review After Thursday WebAttacks
 
-**Prepared by:** Claude Sonnet 4.6  
 **Date:** 2026-06-26  
 **Branch:** paper2-expensive-downstream  
 **Trigger:** Thursday WebAttacks final results + global checkpoint 005 completed
