@@ -7,6 +7,8 @@
 ![pre-registered](https://img.shields.io/badge/protocol-pre--registered-important)
 ![python](https://img.shields.io/badge/python-3.11-blue)
 
+![Graphical abstract](docs/img/graphical_abstract.png)
+
 Machine-learning intrusion detectors degrade under network **concept drift**, so adaptive systems retrain their
 classifiers. The field treats *when to retrain* as a **drift-detection** problem: fire a monitor, retrain on
 the alarm. This repository shows that framing is incomplete and sometimes harmful — and provides a small,
