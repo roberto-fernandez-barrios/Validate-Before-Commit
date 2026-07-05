@@ -8,9 +8,9 @@
 
 **Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift**
 
-*(Alternative hook, author's choice: "Knowing When Not to Retrain: …". Target venue: IEEE Transactions on Network and Service Management (TNSM); fallbacks TDSC / Expert Systems with Applications. See `notes/paper2_venue_decision_002.md`.)*
+*(Alternative hook, author's choice: "Knowing When Not to Retrain: …". Target venue: Knowledge-Based Systems (Elsevier); parallels Engineering Applications of AI / Expert Systems with Applications; security-branded backup IEEE TDSC. See `notes/paper2_venue_decision_003.md`.)*
 
-**Keywords:** adaptive intrusion detection; concept drift; safe model updating; label-efficient learning; retraining policy; network management.
+**Keywords:** concept drift; intelligent decision support; safe model updating; label-efficient learning; machine learning; intrusion detection.
 
 ## Abstract
 

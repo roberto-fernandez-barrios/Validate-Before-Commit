@@ -5,8 +5,11 @@ bibliography (`references.bib`), the six result tables (`tables/*.tex`), and the
 via `\graphicspath{{../}}`).
 
 ## Two targets
-- **`main_ieee.tex` (IEEEtran)** — primary target: **IEEE TNSM** (two-column, `figure*`/`table*`).
-- **`main.tex` (elsarticle)** — fallback: Expert Systems with Applications / JISA (single-column).
+- **`main.tex` (elsarticle)** — **primary: Knowledge-Based Systems** (Elsevier; single-column, numbered refs
+  via `elsarticle-num`; parallels ESWA / EAAI).
+- **`main_ieee.tex` (IEEEtran)** — security-branded backup: **IEEE TDSC** (two-column, `figure*`/`table*`).
+
+See `notes/paper2_venue_decision_003.md` for the venue decision, guide compliance, and the length caveat.
 
 ## Regenerate the LaTeX from source
 ```bash
