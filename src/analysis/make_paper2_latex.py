@@ -157,32 +157,50 @@ def section(md, start, end):
     return md[a:md.index(end, a)]
 
 
-ELSEVIER_HEAD = r"""\documentclass[preprint,11pt]{elsarticle}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\graphicspath{{../}}
-\usepackage{booktabs}
-\usepackage{amsmath,amssymb}
-\usepackage{xcolor}
-\usepackage[hidelinks]{hyperref}
-\journal{Knowledge-Based Systems}
+ELSEVIER_HEAD = r"""%% Elsevier CAS single-column template (cas-sc) -- target: Knowledge-Based Systems.
+%% Requires cas-sc.cls, cas-common.sty (in this folder) and figures at ../docs/img/.
+\documentclass[a4paper,fleqn]{cas-sc}
+\usepackage[numbers]{natbib}   % KBS uses numbered [1] references, in order of appearance
+\graphicspath{{../}}           % figures live at repo-root docs/img/
+
 \begin{document}
-\begin{frontmatter}
-\title{__TITLE__}
-\author[a]{Roberto Fern\'andez Barrios\corref{cor}}
+\let\WriteBookmarks\relax
+
+\shorttitle{Validate Before Commit}
+\shortauthors{R. Fern\'andez Barrios}
+
+\title[mode=title]{__TITLE__}
+
+\author[1]{Roberto Fern\'andez Barrios}[orcid=0000-0000-0000-0000]
+\cormark[1]
 \ead{roberto.fernandez.barrios@gmail.com}
-\cortext[cor]{Corresponding author.}
-\affiliation[a]{organization={TODO: Affiliation}, country={TODO}}
+\credit{Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization}
+\affiliation[1]{organization={TODO: Affiliation},
+                city={TODO},
+                country={TODO}}
+\cortext[1]{Corresponding author}
+
 \begin{abstract}
 __ABSTRACT__
 \end{abstract}
-% Highlights are submitted as a separate file (manuscript/highlights.md).
-\begin{keyword}
-concept drift \sep intelligent decision support \sep safe model updating \sep
-label-efficient learning \sep machine learning \sep intrusion detection
-\end{keyword}
-\end{frontmatter}
+
+\begin{graphicalabstract}
+\includegraphics[width=\linewidth]{docs/img/graphical_abstract.png}
+\end{graphicalabstract}
+
+\begin{highlights}
+\item Drift alarms do not reveal if retraining helps; model degradation does ($r\approx-0.85$)
+\item Naive drift-triggered retraining can be net-harmful; never adapting can win
+\item Validate before commit: deploy a retrained model only if a small probe confirms gain
+\item The gate needs only tens of labels and fails safe under 40\% poisoned labels
+\item Safe across two detectors and four classifiers; pre-registered, 30-seed CIs
+\end{highlights}
+
+\begin{keywords}
+concept drift \sep intelligent decision support \sep safe model updating \sep label-efficient learning \sep machine learning \sep intrusion detection
+\end{keywords}
+
+\maketitle
 
 """
 
@@ -212,21 +230,16 @@ Adaptive intrusion detection, concept drift, safe model updating, label-efficien
 
 """
 
-TITLE = "Validate Before Commit: Label-Efficient Safe Readaptation for\\\\ Adaptive Network Intrusion Detection under Concept Drift"
+TITLE = "Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift"
 
 TAIL_ELS = r"""
-
-\section*{CRediT authorship contribution statement}
-\textbf{Roberto Fern\'andez Barrios:} Conceptualization, Methodology, Software, Formal analysis,
-Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization.
-% Add co-authors and roles as applicable.
 
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that
 could have appeared to influence the work reported in this paper.
 
 \section*{Funding}
-% TODO: state funding sources, or use the sentence below if none.
+% TODO: state funding sources, or keep the sentence below if none.
 This research did not receive any specific grant from funding agencies in the public, commercial, or
 not-for-profit sectors.
 
@@ -239,7 +252,11 @@ TODO -- deposit on Zenodo and insert here).
 % "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process"
 % section here, per the publisher policy. Remove if not applicable.
 
-\bibliographystyle{elsarticle-num}
+% CRediT roles are declared via \credit{} in the front matter and printed here:
+\printcredits
+
+\bibliographystyle{unsrtnat}  % numbered, in order of appearance (KBS style). For Elsevier's exact CAS
+                              % numbered style use \bibliographystyle{cas-model1-num-names} (from the CAS bundle).
 \bibliography{references}
 \end{document}
 """

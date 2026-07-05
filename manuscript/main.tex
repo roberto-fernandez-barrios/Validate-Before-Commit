@@ -1,29 +1,47 @@
-\documentclass[preprint,11pt]{elsarticle}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\graphicspath{{../}}
-\usepackage{booktabs}
-\usepackage{amsmath,amssymb}
-\usepackage{xcolor}
-\usepackage[hidelinks]{hyperref}
-\journal{Knowledge-Based Systems}
+%% Elsevier CAS single-column template (cas-sc) -- target: Knowledge-Based Systems.
+%% Requires cas-sc.cls, cas-common.sty (in this folder) and figures at ../docs/img/.
+\documentclass[a4paper,fleqn]{cas-sc}
+\usepackage[numbers]{natbib}   % KBS uses numbered [1] references, in order of appearance
+\graphicspath{{../}}           % figures live at repo-root docs/img/
+
 \begin{document}
-\begin{frontmatter}
-\title{Validate Before Commit: Label-Efficient Safe Readaptation for\\ Adaptive Network Intrusion Detection under Concept Drift}
-\author[a]{Roberto Fern\'andez Barrios\corref{cor}}
+\let\WriteBookmarks\relax
+
+\shorttitle{Validate Before Commit}
+\shortauthors{R. Fern\'andez Barrios}
+
+\title[mode=title]{Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift}
+
+\author[1]{Roberto Fern\'andez Barrios}[orcid=0000-0000-0000-0000]
+\cormark[1]
 \ead{roberto.fernandez.barrios@gmail.com}
-\cortext[cor]{Corresponding author.}
-\affiliation[a]{organization={TODO: Affiliation}, country={TODO}}
+\credit{Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization}
+\affiliation[1]{organization={TODO: Affiliation},
+                city={TODO},
+                country={TODO}}
+\cortext[1]{Corresponding author}
+
 \begin{abstract}
 Operational machine-learning intrusion detectors are periodically retrained to cope with concept drift, and the decision of \emph{when} to retrain is usually delegated to a drift detector. We show this is the wrong control variable. Whether retraining helps is governed almost entirely by how degraded the deployed model already is --- the benefit of adaptation correlates with no-adaptation accuracy at r $\approx$ $-$0.82 to $-$0.89 --- a quantity drift detectors, which only measure distributional change, cannot observe. Consequently the detector is not the operative lever, and drift-triggered retraining ranges, across three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT), from strongly beneficial to net-harmful: for a fragile classifier, not adapting outperforms every triggered strategy. We recast readaptation as a cost-aware operational decision and introduce a deployable, label-efficient \emph{validate-before-commit} gate: a candidate is retrained on each trigger but committed only if it beats the incumbent on a small labeled probe. The gate needs only tens of labeled flows (as few as ~8 per confirmed drift), tolerates validation labels up to 20 windows stale, and \emph{fails safe} under adversarial supervision --- never harmful even with 40\% of validation labels flipped. Under a pre-registered protocol with 30-seed 95\% confidence intervals it generalizes across two drift detectors and four downstream classifiers: it converts harm to net benefit (significantly beating naive triggering and never-adapting) and preserves the gain where retraining helps. Two ablations delimit the method --- simple confirmation/cooldown policies and a zero-label variant both fail. Results are reproducible from a public artifact.
 \end{abstract}
-% Highlights are submitted as a separate file (manuscript/highlights.md).
-\begin{keyword}
-concept drift \sep intelligent decision support \sep safe model updating \sep
-label-efficient learning \sep machine learning \sep intrusion detection
-\end{keyword}
-\end{frontmatter}
+
+\begin{graphicalabstract}
+\includegraphics[width=\linewidth]{docs/img/graphical_abstract.png}
+\end{graphicalabstract}
+
+\begin{highlights}
+\item Drift alarms do not reveal if retraining helps; model degradation does ($r\approx-0.85$)
+\item Naive drift-triggered retraining can be net-harmful; never adapting can win
+\item Validate before commit: deploy a retrained model only if a small probe confirms gain
+\item The gate needs only tens of labels and fails safe under 40\% poisoned labels
+\item Safe across two detectors and four classifiers; pre-registered, 30-seed CIs
+\end{highlights}
+
+\begin{keywords}
+concept drift \sep intelligent decision support \sep safe model updating \sep label-efficient learning \sep machine learning \sep intrusion detection
+\end{keywords}
+
+\maketitle
 
 
 \section{Introduction}
@@ -319,17 +337,12 @@ The floats below support the main text (mechanism-law pooling, oracle-regret, la
 \end{figure}
 
 
-\section*{CRediT authorship contribution statement}
-\textbf{Roberto Fern\'andez Barrios:} Conceptualization, Methodology, Software, Formal analysis,
-Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization.
-% Add co-authors and roles as applicable.
-
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that
 could have appeared to influence the work reported in this paper.
 
 \section*{Funding}
-% TODO: state funding sources, or use the sentence below if none.
+% TODO: state funding sources, or keep the sentence below if none.
 This research did not receive any specific grant from funding agencies in the public, commercial, or
 not-for-profit sectors.
 
@@ -342,6 +355,10 @@ TODO -- deposit on Zenodo and insert here).
 % "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process"
 % section here, per the publisher policy. Remove if not applicable.
 
-\bibliographystyle{elsarticle-num}
+% CRediT roles are declared via \credit{} in the front matter and printed here:
+\printcredits
+
+\bibliographystyle{unsrtnat}  % numbered, in order of appearance (KBS style). For Elsevier's exact CAS
+                              % numbered style use \bibliographystyle{cas-model1-num-names} (from the CAS bundle).
 \bibliography{references}
 \end{document}

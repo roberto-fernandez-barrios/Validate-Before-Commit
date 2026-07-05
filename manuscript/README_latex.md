@@ -5,11 +5,18 @@ bibliography (`references.bib`), the six result tables (`tables/*.tex`), and the
 via `\graphicspath{{../}}`).
 
 ## Two targets
-- **`main.tex` (elsarticle)** — **primary: Knowledge-Based Systems** (Elsevier; single-column, numbered refs
-  via `elsarticle-num`; parallels ESWA / EAAI).
+- **`main.tex` — Elsevier CAS single-column (`cas-sc`)** — **primary: Knowledge-Based Systems** (the official
+  Elsevier template; also fits ESWA / EAAI). Uses `\title[mode=title]`, `\author...[orcid=]`, `\credit` +
+  `\printcredits`, `highlights` + `graphicalabstract` environments, numbered refs via `natbib[numbers]`.
 - **`main_ieee.tex` (IEEEtran)** — security-branded backup: **IEEE TDSC** (two-column, `figure*`/`table*`).
 
-See `notes/paper2_venue_decision_003.md` for the venue decision, guide compliance, and the length caveat.
+The CAS class files (`cas-sc.cls`, `cas-dc.cls`, `cas-common.sty`, `cas-model2-names.bst`) are included in this
+folder so `main.tex` compiles here. Bibliography defaults to `\bibliographystyle{unsrtnat}` (numbered, in order
+of appearance = KBS style, and ships with natbib). For Elsevier's exact CAS numbered style, switch to
+`cas-model1-num-names` (obtain that `.bst` from the full Elsevier CAS bundle / CTAN `els-cas-templates`).
+
+Compile: `cd manuscript && latexmk -pdf main.tex` (or `pdflatex main; bibtex main; pdflatex main; pdflatex main`).
+See `notes/paper2_venue_decision_003.md` for the venue decision, guide compliance, and the length handling.
 
 ## Regenerate the LaTeX from source
 ```bash
