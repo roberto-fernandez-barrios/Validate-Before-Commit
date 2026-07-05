@@ -28,12 +28,13 @@ After reading the actual Aims & Scope + full Guide for Authors of four Q1 candid
   three benchmarks are already cited.
 - **Single-anonymized (single-blind) review** -> author names appear; no anonymization needed.
 
-## Soft caveat: length
-KBS prefers **<= 20 double-spaced manuscript pages including tables and figures**. With ~6k words + 9 figures
-+ 6 tables this may run over. Mitigation if page pressure arises at compile time: move secondary
-figures/tables to an Appendix / supplementary material -- candidates: Fig 2b (pooled law), Fig 3 (oracle
-regret), Fig 7 (label latency); Tables 4 (oracle regret) and 5 (Phase-1 negative). The core narrative (Figs
-1, 2, 4, 5, 6, 8; Tables 1, 2, 3, 6) stands alone.
+## Length handling (done)
+KBS prefers **<= 20 double-spaced manuscript pages including tables and figures**. To keep the main paper lean,
+the LaTeX build now moves secondary/robustness floats to **Appendix A ("Additional results and robustness")**:
+Fig 2b (pooled law), Fig 3 (oracle regret), Fig 7 (label latency), Table 4 (oracle regret), Table 5 (Phase-1
+negative). The core narrative stays inline (Figs 1, 2, 4, 5, 6, 8; Tables 1, 2, 3, 6). In-text `\ref`s resolve
+automatically. Toggle by editing `APPENDIX_FIGS` / `APPENDIX_TABS` in `make_paper2_latex.py`. If the compiled
+count is still high, further trim prose or move more material to supplementary.
 
 ## Framing applied for KBS
 - Foreground: an **intelligent decision-support method** (the validate-before-commit gate) + ML methodology

@@ -171,23 +171,9 @@ The picture does not survive to independent data. On UNSW-NB15 the best recovery
 \caption{The benefit of adaptation tracks deployed-model degradation (SVC-RBF, $r=-0.89$).}
 \label{fig:2}
 \end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.png}
-\caption{The degradation--benefit law pooled across four downstream classifiers ($r=-0.82$, bootstrap 95\% CI).}
-\label{fig:2b}
-\end{figure}
 Why does adaptation help enormously in one regime and hurt in another? The answer is not the amount of drift but the state of the deployed model. Across all seven regimes, the benefit of adaptation is almost perfectly predicted by the no-adaptation accuracy: \textbf{r = $-$0.89} between deployed-model BA and adaptation gain across the seven SVC-RBF regimes (Fig.~\ref{fig:2}), and \textbf{r = $-$0.82 (bootstrap CI95 [$-$0.95, $-$0.59], 16 model$\times$regime points)} when pooled across all four downstream classifiers (Fig.~\ref{fig:2b}). Where the deployed model has already collapsed (DDoS: 69.8\% without adaptation), retraining on a fresh window is a large gain; where it remains strong (ToN-IoT: 92.0\%), replacing a well-generalized model with a narrowly-fit current-window model is a net loss.
 
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.png}
-\caption{Decision oracle-regret grows with the fraction of streams on which adapting hurts.}
-\label{fig:3}
-\end{figure}
-\input{tables/table4_oracle_regret.tex}
 This exposes the core problem. Drift detectors answer \emph{"has the distribution changed?"}, but an adaptive NIDS needs \emph{"will retraining improve the classifier?"} --- and these are different questions. We quantify the gap with a decision-level oracle that, per stream, abstains when adaptation would hurt (holding the detector fixed). The resulting \emph{regret} of naive triggering is essentially zero where adaptation always helps (Wednesday, DDoS: 0.00 points, adaptation hurt on 0\% of streams) and largest where it hurts (ToN-IoT: 3.50 points for QK-ZZ, CI95 [0.96, 7.45], adaptation hurt on 80\% of streams), scaling monotonically with harm frequency (Table~\ref{tab:table4_oracle_regret}, Fig.~\ref{fig:3}). The headroom left by naive triggering is real and concentrated exactly where the deployed model is already good.
 
 
@@ -199,7 +185,7 @@ Because drift detectors are blind to model degradation, improving the detector c
 
 \subsection{Simple confirmation and cooldown policies do not prevent harm}
 
-\input{tables/table5_phase1_negative.tex}
+
 If the decision is the lever, the natural fix is a smarter trigger policy. We pre-registered a grid of alarm-confirmation (k-of-n) and cooldown policies and evaluated them against fixed success criteria (preserve benefit in PortScan; avoid harm in ToN-IoT; do not degrade UNSW). None passed: in the harmful regime the tested policies remained far below no-adaptation and did not reduce adaptations relative to a conservative legacy baseline (Table~\ref{tab:table5_phase1_negative}; Appendix E). Confirmation and cooldown act on the \emph{persistence} of distributional change, which is exactly the signal that is uninformative about whether adaptation helps. This negative result motivates a policy that acts on the right quantity.
 
 
@@ -233,13 +219,6 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 \end{figure}
 Five extensions beyond the pre-registered design (explicitly labeled as robustness, not part of the confirmatory claim) probe the gate's limits. \emph{Label efficiency:} sweeping the probe budget from 8 to 128 flows (KS-max, 30 seeds; Fig.~\ref{fig:5}) shows the gate is remarkably label-cheap --- in the harmful regime even the smallest budget avoids harm, ~8 labeled flows per confirmed drift ($\approx$23 per stream) already lifting ToN-IoT gain from $-$1.36 (naive) to +0.38, plateauing near +1.1 by budget 32--64; benefit-regime gain is flat at every budget. A few dozen labels, not hundreds, suffice. \emph{Benefit breadth:} beyond PortScan the gate preserves --- and slightly improves --- the benefit in the two strongest benefit regimes, Wednesday (naive +15.39 $\to$ +16.32) and DDoS (naive +24.81 $\to$ +25.27), never sacrificing benefit where adaptation helps, across three benefit regimes.
 
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{docs/img/fig7_label_latency.png}
-\caption{Gate robustness to label latency: safe with validation labels up to 20 windows stale.}
-\label{fig:7}
-\end{figure}
 
 \begin{figure}[t]
 \centering
@@ -312,6 +291,33 @@ Adaptive network intrusion detection is usually framed as a detection problem: m
 
 
 
+\appendix
+\section{Additional results and robustness}
+The floats below support the main text (mechanism-law pooling, oracle-regret, label-latency, and the Phase-1 negative and oracle-regret tables).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.png}
+\caption{The degradation--benefit law pooled across four downstream classifiers ($r=-0.82$, bootstrap 95\% CI).}
+\label{fig:2b}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.png}
+\caption{Decision oracle-regret grows with the fraction of streams on which adapting hurts.}
+\label{fig:3}
+\end{figure}
+\input{tables/table4_oracle_regret.tex}
+\input{tables/table5_phase1_negative.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{docs/img/fig7_label_latency.png}
+\caption{Gate robustness to label latency: safe with validation labels up to 20 windows stale.}
+\label{fig:7}
+\end{figure}
+
 
 \section*{CRediT authorship contribution statement}
 \textbf{Roberto Fern\'andez Barrios:} Conceptualization, Methodology, Software, Formal analysis,
@@ -328,8 +334,9 @@ This research did not receive any specific grant from funding agencies in the pu
 not-for-profit sectors.
 
 \section*{Data availability}
-The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text; the code and a
-reproducibility guide are released as a public artifact (repository DOI: TODO -- deposit on Zenodo and cite).
+The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text; the code, protocols, and a
+reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact} (repository DOI:
+TODO -- deposit on Zenodo and insert here).
 
 % TODO (author decision): if generative-AI tools were used in manuscript preparation, add a
 % "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process"

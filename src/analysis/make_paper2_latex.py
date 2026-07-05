@@ -52,7 +52,12 @@ UNI = [("−", "$-$"), ("≈", "$\\approx$"), ("×", "$\\times$"), ("±", "$\\pm
        ("η", "$\\eta$"), ("→", "$\\to$"), ("—", "---"), ("–", "--"),
        ("§", "\\S"), ("≫", "$\\gg$"), ("’", "'"), ("“", "``"), ("”", "''")]
 
+# Secondary / robustness floats moved to an Appendix to keep the main paper lean (KBS <=20 pp guideline).
+APPENDIX_FIGS = {"2b", "3", "7"}
+APPENDIX_TABS = {"4", "5"}
+
 placed_figs, placed_tabs = set(), set()
+appendix_blocks = []
 
 
 def inline(t):
@@ -93,10 +98,20 @@ def floats_for(block, env, width, tab_dir):
     out = ""
     for n in dict.fromkeys(re.findall(r"Figs?\.?~?\s*([0-9]+b?)", block)):
         if n in FIGS and n not in placed_figs:
-            placed_figs.add(n); out += fig_float(n, env, width)
+            placed_figs.add(n)
+            block_tex = fig_float(n, env, width)
+            if n in APPENDIX_FIGS:
+                appendix_blocks.append(block_tex)
+            else:
+                out += block_tex
     for n in dict.fromkeys(re.findall(r"Table~?\s*([0-9]+)", block)):
         if n in TAB_FILES and n not in placed_tabs:
-            placed_tabs.add(n); out += f"\\input{{{tab_dir}/{TAB_FILES[n]}}}\n"
+            placed_tabs.add(n)
+            inp = f"\\input{{{tab_dir}/{TAB_FILES[n]}}}\n"
+            if n in APPENDIX_TABS:
+                appendix_blocks.append(inp)
+            else:
+                out += inp
     return out
 
 
@@ -216,8 +231,9 @@ This research did not receive any specific grant from funding agencies in the pu
 not-for-profit sectors.
 
 \section*{Data availability}
-The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text; the code and a
-reproducibility guide are released as a public artifact (repository DOI: TODO -- deposit on Zenodo and cite).
+The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text; the code, protocols, and a
+reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact} (repository DOI:
+TODO -- deposit on Zenodo and insert here).
 
 % TODO (author decision): if generative-AI tools were used in manuscript preparation, add a
 % "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process"
@@ -232,7 +248,7 @@ TAIL_IEEE = r"""
 
 \section*{Data Availability}
 The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed here.
-Code and a reproducibility guide are released as a public artifact.
+Code and a reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact}.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
@@ -249,15 +265,23 @@ def main():
     else:
         env, width, tab_dir, head, tail, out = "figure", "\\linewidth", "tables", ELSEVIER_HEAD, TAIL_ELS, "manuscript/main.tex"
 
-    placed_figs.clear(); placed_tabs.clear()
+    placed_figs.clear(); placed_tabs.clear(); appendix_blocks.clear()
     md = open(MD, encoding="utf-8").read()
     abstract = inline(section(md, "## Abstract", "## Contributions").split("\n", 2)[2].strip().replace("\n", " "))
     body = convert_body(section(md, "## 1. Introduction", "## Main tables"), env, width, tab_dir)
 
-    doc = head.replace("__TITLE__", TITLE).replace("__ABSTRACT__", abstract) + body + tail
+    appendix = ""
+    if appendix_blocks:
+        appendix = ("\n\\appendix\n\\section{Additional results and robustness}\n"
+                    "The floats below support the main text (mechanism-law pooling, oracle-regret, "
+                    "label-latency, and the Phase-1 negative and oracle-regret tables).\n"
+                    + "".join(appendix_blocks))
+
+    doc = head.replace("__TITLE__", TITLE).replace("__ABSTRACT__", abstract) + body + appendix + tail
     open(out, "w", encoding="utf-8").write(doc)
     print("wrote", out, "| target:", target)
-    print("figures placed:", sorted(placed_figs), "| tables placed:", sorted(placed_tabs))
+    print("main figures:", sorted(placed_figs - APPENDIX_FIGS), "| appendix figures:", sorted(placed_figs & APPENDIX_FIGS))
+    print("main tables:", sorted(placed_tabs - APPENDIX_TABS), "| appendix tables:", sorted(placed_tabs & APPENDIX_TABS))
 
 
 if __name__ == "__main__":
