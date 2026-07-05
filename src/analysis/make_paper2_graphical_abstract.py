@@ -62,11 +62,12 @@ def main():
         "✓  SAFE & label-efficient\n$+0.9$ to $+1.1$ BA pts;\nnever worse than either baseline", "#e8f4f2", GREEN, "#1d6f64", 10.5, "bold")
 
     # Bottom robustness badges
-    badges = ("~8 labels / confirmed drift   •   probes up to 20 windows stale   •   fails safe under 40% label flips   •   "
-              "2 detectors × 4 downstream classifiers   •   pre-registered, 30-seed 95% CIs   •   reproducible artifact")
-    ax.add_patch(FancyBboxPatch((0.02, 0.015), 0.96, 0.085, boxstyle="round,pad=0.004,rounding_size=0.02",
+    badges1 = "~8 labels / confirmed drift    •    probes up to 20 windows stale    •    fails safe under 40% label flips"
+    badges2 = "2 detectors × 4 downstream classifiers    •    pre-registered, 30-seed 95% CIs    •    reproducible artifact"
+    ax.add_patch(FancyBboxPatch((0.03, 0.008), 0.94, 0.12, boxstyle="round,pad=0.004,rounding_size=0.02",
                                 linewidth=1.2, edgecolor=GREY, facecolor="#f7f7f7", zorder=1))
-    ax.text(0.5, 0.057, badges, ha="center", va="center", fontsize=9.0, color=DARK)
+    ax.text(0.5, 0.092, badges1, ha="center", va="center", fontsize=8.5, color=DARK)
+    ax.text(0.5, 0.042, badges2, ha="center", va="center", fontsize=8.5, color=DARK)
 
     fig.savefig(f"{OUT}/graphical_abstract.png", dpi=200, bbox_inches="tight")
     fig.savefig(f"{OUT}/graphical_abstract.pdf", bbox_inches="tight")
