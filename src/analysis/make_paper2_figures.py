@@ -62,10 +62,14 @@ def fig2_mechanism():
     m, b = np.polyfit(x, y, 1)
     xs = np.linspace(x.min(), x.max(), 50)
     ax.plot(xs, m * xs + b, "k--", lw=1)
+    # per-label offsets (dx, dy, ha) to avoid overlapping the trend line / axis / each other
+    off = {"ToN-IoT": (5, 7, "left"), "Reconnaissance": (-8, -12, "right")}
     for _, row in d.iterrows():
-        ax.annotate(row["regime"].replace("CICIDS ", "").replace("UNSW-NB15 ", "").replace(" Scanning", ""),
-                    (row["noadapt_BA"] * 100, row["best_gain_BA_pts"]), fontsize=7,
-                    xytext=(4, 3), textcoords="offset points")
+        name = row["regime"].replace("CICIDS ", "").replace("UNSW-NB15 ", "").replace(" Scanning", "")
+        dx, dy, ha = off.get(name, (4, 3, "left"))
+        ax.annotate(name, (row["noadapt_BA"] * 100, row["best_gain_BA_pts"]), fontsize=7,
+                    xytext=(dx, dy), textcoords="offset points", ha=ha)
+    ax.set_xlim(x.min() - 2, x.max() + 8)  # right room for the ToN-IoT label; left pad for DDoS
     ax.axhline(0, color="k", lw=0.6)
     ax.set_xlabel("Deployed-model BA without adaptation (%)")
     ax.set_ylabel("Adaptation benefit (BA pts)")
