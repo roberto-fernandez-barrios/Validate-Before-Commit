@@ -28,9 +28,12 @@ def main():
         s = CAP_PREFIX.sub(r"\1", s)
         s = s.replace(r"\begin{tabular}", "\\small\n\\begin{tabular}")  # keep wide tables in the margin
         base = os.path.basename(f)
-        open(os.path.join(DST, base), "w", encoding="utf-8").write(s)
+        # Elsevier CAS: no explicit float position (the class places floats; avoids the
+        # "No positions in optional float specifier" warning).
+        cas = s.replace(r"\begin{table}[t]", r"\begin{table}")
+        open(os.path.join(DST, base), "w", encoding="utf-8").write(cas)
         # IEEE two-column: span both columns with table*
-        ieee = s.replace(r"\begin{table}", r"\begin{table*}").replace(r"\end{table}", r"\end{table*}")
+        ieee = s.replace(r"\begin{table}[t]", r"\begin{table*}[t]").replace(r"\end{table}", r"\end{table*}")
         open(os.path.join(DST + "_ieee", base), "w", encoding="utf-8").write(ieee)
         print("wrote", base, "(elsevier + ieee)")
     # verify ascii-clean

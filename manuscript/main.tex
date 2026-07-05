@@ -183,7 +183,7 @@ We present results in logical, not chronological, order. Section 5.1 establishes
 \subsection{Readaptation is regime-dependent and sometimes harmful}
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig1_regime_spectrum.png}
 \caption{Readaptation value is regime-dependent and sometimes harmful: best detector-triggered gain over no-adaptation per dataset and attack regime.}
@@ -199,7 +199,7 @@ The picture does not survive to independent data. On UNSW-NB15 the best recovery
 \subsection{The value of readaptation is governed by model degradation, not distribution change}
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig2_mechanism_law.png}
 \caption{The benefit of adaptation tracks deployed-model degradation (SVC-RBF, $r=-0.89$).}
@@ -226,7 +226,7 @@ If the decision is the lever, the natural fix is a smarter trigger policy. We pr
 \subsection{A label-efficient validate-before-commit gate resolves the problem}
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig4_phase2_gate.png}
 \caption{The validate-before-commit gate preserves benefit and avoids harm, identically for a classical (KS-max) and a quantum (QK-ZZ) detector.}
@@ -245,7 +245,7 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 \subsection{Gate robustness (post-registration)}
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig5_label_budget_curve.png}
 \caption{Label-efficiency frontier: gain over no-adaptation versus probe budget; a small probe suffices to avoid harm.}
@@ -254,7 +254,7 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 Five extensions beyond the pre-registered design (explicitly labeled as robustness, not part of the confirmatory claim) probe the gate's limits. \emph{Label efficiency:} sweeping the probe budget from 8 to 128 flows (KS-max, 30 seeds; Fig.~\ref{fig:5}) shows the gate is remarkably label-cheap --- in the harmful regime even the smallest budget avoids harm, ~8 labeled flows per confirmed drift ($\approx$23 per stream) already lifting ToN-IoT gain from $-$1.36 (naive) to +0.38, plateauing near +1.1 by budget 32--64; benefit-regime gain is flat at every budget. A few dozen labels, not hundreds, suffice. \emph{Benefit breadth:} beyond PortScan the gate preserves --- and slightly improves --- the benefit in the two strongest benefit regimes, Wednesday (naive +15.39 $\to$ +16.32) and DDoS (naive +24.81 $\to$ +25.27), never sacrificing benefit where adaptation helps, across three benefit regimes.
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig8_probe_poison.png}
 \caption{The gate fails safe under adversarial validation labels (up to 40\% flipped).}
@@ -266,7 +266,7 @@ Five extensions beyond the pre-registered design (explicitly labeled as robustne
 \subsection{Generalization across downstream classifiers}
 
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig6_downstream_generalization.png}
 \caption{Generalization across four downstream classifiers: net-harm is specific to SVC-RBF; the gate is safe for all.}
@@ -329,14 +329,14 @@ Adaptive network intrusion detection is usually framed as a detection problem: m
 \section{Additional results and robustness}
 The floats below support the main text (mechanism-law pooling, oracle-regret, label-latency, and the Phase-1 negative and oracle-regret tables).
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.png}
 \caption{The degradation--benefit law pooled across four downstream classifiers ($r=-0.82$, bootstrap 95\% CI).}
 \label{fig:2b}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.png}
 \caption{Decision oracle-regret grows with the fraction of streams on which adapting hurts.}
@@ -345,7 +345,7 @@ The floats below support the main text (mechanism-law pooling, oracle-regret, la
 \input{tables/table4_oracle_regret.tex}
 \input{tables/table5_phase1_negative.tex}
 
-\begin{figure}[t]
+\begin{figure}
 \centering
 \includegraphics[width=\linewidth]{docs/img/fig7_label_latency.png}
 \caption{Gate robustness to label latency: safe with validation labels up to 20 windows stale.}

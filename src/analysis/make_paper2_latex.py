@@ -88,18 +88,18 @@ def inline(t):
     return t
 
 
-def fig_float(n, env, width):
+def fig_float(n, env, width, pos):
     path, cap = FIGS[n]
-    return (f"\n\\begin{{{env}}}[t]\n\\centering\n\\includegraphics[width={width}]{{{path}}}\n"
+    return (f"\n\\begin{{{env}}}{pos}\n\\centering\n\\includegraphics[width={width}]{{{path}}}\n"
             f"\\caption{{{cap}}}\n\\label{{fig:{n}}}\n\\end{{{env}}}\n")
 
 
-def floats_for(block, env, width, tab_dir):
+def floats_for(block, env, width, tab_dir, pos):
     out = ""
     for n in dict.fromkeys(re.findall(r"Figs?\.?~?\s*([0-9]+b?)", block)):
         if n in FIGS and n not in placed_figs:
             placed_figs.add(n)
-            block_tex = fig_float(n, env, width)
+            block_tex = fig_float(n, env, width, pos)
             if n in APPENDIX_FIGS:
                 appendix_blocks.append(block_tex)
             else:
@@ -115,7 +115,7 @@ def floats_for(block, env, width, tab_dir):
     return out
 
 
-def convert_body(md, env, width, tab_dir):
+def convert_body(md, env, width, tab_dir, pos):
     lines = md.split("\n")
     out, i = [], 0
     while i < len(lines):
@@ -146,7 +146,7 @@ def convert_body(md, env, width, tab_dir):
             out.append("\\end{enumerate}"); continue
         if ln.strip() == "" or ln.strip() == "---":
             out.append(""); i += 1; continue
-        out.append(floats_for(ln, env, width, tab_dir).rstrip("\n"))
+        out.append(floats_for(ln, env, width, tab_dir, pos).rstrip("\n"))
         out.append(inline(ln))
         i += 1
     return "\n".join(out)
@@ -295,14 +295,14 @@ def main():
     if target not in ("elsevier", "ieee"):
         raise SystemExit("target must be 'elsevier' or 'ieee'")
     if target == "ieee":
-        env, width, tab_dir, head, tail, out = "figure*", "\\textwidth", "tables_ieee", IEEE_HEAD, TAIL_IEEE, "manuscript/main_ieee.tex"
+        env, width, tab_dir, pos, head, tail, out = "figure*", "\\textwidth", "tables_ieee", "[t]", IEEE_HEAD, TAIL_IEEE, "manuscript/main_ieee.tex"
     else:
-        env, width, tab_dir, head, tail, out = "figure", "\\linewidth", "tables", ELSEVIER_HEAD, TAIL_ELS, "manuscript/main.tex"
+        env, width, tab_dir, pos, head, tail, out = "figure", "\\linewidth", "tables", "", ELSEVIER_HEAD, TAIL_ELS, "manuscript/main.tex"
 
     placed_figs.clear(); placed_tabs.clear(); appendix_blocks.clear()
     md = open(MD, encoding="utf-8").read()
     abstract = inline(section(md, "## Abstract", "## Contributions").split("\n", 2)[2].strip().replace("\n", " "))
-    body = convert_body(section(md, "## 1. Introduction", "## Main tables"), env, width, tab_dir)
+    body = convert_body(section(md, "## 1. Introduction", "## Main tables"), env, width, tab_dir, pos)
 
     appendix = ""
     if appendix_blocks:
