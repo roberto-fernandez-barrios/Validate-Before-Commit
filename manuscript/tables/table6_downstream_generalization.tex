@@ -2,7 +2,7 @@
 \centering
 \caption{Generalization across downstream classifiers (KS-max, 20 seeds; SVC-RBF at 30). Net-harm (naive below no-adaptation) appears only for SVC-RBF on ToN-IoT; the mechanism law and the gate's safety hold for all four models.}
 \label{tab:table6_downstream_generalization}
-\small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{lllllll}
 \toprule
 Downstream & Regime & No-adapt BA & Naive gain & Gate gain & Harm (naive<no-adapt) & Gate avoids harm \\
@@ -20,5 +20,5 @@ MLP & PortScan (benefit) & 68.9 & 27.08 & 27.04 & no & yes \\
 MLP & UNSW Recon (mixed) & 86.8 & 1.0 & 1.15 & no & yes \\
 MLP & ToN-IoT (harm) & 94.8 & 0.24 & 0.46 & no & yes \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}

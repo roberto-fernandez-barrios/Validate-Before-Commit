@@ -2,7 +2,7 @@
 \centering
 \caption{Phase 2 paired bootstrap 95\% CIs (30 seeds). Bold-worthy: in ToN-IoT the labeled-probe gate is significantly above both naive triggering and no-adaptation.}
 \label{tab:table3_phase2_paired_ci}
-\small
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
 \begin{tabular}{lllllll}
 \toprule
 Regime & Detector & Policy & $\Delta$ vs naive (pts) & CI95 vs naive & $\Delta$ vs no-adapt (pts) & CI95 vs no-adapt \\
@@ -26,5 +26,5 @@ ToN-IoT (harm) & QK-ZZ & gate-32 & 4.74 & [+2.47, +7.69] & 1.06 & [+0.77, +1.40]
 ToN-IoT (harm) & QK-ZZ & gate-64 & 4.74 & [+2.52, +7.56] & 1.05 & [+0.77, +1.40] \\
 ToN-IoT (harm) & QK-ZZ & unsup-0 & -1.58 & [-4.00, +0.77] & -5.26 & [-8.20, -2.65] \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table*}

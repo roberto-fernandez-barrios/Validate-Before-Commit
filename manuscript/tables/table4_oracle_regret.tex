@@ -2,7 +2,7 @@
 \centering
 \caption{Decision oracle-regret and harm frequency. Regret ~0 where adaptation always helps, largest where it hurts; the pattern is detector-invariant.}
 \label{tab:table4_oracle_regret}
-\small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{llllllll}
 \toprule
 Regime & Class & Detector & No-adapt BA & Naive BA & Regret (pts) & Regret CI95 & Harm streams (\%) \\
@@ -22,5 +22,5 @@ UNSW-NB15 Reconnaissance & mixed & QK-ZZ & 84.6 & 84.9 & 0.1 & [0.00, 0.24] & 40
 ToN-IoT Scanning & harmful & Energy & 92.0 & 90.7 & 1.63 & [0.48, 2.78] & 50 \\
 ToN-IoT Scanning & harmful & QK-ZZ & 92.0 & 88.7 & 3.5 & [0.96, 7.45] & 80 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}

@@ -2,7 +2,7 @@
 \centering
 \caption{Readaptation value is regime-dependent. Best detector-triggered gain vs. no-adaptation (30 seeds CICIDS, 10 external).}
 \label{tab:table1_regime_taxonomy}
-\small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{llllll}
 \toprule
 Dataset / regime & Class & No-adapt BA & Best gain (BA pts) & Best gain (F1 pts) & Best detector \\
@@ -15,5 +15,5 @@ UNSW-NB15 DoS & marginal & 84.0 & 1.4 & 0.3 & KS-max \\
 UNSW-NB15 Reconnaissance & mixed & 84.6 & 0.3 & 0.2 & QK-ZZ \\
 ToN-IoT Scanning & harmful & 92.0 & -0.6 & -0.2 & QK-PauliXZ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}

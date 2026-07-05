@@ -2,7 +2,7 @@
 \centering
 \caption{Phase 2 gate (30 seeds). The labeled-probe gate preserves benefit, avoids harm, and beats naive triggering; the zero-label variant fails.}
 \label{tab:table2_phase2_gate_summary}
-\small
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
 \begin{tabular}{lllllll}
 \toprule
 Regime & Detector & Policy & BA (\%) & Gain (pts) & Commits & Labels \\
@@ -32,5 +32,5 @@ ToN-IoT (harm) & QK-ZZ & gate-64 & 93.28 & 1.05 & 2.1 & 248 \\
 ToN-IoT (harm) & QK-ZZ & naive & 88.54 & -3.68 & 2.9 & 0 \\
 ToN-IoT (harm) & QK-ZZ & unsup-0 & 86.96 & -5.26 & 1.0 & 0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table*}

@@ -18,6 +18,14 @@ REPL = [("−", "$-$"), ("≈", r"$\approx$"), ("×", r"$\times$"),
 CAP_PREFIX = re.compile(r"(\\caption\{)(?:Table \d+:\s*|Appendix Table:\s*)")
 
 
+def shrink(txt, maxw):
+    """Wrap the tabular in a shrink-to-fit box: wide tables are scaled down to `maxw`,
+    narrow tables keep their natural width (avoids Overfull \\hbox in wide tables)."""
+    open_box = (r"\resizebox{\ifdim\width>" + maxw + " " + maxw + r"\else\width\fi}{!}{%" + "\n"
+                + r"\begin{tabular}")
+    return txt.replace(r"\begin{tabular}", open_box).replace(r"\end{tabular}", r"\end{tabular}}")
+
+
 def main():
     os.makedirs(DST, exist_ok=True)
     os.makedirs(DST + "_ieee", exist_ok=True)
@@ -26,14 +34,14 @@ def main():
         for a, b in REPL:
             s = s.replace(a, b)
         s = CAP_PREFIX.sub(r"\1", s)
-        s = s.replace(r"\begin{tabular}", "\\small\n\\begin{tabular}")  # keep wide tables in the margin
         base = os.path.basename(f)
         # Elsevier CAS: no explicit float position (the class places floats; avoids the
-        # "No positions in optional float specifier" warning).
-        cas = s.replace(r"\begin{table}[t]", r"\begin{table}")
+        # "No positions in optional float specifier" warning); shrink wide tables to \linewidth.
+        cas = shrink(s.replace(r"\begin{table}[t]", r"\begin{table}"), r"\linewidth")
         open(os.path.join(DST, base), "w", encoding="utf-8").write(cas)
-        # IEEE two-column: span both columns with table*
-        ieee = s.replace(r"\begin{table}[t]", r"\begin{table*}[t]").replace(r"\end{table}", r"\end{table*}")
+        # IEEE two-column table* spans \textwidth; shrink wide tables to \textwidth.
+        ieee = shrink(s.replace(r"\begin{table}[t]", r"\begin{table*}[t]").replace(r"\end{table}", r"\end{table*}"),
+                      r"\textwidth")
         open(os.path.join(DST + "_ieee", base), "w", encoding="utf-8").write(ieee)
         print("wrote", base, "(elsevier + ieee)")
     # verify ascii-clean
