@@ -167,17 +167,33 @@ ELSEVIER_HEAD = r"""%% Elsevier CAS single-column template (cas-sc) -- target: K
 \let\WriteBookmarks\relax
 
 \shorttitle{Validate Before Commit}
-\shortauthors{R. Fern\'andez Barrios}
+\shortauthors{Fern\'andez-Barrios et al.}
 
 \title[mode=title]{__TITLE__}
 
-\author[1]{Roberto Fern\'andez Barrios}[orcid=0000-0000-0000-0000]
+\author[1]{Roberto Fern\'andez-Barrios}[orcid=0009-0003-5312-2634]
 \cormark[1]
-\ead{roberto.fernandez.barrios@gmail.com}
-\credit{Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization}
-\affiliation[1]{organization={TODO: Affiliation},
-                city={TODO},
-                country={TODO}}
+\ead{roberto.fernandez.b@deusto.es}
+\credit{Conceptualization, Methodology, Software, Data curation, Formal analysis, Visualization, Investigation, Writing -- original draft, Writing -- review \& editing}
+
+\author[1]{Iker Pastor-L\'opez}[orcid=0000-0002-3068-6248]
+\ead{iker.pastor@deusto.es}
+\credit{Supervision, Validation, Writing -- review \& editing}
+
+\author[1]{Amaia Pikatza-Huerga}[orcid=0009-0003-9080-6242]
+\ead{a.pikatza@deusto.es}
+\credit{Validation, Project administration, Writing -- review \& editing}
+
+\author[1]{Pablo Garc\'ia Bringas}[orcid=0000-0003-3594-9534]
+\ead{pablo.garcia.bringas@deusto.es}
+\credit{Supervision, Resources, Writing -- review \& editing}
+
+\affiliation[1]{organization={Faculty of Engineering, University of Deusto},
+                addressline={Avda. de las Universidades, 24},
+                city={Bilbao},
+                postcode={48007},
+                country={Spain}}
+
 \cortext[1]{Corresponding author}
 
 \begin{abstract}
@@ -215,10 +231,11 @@ IEEE_HEAD = r"""\documentclass[journal]{IEEEtran}
 \usepackage[hidelinks]{hyperref}
 \begin{document}
 \title{__TITLE__}
-\author{Roberto Fern\'andez Barrios%
-\thanks{R. Fern\'andez Barrios is with TODO: Affiliation (e-mail: roberto.fernandez.barrios@gmail.com).}}
-\markboth{IEEE Transactions on Network and Service Management}%
-{Fern\'andez Barrios: Validate Before Commit --- Label-Efficient Safe Readaptation for Adaptive NIDS}
+\author{Roberto Fern\'andez-Barrios,~Iker Pastor-L\'opez,~Amaia Pikatza-Huerga,~and~Pablo Garc\'ia~Bringas%
+\thanks{The authors are with the Faculty of Engineering, University of Deusto, 48007 Bilbao, Spain
+(e-mail: roberto.fernandez.b@deusto.es; iker.pastor@deusto.es; a.pikatza@deusto.es; pablo.garcia.bringas@deusto.es).}}
+\markboth{IEEE Transactions on Dependable and Secure Computing}%
+{Fern\'andez-Barrios \MakeLowercase{\textit{et al.}}: Validate Before Commit}
 \maketitle
 \begin{abstract}
 __ABSTRACT__

@@ -135,7 +135,8 @@ This work is under review. Until a DOI is available, please cite the preprint/wo
 @unpublished{fernandezbarrios2026validate,
   title  = {Validate Before Commit: Label-Efficient Safe Readaptation for
             Adaptive Network Intrusion Detection under Concept Drift},
-  author = {Fern{\'a}ndez Barrios, Roberto and others},
+  author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
+            Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},
   note   = {Under review}
 }

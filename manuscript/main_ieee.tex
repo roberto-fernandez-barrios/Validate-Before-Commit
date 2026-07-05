@@ -9,10 +9,11 @@
 \usepackage[hidelinks]{hyperref}
 \begin{document}
 \title{Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift}
-\author{Roberto Fern\'andez Barrios%
-\thanks{R. Fern\'andez Barrios is with TODO: Affiliation (e-mail: roberto.fernandez.barrios@gmail.com).}}
-\markboth{IEEE Transactions on Network and Service Management}%
-{Fern\'andez Barrios: Validate Before Commit --- Label-Efficient Safe Readaptation for Adaptive NIDS}
+\author{Roberto Fern\'andez-Barrios,~Iker Pastor-L\'opez,~Amaia Pikatza-Huerga,~and~Pablo Garc\'ia~Bringas%
+\thanks{The authors are with the Faculty of Engineering, University of Deusto, 48007 Bilbao, Spain
+(e-mail: roberto.fernandez.b@deusto.es; iker.pastor@deusto.es; a.pikatza@deusto.es; pablo.garcia.bringas@deusto.es).}}
+\markboth{IEEE Transactions on Dependable and Secure Computing}%
+{Fern\'andez-Barrios \MakeLowercase{\textit{et al.}}: Validate Before Commit}
 \maketitle
 \begin{abstract}
 Operational machine-learning intrusion detectors are periodically retrained to cope with concept drift, and the decision of \emph{when} to retrain is usually delegated to a drift detector. We show this is the wrong control variable. Whether retraining helps is governed almost entirely by how degraded the deployed model already is --- the benefit of adaptation correlates with no-adaptation accuracy at r $\approx$ $-$0.82 to $-$0.89 --- a quantity drift detectors, which only measure distributional change, cannot observe. Consequently the detector is not the operative lever, and drift-triggered retraining ranges, across three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT), from strongly beneficial to net-harmful: for a fragile classifier, not adapting outperforms every triggered strategy. We recast readaptation as a cost-aware operational decision and introduce a deployable, label-efficient \emph{validate-before-commit} gate: a candidate is retrained on each trigger but committed only if it beats the incumbent on a small labeled probe. The gate needs only tens of labeled flows (as few as ~8 per confirmed drift), tolerates validation labels up to 20 windows stale, and \emph{fails safe} under adversarial supervision --- never harmful even with 40\% of validation labels flipped. Under a pre-registered protocol with 30-seed 95\% confidence intervals it generalizes across two drift detectors and four downstream classifiers: it converts harm to net benefit (significantly beating naive triggering and never-adapting) and preserves the gain where retraining helps. Two ablations delimit the method --- simple confirmation/cooldown policies and a zero-label variant both fail. Results are reproducible from a public artifact.

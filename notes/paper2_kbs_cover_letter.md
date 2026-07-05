@@ -35,5 +35,7 @@ our code and protocols are released as a citable artifact. Highlights and a grap
 Thank you for considering our submission.
 
 Sincerely,
-Roberto Fernández Barrios, on behalf of all authors
-(corresponding author; roberto.fernandez.barrios@gmail.com)
+Roberto Fernández-Barrios, on behalf of all authors
+(Iker Pastor-López, Amaia Pikatza-Huerga, Pablo García Bringas)
+Faculty of Engineering, University of Deusto, Bilbao, Spain
+Corresponding author: roberto.fernandez.b@deusto.es
