@@ -140,6 +140,9 @@ def main():
           float(("marginal" in t1) and ("0.5" in t1) and ("mixed" not in t1)), 0.1)
     check("tex table4 fresh: 3.53 [1.76, 5.54]", 1.0,
           float(("3.53" in t4) and ("[1.76, 5.54]" in t4)), 0.1)
+    tex = open("manuscript/main.tex", encoding="utf-8").read()
+    check("main.tex Limitations is real, not a stub", 1.0,
+          float(("promote to a numbered section" not in tex) and ("fragile-model tail" in tex)), 0.1)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

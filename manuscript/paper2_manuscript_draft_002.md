@@ -110,7 +110,7 @@ Per window we record balanced accuracy (BA) and attack-class F1; per stream we a
 
 ## 5. Results
 
-We present results in logical, not chronological, order. Section 5.1 establishes that readaptation is beneficial on CICIDS2017 but *not* on the external benchmarks; 5.2 explains the pattern with a mechanistic law; 5.3 shows the detector — classical or quantum — is not the lever; 5.4 shows simple policies do not fix it; 5.5 presents the label-efficient gate that does; 5.6 reports robustness and controls.
+We present results in logical, not chronological, order. Section 5.1 establishes that readaptation is beneficial on CICIDS2017 but *not* on the external benchmarks; 5.2 explains the pattern with a mechanistic law; 5.3 shows the detector — classical or quantum — is not the lever; 5.4 shows simple policies do not fix it; 5.5 presents the label-efficient gate that does; 5.6 probes the gate's robustness, 5.7 its generalization across downstream classifiers, and 5.8 the remaining controls.
 
 ### 5.1 Readaptation is regime-dependent and sometimes harmful
 
@@ -126,7 +126,7 @@ This exposes the core problem. Drift detectors answer *"has the distribution cha
 
 ### 5.3 The detector is not the lever
 
-Because drift detectors are blind to model degradation, improving the detector cannot solve the problem — and it does not. Quantum-kernel MMD monitors do define distinct *operating points* on CICIDS2017 (QK-MMD ZZ triggers 1.8–2.1 fewer readaptations than Energy distance at equivalent accuracy in Wednesday/DDoS, and inverts in PortScan), but at a ~114× monitoring-runtime cost, and these profiles do not replicate externally. Critically, the regime taxonomy and the harmful-adaptation outcome are identical for classical and quantum detectors (Fig. 3, Table 1): on ToN-IoT, naive triggering is net-harmful whether the trigger is KS-max (−1.4 points) or QK-ZZ (−3.7 points). The lever is the adapt/no-adapt decision, not the similarity measure that fires the trigger.
+Because drift detectors are blind to model degradation, improving the detector cannot solve the problem — and it does not. Quantum-kernel MMD monitors do define distinct *operating points* on CICIDS2017 (QK-MMD ZZ triggers 1.8–2.1 fewer readaptations than Energy distance at equivalent accuracy in Wednesday/DDoS, and inverts in PortScan), but at a ~114× monitoring-runtime cost, and these profiles do not replicate externally. Critically, the regime taxonomy and the harmful-adaptation outcome are identical for classical and quantum detectors (Fig. 3, Tables 1–2): on ToN-IoT, naive triggering is net-harmful whether the trigger is KS-max (−1.4 points) or QK-ZZ (−3.7 points; Table 2). The lever is the adapt/no-adapt decision, not the similarity measure that fires the trigger.
 
 ### 5.4 Simple confirmation and cooldown policies do not prevent harm
 
@@ -176,7 +176,7 @@ The findings are robust to the evaluation metric (the taxonomy and harmful-adapt
 
 ## 7. Limitations
 
-*(See the Limitations paragraph below; promote to a numbered section at submission.)*
+Adaptation on our benchmarks retrains on labeled windows; the validate-before-commit gate accordingly assumes access to a small labeled probe at decision time, and we report its size (≈32–64 flows per confirmed drift) as the realistic cost rather than treating labels as free. The strongest positive (benefit) evidence is concentrated in CICIDS2017; the external benchmarks provide the marginal and harmful ends of the spectrum, which is what the argument requires, but broader benefit-regime replication is future work. Quantum kernels are classically simulated, so the reported 114× monitoring overhead is a simulation figure. The gate is evaluated at fixed per-window severity; we do model label latency (the probe may be up to 20 windows stale; §5.6) but not asynchronous or partial labeling. The net-harm result is specific to a fragile downstream classifier (SVC-RBF) on ToN-IoT and does not appear for more robust classifiers (§5.7); we therefore frame it as the fragile-model tail of a general degradation–benefit law rather than a universal harm claim, and note that the gate's safety — unlike the harm — generalizes across the four downstream models tested. Finally, all evaluation uses the same four downstream classifiers and three regimes for the gate; broader deployment settings remain future work.
 
 ## 8. Conclusion
 
@@ -189,19 +189,13 @@ Adaptive network intrusion detection is usually framed as a detection problem: m
 - **Table 1** `table1_regime_taxonomy` — Regime taxonomy: per (dataset×regime) no-adaptation BA, best adaptation gain (BA and attack-F1), class. (→ §5.1, Fig. 1)
 - **Table 2** `table2_phase2_gate_summary` — Phase 2 gate: per (regime×detector×gate) BA, gain, commits, labels (30 seeds). (→ §5.5, Fig. 4)
 - **Table 3** `table3_phase2_paired_ci` — Phase 2 paired bootstrap CI95, gate vs naive and vs no-adaptation. In ToN-IoT the labeled-probe gate is significantly above both. (→ §5.5)
-- **Table 4** `table4_oracle_regret` — Decision oracle-regret and harm frequency per regime/detector; regret ~0 in pure-benefit regimes, 3.50 pts (ToN-IoT QK-ZZ). (→ §5.2, Fig. 3)
+- **Table 4** `table4_oracle_regret` — Decision oracle-regret and harm frequency per regime/detector; regret ~0 in pure-benefit regimes, 3.53 pts (ToN-IoT QK-ZZ). (→ §5.2, Fig. 3; Appendix)
+- **Table 5** `table5_phase1_negative` — Pre-registered simple policies (k-of-n, cooldown) fail benefit-preservation and harm-avoidance. (→ §5.4; Appendix)
 - **Table 6** `table6_downstream_generalization` — Gate across four downstream classifiers × 3 regimes: no-adapt/naive/gate gain + harm-reproduced / gate-avoids-harm flags. (→ §5.7, Fig. 6)
 - Regenerate with `python -m src.analysis.make_paper2_paper_tables`.
 - **Appendix tables** — QK operating points + paired CIs (CICIDS), UNSW/ToN-IoT full tables, Phase 1 policy grid, feature-map sensitivity, RF downstream, nuisance controls.
 
 ## Figures (rendered; `make_paper2_figures.py`, `make_paper2_budget_curve.py`)
 
-- **Fig. 1** regime spectrum · **Fig. 2** mechanism law (r=−0.89, SVC) · **Fig. 2b** pooled mechanism law across 4 downstream models (r=−0.82, CI95) · **Fig. 3** oracle-regret vs harm-frequency · **Fig. 4** the gate (both detectors) · **Fig. 5** label-efficiency frontier (probe budget 8–128) · **Fig. 6** generalization across four downstream classifiers (harm is SVC-specific; gate safe everywhere) · **Fig. 7** gate robustness to label latency (probe up to 20 windows stale) · **Fig. 8** gate fails safe under adversarial validation labels (up to 40% flipped).
+- **Fig. 1** regime spectrum · **Fig. 2** mechanism law (r=−0.89, SVC) · **Fig. 2b** pooled mechanism law across 4 downstream models (r=−0.81, CI95) · **Fig. 3** oracle-regret vs harm-frequency · **Fig. 4** the gate (both detectors) · **Fig. 5** label-efficiency frontier (probe budget 8–128) · **Fig. 6** generalization across four downstream classifiers (harm is SVC-specific; gate safe everywhere) · **Fig. 7** gate robustness to label latency (probe up to 20 windows stale) · **Fig. 8** gate fails safe under adversarial validation labels (up to 40% flipped).
 
-## Intro thesis paragraph (for §1)
-
-> Machine-learning NIDS degrade under network concept drift, so adaptive systems periodically retrain, and the field frames the core question as *drift detection*: build a sensitive monitor, retrain when it fires. We argue this framing is wrong on both ends. Sensitive detection does not translate into good decisions — across three benchmarks, quantum-kernel and classical monitors alike yield only regime-dependent operating points that fail to replicate externally. More fundamentally, retraining is not always beneficial: we observe a spectrum from strong benefit to net harm, including a regime where no adaptation dominates every triggered strategy, and we show the sign of the effect is governed by deployed-model degradation — a quantity the detector does not measure. We therefore recast adaptive retraining as a cost-aware adapt/no-adapt decision, show that simple policies do not solve it, and give a label-efficient validate-before-commit gate that does.
-
-## Limitations paragraph (for §7)
-
-> Adaptation on our benchmarks retrains on labeled windows; the validate-before-commit gate accordingly assumes access to a small labeled probe at decision time, and we report its size (≈32–64 flows per confirmed drift) as the realistic cost rather than treating labels as free. The strongest positive (benefit) evidence is concentrated in CICIDS2017; the external benchmarks provide the marginal and harmful ends of the spectrum, which is what the argument requires, but broader benefit-regime replication is future work. Quantum kernels are classically simulated, so the reported 114× monitoring overhead is a simulation figure. The gate is evaluated at fixed per-window severity; we do model label latency (the probe may be up to 20 windows stale; §5.6) but not asynchronous or partial labeling. The net-harm result is specific to a fragile downstream classifier (SVC-RBF) on ToN-IoT and does not appear for more robust classifiers (§5.7); we therefore frame it as the fragile-model tail of a general degradation–benefit law rather than a universal harm claim, and note that the gate's safety — unlike the harm — generalizes across the four downstream models tested. Finally, all evaluation uses the same four downstream classifiers and three regimes for the gate; broader deployment settings remain future work.
