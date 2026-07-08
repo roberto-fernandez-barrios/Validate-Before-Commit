@@ -62,7 +62,7 @@ def t1_taxonomy():
         "Best detector": d["best_adaptive_method"].map(lambda m: DNAME.get(m, m)),
     })
     emit("table1_regime_taxonomy", out,
-         "Table 1: Readaptation value is regime-dependent. Best detector-triggered gain vs. no-adaptation (30 seeds CICIDS, 10 external).")
+         "Table 1: Readaptation value is regime-dependent. Best detector-triggered gain vs. no-adaptation (30 seeds per regime).")
 
 
 def _phase2():

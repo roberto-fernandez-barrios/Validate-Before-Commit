@@ -16,9 +16,9 @@ REGIMES = [
     ("cicids_ddos", "CICIDS DDoS", "benefit", "paper2_progressive_cicids_tuesday_friday_ddos_final_001"),
     ("cicids_portscan", "CICIDS PortScan", "benefit", "paper2_progressive_cicids_tuesday_friday_portscan_final_001"),
     ("cicids_webattacks", "CICIDS WebAttacks", "benefit", "paper2_progressive_thursday_webattacks_final_001"),
-    ("unsw_dos", "UNSW-NB15 DoS", "marginal", "paper2_unsw_nb15_dos_medium_001"),
-    ("unsw_recon", "UNSW-NB15 Reconnaissance", "mixed", "paper2_unsw_nb15_reconnaissance_medium_001"),
-    ("ton_iot_scanning", "ToN-IoT Scanning", "harmful", "paper2_ton_iot_scanning_medium_001"),
+    ("unsw_dos", "UNSW-NB15 DoS", "marginal", "paper2_unsw_nb15_dos_full30_001"),
+    ("unsw_recon", "UNSW-NB15 Reconnaissance", "marginal", "paper2_unsw_nb15_reconnaissance_full30_001"),
+    ("ton_iot_scanning", "ToN-IoT Scanning", "harmful", "paper2_ton_iot_scanning_full30_001"),
 ]
 DET = ["energy_distance", "mmd_rbf", "ks_max", "jsd", "qk_mmd_zz", "qk_mmd_pauli_xz"]
 

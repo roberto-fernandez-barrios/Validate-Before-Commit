@@ -22,7 +22,7 @@ FIGS = {
     "2":  ("docs/img/fig2_mechanism_law.png",
            "The benefit of adaptation tracks deployed-model degradation (SVC-RBF, $r=-0.89$)."),
     "2b": ("docs/img/fig2b_mechanism_law_pooled.png",
-           "The degradation--benefit law pooled across four downstream classifiers ($r=-0.82$, bootstrap 95\\% CI)."),
+           "The degradation--benefit law pooled across four downstream classifiers ($r=-0.81$, bootstrap 95\\% CI)."),
     "3":  ("docs/img/fig3_oracle_regret.png",
            "Decision oracle-regret grows with the fraction of streams on which adapting hurts."),
     "4":  ("docs/img/fig4_phase2_gate.png",
