@@ -132,6 +132,15 @@ def main():
     check("abstract <= 250 words", 244, float(len(abstract.split())), 6.0)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
+    # --- LaTeX table freshness (manuscript/tables must match the regenerated sources) ---
+    t1 = open("manuscript/tables/table1_regime_taxonomy.tex", encoding="utf-8").read()
+    t4 = open("manuscript/tables/table4_oracle_regret.tex", encoding="utf-8").read()
+    check("tex table1 fresh: 30 seeds per regime", 1.0, float("30 seeds per regime" in t1), 0.1)
+    check("tex table1 fresh: Recon marginal +0.5", 1.0,
+          float(("marginal" in t1) and ("0.5" in t1) and ("mixed" not in t1)), 0.1)
+    check("tex table4 fresh: 3.53 [1.76, 5.54]", 1.0,
+          float(("3.53" in t4) and ("[1.76, 5.54]" in t4)), 0.1)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")
