@@ -75,3 +75,12 @@ data/processed/unsw_nb15/*.csv
 # Paper 2 local ToN-IoT datasets
 data/raw/ton_iot/
 data/processed/ton_iot_q1_gate/*.csv
+
+# Journal guide and LaTeX template bundles (publisher-copyrighted; not redistributed)
+/guide
+/latex_template
+
+# Manuscript build artifacts (the compiled PDF is intentionally not published in the repo)
+manuscript/*.pdf
+*.abs
+*.spl
