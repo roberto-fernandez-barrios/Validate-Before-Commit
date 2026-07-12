@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Validate Before Commit: reproducibility artifact (code and protocols)"
+type: software
+authors:
+  - family-names: "Fernández-Barrios"
+    given-names: "Roberto"
+    orcid: "https://orcid.org/0009-0003-5312-2634"
+    affiliation: "Faculty of Engineering, University of Deusto"
+  - family-names: "Pastor-López"
+    given-names: "Iker"
+    orcid: "https://orcid.org/0000-0002-3068-6248"
+    affiliation: "Faculty of Engineering, University of Deusto"
+  - family-names: "Pikatza-Huerga"
+    given-names: "Amaia"
+    orcid: "https://orcid.org/0009-0003-9080-6242"
+    affiliation: "Faculty of Engineering, University of Deusto"
+  - family-names: "García Bringas"
+    given-names: "Pablo"
+    orcid: "https://orcid.org/0000-0003-3594-9534"
+    affiliation: "Faculty of Engineering, University of Deusto"
+license: MIT
+repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
+preferred-citation:
+  type: unpublished
+  title: "Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift"
+  authors:
+    - family-names: "Fernández-Barrios"
+      given-names: "Roberto"
+    - family-names: "Pastor-López"
+      given-names: "Iker"
+    - family-names: "Pikatza-Huerga"
+      given-names: "Amaia"
+    - family-names: "García Bringas"
+      given-names: "Pablo"
+  year: 2026
+  notes: "Under review"

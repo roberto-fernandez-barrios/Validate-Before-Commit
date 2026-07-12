@@ -144,5 +144,5 @@ This work is under review. Until a DOI is available, please cite the preprint/wo
 
 ## License
 
-License to be selected before public release. Recommended: **MIT** for the code and **CC-BY-4.0** for the
-manuscript text and figures. Add a `LICENSE` file accordingly.
+The code and analysis scripts are released under the **MIT License** (see [`LICENSE`](LICENSE)).
+Citation metadata for the artifact is provided in [`CITATION.cff`](CITATION.cff) and `.zenodo.json`.

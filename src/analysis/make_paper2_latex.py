@@ -256,7 +256,6 @@ The authors declare that they have no known competing financial interests or per
 could have appeared to influence the work reported in this paper.
 
 \section*{Funding}
-% TODO: state funding sources, or keep the sentence below if none.
 This research did not receive any specific grant from funding agencies in the public, commercial, or
 not-for-profit sectors.
 
@@ -265,9 +264,11 @@ The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the te
 reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact} (repository DOI:
 TODO -- deposit on Zenodo and insert here).
 
-% TODO (author decision): if generative-AI tools were used in manuscript preparation, add a
-% "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process"
-% section here, per the publisher policy. Remove if not applicable.
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work the authors used Claude (Anthropic) to assist with drafting and editing
+the manuscript text and with the implementation of the analysis scripts. After using this tool, the authors
+reviewed, verified and edited the content as needed and take full responsibility for the content of the
+published article.
 
 % CRediT roles are declared via \credit{} in the front matter and printed here:
 \printcredits

@@ -14,10 +14,10 @@ submission day. Corresponding author: Roberto Fernández-Barrios (roberto.fernan
       - [ ] insert it in the `fernandezbarrios2026artifact` entry in `references.bib`;
       - [ ] insert it in the *Data availability* paragraph (search `TODO -- deposit on Zenodo` in
             `src/analysis/make_paper2_latex.py`, regenerate).
-- [ ] **Funding** — edit the Funding section (default says "no specific grant"; change if a project funds it).
-- [ ] **Generative-AI declaration (author decision)** — if AI tools were used in manuscript preparation,
-      add the required section before the references (a `% TODO` marks the spot); Elsevier requires the
-      disclosure and forbids listing AI as an author.
+- [x] **Funding** — finalized (2026-07-12): no funding; the standard Elsevier no-grant sentence is in.
+- [x] **Generative-AI declaration** — added (2026-07-12) as the required section before the references
+      (standard Elsevier wording; tool named; authors take full responsibility). Mandatory in this case —
+      the "nothing to disclose" path only covers grammar/spell-check-level tooling.
 - [ ] **ORCID check** — Roberto's is set; confirm the other three authors' ORCIDs render correctly.
 - [ ] **Reference proofread** — verify the 3–4 `confidence: medium` entries flagged in the
       `references.bib` header (Chouchen & Jemili 2023; EDDM 1970s-style workshop ref; few-shot NIDS 2024)
