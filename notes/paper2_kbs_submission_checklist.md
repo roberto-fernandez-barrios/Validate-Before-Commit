@@ -5,8 +5,11 @@ submission day. Corresponding author: Roberto Fernández-Barrios (roberto.fernan
 
 ## A) Before compiling (fill the TODOs)
 
-- [ ] **Paper 1 reference** — replace the `@misc{fernandez_paper1}` stub in `manuscript/references.bib`
-      (authors, title, venue, year, DOI).
+- [x] **Paper 1 reference** — filled (2026-07-12): "Quantum and Classical Kernels under Distribution
+      Shift: Kernel Geometry Governs Out-of-Distribution Robustness", Fernández-Barrios, Pastor-López,
+      González-Santocildes, García Bringas; preprint, submitted to EPJ Quantum Technology.
+      **Remaining sub-TODO:** insert the arXiv identifier in the bib `note` once the preprint is posted
+      (KBS requires preprints to be marked and carry their identifier/DOI).
 - [ ] **Zenodo deposit** — upload the code artifact (tag a release of the repo), get the DOI, then:
       - [ ] insert it in the `fernandezbarrios2026artifact` entry in `references.bib`;
       - [ ] insert it in the *Data availability* paragraph (search `TODO -- deposit on Zenodo` in
