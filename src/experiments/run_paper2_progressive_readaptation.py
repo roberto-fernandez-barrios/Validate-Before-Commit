@@ -140,10 +140,14 @@ def transform_X(X: np.ndarray, scaler: StandardScaler, pca: PCA | None) -> np.nd
     return Xs
 
 
-def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf"):
-    """Fit the downstream classifier. Name kept for backward compatibility."""
+def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf", proba: bool = False):
+    """Fit the downstream classifier. Name kept for backward compatibility.
+
+    `proba=True` enables predict_proba on SVC (Platt scaling) for confidence-based gates (ATC/DoC).
+    """
     if model_type == "svc_rbf":
-        model = SVC(kernel="rbf", gamma="scale", class_weight="balanced", random_state=seed)
+        model = SVC(kernel="rbf", gamma="scale", class_weight="balanced", random_state=seed,
+                    probability=proba)
     elif model_type == "random_forest":
         model = RandomForestClassifier(
             n_estimators=200, class_weight="balanced", random_state=seed, n_jobs=-1
@@ -164,6 +168,30 @@ def evaluate_model(model: SVC, X: np.ndarray, y: np.ndarray) -> dict[str, float]
         "balanced_accuracy": float(balanced_accuracy_score(y, pred)),
         "f1": float(f1_score(y, pred, zero_division=0)),
     }
+
+
+def _model_conf(model, X: np.ndarray) -> np.ndarray:
+    """Max class probability per row (confidence), for ATC/DoC gates."""
+    return model.predict_proba(X).max(axis=1)
+
+
+def _labelfree_estimate(kind: str, model, val: tuple[np.ndarray, np.ndarray], X_target: np.ndarray) -> float:
+    """Label-free target-accuracy estimate from labeled SOURCE validation data + unlabeled target.
+
+    atc: Average Thresholded Confidence (Garg et al., ICLR 2022) -- learn threshold t on val so that
+         the fraction of val confidences above t equals val accuracy; estimate = fraction of target
+         confidences above t.
+    doc: Difference of Confidences (Guillory et al., ICCV 2021) --
+         est = acc_val - (mean_conf_val - mean_conf_target).
+    """
+    valX, valy = val
+    acc_val = float((model.predict(valX) == valy).mean())
+    conf_val = _model_conf(model, valX)
+    conf_t = _model_conf(model, X_target)
+    if kind == "atc":
+        thr = float(np.quantile(conf_val, 1.0 - acc_val)) if acc_val < 1.0 else float(conf_val.min())
+        return float((conf_t > thr).mean())
+    return acc_val - (float(conf_val.mean()) - float(conf_t.mean()))
 
 
 class KsWindowDetector:
@@ -450,6 +478,15 @@ def run_strategy(
     n_gate_rejections = 0
     labels_used_total = 0
 
+    # ATC/DoC gates: labeled SOURCE validation sample for the incumbent, drawn at its training severity
+    # (0.0 for the initial model). Zero target-window labels are ever used by these gates.
+    incumbent_val = None
+    if args.adaptation_gate in ("atc", "doc"):
+        Xv_raw, yv = sample_balanced_from_distribution(
+            pools, n_per_class=max(1, args.gate_val_size // 2), severity=0.0, rng=rng,
+        )
+        incumbent_val = (transform_X(Xv_raw, scaler, pca), yv)
+
     window_rows = []
     detector_runtime_sec_total = 0.0
     fit_runtime_sec_total = 0.0
@@ -505,11 +542,13 @@ def run_strategy(
             Xa = transform_X(Xa_raw, scaler, pca)
 
             fit_start = time.perf_counter()
-            candidate_model = train_svc(Xa, ya, seed + t + 1, args.downstream_model)
+            needs_proba = args.adaptation_gate in ("atc", "doc")
+            candidate_model = train_svc(Xa, ya, seed + t + 1, args.downstream_model, proba=needs_proba)
             fit_runtime_sec_total += time.perf_counter() - fit_start
 
             # Safe/cost-aware gate: decide whether to COMMIT (deploy) the candidate.
             commit = True
+            cand_val = None
             gate = args.adaptation_gate
             if gate == "labeled_probe":
                 n_probe = max(1, args.probe_size // 2)
@@ -534,6 +573,16 @@ def run_strategy(
                 pred_cand = candidate_model.predict(Xw)
                 disagree = float(np.mean(pred_dep != pred_cand))
                 commit = bool(disagree >= args.gate_disagree_threshold)
+            elif gate in ("atc", "doc"):
+                # Label-free gate: estimate target accuracy of incumbent and candidate from their
+                # own labeled source-validation samples + the UNLABELED current window.
+                Xv_raw, yv = sample_balanced_from_distribution(
+                    pools, n_per_class=max(1, args.gate_val_size // 2), severity=sev_t, rng=rng,
+                )
+                cand_val = (transform_X(Xv_raw, scaler, pca), yv)
+                est_dep = _labelfree_estimate(gate, current_model, incumbent_val, Xw)
+                est_cand = _labelfree_estimate(gate, candidate_model, cand_val, Xw)
+                commit = bool(est_cand >= est_dep + args.gate_margin)
             elif gate != "none":
                 raise ValueError(f"Unknown adaptation gate: {gate}")
 
@@ -544,6 +593,8 @@ def run_strategy(
                 if sev_t < args.false_adaptation_severity_threshold:
                     false_adaptations += 1
                 current_model = candidate_model
+                if cand_val is not None:
+                    incumbent_val = cand_val
                 # Reset detector reference to the current adapted regime.
                 detector = build_detector(method, args, seed + t + 1)
                 detector, threshold = calibrate_detector(
@@ -665,8 +716,9 @@ def main() -> None:
         "--adaptation-gate",
         type=str,
         default="none",
-        choices=["none", "labeled_probe", "unsup_disagree"],
+        choices=["none", "labeled_probe", "unsup_disagree", "atc", "doc"],
     )
+    parser.add_argument("--gate-val-size", type=int, default=256)
     parser.add_argument("--probe-size", type=int, default=64)
     parser.add_argument("--probe-lag", type=int, default=0)
     parser.add_argument("--probe-poison", type=float, default=0.0)
@@ -720,7 +772,10 @@ def main() -> None:
 
         scaler, pca, X_train = fit_transformer(X_train_raw, args.dim, seed)
 
-        initial_model = train_svc(X_train, y_train, seed, args.downstream_model)
+        initial_model = train_svc(
+            X_train, y_train, seed, args.downstream_model,
+            proba=args.adaptation_gate in ("atc", "doc"),
+        )
 
         no_adapt_rows = []
 
