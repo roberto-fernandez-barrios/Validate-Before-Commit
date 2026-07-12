@@ -129,8 +129,16 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words", 244, float(len(abstract.split())), 6.0)
+    check("abstract <= 250 words", 248, float(len(abstract.split())), 2.0)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
+
+    # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
+    lf = pd.read_csv(f"{T}/paper2_phase2h_labelfree_gates_001/paper2_labelfree_gates_summary.csv")
+    lfc = pd.read_csv(f"{T}/paper2_phase2h_labelfree_gates_001/paper2_labelfree_gates_paired_ci.csv")
+    check("5.6 ATC SVC ToN +0.40", 0.40, val(lf, "gain_pts", downstream="svc_rbf", regime="ton_scanning", gate="atc"), 0.006)
+    check("5.6 DoC SVC ToN +1.16", 1.16, val(lf, "gain_pts", downstream="svc_rbf", regime="ton_scanning", gate="doc"), 0.006)
+    check("5.6 ATC SVC PortScan -1.86 vs naive", -1.86, val(lfc, "d_vs_naive", downstream="svc_rbf", regime="portscan", gate="atc"), 0.006)
+    check("5.6 DoC SVC PortScan -4.64 vs naive", -4.64, val(lfc, "d_vs_naive", downstream="svc_rbf", regime="portscan", gate="doc"), 0.006)
 
     # --- LaTeX table freshness (manuscript/tables must match the regenerated sources) ---
     t1 = open("manuscript/tables/table1_regime_taxonomy.tex", encoding="utf-8").read()
