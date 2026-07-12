@@ -20,6 +20,7 @@ authors:
     orcid: "https://orcid.org/0000-0003-3594-9534"
     affiliation: "Faculty of Engineering, University of Deusto"
 license: MIT
+doi: "10.5281/zenodo.21322257"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished

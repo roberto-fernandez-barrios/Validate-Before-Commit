@@ -10,10 +10,10 @@ submission day. Corresponding author: Roberto Fernández-Barrios (roberto.fernan
       González-Santocildes, García Bringas; preprint, submitted to EPJ Quantum Technology.
       **Remaining sub-TODO:** insert the arXiv identifier in the bib `note` once the preprint is posted
       (KBS requires preprints to be marked and carry their identifier/DOI).
-- [ ] **Zenodo deposit** — upload the code artifact (tag a release of the repo), get the DOI, then:
-      - [ ] insert it in the `fernandezbarrios2026artifact` entry in `references.bib`;
-      - [ ] insert it in the *Data availability* paragraph (search `TODO -- deposit on Zenodo` in
-            `src/analysis/make_paper2_latex.py`, regenerate).
+- [x] **Zenodo deposit** — DONE (2026-07-12): GitHub release v1.0.0 archived by Zenodo.
+      **Version DOI 10.5281/zenodo.21322257** (concept DOI ...21322256). Propagated to
+      `references.bib`, the Data-availability statement (both LaTeX targets), `CITATION.cff`
+      and the README badge.
 - [x] **Funding** — finalized (2026-07-12): no funding; the standard Elsevier no-grant sentence is in.
 - [x] **Generative-AI declaration** — added (2026-07-12) as the required section before the references
       (standard Elsevier wording; tool named; authors take full responsibility). Mandatory in this case —

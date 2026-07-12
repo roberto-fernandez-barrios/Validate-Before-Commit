@@ -6,6 +6,7 @@
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
 ![pre-registered](https://img.shields.io/badge/protocol-pre--registered-important)
 ![python](https://img.shields.io/badge/python-3.11-blue)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21322257.svg)](https://doi.org/10.5281/zenodo.21322257)
 
 ![Graphical abstract](docs/img/graphical_abstract.png)
 
@@ -129,7 +130,8 @@ this repository.
 
 ## Citation
 
-This work is under review. Until a DOI is available, please cite the preprint/working paper:
+The paper is under review; cite it as below. To cite the **software artifact** itself, use the Zenodo DOI
+[10.5281/zenodo.21322257](https://doi.org/10.5281/zenodo.21322257) (metadata in `CITATION.cff`).
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
