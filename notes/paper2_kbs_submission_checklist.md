@@ -22,7 +22,8 @@ submission day. Corresponding author: Roberto Fernández-Barrios (roberto.fernan
 - [ ] **Reference proofread** — verify the 3–4 `confidence: medium` entries flagged in the
       `references.bib` header (Chouchen & Jemili 2023; EDDM 1970s-style workshop ref; few-shot NIDS 2024)
       against the publisher pages.
-- [ ] **Prose pass in your own voice** — especially Introduction, Related Work, Discussion.
+- [x] **Prose pass in your own voice** — DONE (2026-07-12): full manuscript reviewed and approved by the
+      corresponding author ("está perfecto").
 
 ## B) Build + QA (local)
 
