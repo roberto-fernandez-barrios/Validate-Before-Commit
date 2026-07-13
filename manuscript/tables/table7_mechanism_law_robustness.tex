@@ -1,0 +1,22 @@
+% Generated from results/tables/paper2_mechanism_law_robustness_001/summary.csv
+% (src/analysis/make_paper2_mechanism_law_robustness.py, 2026-07-13). Re-aggregation only.
+\begin{table}
+\centering
+\caption{Robustness of the degradation--benefit law (re-aggregation of the 30-seed artifacts; no new experiments). The law survives disaggregation to individual streams, seed resampling, and removal of any one regime or dataset; removing all four CICIDS2017 benefit regimes at once restricts the range of deployed-model degradation and attenuates --- but does not invert --- the correlation.}
+\label{tab:table7_mechanism_law_robustness}
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{llrl}
+\toprule
+Analysis & Points & $n$ & $r$ \\
+\midrule
+Regime-level (as published, \S5.2) & SVC-RBF regime means & 7 & $-0.89$ \\
+Seed-resampling bootstrap & 30 seeds/regime, 5000 resamples & 7 & $-0.89$, CI95 $[-0.90, -0.88]$ \\
+Stream-level (no aggregation) & regime $\times$ seed points & 210 & $-0.91$ \\
+Leave-one-regime-out & each of the 7 regimes removed & 6 & $-0.72$ to $-0.92$ \\
+Pooled across downstream models & SVC taxonomy + RF/LogReg/MLP & 16 & $-0.81$ \\
+\quad without ToN-IoT & & 12 & $-0.81$ \\
+\quad without UNSW-NB15 & & 11 & $-0.95$ \\
+\quad without CICIDS2017 & range-restricted & 9 & $-0.52$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

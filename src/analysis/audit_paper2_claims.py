@@ -152,6 +152,22 @@ def main():
     check("main.tex Limitations is real, not a stub", 1.0,
           float(("promote to a numbered section" not in tex) and ("fragile-model tail" in tex)), 0.1)
 
+    # --- Section 5.2 / Table 7: mechanism-law robustness (re-aggregation) ---
+    rob = pd.read_csv(f"{T}/paper2_mechanism_law_robustness_001/summary.csv")
+    check("5.2 rob svc7 r -0.89", -0.89, val(rob, "r", analysis="svc7_full"), 0.005)
+    check("5.2 rob per-seed r -0.91 (n=210)", -0.91, val(rob, "r", analysis="per_seed_pooled"), 0.005)
+    check("5.2 rob seed-boot CI lo -0.90", -0.90, val(rob, "r_min", analysis="svc7_seed_bootstrap"), 0.005)
+    check("5.2 rob seed-boot CI hi -0.88", -0.88, val(rob, "r_max", analysis="svc7_seed_bootstrap"), 0.005)
+    check("5.2 rob LORO strongest -0.92", -0.92, val(rob, "r_min", analysis="svc7_loro_range"), 0.005)
+    check("5.2 rob LORO weakest -0.72", -0.72, val(rob, "r_max", analysis="svc7_loro_range"), 0.005)
+    check("5.2 rob pooled16 r -0.81", -0.81, val(rob, "r", analysis="pooled16_full"), 0.005)
+    check("5.2 rob LODO no-ToN -0.81", -0.81, val(rob, "r", analysis="pooled16_lodo", detail="without ton_iot"), 0.005)
+    check("5.2 rob LODO no-UNSW -0.95", -0.95, val(rob, "r", analysis="pooled16_lodo", detail="without unsw"), 0.005)
+    check("5.2 rob LODO no-CICIDS -0.52", -0.52, val(rob, "r", analysis="pooled16_lodo", detail="without cicids"), 0.005)
+    t7 = open("manuscript/tables/table7_mechanism_law_robustness.tex", encoding="utf-8").read()
+    check("tex table7 fresh: per-seed -0.91 and LODO -0.52", 1.0,
+          float(("$-0.91$" in t7) and ("$-0.52$" in t7) and ("$-0.72$ to $-0.92$" in t7)), 0.1)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

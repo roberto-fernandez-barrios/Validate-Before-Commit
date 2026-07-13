@@ -53,6 +53,7 @@ python -m src.analysis.make_paper2_ba_f1_summary           # regime taxonomy (BA
 python -m src.analysis.make_paper2_budget_curve            # Phase 2b label-efficiency frontier + benefit regimes
 python -m src.analysis.make_paper2_paper_tables            # Tables 1-5 (Markdown + LaTeX booktabs)
 python -m src.analysis.make_paper2_figures                 # Figs 1-4 (spectrum, mechanism, regret, gate)
+python -m src.analysis.make_paper2_mechanism_law_robustness # Table 7: LORO/LODO/per-seed robustness of r
 ```
 
 Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
@@ -63,6 +64,7 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 |---|---|
 | Readaptation ranges benefit→harm across 3 datasets | `paper2_metrics_ba_f1_summary_001/`, Table 1, Fig 1 |
 | Benefit ~ deployed-model degradation, r = −0.89 | Fig 2 (`make_paper2_figures`) |
+| The law survives disaggregation (r = −0.91 per-seed) and any leave-one-out | `paper2_mechanism_law_robustness_001/`, Table 7 |
 | Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Table 4, Fig 3 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Table 5; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Tables 2-3, Fig 4 |
