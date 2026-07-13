@@ -539,6 +539,15 @@ def run_strategy(
                 severity=sev_t,
                 rng=rng,
             )
+            if args.adapt_strategy == "replay":
+                # Phase 2i: retrain-current-plus-replay — augment the current-severity sample
+                # with an equal-size (by default) replay sample from the reference regime.
+                replay_n = args.replay_size_per_class or args.adapt_size_per_class
+                Xr_raw, yr = sample_balanced_from_distribution(
+                    pools, n_per_class=replay_n, severity=0.0, rng=rng,
+                )
+                Xa_raw = np.vstack([Xa_raw, Xr_raw])
+                ya = np.concatenate([ya, yr])
             Xa = transform_X(Xa_raw, scaler, pca)
 
             fit_start = time.perf_counter()
@@ -656,6 +665,7 @@ def run_strategy(
         "n_gate_rejections": n_gate_rejections,
         "labels_used_total": labels_used_total,
         "adaptation_gate": args.adaptation_gate,
+        "adapt_strategy": args.adapt_strategy,
         "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
         "probe_lag": args.probe_lag if args.adaptation_gate == "labeled_probe" else 0,
         "probe_poison": args.probe_poison if args.adaptation_gate == "labeled_probe" else 0.0,
@@ -723,6 +733,13 @@ def main() -> None:
     parser.add_argument("--probe-lag", type=int, default=0)
     parser.add_argument("--probe-poison", type=float, default=0.0)
     parser.add_argument("--gate-margin", type=float, default=0.0)
+    parser.add_argument("--adapt-strategy", type=str, default="full_replace",
+                        choices=["full_replace", "replay"],
+                        help="Candidate training data: current-severity sample only "
+                             "(full_replace, default) or current + reference-regime replay "
+                             "sample (replay; Phase 2i).")
+    parser.add_argument("--replay-size-per-class", type=int, default=None,
+                        help="Replay sample size per class (default: adapt-size-per-class).")
     parser.add_argument("--gate-disagree-threshold", type=float, default=0.15)
 
     parser.add_argument(
