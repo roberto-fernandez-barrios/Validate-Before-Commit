@@ -121,7 +121,8 @@ def fig4_phase2():
         ax.set_title(det.replace("qk_mmd_zz", "QK-ZZ").replace("ks_max", "KS-max"))
         ax.set_ylabel("Gain vs no-adaptation (BA pts)")
     axes[-1].legend(fontsize=8, title="policy")
-    fig.suptitle("Label-efficient gate: preserves benefit, avoids harm — for both detectors")
+    # y > 1 lifts the suptitle clear of the panel titles (bbox_inches="tight" keeps it in frame)
+    fig.suptitle("Label-efficient gate: preserves benefit, avoids harm — for both detectors", y=1.06)
     save(fig, "fig4_phase2_gate")
 
 
