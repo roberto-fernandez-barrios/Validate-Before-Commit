@@ -262,7 +262,7 @@ not-for-profit sectors.
 \section*{Data availability}
 The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text; the code, protocols, and a
 reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact}
-(Zenodo, DOI \href{https://doi.org/10.5281/zenodo.21322257}{10.5281/zenodo.21322257}).
+(Zenodo, DOI \href{https://doi.org/10.5281/zenodo.21322256}{10.5281/zenodo.21322256}).
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 During the preparation of this work the authors used Claude (Anthropic) to assist with drafting and editing
@@ -284,7 +284,7 @@ TAIL_IEEE = r"""
 \section*{Data Availability}
 The three public benchmarks (CICIDS2017, UNSW-NB15, ToN-IoT) are cited in the text and not redistributed here.
 Code and a reproducibility guide are released as a public artifact~\cite{fernandezbarrios2026artifact}
-(Zenodo, DOI 10.5281/zenodo.21322257).
+(Zenodo, DOI 10.5281/zenodo.21322256).
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
