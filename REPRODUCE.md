@@ -55,6 +55,7 @@ python -m src.analysis.make_paper2_paper_tables            # Tables 1-5 (Markdow
 python -m src.analysis.make_paper2_figures                 # Figs 1-4 (spectrum, mechanism, regret, gate)
 python -m src.analysis.make_paper2_mechanism_law_robustness # Table 7: LORO/LODO/per-seed robustness of r
 python -m src.analysis.aggregate_paper2_replay_baseline     # Phase 2i: replay baseline verdict
+python -m src.analysis.aggregate_paper2_probe_prevalence    # Phase 2j: probe-prevalence verdict
 ```
 
 Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
@@ -67,6 +68,7 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Benefit ~ deployed-model degradation, r = −0.89 | Fig 2 (`make_paper2_figures`) |
 | The law survives disaggregation (r = −0.91 per-seed) and any leave-one-out | `paper2_mechanism_law_robustness_001/`, Table 7 |
 | Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, §5.6 |
+| The probe need not be balanced: full safety/benefit at natural prevalence (π=0.10/0.01) | `paper2_phase2j_probe_prevalence_001/`, §5.6 |
 | Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Table 4, Fig 3 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Table 5; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Tables 2-3, Fig 4 |

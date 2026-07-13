@@ -202,6 +202,24 @@ def main():
     check("5.6 replay-naive ToN CI hi < 0 (sig harmful)", -2.34,
           val(repci, "ci_hi", regime="ton_scanning", contrast="replay_naive_vs_noadapt"), 0.005)
 
+    # --- Section 5.6 / Phase 2j: probe prevalence ---
+    prev = pd.read_csv(f"{T}/paper2_phase2j_probe_prevalence_001/summary.csv")
+    prevci = pd.read_csv(f"{T}/paper2_phase2j_probe_prevalence_001/paired_ci.csv")
+    check("5.6 prevalence ToN p10 +1.00", 1.00, val(prev, "gain_pts", regime="ton_scanning", arm="p10_b32"), 0.005)
+    check("5.6 prevalence ToN p01 +1.01", 1.01, val(prev, "gain_pts", regime="ton_scanning", arm="p01_b32"), 0.005)
+    check("5.6 prevalence ToN p01_b320 +0.68", 0.675, val(prev, "gain_pts", regime="ton_scanning", arm="p01_b320"), 0.005)
+    check("5.6 prevalence PortScan p10 +7.93", 7.93, val(prev, "gain_pts", regime="portscan", arm="p10_b32"), 0.005)
+    check("5.6 prevalence PortScan p01 +7.62", 7.62, val(prev, "gain_pts", regime="portscan", arm="p01_b32"), 0.005)
+    check("5.6 prevalence PortScan p01_b320 +8.00", 7.998, val(prev, "gain_pts", regime="portscan", arm="p01_b320"), 0.005)
+    check("5.6 prevalence ToN p10 CI lo 0.66", 0.663,
+          val(prevci, "ci_lo", regime="ton_scanning", arm="p10_b32"), 0.005)
+    check("5.6 prevalence ToN p01 CI lo 0.69", 0.690,
+          val(prevci, "ci_lo", regime="ton_scanning", arm="p01_b32"), 0.005)
+    check("5.6 prevalence balanced ref ToN +0.93", 0.934,
+          val(prev, "gain_pts", regime="ton_scanning", arm="balanced_b32"), 0.005)
+    check("5.6 prevalence balanced ref PortScan +8.27", 8.27,
+          val(prev, "gain_pts", regime="portscan", arm="balanced_b32"), 0.005)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")
