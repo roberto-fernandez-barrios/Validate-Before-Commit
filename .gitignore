@@ -84,3 +84,25 @@ data/processed/ton_iot_q1_gate/*.csv
 manuscript/*.pdf
 *.abs
 *.spl
+
+# Internal planning / strategy / submission-logistics documents (kept locally, not part of
+# the public research artifact — protocols, pre-registrations and checkpoints remain tracked)
+/PAPER_2_execution_plan_Q1.md
+notes/paper2_director_summary_001.md
+notes/paper2_final_salvage_decision_001.md
+notes/paper2_final_salvage_review_001.md
+notes/paper2_rescue_review.md
+notes/paper2_next_steps_review.md
+notes/paper2_journal_search_prompt.md
+notes/paper2_journal_search_prompt_002.md
+notes/paper2_venue_and_cover_letter_001.md
+notes/paper2_venue_decision_002.md
+notes/paper2_venue_decision_003.md
+notes/paper2_strategic_review_after_thursday.md
+notes/paper2_strategic_review_after_unsw_medium.md
+notes/paper2_kbs_cover_letter.md
+notes/paper2_kbs_submission_checklist.md
+notes/paper2_phase2_pr_body.md
+notes/paper2_manuscript_skeleton_001.md
+manuscript/paper2_manuscript_skeleton_001.md
+notes/paper2_bibliography_ceiling_integration_001.md

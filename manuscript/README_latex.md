@@ -16,7 +16,6 @@ of appearance = KBS style, and ships with natbib). For Elsevier's exact CAS numb
 `cas-model1-num-names` (obtain that `.bst` from the full Elsevier CAS bundle / CTAN `els-cas-templates`).
 
 Compile: `cd manuscript && latexmk -pdf main.tex` (or `pdflatex main; bibtex main; pdflatex main; pdflatex main`).
-See `notes/paper2_venue_decision_003.md` for the venue decision, guide compliance, and the length handling.
 
 ## Regenerate the LaTeX from source
 ```bash
@@ -25,7 +24,6 @@ python -m src.analysis.make_paper2_latex ieee      # manuscript/main_ieee.tex   
 python -m src.analysis.make_paper2_latex elsevier  # manuscript/main.tex        (fallback)
 ```
 Compile IEEE with `latexmk -pdf main_ieee.tex` (needs `IEEEtran.cls`, standard in TeX Live/MiKTeX).
-See `notes/paper2_venue_decision_002.md` for the venue decision and required submission statements.
 
 ## Compile (needs a TeX distribution: TeX Live / MiKTeX; elsarticle.cls is standard)
 ```bash
