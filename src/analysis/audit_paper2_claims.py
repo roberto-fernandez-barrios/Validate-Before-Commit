@@ -237,6 +237,26 @@ def main():
     check("5.6 cand2000 ToN naive CI hi < 0", -2.486,
           val(ctl, "ci_hi", control="cand2000", regime="ton_scanning", arm="none"), 0.005)
 
+    # --- Section 5.9 / harness-v2 registered replication ---
+    v2 = pd.read_csv(f"{T}/paper2_v2_replication_001/summary.csv")
+    v2c = pd.read_csv(f"{T}/paper2_v2_replication_001/paired_ci.csv")
+    v2m = pd.read_csv(f"{T}/paper2_v2_replication_001/mechanism.csv")
+    check("5.9 v2 ToN naive -1.41", -1.41, val(v2, "gain_pts", detector="ks", regime="ton_scanning", arm="none"), 0.005)
+    check("5.9 v2 ToN lp32 +0.95", 0.949, val(v2, "gain_pts", detector="ks", regime="ton_scanning", arm="lp32"), 0.005)
+    check("5.9 v2 ToN lp32 vs naive +2.36", 2.359,
+          val(v2c, "diff", detector="ks", regime="ton_scanning", contrast="lp32_vs_naive"), 0.005)
+    check("5.9 v2 PortScan lp32 +8.79", 8.791, val(v2, "gain_pts", detector="ks", regime="portscan", arm="lp32"), 0.005)
+    check("5.9 v2 PortScan naive +7.94", 7.942, val(v2, "gain_pts", detector="ks", regime="portscan", arm="none"), 0.005)
+    check("5.9 v2 UNSW lp32 +1.31", 1.31, val(v2, "gain_pts", detector="ks", regime="unsw_recon", arm="lp32"), 0.005)
+    check("5.9 v2 QK ToN naive -1.58", -1.58, val(v2, "gain_pts", detector="qk", regime="ton_scanning", arm="none"), 0.005)
+    check("5.9 v2 QK ToN lp32 +0.91", 0.907, val(v2, "gain_pts", detector="qk", regime="ton_scanning", arm="lp32"), 0.005)
+    check("5.9 v2 holdout ToN +0.97", 0.970, val(v2, "gain_pts", detector="ks", regime="ton_scanning", arm="holdout32"), 0.005)
+    check("5.9 v2 holdout PortScan +8.69", 8.694, val(v2, "gain_pts", detector="ks", regime="portscan", arm="holdout32"), 0.005)
+    check("5.9 v2 lcb ToN +0.49", 0.491, val(v2, "gain_pts", detector="ks", regime="ton_scanning", arm="lcb64"), 0.005)
+    check("5.9 v2 mech pooled r_deg -0.56", -0.555, val(v2m, "r_deg", regime="POOLED"), 0.005)
+    check("5.9 v2 mech pooled r_score ~0", -0.004, val(v2m, "r_score", regime="POOLED"), 0.005)
+    check("5.9 v2 mech pooled n=252", 252, val(v2m, "n_triggers", regime="POOLED"), 0.5)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

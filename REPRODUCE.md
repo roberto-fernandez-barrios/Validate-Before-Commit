@@ -57,6 +57,7 @@ python -m src.analysis.make_paper2_mechanism_law_robustness # Table 7: LORO/LODO
 python -m src.analysis.aggregate_paper2_replay_baseline     # Phase 2i: replay baseline verdict
 python -m src.analysis.aggregate_paper2_probe_prevalence    # Phase 2j: probe-prevalence verdict
 python -m src.analysis.aggregate_paper2_size_dim_controls   # Phase 2k: candidate-size / full-dim controls
+python -m src.analysis.aggregate_paper2_v2_replication      # Harness-v2 registered replication verdict
 ```
 
 Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
@@ -71,6 +72,7 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, §5.6 |
 | The probe need not be balanced: full safety/benefit at natural prevalence (π=0.10/0.01) | `paper2_phase2j_probe_prevalence_001/`, §5.6 |
 | Harm is not a size/PCA artifact: deepens with size-matched candidates; persists point-wise at full dim | `paper2_phase2k_size_dim_controls_001/`, §5.6 |
+| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; zero-incremental-label holdout gate; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.9, tag `harness-v2-protocol` |
 | Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Table 4, Fig 3 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Table 5; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Tables 2-3, Fig 4 |
