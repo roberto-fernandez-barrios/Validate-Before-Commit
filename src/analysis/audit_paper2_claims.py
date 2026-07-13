@@ -186,6 +186,22 @@ def main():
     check("5.1 KS-max prespecified taxonomy: ToN -2.4", -2.4,
           val(baf1, "gain_BA_pts", regime_id="ton_iot_scanning", method="ks_max"), 0.05)
 
+    # --- Section 5.6 / Phase 2i: replay retraining baseline ---
+    rep = pd.read_csv(f"{T}/paper2_phase2i_replay_baseline_001/summary.csv")
+    repci = pd.read_csv(f"{T}/paper2_phase2i_replay_baseline_001/paired_ci.csv")
+    check("5.6 replay-naive ToN -4.54", -4.54, val(rep, "gain_pts", regime="ton_scanning", arm="replay_naive"), 0.005)
+    check("5.6 replay-naive PortScan +6.59", 6.59, val(rep, "gain_pts", regime="portscan", arm="replay_naive"), 0.005)
+    check("5.6 replay+gate ToN +0.59", 0.585, val(rep, "gain_pts", regime="ton_scanning", arm="replay_lp32"), 0.005)
+    check("5.6 replay+gate PortScan +8.26", 8.255, val(rep, "gain_pts", regime="portscan", arm="replay_lp32"), 0.005)
+    check("5.6 replay gate-vs-replay-naive ToN +5.13", 5.125,
+          val(repci, "diff", regime="ton_scanning", contrast="replay_lp32_vs_replay_naive"), 0.005)
+    check("5.6 replay gate ToN vs noadapt CI lo 0.23", 0.227,
+          val(repci, "ci_lo", regime="ton_scanning", contrast="replay_lp32_vs_noadapt"), 0.005)
+    check("5.6 replay gate PortScan rescue +1.66", 1.662,
+          val(repci, "diff", regime="portscan", contrast="replay_lp32_vs_replay_naive"), 0.005)
+    check("5.6 replay-naive ToN CI hi < 0 (sig harmful)", -2.34,
+          val(repci, "ci_hi", regime="ton_scanning", contrast="replay_naive_vs_noadapt"), 0.005)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")
