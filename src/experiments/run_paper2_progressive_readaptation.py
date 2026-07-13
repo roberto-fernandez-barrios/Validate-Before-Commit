@@ -119,6 +119,31 @@ def sample_balanced_from_distribution(
     return X[perm], y[perm]
 
 
+def sample_prevalence_from_distribution(
+    pools: Pools,
+    n_total: int,
+    attack_frac: float,
+    severity: float,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Binary sample at a given attack prevalence (Phase 2j probes). Each class is the same
+    ref/current mixture as sample_balanced_from_distribution; at least one attack flow is
+    always included (a probe with zero attacks cannot compare attack behaviour)."""
+    severity = float(np.clip(severity, 0.0, 1.0))
+    n_att = max(1, int(round(n_total * attack_frac)))
+    n_ben = max(1, n_total - n_att)
+
+    def mixed(pool_ref, pool_cur, n):
+        n_cur = int(round(n * severity))
+        return np.vstack([sample_rows(pool_ref, n - n_cur, rng), sample_rows(pool_cur, n_cur, rng)])
+
+    X = np.vstack([mixed(pools.ref_benign, pools.cur_benign, n_ben),
+                   mixed(pools.ref_attack, pools.cur_attack, n_att)])
+    y = np.array([0] * n_ben + [1] * n_att)
+    perm = rng.permutation(len(y))
+    return X[perm], y[perm]
+
+
 def fit_transformer(X_train: np.ndarray, dim: int, seed: int):
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X_train)
@@ -564,9 +589,16 @@ def run_strategy(
                 # Realistic label latency: the probe comes from traffic labeled `probe_lag`
                 # windows ago (its severity), not from the current window.
                 probe_sev = progressive_severity(max(0, t - args.probe_lag), args)
-                Xp_raw, yp = sample_balanced_from_distribution(
-                    pools, n_per_class=n_probe, severity=probe_sev, rng=rng,
-                )
+                if args.probe_prevalence != 0.5:
+                    # Phase 2j: probe drawn at the traffic's natural attack prevalence.
+                    Xp_raw, yp = sample_prevalence_from_distribution(
+                        pools, n_total=args.probe_size, attack_frac=args.probe_prevalence,
+                        severity=probe_sev, rng=rng,
+                    )
+                else:
+                    Xp_raw, yp = sample_balanced_from_distribution(
+                        pools, n_per_class=n_probe, severity=probe_sev, rng=rng,
+                    )
                 Xp = transform_X(Xp_raw, scaler, pca)
                 # Adversarial / noisy probe: an attacker (or faulty labeler) flips a
                 # fraction of the validation labels the gate relies on.
@@ -669,6 +701,7 @@ def run_strategy(
         "probe_size": args.probe_size if args.adaptation_gate == "labeled_probe" else 0,
         "probe_lag": args.probe_lag if args.adaptation_gate == "labeled_probe" else 0,
         "probe_poison": args.probe_poison if args.adaptation_gate == "labeled_probe" else 0.0,
+        "probe_prevalence": args.probe_prevalence if args.adaptation_gate == "labeled_probe" else 0.5,
         "gate_margin": args.gate_margin if args.adaptation_gate == "labeled_probe" else 0.0,
         "false_adaptations": false_adaptations,
         "first_adaptation_window": adaptation_windows[0] if adaptation_windows else np.nan,
@@ -732,6 +765,9 @@ def main() -> None:
     parser.add_argument("--probe-size", type=int, default=64)
     parser.add_argument("--probe-lag", type=int, default=0)
     parser.add_argument("--probe-poison", type=float, default=0.0)
+    parser.add_argument("--probe-prevalence", type=float, default=0.5,
+                        help="Attack fraction of the labeled probe (0.5 = balanced, default; "
+                             "Phase 2j draws the probe at the traffic's natural prevalence).")
     parser.add_argument("--gate-margin", type=float, default=0.0)
     parser.add_argument("--adapt-strategy", type=str, default="full_replace",
                         choices=["full_replace", "replay"],
