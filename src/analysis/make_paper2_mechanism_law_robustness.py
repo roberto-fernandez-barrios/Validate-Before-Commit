@@ -120,9 +120,75 @@ def main():
     rows.append(dict(analysis="per_seed_pooled", detail="7 regimes x 30 seeds", n=len(PS),
                      r=round(r_seed, 3)))
 
+    # ---- 5. coupling diagnostics: is r more than mathematical coupling? ---------------
+    # gain = A - N shares N with the predictor, so r(N, A-N) is negative even if A were
+    # independent of N. Diagnostics: (a) dispersion of the restored level A vs N; (b) slope
+    # of gain on N; (c) exhaustive permutation null that re-pairs the observed A values with
+    # the observed N values (holds both marginals; r under "A unrelated to N"); (d) the
+    # non-coupled contrast: detector scores do NOT predict the gain, N does.
+    from itertools import permutations
+    crows = []
+    N = M["base_BA_pct"].values
+    A = N + M["gain_pts"].values
+    crows.append(dict(metric="sigma_noadapt_BA", value=round(float(np.std(N, ddof=1)), 3)))
+    crows.append(dict(metric="sigma_adapted_BA", value=round(float(np.std(A, ddof=1)), 3)))
+    slope = float(np.polyfit(N, A - N, 1)[0])
+    crows.append(dict(metric="slope_gain_on_base", value=round(slope, 3)))
+    null_rs = [pearson(N, np.array(p) - N) for p in permutations(A)]
+    r_obs = pearson(N, A - N)
+    crows.append(dict(metric="perm_null_median_r", value=round(float(np.median(null_rs)), 3)))
+    crows.append(dict(metric="perm_null_p_more_negative",
+                      value=round(float(np.mean(np.array(null_rs) <= r_obs)), 3)))
+    # detector-score contrast: per detector, corr(regime-mean score/threshold, that
+    # detector's own gain) across the 7 regimes.
+    gains = pd.read_csv(f"{TAB}/paper2_metrics_ba_f1_summary_001/paper2_ba_f1_by_regime_method.csv")
+    det_rs = []
+    for det in DET:
+        xs, ys = [], []
+        for label, ds, run in REGIMES:
+            w = pd.read_csv(f"{RAW}/{run}/paper2_progressive_readaptation_window_results.csv",
+                            usecols=["method", "score", "threshold"])
+            w = w[w.method == det].dropna(subset=["score", "threshold"])
+            xs.append(float((w["score"] / w["threshold"]).mean()))
+            g = gains[(gains.regime == label) & (gains.method == det)]
+            ys.append(float(g["gain_BA_pts"].iloc[0]))
+        det_rs.append(pearson(xs, ys))
+        crows.append(dict(metric=f"detector_score_vs_gain_r__{det}", value=round(det_rs[-1], 3)))
+    crows.append(dict(metric="detector_score_vs_gain_r_min", value=round(min(det_rs), 3)))
+    crows.append(dict(metric="detector_score_vs_gain_r_max", value=round(max(det_rs), 3)))
+    # within-regime (= within a single deployment) versions: over the 30 seeds of each
+    # regime, does the detector's score predict that seed's gain? does degradation?
+    within_score, within_base = [], []
+    for label, ds, run in REGIMES:
+        w = pd.read_csv(f"{RAW}/{run}/paper2_progressive_readaptation_window_results.csv",
+                        usecols=["seed", "method", "score", "threshold", "balanced_accuracy"])
+        ba = w.groupby(["seed", "method"])["balanced_accuracy"].mean().unstack("method")
+        best = ba[DET].mean().idxmax()
+        gain_s = (ba[best] - ba["no_adaptation"]) * 100
+        base_s = ba["no_adaptation"] * 100
+        sc = w[w.method == best].dropna(subset=["score", "threshold"])
+        ratio_s = (sc["score"] / sc["threshold"]).groupby(sc["seed"]).mean()
+        idx = gain_s.index.intersection(ratio_s.index)
+        if len(idx) >= 5 and ratio_s[idx].std() > 0 and gain_s[idx].std() > 0:
+            within_score.append(pearson(ratio_s[idx], gain_s[idx]))
+        if base_s.std() > 0 and gain_s.std() > 0:
+            within_base.append(pearson(base_s, gain_s))
+    crows.append(dict(metric="within_regime_score_vs_gain_r_median",
+                      value=round(float(np.median(within_score)), 3)))
+    crows.append(dict(metric="within_regime_score_vs_gain_r_min", value=round(min(within_score), 3)))
+    crows.append(dict(metric="within_regime_score_vs_gain_r_max", value=round(max(within_score), 3)))
+    crows.append(dict(metric="within_regime_base_vs_gain_r_median",
+                      value=round(float(np.median(within_base)), 3)))
+    crows.append(dict(metric="within_regime_base_vs_gain_r_min", value=round(min(within_base), 3)))
+    crows.append(dict(metric="within_regime_base_vs_gain_r_max", value=round(max(within_base), 3)))
+    C = pd.DataFrame(crows)
+    C.to_csv(f"{OUT}/coupling_diagnostics.csv", index=False)
+
     S = pd.DataFrame(rows)
     S.to_csv(f"{OUT}/summary.csv", index=False)
     print(S.to_string(index=False))
+    print()
+    print(C.to_string(index=False))
 
 
 if __name__ == "__main__":

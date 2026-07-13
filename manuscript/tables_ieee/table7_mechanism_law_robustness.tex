@@ -17,6 +17,14 @@ Pooled across downstream models & SVC taxonomy + RF/LogReg/MLP & 16 & $-0.81$ \\
 \quad without ToN-IoT & & 12 & $-0.81$ \\
 \quad without UNSW-NB15 & & 11 & $-0.95$ \\
 \quad without CICIDS2017 & range-restricted & 9 & $-0.52$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Coupling diagnostics (\S5.2): the substance is the compressed restored level, not $r$}}\\
+Restored-level dispersion & $\sigma$(post-adapt BA) vs.\ $\sigma$(deployed BA) & 7 & 3.5 vs.\ 7.4 pts \\
+Slope of gain on deployed BA & regime means & 7 & $-0.87$ \\
+Re-pairing null (exhaustive) & median $r$; $p$(observed more extreme) & 7 & $-0.91$; $p=0.80$ \\
+Within-regime: score vs.\ gain & median (min..max) over regimes & 30/regime & $+0.06$ ($+0.02$..$+0.13$) \\
+Within-regime: deployed BA vs.\ gain & median (min..max) over regimes & 30/regime & $-0.68$ ($-0.99$..$-0.35$) \\
+Cross-regime: classical score vs.\ gain & per-detector $r$ & 7 & $+0.75$..$+0.94$ \\
 \bottomrule
 \end{tabular}}
 \end{table*}

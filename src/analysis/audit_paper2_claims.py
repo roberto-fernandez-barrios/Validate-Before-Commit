@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words", 248, float(len(abstract.split())), 2.0)
+    check("abstract <= 250 words", 249, float(len(abstract.split())), 1.0)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -167,6 +167,24 @@ def main():
     t7 = open("manuscript/tables/table7_mechanism_law_robustness.tex", encoding="utf-8").read()
     check("tex table7 fresh: per-seed -0.91 and LODO -0.52", 1.0,
           float(("$-0.91$" in t7) and ("$-0.52$" in t7) and ("$-0.72$ to $-0.92$" in t7)), 0.1)
+
+    # --- Section 5.2: coupling diagnostics (restoration-to-ceiling framing) ---
+    cpl = pd.read_csv(f"{T}/paper2_mechanism_law_robustness_001/coupling_diagnostics.csv")
+    check("5.2 cpl sigma deployed 7.4", 7.4, val(cpl, "value", metric="sigma_noadapt_BA"), 0.05)
+    check("5.2 cpl sigma restored 3.5", 3.5, val(cpl, "value", metric="sigma_adapted_BA"), 0.06)
+    check("5.2 cpl slope -0.87", -0.87, val(cpl, "value", metric="slope_gain_on_base"), 0.005)
+    check("5.2 cpl perm null median -0.91", -0.91, val(cpl, "value", metric="perm_null_median_r"), 0.005)
+    check("5.2 cpl perm p 0.80", 0.80, val(cpl, "value", metric="perm_null_p_more_negative"), 0.005)
+    check("5.2 cpl within-regime score r median +0.06", 0.06,
+          val(cpl, "value", metric="within_regime_score_vs_gain_r_median"), 0.005)
+    check("5.2 cpl within-regime score r max 0.13", 0.13,
+          val(cpl, "value", metric="within_regime_score_vs_gain_r_max"), 0.005)
+    check("5.2 cpl within-regime base r median -0.68", -0.68,
+          val(cpl, "value", metric="within_regime_base_vs_gain_r_median"), 0.005)
+    check("5.2 cpl cross-regime classical score r max 0.94", 0.94,
+          val(cpl, "value", metric="detector_score_vs_gain_r__mmd_rbf"), 0.005)
+    check("5.1 KS-max prespecified taxonomy: ToN -2.4", -2.4,
+          val(baf1, "gain_BA_pts", regime_id="ton_iot_scanning", method="ks_max"), 0.05)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
