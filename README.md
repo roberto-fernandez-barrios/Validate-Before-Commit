@@ -4,7 +4,7 @@
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
-![pre-registered](https://img.shields.io/badge/protocol-pre--registered-important)
+![pre-specified](https://img.shields.io/badge/protocol-pre--specified-important)
 ![python](https://img.shields.io/badge/python-3.11-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21322256.svg)](https://doi.org/10.5281/zenodo.21322256)
 
@@ -25,14 +25,16 @@ deployable fix.
 - Across **three public benchmarks** (CICIDS2017, UNSW-NB15, ToN-IoT) and multiple attack regimes, the value of
   drift-triggered retraining spans **+19.5 to −4.5 balanced-accuracy points**. For a fragile downstream model,
   *never adapting* can beat every triggered strategy.
-- Whether retraining helps is governed by **how degraded the deployed model already is** — a correlation of
-  **r ≈ −0.82 to −0.89** (with CI) that a drift detector *cannot observe*. The detector — classical two-sample
-  test or quantum-kernel MMD — is **not the lever**.
-- Simple confirmation/cooldown policies do **not** fix it (a pre-registered negative).
+- Whether retraining helps is governed by **how degraded the deployed model already is**: retraining restores
+  accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity a
+  drift detector cannot observe (within a deployment, detector scores are uninformative about the gain, r ≈ 0.06).
+  The detector — classical two-sample test or quantum-kernel MMD — is **not the lever**.
+- Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
 - **The fix:** a label-efficient **validate-before-commit gate** — on each triggered drift, retrain a candidate
   but deploy it **only if it beats the incumbent on a small labeled probe** (tens of labeled flows). It is
-  pre-registered, evaluated with 30-seed 95% CIs, generalizes across two detectors and four downstream models,
-  tolerates label latency, and **fails safe under adversarial validation labels**.
+  evaluated under pre-specified criteria with 30-seed 95% CIs, generalizes across two detectors (with SVC) and
+  four downstream models (with KS-max), tolerates label latency and natural-prevalence probes, and **fails safe
+  under randomly corrupted validation labels**.
 
 ---
 
@@ -42,7 +44,7 @@ deployable fix.
 
 ![Regime spectrum](docs/img/fig1_regime_spectrum.png)
 
-**2 — The benefit of adaptation tracks deployed-model degradation, not distributional change (r ≈ −0.89).**
+**2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of adaptation is the deployed model's headroom (coupling-aware analysis in the paper, §5.2).**
 
 ![Mechanism law](docs/img/fig2_mechanism_law.png)
 
@@ -51,14 +53,14 @@ never-adapting — identically for a classical (KS-max) and a quantum (QK-ZZ) de
 
 ![Gate results](docs/img/fig4_phase2_gate.png)
 
-**4 — The gate fails safe: with up to 40% of validation labels poisoned it never becomes harmful and never
-underperforms naive.**
+**4 — The gate fails safe: with up to 40% of validation labels randomly flipped it never becomes harmful and is
+never significantly worse than naive.**
 
 ![Adversarial probe](docs/img/fig8_probe_poison.png)
 
 ---
 
-## Results at a glance (ToN-IoT harm regime, 30 seeds, pre-registered)
+## Results at a glance (ToN-IoT harm regime, 30 seeds, pre-specified criteria)
 
 | Detector | naive retraining | **validate-before-commit gate** | gate vs naive (CI95) | gate vs never-adapt (CI95) |
 |---|---:|---:|---|---|
@@ -111,7 +113,7 @@ python -m src.analysis.make_paper2_gate_robustness # latency / harm-breadth / ma
 ```
 
 Full details, including the exact experiment commands and a claim → artifact map, are in
-[`REPRODUCE.md`](REPRODUCE.md). The confirmatory Phase 2 protocol is pre-registered in
+[`REPRODUCE.md`](REPRODUCE.md). The confirmatory Phase 2 protocol was pre-specified in
 [`notes/paper2_phase2_gated_readaptation_preregistration_001.md`](notes/paper2_phase2_gated_readaptation_preregistration_001.md).
 
 ## Data availability

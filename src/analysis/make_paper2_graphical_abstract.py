@@ -59,11 +59,11 @@ def main():
         "#e8f4f2", GREEN, DARK, 9.6, "bold")
     arrow(ax, 0.61, 0.29, 0.66, 0.29, GREEN)
     box(ax, 0.66, 0.19, 0.325, 0.20,
-        "✓  SAFE & label-efficient\n$+0.9$ to $+1.1$ BA pts;\nnever worse than either baseline", "#e8f4f2", GREEN, "#1d6f64", 10.5, "bold")
+        "✓  Empirically safe & label-efficient\n$+0.9$ to $+1.1$ BA pts; never\nsignificantly worse than either baseline", "#e8f4f2", GREEN, "#1d6f64", 10.5, "bold")
 
     # Bottom robustness badges
-    badges1 = "~8 labels / confirmed drift    •    probes up to 20 windows stale    •    fails safe under 40% label flips"
-    badges2 = "2 detectors × 4 downstream classifiers    •    pre-registered, 30-seed 95% CIs    •    reproducible artifact"
+    badges1 = "~8 labels / confirmed drift    •    probes 20 windows stale or natural prevalence    •    fails safe under 40% random label flips"
+    badges2 = "2 detectors × 4 downstream classifiers    •    pre-specified criteria, 30-seed 95% CIs    •    reproducible artifact"
     ax.add_patch(FancyBboxPatch((0.03, 0.008), 0.94, 0.12, boxstyle="round,pad=0.004,rounding_size=0.02",
                                 linewidth=1.2, edgecolor=GREY, facecolor="#f7f7f7", zorder=1))
     ax.text(0.5, 0.092, badges1, ha="center", va="center", fontsize=8.5, color=DARK)

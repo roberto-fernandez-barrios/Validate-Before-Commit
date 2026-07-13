@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words", 249, float(len(abstract.split())), 1.0)
+    check("abstract <= 250 words", 250, float(len(abstract.split())), 0.5)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -219,6 +219,23 @@ def main():
           val(prev, "gain_pts", regime="ton_scanning", arm="balanced_b32"), 0.005)
     check("5.6 prevalence balanced ref PortScan +8.27", 8.27,
           val(prev, "gain_pts", regime="portscan", arm="balanced_b32"), 0.005)
+
+    # --- Section 5.6 / Phase 2k: candidate-size and dimensionality controls ---
+    ctl = pd.read_csv(f"{T}/paper2_phase2k_size_dim_controls_001/summary.csv")
+    check("5.6 cand2000 ToN naive -5.34", -5.34,
+          val(ctl, "gain_pts", control="cand2000", regime="ton_scanning", arm="none"), 0.005)
+    check("5.6 cand2000 ToN gate +0.58", 0.582,
+          val(ctl, "gain_pts", control="cand2000", regime="ton_scanning", arm="lp32"), 0.005)
+    check("5.6 cand2000 PortScan gate +9.33", 9.327,
+          val(ctl, "gain_pts", control="cand2000", regime="portscan", arm="lp32"), 0.005)
+    check("5.6 cand2000 UNSW naive +3.31", 3.313,
+          val(ctl, "gain_pts", control="cand2000", regime="unsw_recon", arm="none"), 0.005)
+    check("5.6 fulldim ToN naive -0.65", -0.651,
+          val(ctl, "gain_pts", control="fulldim", regime="ton_scanning", arm="none"), 0.005)
+    check("5.6 fulldim PortScan naive +16.2", 16.226,
+          val(ctl, "gain_pts", control="fulldim", regime="portscan", arm="none"), 0.05)
+    check("5.6 cand2000 ToN naive CI hi < 0", -2.486,
+          val(ctl, "ci_hi", control="cand2000", regime="ton_scanning", arm="none"), 0.005)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
