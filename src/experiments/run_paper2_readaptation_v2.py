@@ -207,6 +207,24 @@ def calibrate(detector, env: Environment, severity: float, args, rng) -> tuple[o
     return detector, float(np.quantile(scores, args.threshold_quantile))
 
 
+def calibrate_observed(detector, seen: list[tuple[np.ndarray, np.ndarray]], args):
+    """Amendment 007: post-commit recalibration from OBSERVED traffic only.
+
+    The reference is built from the last 8 observed windows (the rows the candidate itself
+    trained on -- a deployment has them), and the threshold is the 0.95 quantile of the
+    detector's scores on the preceding observed windows scored against that reference.
+    Reads no severity and touches no pool. The `pools` path (calibrate) remains the default
+    so every pre-amendment-007 run reproduces bit-for-bit.
+    """
+    ref = np.vstack([x for x, _ in seen[-8:]])
+    detector.fit(ref)
+    hist = seen[-(8 + args.calibration_windows):-8]
+    scores = [float(detector.score(x)) for x, _ in hist]
+    if not scores:                       # too early in the stream: fall back to the ref windows
+        scores = [float(detector.score(x)) for x, _ in seen[-8:]]
+    return detector, float(np.quantile(scores, args.threshold_quantile))
+
+
 def run_arm(method: str, env: Environment, args, seed: int):
     """One (detector, gate) arm over the shared pre-generated stream."""
     detector = build_detector(method, args, seed)
@@ -219,6 +237,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
     labels_probe = labels_monitor = labels_candidate = 0   # amendment 004 accounting
     n_cand_trained = n_skip_train = 0
     probe_zero_attack = n_probes = 0                       # amendment 006 (honest prevalence)
+    probe_row_collisions = 0                               # amendment 007 (row-identity audit)
+    probe_labels_seq: list[int] = []                       # amendment 007 (sequential gate)
     adapt_windows: list[int] = []
     ba_hist: list[float] = []
     rows, trig_rows = [], []
@@ -243,11 +263,24 @@ def run_arm(method: str, env: Environment, args, seed: int):
         """
         probe_rng = np.random.default_rng(seed * 200_003 + t)
         if args.probe_source == "observed":
+            nonlocal probe_row_collisions
             k = t - 9
             if k < 0 or k >= len(seen):
                 return None
             Xw_obs, yw_obs = seen[k]
-            idx = probe_rng.choice(len(yw_obs), min(args.probe_size, len(yw_obs)), replace=False)
+            # amendment 007: ROW-IDENTITY disjointness. Stream windows are drawn from the pools
+            # with replacement, so the same pool row can appear both here and in the candidate's
+            # training windows (window-disjoint is not row-disjoint). Exclude, by exact
+            # feature-vector identity, every row that also occurs in those eight windows.
+            train_rows = np.vstack([x for x, _ in seen[-8:]])
+            train_set = {r.tobytes() for r in np.ascontiguousarray(train_rows)}
+            keep = np.array([r.tobytes() not in train_set
+                             for r in np.ascontiguousarray(Xw_obs)], dtype=bool)
+            probe_row_collisions += int((~keep).sum())
+            pool_idx = np.where(keep)[0]
+            if len(pool_idx) < 8:                     # cannot form an informative probe
+                return None
+            idx = probe_rng.choice(pool_idx, min(args.probe_size, len(pool_idx)), replace=False)
             return Xw_obs[idx], np.asarray(yw_obs)[idx].copy()
         if args.probe_prevalence is not None:
             Xp_raw, yp = sample_binomial_prevalence(
@@ -331,10 +364,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
             else:
                 err_hist.append(err)
                 alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
+        elif args.trigger_mode == "random":
+            # amendment 007 control: triggers fired at a fixed rate, independent of any drift
+            # signal (isolates "harm from replacing a model" from "harm from drift")
+            alarms.append(bool(np.random.default_rng(seed * 700_001 + t).random() < args.trigger_prob))
         else:
             alarms.append(score > threshold)
-        if args.trigger_mode in ("ddm", "adwin", "ddm_river", "adwin_river"):
-            trigger = bool(alarms[-1]) and cooldown <= 0   # canonical monitors self-confirm
+        if args.trigger_mode in ("ddm", "adwin", "ddm_river", "adwin_river", "random"):
+            trigger = bool(alarms[-1]) and cooldown <= 0   # self-confirming triggers
         else:
             recent = alarms[-args.consecutive_k:]
             trigger = len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
@@ -403,8 +440,41 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 n_cand_trained += 1
                 labels_candidate += int(len(ya))
 
-                if gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
-                            "two_stage", "labeled_probe_mcnemar"):
+                if gate == "labeled_probe_seq":
+                    # amendment 007: sequential probe. Buy labels in blocks of 16 and stop as
+                    # soon as the one-sided 90% CI of the per-flow correctness difference
+                    # resolves the sign; only near-ties cost the full budget. The McNemar result
+                    # showed the label budget is the binding constraint -- this spends it where
+                    # it matters instead of uniformly.
+                    Xp_all, yp_all = draw_probe(t, sev_probe) or (None, None)
+                    if Xp_all is None:
+                        commit = True
+                    else:
+                        spent = 0
+                        commit = None
+                        while spent < min(args.probe_size, len(yp_all)):
+                            spent = min(spent + args.seq_block, len(yp_all))
+                            Xs_, ys_ = Xp_all[:spent], yp_all[:spent]
+                            d = ((candidate.predict(Xs_) == ys_).astype(float)
+                                 - (model.predict(Xs_) == ys_).astype(float))
+                            se = float(d.std(ddof=1) / np.sqrt(len(d))) if len(d) > 1 else np.inf
+                            if np.isfinite(se) and se > 0:
+                                if d.mean() - LCB_ALPHA_Z * se > 0:
+                                    commit = True; break
+                                if d.mean() + LCB_ALPHA_Z * se < 0:
+                                    commit = False; break
+                            elif d.mean() != 0:      # zero variance: the sign is unambiguous
+                                commit = bool(d.mean() > 0); break
+                        p_inc = float((model.predict(Xp_all[:spent]) == yp_all[:spent]).mean())
+                        p_cand = float((candidate.predict(Xp_all[:spent]) == yp_all[:spent]).mean())
+                        if commit is None:           # never resolved: fall back to the point rule
+                            commit = bool(p_cand >= p_inc)
+                        labels_used += spent; labels_probe += spent
+                        probe_labels_seq.append(spent)
+                        n_probes += 1
+                        probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
+                elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
+                              "two_stage", "labeled_probe_mcnemar"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
@@ -506,8 +576,12 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     if len(probe[1]):
                         health_ref = float((model.predict(probe[0]) == probe[1]).mean())
                 detector = build_detector(method, args, seed + t + 1)
-                detector, threshold = calibrate(detector, env, sev, args,
-                                                np.random.default_rng(seed * 1_000 + 999 + t))
+                if args.recal_source == "observed":
+                    # amendment 007: recalibrate from observed traffic only (no sev, no pools)
+                    detector, threshold = calibrate_observed(detector, seen, args)
+                else:
+                    detector, threshold = calibrate(detector, env, sev, args,
+                                                    np.random.default_rng(seed * 1_000 + 999 + t))
             else:
                 n_reject += 1
             alarms = []
@@ -527,6 +601,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    labels_candidate=labels_candidate, n_candidates_trained=n_cand_trained,
                    n_train_skipped=n_skip_train,
                    n_probes=n_probes, n_probes_zero_attack=probe_zero_attack,
+                   probe_row_collisions=probe_row_collisions,
+                   seq_labels_mean=float(np.mean(probe_labels_seq)) if probe_labels_seq else np.nan,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
                    mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in rows])),
@@ -556,7 +632,15 @@ def main():
     p.add_argument("--cooldown-windows", type=int, default=10)
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
-                            "labeled_probe_mcnemar", "unsup_disagree", "atc", "doc", "two_stage"])
+                            "labeled_probe_mcnemar", "labeled_probe_seq", "unsup_disagree",
+                            "atc", "doc", "two_stage"])
+    p.add_argument("--recal-source", type=str, default="pools", choices=["pools", "observed"],
+                   help="observed = rebuild the post-commit detector reference/threshold from "
+                        "observed windows only (no severity, no pools).")
+    p.add_argument("--seq-block", type=int, default=16,
+                   help="labeled_probe_seq: probe labels bought per sequential block.")
+    p.add_argument("--trigger-prob", type=float, default=0.05,
+                   help="trigger-mode random: per-window trigger probability (drift-independent).")
     p.add_argument("--probe-source", type=str, default="pools", choices=["pools", "observed"],
                    help="observed = 32 rows of the OBSERVED window t-9 (no severity, no pools, "
                         "natural composition); pools = simulator sample at the true severity.")
@@ -597,7 +681,8 @@ def main():
                         "ensemble (ensemble_cal = Platt-calibrated members, probabilistic "
                         "nesting), or retrain on the last 8 observed stream windows.")
     p.add_argument("--trigger-mode", type=str, default="detector",
-                   choices=["detector", "performance", "ddm", "adwin", "ddm_river", "adwin_river"],
+                   choices=["detector", "performance", "ddm", "adwin", "ddm_river", "adwin_river",
+                            "random"],
                    help="performance = DDM-style trigger on the incumbent's monitored error "
                         "(labels spent on monitoring instead of gating).")
     p.add_argument("--monitor-labels", type=int, default=8,
@@ -631,7 +716,8 @@ def main():
                              n_adaptations=0, n_triggers=0, n_gate_rejections=0,
                              labels_used_total=0, labels_probe=0, labels_monitor=0,
                              labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
-                             n_probes=0, n_probes_zero_attack=0,
+                             n_probes=0, n_probes_zero_attack=0, probe_row_collisions=0,
+                             seq_labels_mean=np.nan,
                              adaptation_gate="none", harness="v2",
                              first_adaptation_window=np.nan,
                              mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
