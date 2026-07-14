@@ -48,6 +48,69 @@ from src.experiments.run_paper2_progressive_readaptation import (
 )
 
 ROLE_FRACS = {"window": 0.5, "train": 0.3, "probe": 0.2}
+
+
+class DDM:
+    """Canonical Drift Detection Method (Gama et al., 2004) on a monitored error stream."""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.n = 0; self.p = 0.0; self.p_min = np.inf; self.s_min = np.inf
+
+    def update(self, err_rate: float, m: int) -> bool:
+        # incorporate m Bernoulli observations with observed error rate err_rate
+        for _ in range(m):
+            self.n += 1
+            self.p += (err_rate - self.p) / self.n
+        s = np.sqrt(max(self.p * (1 - self.p), 1e-12) / max(self.n, 1))
+        if self.n >= 30 and self.p + s < self.p_min + self.s_min:
+            self.p_min, self.s_min = self.p, s
+        return bool(self.n >= 30 and self.p + s > self.p_min + 3 * self.s_min)
+
+
+class ADWIN:
+    """Adaptive Windowing (Bifet & Gavalda, 2007), exact O(n^2) variant on window error rates."""
+    def __init__(self, delta: float = 0.002):
+        self.delta = delta; self.w: list[float] = []
+
+    def reset(self):
+        self.w = []
+
+    def update(self, err_rate: float) -> bool:
+        self.w.append(err_rate)
+        n = len(self.w)
+        if n < 6:
+            return False
+        for cut in range(3, n - 2):
+            a, b = self.w[:cut], self.w[cut:]
+            m_inv = 1 / len(a) + 1 / len(b)
+            var = float(np.var(self.w))
+            eps = np.sqrt(2 * m_inv * var * np.log(2 / self.delta)) + (2 / 3) * m_inv * np.log(2 / self.delta)
+            if abs(float(np.mean(a)) - float(np.mean(b))) > eps:
+                self.w = b
+                return True
+        return False
+
+
+class EnsembleModel:
+    """Soft incumbent+candidate ensemble (adaptive-update baseline)."""
+    def __init__(self, a, b):
+        self.a, self.b = a, b
+
+    def _score(self, m, X):
+        if hasattr(m, "predict_proba") and getattr(m, "probability", True):
+            try:
+                return m.predict_proba(X)[:, 1]
+            except Exception:
+                pass
+        if hasattr(m, "decision_function"):
+            d = m.decision_function(X)
+            return 1 / (1 + np.exp(-d))
+        return m.predict(X).astype(float)
+
+    def predict(self, X):
+        return ((self._score(self.a, X) + self._score(self.b, X)) / 2 >= 0.5).astype(int)
 FUTURE_K = 5  # future windows for per-trigger delta-BA logging
 LCB_ALPHA_Z = 1.2816  # one-sided 90% normal quantile
 
@@ -150,7 +213,12 @@ def run_arm(method: str, env: Environment, args, seed: int):
             rng=np.random.default_rng(seed + 999))
         incumbent_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
 
-    # performance-aware (DDM-style) trigger: labels spent on MONITORING the incumbent's error
+    # canonical performance-aware monitors (labels spent on MONITORING the incumbent's error)
+    ddm = DDM() if args.trigger_mode == "ddm" else None
+    adwin = ADWIN() if args.trigger_mode == "adwin" else None
+    # per-arm history of observed stream windows (for sliding-window retraining)
+    seen: list[tuple[np.ndarray, np.ndarray]] = []
+    # legacy custom performance trigger
     perf_thr, err_hist = None, []
     if args.trigger_mode == "performance":
         mc_rng = np.random.default_rng(seed + 889)
@@ -171,25 +239,40 @@ def run_arm(method: str, env: Environment, args, seed: int):
         m["alerts"] = int((pred == 1).sum())
         ba_hist.append(m["balanced_accuracy"])
         score = float(detector.score(Xw))
-        if args.trigger_mode == "performance":
+        if args.trigger_mode in ("performance", "ddm", "adwin"):
             mon_rng = np.random.default_rng(seed * 400_009 + t)
             Xm_raw, ym = sample_balanced_from_distribution(
                 env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=sev, rng=mon_rng)
             Xm = transform_X(Xm_raw, env.scaler, env.pca)
-            err_hist.append(1.0 - float((model.predict(Xm) == ym).mean()))
+            err = 1.0 - float((model.predict(Xm) == ym).mean())
             labels_used += args.monitor_labels
-            alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
+            if args.trigger_mode == "ddm":
+                alarms.append(ddm.update(err, args.monitor_labels))
+            elif args.trigger_mode == "adwin":
+                alarms.append(adwin.update(err))
+            else:
+                err_hist.append(err)
+                alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
         else:
             alarms.append(score > threshold)
-        recent = alarms[-args.consecutive_k:]
-        trigger = len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
+        if args.trigger_mode in ("ddm", "adwin"):
+            trigger = bool(alarms[-1]) and cooldown <= 0   # canonical monitors self-confirm
+        else:
+            recent = alarms[-args.consecutive_k:]
+            trigger = len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
+        seen.append((Xw, yw))
         adapted = False
         if trigger:
             n_trig += 1
             cand_rng = np.random.default_rng(seed * 100_003 + t)
-            Xa_raw, ya = sample_balanced_from_distribution(
-                env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
-            Xa = transform_X(Xa_raw, env.scaler, env.pca)
+            if args.adapt_strategy == "sliding_window":
+                # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
+                hist = seen[-8:]
+                Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
+            else:
+                Xa_raw, ya = sample_balanced_from_distribution(
+                    env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
+                Xa = transform_X(Xa_raw, env.scaler, env.pca)
 
             probe = None
             if gate == "labeled_probe_holdout":
@@ -258,7 +341,11 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 n_adapt += 1
                 adapt_windows.append(t)
                 adapted = True
-                model = candidate
+                model = EnsembleModel(model, candidate) if args.adapt_strategy == "ensemble" else candidate
+                if ddm is not None:
+                    ddm.reset()
+                if adwin is not None:
+                    adwin.reset()
                 if cand_val is not None:
                     incumbent_val = cand_val
                 detector = build_detector(method, args, seed + t + 1)
@@ -327,7 +414,12 @@ def main():
     p.add_argument("--policy-k", type=int, default=None)
     p.add_argument("--policy-n", type=int, default=None)
     p.add_argument("--policy-name", type=str, default=None)
-    p.add_argument("--trigger-mode", type=str, default="detector", choices=["detector", "performance"],
+    p.add_argument("--adapt-strategy", type=str, default="full_replace",
+                   choices=["full_replace", "ensemble", "sliding_window"],
+                   help="Update rule on commit: replace the incumbent, soft incumbent+candidate "
+                        "ensemble, or retrain on the last 8 observed stream windows.")
+    p.add_argument("--trigger-mode", type=str, default="detector",
+                   choices=["detector", "performance", "ddm", "adwin"],
                    help="performance = DDM-style trigger on the incumbent's monitored error "
                         "(labels spent on monitoring instead of gating).")
     p.add_argument("--monitor-labels", type=int, default=8,
