@@ -31,6 +31,7 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   drift-detector scores do not measure (at individual triggered decisions a hierarchical model gives
   β_deg = −1.02 [−1.17, −0.87] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
   MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
+- **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each.
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
 - **The fix:** a **validate-before-commit gate** — the loop retrains its candidate as usual, and the gate decides
   **deployment**: commit only if the candidate beats the incumbent on a small labeled probe (32 flows — the

@@ -51,8 +51,9 @@ def main():
     arrow(ax, 0.185, 0.55, 0.30, 0.72)
     box(ax, 0.30, 0.63, 0.25, 0.18, "Always DEPLOY\n(the standard loop)", "#fdece7", RED, DARK, 11)
     arrow(ax, 0.55, 0.72, 0.63, 0.72, RED)
-    box(ax, 0.63, 0.615, 0.355, 0.205,
-        "✗  Can be NET-HARMFUL\nToN-IoT:  $-1.6$ to $-2.9$ BA pts\n(never adapting wins)", "#fdece7", RED, "#a63a24", 11.5, "bold")
+    box(ax, 0.63, 0.60, 0.355, 0.235,
+        "✗  NET-HARMFUL when the incumbent\nis healthy — in ALL THREE benchmarks\n(registered prediction test)\n…and even with ZERO drift to detect",
+        "#fdece7", RED, "#a63a24", 10.8, "bold")
 
     # Gate branch (bottom)
     arrow(ax, 0.185, 0.45, 0.30, 0.30)
@@ -60,17 +61,17 @@ def main():
         "VALIDATE BEFORE COMMIT\ntest the candidate on ~32\nlabeled flows; deploy only if\nit beats the incumbent",
         "#e8f4f2", GREEN, DARK, 10.6, "bold")
     arrow(ax, 0.60, 0.29, 0.655, 0.29, GREEN)
-    box(ax, 0.655, 0.165, 0.33, 0.25,
-        "✓  Harm → net benefit ($+2.4$ vs naive)\n✓  Benefit preserved ($+9.1$ PortScan)\nRegistered replication, 2 detectors ×\n4 classifiers, clustered 30-seed CIs",
-        "#e8f4f2", GREEN, "#1d6f64", 10.6, "bold")
+    box(ax, 0.655, 0.155, 0.33, 0.26,
+        "✓  Harm → net benefit ($+2.4$ vs naive)\n✓  Benefit preserved ($+9.1$ PortScan)\n✓  Holds with candidate, probe AND\n    recalibration from observed traffic only\nRegistered replication, 2 detectors × 4 models",
+        "#e8f4f2", GREEN, "#1d6f64", 10.2, "bold")
 
     # Bottom badges: honest scope
-    badges1 = "decision cost: tens of labels (candidates: ~1,024/trigger, accounted)  •  probes may be 20 windows stale  •  harm-avoiding up to 40% flipped labels"
-    badges2 = "boundary mapped: pays a premium on deep-benefit chronological streams  •  registered protocol + amendments, public tag  •  reproducible artifact"
+    badges1 = "decision cost: tens of labels (candidates: ~1,024/trigger, accounted)  •  no policy dominates the accuracy–labels–updates frontier: we map it"
+    badges2 = "boundary reported: pays a premium on deep-benefit chronological replays  •  7 registered amendments, public tags  •  auditable artifact (305 pinned claims)"
     ax.add_patch(FancyBboxPatch((0.03, 0.008), 0.94, 0.115, boxstyle="round,pad=0.004,rounding_size=0.02",
                                 linewidth=1.2, edgecolor=GREY, facecolor="#f7f7f7", zorder=1))
-    ax.text(0.5, 0.088, badges1, ha="center", va="center", fontsize=9.2, color=DARK)
-    ax.text(0.5, 0.038, badges2, ha="center", va="center", fontsize=9.2, color=DARK)
+    ax.text(0.5, 0.088, badges1, ha="center", va="center", fontsize=9.8, color=DARK)
+    ax.text(0.5, 0.038, badges2, ha="center", va="center", fontsize=9.8, color=DARK)
 
     fig.savefig(f"{OUT}/graphical_abstract.png", dpi=220, bbox_inches="tight")
     fig.savefig(f"{OUT}/graphical_abstract.pdf", bbox_inches="tight")

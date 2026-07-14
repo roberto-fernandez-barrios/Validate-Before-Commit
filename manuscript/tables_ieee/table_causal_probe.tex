@@ -1,15 +1,20 @@
 \begin{table*}[t]
 \centering
-\caption{\textbf{The gate does not need the simulator.} In the core harness the candidate and the probe are drawn from the environment's pools \emph{at the true current severity} --- information a deployment does not have. The causal arm (amendment 006, registered) removes it entirely: the candidate trains only on the last eight \emph{observed} stream windows and the probe is 32 rows sampled from the observed window $t{-}9$ (strictly past, disjoint from the candidate's training windows, whatever class composition that window happens to have); no component reads $\mathrm{sev}(t)$ or the pools. The pre-registered criteria --- gate significantly above the observed-candidate naive arm in the harm regime, and not below no-adaptation --- both pass, and the causal gate is statistically indistinguishable from the oracle-probe gate in the harm and marginal regimes.}
+\caption{\textbf{The gate does not need the simulator (Algorithm 1B).} In the core harness the candidate, the probe \emph{and the post-commit detector reference} are drawn from the environment's pools at the true current severity --- information a deployment does not have. The registered causal arm (amendment 007) removes all three: the candidate trains only on the last eight \emph{observed} windows; the probe is 32 rows of the observed window $t{-}9$, excluded by \emph{row identity} from the candidate's training rows (27--38 colliding rows per stream were removed --- the pools are sampled with replacement, so window-disjoint was not row-disjoint); and the detector is recalibrated from observed windows alone. Nothing reads $\mathrm{sev}(t)$. Both pre-registered criteria pass, and the causal gate remains statistically indistinguishable from the oracle-probe gate in the harm regime. An earlier version of this arm (amendment 006) still recalibrated the detector with the simulator's severity; those numbers are superseded by the ones below.}
 \label{tab:causal_probe}
 \resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
 \begin{tabular}{lrrrr}
 \toprule
-Regime & Naive (observed candidates) & Causal gate & Gate $-$ naive (paired) & Causal $-$ oracle probe \\
+Regime & Naive (observed candidates) & Causal gate (1B) & Gate $-$ naive (paired) & Causal $-$ oracle gate \\
 \midrule
-PortScan (benefit) & $+$8.04 [5.81, 10.08] & $+$8.64 [6.69, 10.57] & $+$0.60 [$-$0.11, 1.58] & $-$0.48 [$-$0.76, $-$0.20] \\
-UNSW Recon (marginal) & $+$0.96 [0.68, 1.25] & $+$1.31 [1.11, 1.51] & $+$0.35 [0.10, 0.63] & $-$0.04 [$-$0.27, 0.18] \\
-ToN-IoT (harm) & $-$2.44 [$-$4.11, $-$0.92] & $+$0.85 [0.57, 1.13] & $+$3.29 [1.85, 5.03] & $+$0.06 [$-$0.20, 0.32] \\
+PortScan (benefit) & $+$7.62 [5.27, 9.76] & $+$8.57 [6.62, 10.41] & $+$0.95 [0.13, 2.02] & $-$0.55 [$-$0.87, $-$0.26] \\
+UNSW Recon (marginal) & $+$0.87 [0.58, 1.14] & $+$0.98 [0.74, 1.21] & $+$0.11 [$-$0.11, 0.36] & $-$0.37 [$-$0.64, $-$0.12] \\
+ToN-IoT (harm) & $-$3.19 [$-$5.92, $-$0.99] & $+$0.67 [0.35, 1.00] & $+$3.86 [1.67, 6.73] & $-$0.12 [$-$0.45, 0.21] \\
+\midrule
+\multicolumn{5}{l}{\emph{Mild drift ($\mathrm{sev}_{\max}{=}0.25$) under the same fully causal pipeline --- both defenses in one experiment:}} \\
+PortScan (benefit) & $-$0.98 [$-$3.22, 0.37] & $+$0.09 [$-$0.45, 0.50] & $+$1.07 [$-$0.03, 3.11] & --- \\
+UNSW Recon (marginal) & $-$0.11 [$-$0.17, $-$0.06] & $-$0.08 [$-$0.15, $-$0.03] & $+$0.03 [0.01, 0.05] & --- \\
+ToN-IoT (harm) & $-$0.42 [$-$0.95, $-$0.07] & $-$0.12 [$-$0.28, 0.01] & $+$0.30 [0.00, 0.79] & --- \\
 \bottomrule
 \end{tabular}}
 \end{table*}

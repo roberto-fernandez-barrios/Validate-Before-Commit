@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words (md tokenization; tex=241)", 254, float(len(abstract.split())), 0.5)
+    check("abstract <= 250 words (md tokenization; tex=250)", 254, float(len(abstract.split())), 0.5)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -497,6 +497,61 @@ def main():
           val(w6, "value", metric="BA_two_class", quantity="gate_vs_naive"), 0.005)
     check("5.9 wed2thu accuracy premium -0.08 (ns)", -0.083,
           val(w6, "value", metric="accuracy_all", quantity="gate_vs_naive"), 0.005)
+
+    # --- Amendment 007: genuinely causal arm, zero-drift control, sequential gate ---
+    a7 = pd.read_csv(f"{T}/paper2_amendment_007/summary.csv")
+    c7 = pd.read_csv(f"{T}/paper2_amendment_007/paired_ci.csv")
+    # causal arm WITH observed recalibration + row-identity-disjoint probes (supersedes 006)
+    check("5.9 causal7 ToN naive -3.19", -3.189, val(a7, "gain", regime="ton_scanning", arm="tcausal_none"), 0.005)
+    check("5.9 causal7 ToN gate +0.67", 0.670, val(a7, "gain", regime="ton_scanning", arm="tcausal_gate"), 0.005)
+    check("5.9 causal7 ToN gate vs naive +3.86", 3.859,
+          val(c7, "diff", regime="ton_scanning", contrast="tcausal_gate_vs_naive"), 0.005)
+    check("5.9 causal7 ~ oracle ToN -0.12 (ns)", -0.118,
+          val(c7, "diff", regime="ton_scanning", contrast="tcausal_gate_vs_lp32(oracle)"), 0.005)
+    check("5.9 causal7 PortScan gate +8.57", 8.571, val(a7, "gain", regime="portscan", arm="tcausal_gate"), 0.005)
+    check("5.9 causal7 PortScan gate vs naive +0.95", 0.950,
+          val(c7, "diff", regime="portscan", contrast="tcausal_gate_vs_naive"), 0.005)
+    check("5.9 causal7 UNSW gate +0.98", 0.980, val(a7, "gain", regime="unsw_recon", arm="tcausal_gate"), 0.005)
+    check("5.9 causal7 row collisions ToN 35.7 (real overlap removed)", 35.70,
+          val(a7, "probe_row_collisions", regime="ton_scanning", arm="tcausal_gate"), 0.05)
+    # mild drift inside the causal pipeline (both defenses, one experiment)
+    check("5.9 causal7 s025 ToN naive -0.42", -0.415,
+          val(a7, "gain", regime="ton_scanning", arm="tcausal_s025_none"), 0.005)
+    check("5.9 causal7 s025 UNSW naive -0.11 (resolved)", -0.113,
+          val(a7, "gain", regime="unsw_recon", arm="tcausal_s025_none"), 0.005)
+    check("5.9 causal7 s025 PortScan naive -0.98", -0.978,
+          val(a7, "gain", regime="portscan", arm="tcausal_s025_none"), 0.005)
+    check("5.9 causal7 s025 ToN gate vs naive +0.30", 0.299,
+          val(c7, "diff", regime="ton_scanning", contrast="tcausal_s025_gate_vs_naive"), 0.005)
+    # ZERO-DRIFT CONTROL (random triggers, no drift at all)
+    check("5.9 zero-drift PortScan naive -2.76", -2.757,
+          val(a7, "gain", regime="portscan", arm="rand_s0_none"), 0.005)
+    check("5.9 zero-drift UNSW naive -0.75", -0.752,
+          val(a7, "gain", regime="unsw_recon", arm="rand_s0_none"), 0.005)
+    check("5.9 zero-drift ToN naive -4.75", -4.751,
+          val(a7, "gain", regime="ton_scanning", arm="rand_s0_none"), 0.005)
+    check("5.9 zero-drift PortScan naive CI hi < 0", -2.029,
+          val(a7, "ci_hi", regime="portscan", arm="rand_s0_none"), 0.01)
+    check("5.9 zero-drift PortScan gate -1.11", -1.114,
+          val(a7, "gain", regime="portscan", arm="rand_s0_lp32"), 0.005)
+    check("5.9 zero-drift ToN gate -0.25", -0.245,
+          val(a7, "gain", regime="ton_scanning", arm="rand_s0_lp32"), 0.005)
+    check("5.9 zero-drift ToN gate vs naive +4.51", 4.506,
+          val(c7, "diff", regime="ton_scanning", contrast="rand_s0_gate_vs_naive"), 0.005)
+    check("5.9 zero-drift PortScan gate vs naive +1.64", 1.643,
+          val(c7, "diff", regime="portscan", contrast="rand_s0_gate_vs_naive"), 0.005)
+    check("5.9 zero-drift UNSW gate vs naive +0.19", 0.194,
+          val(c7, "diff", regime="unsw_recon", contrast="rand_s0_gate_vs_naive"), 0.005)
+    check("5.9 rand mild-drift ToN naive -4.03", -4.032,
+          val(a7, "gain", regime="ton_scanning", arm="rand_s025_none"), 0.005)
+    # sequential probe gate
+    check("5.9 seq PortScan +9.21 (best gate)", 9.214, val(a7, "gain", regime="portscan", arm="seq64"), 0.005)
+    check("5.9 seq PortScan vs lp32 +0.09 (sig)", 0.094,
+          val(c7, "diff", regime="portscan", contrast="seq64_vs_lp32"), 0.005)
+    check("5.9 seq mean labels/decision 54.1 (< 64)", 54.07,
+          val(a7, "seq_labels_mean", regime="portscan", arm="seq64"), 0.05)
+    check("5.9 seq ToN +0.76", 0.760, val(a7, "gain", regime="ton_scanning", arm="seq64"), 0.005)
+    check("5.9 seq UNSW +1.38", 1.379, val(a7, "gain", regime="unsw_recon", arm="seq64"), 0.005)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
