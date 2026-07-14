@@ -41,8 +41,21 @@ python -m src.experiments.run_paper2_progressive_readaptation \
   --outdir results/raw/ton_scanning_ks_qk_lp32
 ```
 
-The **pre-registered Phase 2** protocol (3 regimes × 2 detectors × gates {none, lp32, lp64, unsup}, 30 seeds)
-is documented in `notes/paper2_phase2_gated_readaptation_preregistration_001.md`.
+The **pre-specified Phase 2** protocol (criteria fixed at 10 seeds, conditionally expanded to 30; see the
+manuscript's honesty notes) is documented in `notes/paper2_phase2_gated_readaptation_preregistration_001.md`.
+The **confirmatory study is the harness-v2 registered replication** (protocol publicly tagged
+`harness-v2-protocol` + amendment 002; pristine seeds 104–133). v2 runner and one arm example:
+
+```bash
+python -m src.experiments.run_paper2_readaptation_v2 \
+  --data-ref data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv \
+  --data-cur data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv \
+  --seeds 104,...,133 --methods ks_max --adaptation-gate labeled_probe_holdout --probe-size 32 \
+  --outdir results/raw/paper2_v2_ton_scanning_ks_holdout32b
+```
+All 45+21 v2 arm invocations follow this template; the full arm list (regimes × detectors × gates ×
+downstream models × prevalence) is enumerated in `notes/paper2_harness_v2_registered_replication_protocol_001.md`
+and `notes/paper2_harness_v2_amendment_002.md`.
 
 ## 4. Analysis → tables and figures (all read the raw window/summary CSVs)
 
