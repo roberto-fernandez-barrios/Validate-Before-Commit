@@ -104,14 +104,27 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
 
 
 def calibrate(detector, env: Environment, severity: float, args, rng) -> tuple[object, float]:
-    """Reference from TRAIN pools; calibration scores on dedicated WINDOW-pool draws."""
-    X_ref_raw, _ = sample_balanced_from_distribution(
-        env.train_pools, n_per_class=args.detector_ref_size_per_class, severity=severity, rng=rng)
+    """Reference from TRAIN pools; calibration scores on dedicated WINDOW-pool draws.
+    Reference and calibration windows follow the stream's operating prevalence, so a
+    natural-prevalence deployment is calibrated at natural prevalence (review point)."""
+    prev = args.stream_prevalence
+    if prev != 0.5:
+        X_ref_raw, _ = sample_prevalence_from_distribution(
+            env.train_pools, n_total=2 * args.detector_ref_size_per_class, attack_frac=prev,
+            severity=severity, rng=rng)
+    else:
+        X_ref_raw, _ = sample_balanced_from_distribution(
+            env.train_pools, n_per_class=args.detector_ref_size_per_class, severity=severity, rng=rng)
     detector.fit(transform_X(X_ref_raw, env.scaler, env.pca))
     scores = []
     for _ in range(args.calibration_windows):
-        Xc_raw, _ = sample_balanced_from_distribution(
-            env.cal_scores_pools, n_per_class=args.window_size // 2, severity=severity, rng=rng)
+        if prev != 0.5:
+            Xc_raw, _ = sample_prevalence_from_distribution(
+                env.cal_scores_pools, n_total=args.window_size, attack_frac=prev,
+                severity=severity, rng=rng)
+        else:
+            Xc_raw, _ = sample_balanced_from_distribution(
+                env.cal_scores_pools, n_per_class=args.window_size // 2, severity=severity, rng=rng)
         scores.append(float(detector.score(transform_X(Xc_raw, env.scaler, env.pca))))
     return detector, float(np.quantile(scores, args.threshold_quantile))
 
@@ -180,7 +193,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
 
             probe = None
             if gate == "labeled_probe_holdout":
-                # carve the probe out of the labeled training batch (zero incremental labels)
+                # carve the probe out of the labeled training batch (zero incremental labels).
+                # Deduplicate first: with-replacement draws can place copies of one flow in
+                # both halves; training proceeds on rows that are identity-disjoint from the
+                # held-out probe.
+                _, uniq = np.unique(Xa, axis=0, return_index=True)
+                uniq = np.sort(uniq)
+                Xa, ya = Xa[uniq], ya[uniq]
                 nb = max(1, args.probe_size // 2)
                 ben = np.where(ya == 0)[0][:nb]
                 att = np.where(ya == 1)[0][:nb]
