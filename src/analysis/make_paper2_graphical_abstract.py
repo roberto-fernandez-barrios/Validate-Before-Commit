@@ -62,7 +62,7 @@ def main():
         "#e8f4f2", GREEN, DARK, 10.6, "bold")
     arrow(ax, 0.60, 0.29, 0.655, 0.29, GREEN)
     box(ax, 0.655, 0.155, 0.33, 0.26,
-        "✓  Harm → net benefit ($+2.4$ vs naive)\n✓  Benefit preserved ($+9.1$ PortScan)\n✓  Holds with candidate, probe AND\n    recalibration from observed traffic only\nRegistered replication, 2 detectors × 4 models",
+        "✓  Harm → net benefit ($+2.4$ vs naive)\n✓  Benefit preserved ($+9.1$ PortScan)\n✓  Holds with candidate, probe AND\n    recalibration from observed traffic only\nRegistered core (2 detectors) + registered\nextensions (4 downstream models)",
         "#e8f4f2", GREEN, "#1d6f64", 10.2, "bold")
 
     # Bottom badges: honest scope

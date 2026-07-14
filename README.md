@@ -33,12 +33,15 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
 - **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each.
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
-- **The fix:** a **validate-before-commit gate** — the loop retrains its candidate as usual, and the gate decides
-  **deployment**: commit only if the candidate beats the incumbent on a small labeled probe (32 flows — the
-  *decision's* incremental cost; candidates themselves consume ~1,024 labels/trigger, fully accounted in the paper).
-  Confirmed by a **replication registered before execution** on a hardened harness (bit-identical streams, disjoint
-  partitions, pristine seeds) across two detectors and four downstream models; robust to 20-window label latency
-  and harm-avoiding up to 40% randomly flipped probe labels (net benefit survives to 25%).
+- **Candidate governance, not just drift detection:** a **validate-before-commit gate** — the loop retrains its
+  candidate as usual, and the gate decides **deployment**: commit only if the candidate beats the incumbent on a
+  small labeled probe (32 flows — the *decision's* incremental cost; candidates themselves consume ~1,024
+  labels/trigger, fully accounted). A drift alarm is a *proposal generator*, not deployment evidence: whatever
+  produces a proposal — true drift, a false alarm, or a scheduled retrain — the challenger should be validated
+  before it replaces the incumbent. A **zero-drift control** makes the point: forcing updates on a healthy model
+  is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
+  Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
+  downstream models, and by a **causal arm** (candidate, probe and detector recalibration from observed traffic only).
 - **Honest boundary:** on real chronological streams sitting deep in the benefit regime, the gate pays a measurable
   insurance premium in balanced accuracy vs always-deploy, while *beating* always-deploy on overall accuracy on the
   same streams. A registered stratified-probe test rejected our first (composition) explanation; probe *staleness*
@@ -109,11 +112,16 @@ distributional change rather than estimated model improvement. See `manuscript/`
 full specification.
 
 Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.py`):
-`--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,unsup_disagree,atc,doc,two_stage}`,
-`--probe-size`, `--probe-latency`, `--probe-flip-frac`, `--gate-margin`,
-`--adapt-strategy {full_replace,ensemble,ensemble_cal,sliding_window}`,
-`--trigger-mode {detector,performance,ddm,adwin,ddm_river,adwin_river}`,
+`--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,labeled_probe_mcnemar,labeled_probe_seq,labeled_probe_seqav,unsup_disagree,atc,doc,two_stage}`,
+`--probe-size`, `--probe-latency`, `--probe-flip-frac`, `--probe-source {pools,observed}`,
+`--probe-prevalence`, `--recal-source {pools,observed}`, `--gate-margin`, `--two-stage-delta`,
+`--health-ref-mode {static,per_incumbent}`, `--seqav-alpha`,
+`--adapt-strategy {full_replace,ensemble,ensemble_cal,sliding_window}`, `--adapt-size-per-class`,
+`--trigger-mode {detector,performance,ddm,adwin,ddm_river,adwin_river,random}`, `--trigger-prob`, `--max-severity`,
 `--downstream-model {svc_rbf,random_forest,logreg,mlp}`.
+The **observed-data (causal) gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`;
+the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **anytime-valid sequential gate** is
+`--adaptation-gate labeled_probe_seqav`.
 
 ---
 

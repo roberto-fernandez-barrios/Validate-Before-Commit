@@ -553,6 +553,48 @@ def main():
     check("5.9 seq ToN +0.76", 0.760, val(a7, "gain", regime="ton_scanning", arm="seq64"), 0.005)
     check("5.9 seq UNSW +1.38", 1.379, val(a7, "gain", regime="unsw_recon", arm="seq64"), 0.005)
 
+    # --- Amendment 008: size-matched zero drift, risk-averse gates under zero drift, seqav ---
+    a8 = pd.read_csv(f"{T}/paper2_amendment_008/summary.csv")
+    c8 = pd.read_csv(f"{T}/paper2_amendment_008/paired_ci.csv")
+    # size-matched zero drift: harm survives (not a small-candidate artifact)
+    check("8 zero-drift sz2000 PortScan naive -4.81", -4.808,
+          val(a8, "gain", regime="portscan", arm="rz_none_sz2000"), 0.02)
+    check("8 zero-drift sz2000 ToN naive -5.76", -5.756,
+          val(a8, "gain", regime="ton_scanning", arm="rz_none_sz2000"), 0.02)
+    check("8 zero-drift sz2000 UNSW naive -0.13 (resolved)", -0.128,
+          val(a8, "gain", regime="unsw_recon", arm="rz_none_sz2000"), 0.01)
+    check("8 zero-drift sz2000 PortScan naive CI hi < 0", -2.461,
+          val(a8, "ci_hi", regime="portscan", arm="rz_none_sz2000"), 0.02)
+    # risk-averse gates under zero drift recover essentially all the loss
+    check("8 zero-drift McNemar ToN 0.00 (recovers all)", 0.0,
+          val(a8, "gain", regime="ton_scanning", arm="rz_mcnemar32"), 0.005)
+    check("8 zero-drift McNemar PortScan 0.00", 0.0,
+          val(a8, "gain", regime="portscan", arm="rz_mcnemar32"), 0.005)
+    check("8 zero-drift McNemar vs naive PortScan +2.76", 2.757,
+          val(c8, "diff", regime="portscan", contrast="rz_mcnemar_vs_naive"), 0.01)
+    check("8 zero-drift McNemar vs naive ToN +4.75", 4.751,
+          val(c8, "diff", regime="ton_scanning", contrast="rz_mcnemar_vs_naive"), 0.01)
+    check("8 zero-drift seqav ToN 0.00", 0.0, val(a8, "gain", regime="ton_scanning", arm="rz_seqav64"), 0.005)
+    check("8 zero-drift lcb ToN +0.01", 0.010, val(a8, "gain", regime="ton_scanning", arm="rz_lcb64"), 0.005)
+    check("8 zero-drift eps0 gate ToN -0.25 (reduces not eliminates)", -0.245,
+          val(a8, "gain", regime="ton_scanning", arm="rand_s0_lp32"), 0.01)
+    # detector-triggered zero drift: real detector rarely fires
+    check("8 zero-drift real-detector ToN naive -1.03", -1.030,
+          val(a8, "gain", regime="ton_scanning", arm="sev0_none"), 0.01)
+    check("8 zero-drift real-detector ToN triggers ~0.13", 0.13,
+          val(a8, "n_triggers", regime="ton_scanning", arm="sev0_none"), 0.02)
+    check("8 zero-drift real-detector PortScan triggers ~0.07", 0.07,
+          val(a8, "n_triggers", regime="portscan", arm="sev0_none"), 0.02)
+    # anytime-valid sequential gate on normal streams
+    check("8 seqav PortScan +8.04 (conservative)", 8.040, val(a8, "gain", regime="portscan", arm="seqav64"), 0.01)
+    check("8 seqav vs lp32 PortScan -1.08", -1.080, val(c8, "diff", regime="portscan", contrast="seqav_vs_lp32"), 0.01)
+    check("8 seqav labels/decision ~60", 59.66, val(a8, "seq_labels_mean", regime="portscan", arm="seqav64"), 0.2)
+    # candidate/future-eval leakage audit: shared across arms, paired contrast unaffected
+    check("8 causal gate == v9 (identity: ToN gate vs naive +3.86)", 3.859,
+          val(c8, "diff", regime="ton_scanning", contrast="c8_gate_vs_naive"), 0.01)
+    check("8 cand-future collisions ToN gate ~462 (audited)", 462.10,
+          val(a8, "cand_future_collisions", regime="ton_scanning", arm="c8_gate"), 1.0)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

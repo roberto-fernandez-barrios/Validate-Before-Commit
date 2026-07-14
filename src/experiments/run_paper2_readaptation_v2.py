@@ -478,7 +478,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         n_probes += 1
                         probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
                 elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
-                              "two_stage", "labeled_probe_mcnemar"):
+                              "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)

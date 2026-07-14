@@ -1,21 +1,19 @@
 \begin{table*}[t]
 \centering
-\caption{\textbf{The zero-drift control: harmful updating is not about drift at all.} A registered control (amendment 007) fires triggers at a fixed rate \emph{independent of any drift signal} and evaluates streams with \textbf{no drift whatsoever} ($\mathrm{sev}_{\max}{=}0$). Replacing a healthy incumbent with a fresh estimate of \emph{the same} distribution is net-harmful in all three benchmarks --- and the commit gate recovers most of the loss in each. This is the limiting case of the degradation--headroom account (zero headroom $\Rightarrow$ the value of an update cannot be positive), and it decomposes the harm the paper reports: most of what naive updating loses under mild drift is the price of replacing a healthy model with a finite re-estimate, not a drift-specific effect. It also removes the detector from the argument entirely: with no drift to detect, no monitor --- however good --- can prevent this loss. Only validating the candidate can. BA points vs no-adaptation, 30 seeds, SVC-RBF.}
+\caption{\textbf{The zero-drift control: harmful updating is candidate governance, not drift.} Registered controls (amendment 008) fire triggers at a fixed rate \emph{independent of any drift signal} on streams with \textbf{no drift at all} ($\mathrm{sev}_{\max}{=}0$). Replacing a healthy incumbent is significantly net-harmful in all three benchmarks (row 1), and \textbf{size-matching the candidate to the incumbent's 2{,}000 flows/class does not remove it} (row 2, often deeper) --- so the harm is not a small-candidate artifact. The plain $\varepsilon{=}0$ gate reduces the harm but commits on ties, so it does not eliminate it (row 3). \textbf{A risk-controlled gate does}: requiring statistical evidence (exact McNemar, or the anytime-valid sequential test) makes the gate almost never commit when there is no real signal, recovering essentially all of the loss (rows 4--5). Finally, with the \emph{real} detector at zero drift the trigger fires only ${\sim}0.1$ times per stream (row 6), so a well-specified monitor mostly avoids the harm by not firing --- the monitor is not powerless, but any proposal that does reach deployment (a false alarm, a scheduled retrain) should be validated first. BA points vs no-adaptation, 30 seeds, KS-max, SVC-RBF; last column is the paired gate$-$naive contrast.}
 \label{tab:zero_drift}
 \resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
 \begin{tabular}{llrrr}
 \toprule
-Control & Regime & Naive (always deploy) & Commit gate & Gate $-$ naive (paired) \\
+\# & Zero-drift arm & PortScan & UNSW Recon & ToN-IoT \\
 \midrule
-\multirow{3}{*}{\shortstack[l]{Random triggers,\\ \textbf{zero drift}}}
- & PortScan (CICIDS2017) & $-$2.76 [$-$3.76, $-$2.03] & $-$1.11 [$-$1.56, $-$0.73] & $+$1.64 [0.93, 2.58] \\
- & Reconnaissance (UNSW-NB15) & $-$0.75 [$-$0.89, $-$0.62] & $-$0.56 [$-$0.70, $-$0.42] & $+$0.19 [0.10, 0.31] \\
- & Scanning (ToN-IoT) & $-$4.75 [$-$8.12, $-$2.01] & $-$0.25 [$-$0.44, $-$0.08] & $+$4.51 [1.85, 7.91] \\
+1 & naive, random triggers & $-$2.76 [$-$3.71, $-$2.02] & $-$0.75 [$-$0.89, $-$0.62] & $-$4.75 [$-$8.17, $-$2.04] \\
+2 & naive, size-matched candidate (2{,}000/cl) & $-$4.81 [$-$7.68, $-$2.46] & $-$0.13 [$-$0.23, $-$0.04] & $-$5.76 [$-$9.11, $-$2.92] \\
+3 & commit gate, $\varepsilon{=}0$ & $-$1.11 [$-$1.55, $-$0.74] & $-$0.56 [$-$0.70, $-$0.42] & $-$0.25 [$-$0.43, $-$0.07] \\
+4 & commit gate, exact McNemar & $+$0.00 [0.00, 0.00] & $+$0.00 [0.00, 0.00] & $+$0.00 [0.00, 0.00] \\
+5 & commit gate, anytime-valid sequential & $-$0.00 [$-$0.01, 0.00] & $-$0.00 [$-$0.00, 0.00] & $+$0.00 [0.00, 0.00] \\
 \midrule
-\multirow{3}{*}{\shortstack[l]{Random triggers,\\ mild drift (0.25)}}
- & PortScan (CICIDS2017) & $-$0.25 [$-$1.09, 0.46] & $+$0.31 [$-$0.06, 0.67] & $+$0.56 [0.05, 1.31] \\
- & Reconnaissance (UNSW-NB15) & $-$0.81 [$-$0.97, $-$0.65] & $-$0.56 [$-$0.75, $-$0.39] & $+$0.24 [0.11, 0.39] \\
- & Scanning (ToN-IoT) & $-$4.03 [$-$7.11, $-$1.62] & $-$0.20 [$-$0.37, $-$0.05] & $+$3.83 [1.45, 6.91] \\
+6 & naive, \emph{real} detector (fires ${\sim}0.1\times$) & $-$0.23 [$-$0.63, 0.00] & $-$0.04 [$-$0.11, 0.00] & $-$1.03 [$-$3.00, $-$0.00] \\
 \bottomrule
 \end{tabular}}
 \end{table*}
