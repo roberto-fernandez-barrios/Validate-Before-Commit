@@ -256,6 +256,13 @@ def main():
     check("5.9 v2 mech pooled r_deg -0.56", -0.555, val(v2m, "r_deg", regime="POOLED"), 0.005)
     check("5.9 v2 mech pooled r_score ~0", -0.004, val(v2m, "r_score", regime="POOLED"), 0.005)
     check("5.9 v2 mech pooled n=252", 252, val(v2m, "n_triggers", regime="POOLED"), 0.5)
+    ex = pd.read_csv(f"{T}/../tables/paper2_phase3_extras_summary.csv") if False else pd.read_csv(
+        "results/tables/paper2_phase3_extras_summary.csv")
+    check("5.9 perf PortScan +5.40", 5.402, val(ex, "gain", regime="portscan", arm="perf_none"), 0.005)
+    check("5.9 perf ToN 0.00 (never fires)", 0.0, val(ex, "gain", regime="ton_scanning", arm="perf_none"), 0.005)
+    check("5.9 natprev ToN naive -2.63", -2.626, val(ex, "gain", regime="ton_scanning", arm="natprev_none"), 0.005)
+    check("5.9 natprev ToN gate +0.80", 0.801, val(ex, "gain", regime="ton_scanning", arm="natprev_lp32"), 0.005)
+    check("5.9 natprev PortScan naive +9.06", 9.061, val(ex, "gain", regime="portscan", arm="natprev_none"), 0.005)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
