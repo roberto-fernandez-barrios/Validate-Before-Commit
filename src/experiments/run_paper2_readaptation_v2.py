@@ -239,6 +239,10 @@ def run_arm(method: str, env: Environment, args, seed: int):
     probe_zero_attack = n_probes = 0                       # amendment 006 (honest prevalence)
     probe_row_collisions = 0                               # amendment 007 (row-identity audit)
     probe_labels_seq: list[int] = []                       # amendment 007 (sequential gate)
+    cand_future_collisions = 0                             # amendment 008 (train/future-eval audit)
+    # amendment 008: exact feature identity of every future evaluation window's rows, so we can
+    # both AUDIT candidate-training overlap with the future and (optionally) drop it
+    future_row_sets = [ {r.tobytes() for r in np.ascontiguousarray(Xf)} for Xf, _, _ in env.stream ]
     adapt_windows: list[int] = []
     ba_hist: list[float] = []
     rows, trig_rows = [], []
@@ -501,6 +505,32 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         commit = bool(b + c > 0 and
                                       binomtest(c, b + c, 0.5, alternative="greater").pvalue
                                       <= args.mcnemar_alpha)
+                    elif gate == "labeled_probe_seqav":
+                        # amendment 008: ANYTIME-VALID sequential test. Look at 16/32/48/64
+                        # flows; each of the K=4 looks tests at alpha/K (Bonferroni over looks),
+                        # so the family-wise error is controlled and stopping is valid. Commit
+                        # on a resolved positive LCB, reject on a resolved negative UCB;
+                        # undecided at 64 -> reject (risk-averse default).
+                        from scipy.stats import norm
+                        K = max(1, args.probe_size // args.seq_block)
+                        z = float(norm.ppf(1 - args.seqav_alpha / K))
+                        commit = False
+                        seen_n = 0
+                        while seen_n < len(yp):
+                            seen_n = min(seen_n + args.seq_block, len(yp))
+                            dd = ((candidate.predict(Xp[:seen_n]) == yp[:seen_n]).astype(float)
+                                  - (model.predict(Xp[:seen_n]) == yp[:seen_n]).astype(float))
+                            se = float(dd.std(ddof=1) / np.sqrt(len(dd))) if len(dd) > 1 else np.inf
+                            if np.isfinite(se) and se > 0:
+                                if dd.mean() - z * se > 0:
+                                    commit = True; break
+                                if dd.mean() + z * se < 0:
+                                    commit = False; break
+                            elif dd.mean() != 0:
+                                commit = bool(dd.mean() > 0); break
+                        p_inc = float((model.predict(Xp[:seen_n]) == yp[:seen_n]).mean())
+                        p_cand = float((candidate.predict(Xp[:seen_n]) == yp[:seen_n]).mean())
+                        probe_labels_seq.append(seen_n)
                     else:
                         # balanced-accuracy comparison where both classes are present; plain
                         # accuracy otherwise (observed / binomial-prevalence probes may be
@@ -553,6 +583,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 n_adapt += 1
                 adapt_windows.append(t)
                 adapted = True
+                # amendment 008: audit candidate-training rows that recur in FUTURE evaluation
+                # windows (the pools are sampled with replacement, so a training row can be
+                # scored again). Logging only; reported as evidence the effect is negligible.
+                if args.adapt_strategy == "sliding_window" and candidate is not None:
+                    train_ids = {r.tobytes() for x, _ in seen[-8:]
+                                 for r in np.ascontiguousarray(x)}
+                    for fset in future_row_sets[t + 1:]:
+                        cand_future_collisions += len(train_ids & fset)
                 if args.adapt_strategy == "ensemble":
                     model = EnsembleModel(model, candidate)
                 elif args.adapt_strategy == "ensemble_cal":
@@ -602,6 +640,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    n_train_skipped=n_skip_train,
                    n_probes=n_probes, n_probes_zero_attack=probe_zero_attack,
                    probe_row_collisions=probe_row_collisions,
+                   cand_future_collisions=cand_future_collisions,
                    seq_labels_mean=float(np.mean(probe_labels_seq)) if probe_labels_seq else np.nan,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
@@ -632,8 +671,10 @@ def main():
     p.add_argument("--cooldown-windows", type=int, default=10)
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
-                            "labeled_probe_mcnemar", "labeled_probe_seq", "unsup_disagree",
-                            "atc", "doc", "two_stage"])
+                            "labeled_probe_mcnemar", "labeled_probe_seq", "labeled_probe_seqav",
+                            "unsup_disagree", "atc", "doc", "two_stage"])
+    p.add_argument("--seqav-alpha", type=float, default=0.10,
+                   help="labeled_probe_seqav: family-wise alpha, split across looks (Bonferroni).")
     p.add_argument("--recal-source", type=str, default="pools", choices=["pools", "observed"],
                    help="observed = rebuild the post-commit detector reference/threshold from "
                         "observed windows only (no severity, no pools).")
@@ -717,7 +758,7 @@ def main():
                              labels_used_total=0, labels_probe=0, labels_monitor=0,
                              labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
                              n_probes=0, n_probes_zero_attack=0, probe_row_collisions=0,
-                             seq_labels_mean=np.nan,
+                             cand_future_collisions=0, seq_labels_mean=np.nan,
                              adaptation_gate="none", harness="v2",
                              first_adaptation_window=np.nan,
                              mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
