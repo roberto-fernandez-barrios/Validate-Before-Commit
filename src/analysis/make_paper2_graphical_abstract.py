@@ -35,11 +35,11 @@ def main():
     ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
 
     # Title / insight band
-    ax.text(0.5, 0.955, "Validate Before Commit: safe, label-efficient readaptation for adaptive NIDS",
+    ax.text(0.5, 0.955, "Validate Before Commit: label-efficient gating of drift-triggered classifier updates for NIDS",
             ha="center", va="center", fontsize=14.5, weight="bold", color=DARK)
     ax.text(0.5, 0.88,
-            "Detection $\\neq$ decision: the benefit of retraining tracks deployed-model degradation "
-            "(r $\\approx$ $-0.85$) — a quantity drift detectors cannot see.",
+            "Detection $\\neq$ decision: retraining restores accuracy to a nearly regime-invariant level, so its "
+            "benefit is the deployed model's headroom — a quantity detector scores cannot see (per-trigger r $\\approx$ 0).",
             ha="center", va="center", fontsize=10.5, color=DARK, style="italic")
 
     # Source box

@@ -1,6 +1,6 @@
 # Reproducibility — "Knowing When Not to Retrain"
 
-Artifact for the paper on label-efficient safe readaptation for adaptive NIDS under concept drift.
+Artifact for the paper on label-efficient gating of drift-triggered classifier updates for NIDS.
 Everything below regenerates from raw data; results tables/figures live under `results/` (git-ignored) and
 are rebuilt by the analysis scripts. Manuscript + bibliography: `manuscript/`.
 

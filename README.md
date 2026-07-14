@@ -137,8 +137,8 @@ The paper is under review; cite it as below. To cite the **software artifact** i
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
-  title  = {Validate Before Commit: Label-Efficient Safe Readaptation for
-            Adaptive Network Intrusion Detection under Concept Drift},
+  title  = {Validate Before Commit: Label-Efficient Empirical Gating of
+            Drift-Triggered Classifier Updates for Network Intrusion Detection},
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},

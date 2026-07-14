@@ -247,7 +247,7 @@ Adaptive intrusion detection, concept drift, safe model updating, label-efficien
 
 """
 
-TITLE = "Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift"
+TITLE = "Validate Before Commit: Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection"
 
 TAIL_ELS = r"""
 
