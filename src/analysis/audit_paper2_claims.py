@@ -271,6 +271,11 @@ def main():
     check("5.9 ensemble UNSW -0.10", -0.103, val(ab, "gain", regime="unsw_recon", arm="ensemble_none"), 0.005)
     check("5.9 sliding ToN -2.44", -2.437, val(ab, "gain", regime="ton_scanning", arm="sliding_window_none"), 0.005)
     check("5.9 sliding ToN gated +0.78", 0.781, val(ab, "gain", regime="ton_scanning", arm="sliding_window_lp32"), 0.005)
+    tmp = pd.read_csv(f"{T}/paper2_v5_temporal_001/summary.csv")
+    check("5.9 temporal naive +21.3", 21.333, val(tmp, "value", metric="naive_vs_noadapt"), 0.005)
+    check("5.9 temporal gate +19.9", 19.917, val(tmp, "value", metric="gate_vs_noadapt"), 0.005)
+    check("5.9 temporal gate premium -1.42", -1.416, val(tmp, "value", metric="gate_vs_naive"), 0.005)
+    check("5.9 temporal noadapt 68.4%", 68.38, val(tmp, "value", metric="noadapt_BA"), 0.01)
     ex = pd.read_csv(f"{T}/../tables/paper2_phase3_extras_summary.csv") if False else pd.read_csv(
         "results/tables/paper2_phase3_extras_summary.csv")
     check("5.9 perf PortScan +5.40", 5.402, val(ex, "gain", regime="portscan", arm="perf_none"), 0.005)
