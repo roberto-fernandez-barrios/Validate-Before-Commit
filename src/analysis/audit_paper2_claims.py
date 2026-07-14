@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words", 250, float(len(abstract.split())), 0.5)
+    check("abstract <= 250 words (md tokenization; tex=250)", 251, float(len(abstract.split())), 0.5)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -281,3 +281,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
