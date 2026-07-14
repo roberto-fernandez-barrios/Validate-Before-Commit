@@ -159,6 +159,11 @@ Algorithm 1: Gated progressive readaptation (one stream)
 The \texttt{labeled\_probe} gate directly targets the quantity \S3.1 identifies (the sign of $\mathrm{acc}(h')-\mathrm{acc}(h)$), estimated from $b$ labels; the \texttt{unsup\_disagree} gate tests whether that estimate can be obtained without labels.
 
 
+\textbf{A cost-sensitive reading of the gate.} The commit rule is the myopic maximizer of an explicit operational utility. Let each error cost $\lambda_e$ per flow, let a committed update cost $\lambda_U$ (deployment risk, churn) plus compute $\lambda_C$, and let probe labels cost $\lambda_L$ each. Over a horizon of $N$ post-decision flows, committing pays off iff $\lambda_e N \,[\mathrm{acc}(h') - \mathrm{acc}(h)] > \lambda_U + \lambda_C$, i.e.
+$$\mathrm{commit} \iff \widehat{\mathrm{BA}}(h',P) - \widehat{\mathrm{BA}}(h,P) \ge \varepsilon^{\ast}, \qquad \varepsilon^{\ast} = \frac{\lambda_U + \lambda_C}{\lambda_e N},$$
+so the margin $\varepsilon$ is not a heuristic knob but the update cost expressed in accuracy points over the remaining horizon; the probe budget $b$ trades $\lambda_L b$ against estimator variance, and a risk-averse operator replaces the point estimate with a lower confidence bound (the LCB variant of \S5.9). The margin sweep of \S5.6 is the empirical operating characteristic of this utility: raising $\varepsilon$ from 0 to 0.01--0.02 cuts committed updates by ${\sim}30\%$ at equal downstream gain, which is exactly the behaviour an operator with non-trivial $\lambda_U/\lambda_e$ should choose. Asymmetric error costs ($\lambda_{FN} \ne \lambda_{FP}$) substitute a weighted accuracy for BA in the same rule.
+
+
 \subsection{Metrics}
 
 
