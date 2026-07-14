@@ -41,6 +41,7 @@ from src.experiments.run_paper2_progressive_readaptation import (
     make_pools,
     progressive_severity,
     sample_balanced_from_distribution,
+    sample_prevalence_from_distribution,
     train_svc,
     transform_X,
     _labelfree_estimate,
@@ -91,8 +92,13 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
     stream = []
     for t in range(args.post_windows):
         sev = progressive_severity(t, args)
-        Xw_raw, yw = sample_balanced_from_distribution(
-            role["window"], n_per_class=args.window_size // 2, severity=sev, rng=env_rng)
+        if args.stream_prevalence != 0.5:
+            Xw_raw, yw = sample_prevalence_from_distribution(
+                role["window"], n_total=args.window_size, attack_frac=args.stream_prevalence,
+                severity=sev, rng=env_rng)
+        else:
+            Xw_raw, yw = sample_balanced_from_distribution(
+                role["window"], n_per_class=args.window_size // 2, severity=sev, rng=env_rng)
         stream.append((transform_X(Xw_raw, scaler, pca), yw, sev))
     return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"])
 
@@ -131,11 +137,37 @@ def run_arm(method: str, env: Environment, args, seed: int):
             rng=np.random.default_rng(seed + 999))
         incumbent_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
 
+    # performance-aware (DDM-style) trigger: labels spent on MONITORING the incumbent's error
+    perf_thr, err_hist = None, []
+    if args.trigger_mode == "performance":
+        mc_rng = np.random.default_rng(seed + 889)
+        errs = []
+        for _ in range(args.calibration_windows):
+            Xm_raw, ym = sample_balanced_from_distribution(
+                env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=0.0, rng=mc_rng)
+            Xm = transform_X(Xm_raw, env.scaler, env.pca)
+            errs.append(1.0 - float((model.predict(Xm) == ym).mean()))
+        perf_thr = float(np.mean(errs) + 3.0 * (np.std(errs) if np.std(errs) > 0 else 0.02))
+
     for t, (Xw, yw, sev) in enumerate(env.stream):
         m = evaluate_model(model, Xw, yw)
+        pred = model.predict(Xw)
+        fp = int(((pred == 1) & (yw == 0)).sum()); tn = int(((pred == 0) & (yw == 0)).sum())
+        m["fpr"] = fp / max(1, fp + tn)
+        m["recall"] = float(((pred == 1) & (yw == 1)).sum() / max(1, (yw == 1).sum()))
+        m["alerts"] = int((pred == 1).sum())
         ba_hist.append(m["balanced_accuracy"])
         score = float(detector.score(Xw))
-        alarms.append(score > threshold)
+        if args.trigger_mode == "performance":
+            mon_rng = np.random.default_rng(seed * 400_009 + t)
+            Xm_raw, ym = sample_balanced_from_distribution(
+                env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=sev, rng=mon_rng)
+            Xm = transform_X(Xm_raw, env.scaler, env.pca)
+            err_hist.append(1.0 - float((model.predict(Xm) == ym).mean()))
+            labels_used += args.monitor_labels
+            alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
+        else:
+            alarms.append(score > threshold)
         recent = alarms[-args.consecutive_k:]
         trigger = len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
         adapted = False
@@ -222,6 +254,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
 
         rows.append(dict(seed=seed, method=method, window_idx=t, severity_t=sev,
                          balanced_accuracy=m["balanced_accuracy"], f1=m["f1"],
+                         fpr=m["fpr"], recall=m["recall"], alerts=m["alerts"],
                          score=score, threshold=threshold, alarm=bool(alarms[-1]) if alarms else False,
                          trigger=bool(trigger), adapted_now=bool(adapted)))
 
@@ -275,6 +308,14 @@ def main():
     p.add_argument("--policy-k", type=int, default=None)
     p.add_argument("--policy-n", type=int, default=None)
     p.add_argument("--policy-name", type=str, default=None)
+    p.add_argument("--trigger-mode", type=str, default="detector", choices=["detector", "performance"],
+                   help="performance = DDM-style trigger on the incumbent's monitored error "
+                        "(labels spent on monitoring instead of gating).")
+    p.add_argument("--monitor-labels", type=int, default=8,
+                   help="Labels per window for the performance trigger.")
+    p.add_argument("--stream-prevalence", type=float, default=0.5,
+                   help="Attack fraction of EVALUATION windows (0.5 = balanced; natural-"
+                        "prevalence streams report FPR/recall/alert volume).")
     args = p.parse_args()
 
     seeds = [int(s) for s in str(args.seeds).split(",") if s.strip()]
