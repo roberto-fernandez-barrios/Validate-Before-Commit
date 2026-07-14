@@ -1,4 +1,4 @@
-# Reproducibility — "Knowing When Not to Retrain"
+# Reproducibility — "Validate Before Commit"
 
 Artifact for the paper on label-efficient gating of drift-triggered classifier updates for NIDS.
 Everything below regenerates from raw data; results tables/figures live under `results/` (git-ignored) and
@@ -9,7 +9,9 @@ are rebuilt by the analysis scripts. Manuscript + bibliography: `manuscript/`.
 ```bash
 conda create -n paper2 python=3.11 -y
 conda activate paper2
-pip install -r requirements.txt      # numpy, pandas, scipy, scikit-learn, matplotlib
+pip install -r requirements.txt      # numpy, pandas, scipy, scikit-learn, matplotlib, statsmodels, river
+# exact versions used for the published results:
+pip install -r requirements-lock.txt
 ```
 
 ## 2. Data
@@ -44,18 +46,36 @@ python -m src.experiments.run_paper2_progressive_readaptation \
 The **pre-specified Phase 2** protocol (criteria fixed at 10 seeds, conditionally expanded to 30; see the
 manuscript's honesty notes) is documented in `notes/paper2_phase2_gated_readaptation_preregistration_001.md`.
 The **confirmatory study is the harness-v2 registered replication** (protocol publicly tagged
-`harness-v2-protocol` + amendment 002; pristine seeds 104–133). v2 runner and one arm example:
+`harness-v2-protocol` + amendments 002/003/004; pristine seeds 104–133). v2 runner — the PRIMARY arm
+(fresh-probe commit gate):
 
 ```bash
 python -m src.experiments.run_paper2_readaptation_v2 \
   --data-ref data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv \
   --data-cur data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv \
-  --seeds 104,...,133 --methods ks_max --adaptation-gate labeled_probe_holdout --probe-size 32 \
-  --outdir results/raw/paper2_v2_ton_scanning_ks_holdout32b
+  --seeds 104,...,133 --methods ks_max --adaptation-gate labeled_probe --probe-size 32 \
+  --outdir results/raw/paper2_v2_ton_scanning_ks_lp32
 ```
-All 45+21 v2 arm invocations follow this template; the full arm list (regimes × detectors × gates ×
-downstream models × prevalence) is enumerated in `notes/paper2_harness_v2_registered_replication_protocol_001.md`
-and `notes/paper2_harness_v2_amendment_002.md`.
+Other arms swap `--adaptation-gate` (`none` = naive, `labeled_probe_holdout` → `..._holdout32b` dirs,
+`labeled_probe_lcb`, `two_stage`), `--methods` (`qk_mmd_zz`), `--downstream-model`, `--stream-prevalence 0.05`,
+`--adapt-strategy {ensemble,ensemble_cal,sliding_window}`, `--trigger-mode {ddm,adwin,ddm_river,adwin_river}`,
+`--probe-size {8,16,64,128}`, `--probe-latency {5,20}` and `--probe-flip-frac {0.10,0.25,0.40}`. The full arm
+lists, with seeds and output-dir naming, are enumerated in
+`notes/paper2_harness_v2_registered_replication_protocol_001.md` and amendments
+`notes/paper2_harness_v2_amendment_00{2,3,4}.md` (004 also carries the seed ledger).
+
+**Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
+Thursday 227–256):
+
+```bash
+python -m src.experiments.run_paper2_temporal_stream \
+  --data-train data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv \
+  --data-stream data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Morning.pcap_ISCX.csv \
+                data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv \
+                data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv \
+  --seeds 165,...,194 --adaptation-gate labeled_probe \
+  --outdir results/raw/paper2_v6_temporal_fri_labeled_probe
+```
 
 ## 4. Analysis → tables and figures (all read the raw window/summary CSVs)
 
@@ -71,6 +91,9 @@ python -m src.analysis.aggregate_paper2_replay_baseline     # Phase 2i: replay b
 python -m src.analysis.aggregate_paper2_probe_prevalence    # Phase 2j: probe-prevalence verdict
 python -m src.analysis.aggregate_paper2_size_dim_controls   # Phase 2k: candidate-size / full-dim controls
 python -m src.analysis.aggregate_paper2_v2_replication      # Harness-v2 registered replication verdict
+python -m src.analysis.aggregate_paper2_amendment_004       # v2 robustness suite, cost table, temporal streams
+python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model
+python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cross-check vs river
 ```
 
 Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
@@ -85,7 +108,14 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, §5.6 |
 | The probe need not be balanced: full safety/benefit at natural prevalence (π=0.10/0.01) | `paper2_phase2j_probe_prevalence_001/`, §5.6 |
 | Harm is not a size/PCA artifact: deepens with size-matched candidates; persists point-wise at full dim | `paper2_phase2k_size_dim_controls_001/`, §5.6 |
-| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; zero-incremental-label holdout gate; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.9, tag `harness-v2-protocol` |
+| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.10, tag `harness-v2-protocol` |
+| Hierarchical per-trigger model (β_deg −1.02 [−1.17,−0.87]; score/severity/time ≈ 0) + decision metrics (regret 22× lower than always-commit in the harm regime) | `paper2_decision_quality_004/` |
+| v2 robustness: budget (b=32 operating point; b=8 corrected), latency 20, corruption (harm-avoidance to 40%, net benefit to 25%) | `paper2_amendment_004/robustness.csv` |
+| Two-stage gate: 74% fewer candidates, ~½ of naive's total labels, still net-positive in the harm regime | `paper2_amendment_004/robustness.csv` + `label_cost.csv` |
+| Total label/compute accounting per policy (candidates dominate; probe ≈3% of the gate's bill) | `paper2_amendment_004/label_cost.csv`, Table 9 |
+| DDM/ADWIN validated vs reference implementations (river): DDM net-harm replicates; our ADWIN variant under-fires, reference reported | `paper2_monitor_validation_004.csv`, `paper2_v6_*_{ddm,adwin}river_none/` |
+| Calibrated soft ensemble: strongest label-free rule, harm-avoiding everywhere, beats gate in marginal regime, cannot decline updates | `paper2_v6_*_enscal_none/`, `paper2_amendment_004/robustness.csv` |
+| Chronological streams (corrected runner): deep-benefit recoveries on all three days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday | `paper2_amendment_004/temporal.csv`, Table 8 |
 | Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Table 4, Fig 3 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Table 5; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Tables 2-3, Fig 4 |

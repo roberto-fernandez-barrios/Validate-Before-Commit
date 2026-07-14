@@ -11,12 +11,13 @@
 ![Graphical abstract](docs/img/graphical_abstract.png)
 
 Machine-learning intrusion detectors degrade under network **concept drift**, so adaptive systems retrain their
-classifiers. The field treats *when to retrain* as a **drift-detection** problem: fire a monitor, retrain on
-the alarm. This repository shows that framing is incomplete and sometimes harmful — and provides a small,
-deployable fix.
+classifiers. The field treats model updating as a **drift-detection** problem: fire a monitor, retrain on the
+alarm, deploy. This repository shows that the ungoverned step is the *deployment*: always deploying the
+retrained candidate is incomplete and sometimes harmful — and a small commit-time check fixes it.
 
-> **Drift detectors answer "did the distribution change?". An adaptive IDS needs "will retraining improve the
-> classifier?". These are different questions — and the gap between them is where harmful retraining lives.**
+> **Drift detectors answer "did the distribution change?". An adaptive IDS needs "will deploying this retrained
+> candidate improve the classifier?". These are different questions — and the gap between them is where harmful
+> updates live.**
 
 ---
 
@@ -25,16 +26,22 @@ deployable fix.
 - Across **three public benchmarks** (CICIDS2017, UNSW-NB15, ToN-IoT) and multiple attack regimes, the value of
   drift-triggered retraining spans **+19.5 to −4.5 balanced-accuracy points**. For a fragile downstream model,
   *never adapting* can beat every triggered strategy.
-- Whether retraining helps is governed by **how degraded the deployed model already is**: retraining restores
-  accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity a
-  drift detector cannot observe (within a deployment, detector scores are uninformative about the gain, r ≈ 0.06).
-  The detector — classical two-sample test or quantum-kernel MMD — is **not the lever**.
+- Whether an update helps tracks **how degraded the deployed model already is**: retraining restores
+  accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity
+  drift-detector scores do not measure (at individual triggered decisions a hierarchical model gives
+  β_deg = −1.02 [−1.17, −0.87] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
+  MMD — is **not the lever**.
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
-- **The fix:** a label-efficient **validate-before-commit gate** — on each triggered drift, retrain a candidate
-  but deploy it **only if it beats the incumbent on a small labeled probe** (tens of labeled flows). It is
-  evaluated under pre-specified criteria with 30-seed 95% CIs, generalizes across two detectors (with SVC) and
-  four downstream models (with KS-max), tolerates label latency and natural-prevalence probes, and **fails safe
-  under randomly corrupted validation labels**.
+- **The fix:** a **validate-before-commit gate** — the loop retrains its candidate as usual, and the gate decides
+  **deployment**: commit only if the candidate beats the incumbent on a small labeled probe (32 flows — the
+  *decision's* incremental cost; candidates themselves consume ~1,024 labels/trigger, fully accounted in the paper).
+  Confirmed by a **replication registered before execution** on a hardened harness (bit-identical streams, disjoint
+  partitions, pristine seeds) across two detectors and four downstream models; robust to 20-window label latency
+  and harm-avoiding up to 40% randomly flipped probe labels (net benefit survives to 25%).
+- **Honest boundary:** on real chronological streams sitting deep in the benefit regime, the gate pays a measurable
+  insurance premium in balanced accuracy vs always-deploy (it inherits its probe's metric and composition); on the
+  same streams it *beats* always-deploy on overall accuracy. Where the incumbent stays healthy — where the gate's
+  value concentrates — it is net-positive everywhere we measured.
 
 ---
 
@@ -44,46 +51,60 @@ deployable fix.
 
 ![Regime spectrum](docs/img/fig1_regime_spectrum.png)
 
-**2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of adaptation is the deployed model's headroom (coupling-aware analysis in the paper, §5.2).**
+**2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of an update is the deployed
+model's headroom. Per-trigger, non-coupled test (hardened harness): pre-trigger incumbent degradation predicts the
+future value of committing; the detector score at the same triggers predicts nothing (coupling-aware analysis §5.3;
+hierarchical model §5.10).**
 
-![Mechanism law](docs/img/fig2_mechanism_law.png)
+![Per-trigger mechanism](docs/img/fig9_pertrigger.png)
 
 **3 — The validate-before-commit gate preserves benefit, avoids harm, and beats both naive retraining and
 never-adapting — identically for a classical (KS-max) and a quantum (QK-ZZ) detector.**
 
 ![Gate results](docs/img/fig4_phase2_gate.png)
 
-**4 — The gate fails safe: with up to 40% of validation labels randomly flipped it never becomes harmful and is
-never significantly worse than naive.**
+**4 — The gate is harm-avoiding under randomly corrupted validation labels: at up to 40% flipped labels it stays
+significantly above naive in the harm regime; net benefit over no-adaptation survives to 25% (hardened-harness
+numbers in the paper, §5.10).**
 
 ![Adversarial probe](docs/img/fig8_probe_poison.png)
 
 ---
 
-## Results at a glance (ToN-IoT harm regime, 30 seeds, pre-specified criteria)
+## Results at a glance (ToN-IoT harm regime — registered replication, harness v2, pristine seeds 104–133)
 
-| Detector | naive retraining | **validate-before-commit gate** | gate vs naive (CI95) | gate vs never-adapt (CI95) |
+| Detector | naive (always deploy) | **validate-before-commit gate** | gate vs naive (CI95) | gate vs never-adapt (CI95) |
 |---|---:|---:|---|---|
-| KS-max (classical) | −1.36 | **+0.93** | +2.30 [1.15, 3.63] | +0.93 [0.53, 1.36] |
-| QK-ZZ (quantum) | −3.69 | **+1.06** | +4.74 [2.47, 7.69] | +1.06 [0.77, 1.40] |
+| KS-max (classical) | −1.64 | **+0.79** | +2.43 [1.53, 3.43] | +0.79 [0.53, 1.07] |
+| QK-ZZ (quantum) | −2.91 | **+0.72** | +3.63 [1.66, 6.38] | +0.72 [0.44, 0.99] |
 
-Balanced-accuracy points vs. no-adaptation. The gate converts net-harmful retraining into net benefit with
-~100 labeled flows; a **label-budget sweep** shows as few as ~8 labels per confirmed drift already avoid harm.
+Balanced-accuracy points vs. the shared no-adaptation baseline (truly paired: all arms process bit-identical
+streams). The v2 **label-budget sweep** puts the operating point at b = 32: at b = 8 the gate still reduces harm
+(+1.22 above naive) but is no longer net-positive vs never adapting — the initial study's "8 labels suffice" is
+corrected accordingly. A **two-stage** variant that health-checks the incumbent *before* training candidates cuts
+total labels below half of naive's (1,182 vs 2,594 per stream) and stays net-positive (+0.16 [0.03, 0.31]).
 
 ---
 
 ## The method
 
-On every triggered drift the gate retrains a **candidate** model as usual, but **commits it only if it beats
-the deployed model on a small labeled probe** drawn from current traffic (default 32 flows); otherwise the
-incumbent is kept. Two ablations delimit the method: a **zero-label** variant (commit on model disagreement)
-fails — a few labels are necessary — and simple **k-of-n / cooldown** policies fail because they act on
+On every triggered drift the loop retrains a **candidate** model as usual; the gate decides **deployment**:
+commit only if the candidate beats the incumbent on a small labeled probe drawn from current traffic (default
+32 flows); otherwise the incumbent is kept. A **two-stage** variant spends the same probe on the incumbent
+*before* training and skips candidate construction when the incumbent is healthy — gating the training decision
+itself (and its ~1,024 labels). Ablations delimit the method: among the evaluated gates, the label-free variants
+(disagreement, ATC, DoC) either fail or sacrifice benefit; a properly *calibrated* soft ensemble is the strongest
+label-free update rule (harm-avoiding everywhere, ahead of the gate in the marginal regime) but commits every
+trigger and cannot decline an update; simple **k-of-n / cooldown** policies fail because they act on
 distributional change rather than estimated model improvement. See `manuscript/` §3 (Algorithm 1) for the
 full specification.
 
-Enabled by flags on the experiment runner:
-`--adaptation-gate {none,labeled_probe,unsup_disagree}`, `--probe-size`, `--probe-lag`, `--probe-poison`,
-`--gate-margin`, `--downstream-model {svc_rbf,random_forest,logreg,mlp}`.
+Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.py`):
+`--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,unsup_disagree,atc,doc,two_stage}`,
+`--probe-size`, `--probe-latency`, `--probe-flip-frac`, `--gate-margin`,
+`--adapt-strategy {full_replace,ensemble,ensemble_cal,sliding_window}`,
+`--trigger-mode {detector,performance,ddm,adwin,ddm_river,adwin_river}`,
+`--downstream-model {svc_rbf,random_forest,logreg,mlp}`.
 
 ---
 
@@ -109,11 +130,22 @@ pip install -r requirements.txt
 python -m src.analysis.make_paper2_paper_tables    # Tables 1–6 (Markdown + LaTeX)
 python -m src.analysis.make_paper2_figures         # Figures 1–4
 python -m src.analysis.make_paper2_budget_curve    # label-efficiency frontier
-python -m src.analysis.make_paper2_gate_robustness # latency / harm-breadth / margin / poison
+python -m src.analysis.make_paper2_gate_robustness # latency / harm-breadth / margin / poison (v1)
+python -m src.analysis.aggregate_paper2_v2_replication  # registered replication verdict (v2)
+python -m src.analysis.aggregate_paper2_amendment_004   # robustness suite, cost table, temporal streams
+python -m src.analysis.paper2_decision_quality_004      # decision metrics + hierarchical model
+python -m src.analysis.validate_monitors_vs_river       # DDM/ADWIN vs reference implementations
 ```
 
+A `requirements-lock.txt` (pip freeze of the environment that produced the results) accompanies
+`requirements.txt` for exact reproduction.
+
 Full details, including the exact experiment commands and a claim → artifact map, are in
-[`REPRODUCE.md`](REPRODUCE.md). The confirmatory Phase 2 protocol was pre-specified in
+[`REPRODUCE.md`](REPRODUCE.md). The **confirmatory evidence is the registered v2 replication**: protocol
+publicly tagged (`harness-v2-protocol`) before any confirmatory seed ran, plus pre-run registered amendments
+([002](notes/paper2_harness_v2_amendment_002.md), [003](notes/paper2_harness_v2_amendment_003.md),
+[004](notes/paper2_harness_v2_amendment_004.md) — the latter also fixes and re-runs the chronological-stream
+experiment). The initial Phase 2 protocol was pre-specified in
 [`notes/paper2_phase2_gated_readaptation_preregistration_001.md`](notes/paper2_phase2_gated_readaptation_preregistration_001.md).
 
 ## Data availability

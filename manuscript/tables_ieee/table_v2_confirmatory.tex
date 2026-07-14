@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Main confirmatory result} (registered replication, harness v2: common pre-generated streams, role-disjoint partitions, pristine seeds 104--133). Gain vs.\ the shared no-adaptation baseline, in BA points [cluster bootstrap CI95 over 30 seeds]; the last column is the truly paired gate$-$naive contrast on bit-identical streams. Every pre-registered criterion (harm avoidance, benefit preservation, marginal non-degradation, detector invariance) passes.}
+\label{tab:v2_confirmatory}
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
+\begin{tabular}{llrrr}
+\toprule
+Regime & Detector & Naive (always deploy) & Commit gate ($b{=}32$) & Gate $-$ naive (paired) \\
+\midrule
+PortScan (benefit) & KS-max & $+$8.25 [5.83, 10.38] & $+$9.12 [7.24, 10.98] & $+$0.87 [$-$0.01, 2.09] \\
+PortScan (benefit) & QK-ZZ & $+$7.87 [5.49, 9.93] & $+$9.32 [7.33, 11.14] & $+$1.45 [0.51, 2.55] \\
+UNSW Recon (marginal) & KS-max & $+$1.21 [0.96, 1.45] & $+$1.35 [1.17, 1.54] & $+$0.14 [$-$0.09, 0.38] \\
+UNSW Recon (marginal) & QK-ZZ & $+$1.25 [1.05, 1.46] & $+$1.32 [1.12, 1.52] & $+$0.07 [$-$0.09, 0.25] \\
+ToN-IoT (harm) & KS-max & $-$1.64 [$-$2.72, $-$0.64] & $+$0.79 [0.53, 1.07] & $+$2.43 [1.53, 3.43] \\
+ToN-IoT (harm) & QK-ZZ & $-$2.91 [$-$5.49, $-$0.94] & $+$0.72 [0.44, 0.99] & $+$3.63 [1.66, 6.38] \\
+\bottomrule
+\end{tabular}}
+\end{table*}

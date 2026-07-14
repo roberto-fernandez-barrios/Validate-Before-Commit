@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words (md tokenization; tex=250)", 251, float(len(abstract.split())), 0.5)
+    check("abstract <= 250 words (md tokenization; tex=249)", 254, float(len(abstract.split())), 0.5)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -271,11 +271,94 @@ def main():
     check("5.9 ensemble UNSW -0.10", -0.103, val(ab, "gain", regime="unsw_recon", arm="ensemble_none"), 0.005)
     check("5.9 sliding ToN -2.44", -2.437, val(ab, "gain", regime="ton_scanning", arm="sliding_window_none"), 0.005)
     check("5.9 sliding ToN gated +0.78", 0.781, val(ab, "gain", regime="ton_scanning", arm="sliding_window_lp32"), 0.005)
-    tmp = pd.read_csv(f"{T}/paper2_v5_temporal_001/summary.csv")
-    check("5.9 temporal naive +21.3", 21.333, val(tmp, "value", metric="naive_vs_noadapt"), 0.005)
-    check("5.9 temporal gate +19.9", 19.917, val(tmp, "value", metric="gate_vs_noadapt"), 0.005)
-    check("5.9 temporal gate premium -1.42", -1.416, val(tmp, "value", metric="gate_vs_naive"), 0.005)
-    check("5.9 temporal noadapt 68.4%", 68.38, val(tmp, "value", metric="noadapt_BA"), 0.01)
+    # --- Amendment 004: corrected chronological streams (supersede v5 temporal run) ---
+    tmp = pd.read_csv(f"{T}/paper2_amendment_004/temporal.csv")
+    def tval(stream, metric, quantity):
+        return val(tmp, "value", stream=stream, metric=metric, quantity=quantity)
+    check("5.9 temporal fri noadapt 71.97", 71.97, tval("fri", "BA_two_class", "no_adapt_level"), 0.01)
+    check("5.9 temporal fri naive +13.55", 13.553, tval("fri", "BA_two_class", "naive_vs_noadapt"), 0.005)
+    check("5.9 temporal fri gate +7.22", 7.216, tval("fri", "BA_two_class", "gate_vs_noadapt"), 0.005)
+    check("5.9 temporal fri premium -6.34", -6.337, tval("fri", "BA_two_class", "gate_vs_naive"), 0.005)
+    check("5.9 temporal fri acc gate-naive +4.19", 4.190, tval("fri", "accuracy_all", "gate_vs_naive"), 0.005)
+    check("5.9 temporal wed noadapt 53.35", 53.35, tval("wed", "BA_two_class", "no_adapt_level"), 0.01)
+    check("5.9 temporal wed naive +27.63", 27.625, tval("wed", "BA_two_class", "naive_vs_noadapt"), 0.005)
+    check("5.9 temporal wed gate-naive +0.40", 0.401, tval("wed", "BA_two_class", "gate_vs_naive"), 0.005)
+    check("5.9 temporal thu naive +22.74", 22.740, tval("thu", "BA_two_class", "naive_vs_noadapt"), 0.005)
+    check("5.9 temporal thu premium -4.98", -4.978, tval("thu", "BA_two_class", "gate_vs_naive"), 0.005)
+    check("5.9 temporal thu acc gate-naive +1.23", 1.230, tval("thu", "accuracy_all", "gate_vs_naive"), 0.005)
+
+    # --- Amendment 004: v2 robustness suite, two-stage, calibrated ensemble, river monitors ---
+    rb = pd.read_csv(f"{T}/paper2_amendment_004/robustness.csv")
+    check("5.9 v2 budget lp8 ToN -0.42 (corrected claim)", -0.424,
+          val(rb, "gain", regime="ton_scanning", arm="lp8"), 0.005)
+    check("5.9 v2 budget lp8 ToN vs naive +1.22", 1.215,
+          val(rb, "vs_naive", regime="ton_scanning", arm="lp8"), 0.005)
+    check("5.9 v2 budget lp16 ToN +0.29", 0.289, val(rb, "gain", regime="ton_scanning", arm="lp16"), 0.005)
+    check("5.9 v2 budget lp64 ToN +0.92", 0.923, val(rb, "gain", regime="ton_scanning", arm="lp64b"), 0.005)
+    check("5.9 v2 budget lp128 ToN +1.01", 1.006, val(rb, "gain", regime="ton_scanning", arm="lp128"), 0.005)
+    check("5.9 v2 latency20 ToN +0.95", 0.953, val(rb, "gain", regime="ton_scanning", arm="lp32lat20"), 0.005)
+    check("5.9 v2 latency20 PortScan vs lp32 -0.47", -0.465,
+          val(rb, "vs_lp32", regime="portscan", arm="lp32lat20"), 0.005)
+    check("5.9 v2 flip25 ToN +0.57", 0.570, val(rb, "gain", regime="ton_scanning", arm="lp32flip25"), 0.005)
+    check("5.9 v2 flip40 ToN -0.04", -0.043, val(rb, "gain", regime="ton_scanning", arm="lp32flip40"), 0.005)
+    check("5.9 v2 flip40 ToN vs naive +1.60", 1.595,
+          val(rb, "vs_naive", regime="ton_scanning", arm="lp32flip40"), 0.005)
+    check("5.9 two-stage ToN +0.16", 0.163, val(rb, "gain", regime="ton_scanning", arm="twostage"), 0.005)
+    check("5.9 two-stage ToN candidates 0.90", 0.90,
+          val(rb, "n_candidates_trained", regime="ton_scanning", arm="twostage"), 0.01)
+    check("5.9 two-stage PortScan vs lp32 -1.00", -0.998,
+          val(rb, "vs_lp32", regime="portscan", arm="twostage"), 0.005)
+    check("5.9 enscal ToN +0.56", 0.558, val(rb, "gain", regime="ton_scanning", arm="enscal_none"), 0.005)
+    check("5.9 enscal UNSW +1.72", 1.721, val(rb, "gain", regime="unsw_recon", arm="enscal_none"), 0.005)
+    check("5.9 enscal UNSW vs naive +0.51", 0.513,
+          val(rb, "vs_naive", regime="unsw_recon", arm="enscal_none"), 0.005)
+    check("5.9 enscal PortScan +8.55", 8.551, val(rb, "gain", regime="portscan", arm="enscal_none"), 0.01)
+    check("5.9 gate-enscal ToN +0.23 (from vs_lp32)", -0.230,
+          val(rb, "vs_lp32", regime="ton_scanning", arm="enscal_none"), 0.005)
+    check("5.9 ddm_river ToN -2.23", -2.226, val(rb, "gain", regime="ton_scanning", arm="ddmriver_none"), 0.005)
+    check("5.9 ddm_river UNSW +0.14", 0.138, val(rb, "gain", regime="unsw_recon", arm="ddmriver_none"), 0.005)
+    check("5.9 adwin_river PortScan +1.77", 1.770, val(rb, "gain", regime="portscan", arm="adwinriver_none"), 0.005)
+    check("5.9 adwin_river ToN 0 triggers", 0.0, val(rb, "n_triggers", regime="ton_scanning", arm="adwinriver_none"), 0.01)
+
+    # --- Amendment 004: label/compute cost accounting (Table label_cost) ---
+    lc = pd.read_csv(f"{T}/paper2_amendment_004/label_cost.csv")
+    check("cost ToN lp32 total 3626", 3626, val(lc, "total_labels", regime="ton_scanning", policy="labeled_probe b=32"), 1.0)
+    check("cost ToN naive total 2594", 2594, val(lc, "total_labels", regime="ton_scanning", policy="none (naive)"), 1.0)
+    check("cost ToN two-stage total 1182", 1182, val(lc, "total_labels", regime="ton_scanning", policy="two_stage b=32"), 1.0)
+    check("cost ToN lp32 probe 110", 109.9, val(lc, "probe_labels", regime="ton_scanning", policy="labeled_probe b=32"), 0.5)
+
+    # --- Amendment 004: decision-quality metrics + hierarchical model ---
+    dm = pd.read_csv(f"{T}/paper2_decision_quality_004/decision_metrics.csv")
+    check("5.9 dq ToN regret gate 0.0020", 0.0020, val(dm, "regret_gate", regime="ton_scanning"), 0.0002)
+    check("5.9 dq ToN regret always 0.0452", 0.0452, val(dm, "regret_always_commit", regime="ton_scanning"), 0.0002)
+    check("5.9 dq ToN beneficial-rejection 4.9%", 0.0488, val(dm, "beneficial_rejection_rate", regime="ton_scanning"), 0.0005)
+    check("5.9 dq ToN recall 0.95", 0.9535, val(dm, "gate_recall", regime="ton_scanning"), 0.0005)
+    check("5.9 dq PortScan regret 0.0028 vs 0.0140", 0.0028, val(dm, "regret_gate", regime="portscan"), 0.0002)
+    check("5.9 dq pooled precision 0.74", 0.7376, val(dm, "gate_precision", regime="POOLED"), 0.0005)
+    check("5.9 dq pooled recall 0.87", 0.8717, val(dm, "gate_recall", regime="POOLED"), 0.0005)
+    check("5.9 dq pooled harmful-commit 23%", 0.2308, val(dm, "harmful_commit_rate", regime="POOLED"), 0.0005)
+    hm = pd.read_csv(f"{T}/paper2_decision_quality_004/hierarchical_model.csv")
+    check("5.9 hm pooled beta_deg -1.02", -1.0192, val(hm, "beta", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm pooled beta_deg CI lo -1.17", -1.1714, val(hm, "ci_lo", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm pooled beta_score ~0", -0.0335, val(hm, "beta", regime="POOLED", term="score"), 0.005)
+    check("5.9 hm ToN beta_deg -1.15", -1.1480, val(hm, "beta", regime="ton_scanning", term="deg_pre5"), 0.005)
+    lo_r2 = pd.read_csv(f"{T}/paper2_decision_quality_004/loro_r2.csv")
+    check("5.9 LORO ToN r2 0.36", 0.356, val(lo_r2, "r2", held_out="ton_scanning"), 0.005)
+    check("5.9 LORO UNSW r2 fails (-10.5)", -10.523, val(lo_r2, "r2", held_out="unsw_recon"), 0.01)
+
+    # --- Amendment 004: monitor validation vs river ---
+    mv = pd.read_csv(f"{T}/paper2_monitor_validation_004.csv")
+    ddm_agree = float(((mv.ours_ddm >= 0) == (mv.river_ddm >= 0)).mean())
+    adwin_agree = float(((mv.ours_adwin >= 0) == (mv.river_adwin >= 0)).mean())
+    check("5.9 river DDM agreement 0.94", 0.94, ddm_agree, 0.005)
+    check("5.9 river ADWIN agreement 0.57 (ours under-fires)", 0.57, adwin_agree, 0.005)
+
+    # --- Amendment 004: classifiers_lp32 regenerated by the committed aggregator ---
+    cl2 = pd.read_csv(f"{T}/paper2_v2_replication_001/classifiers_lp32.csv")
+    check("5.9 v2 MLP ToN naive -0.16", -0.158, val(cl2, "naive", regime="ton_scanning", dm="mlp"), 0.005)
+    check("5.9 v2 MLP ToN lp32 +0.25", 0.252, val(cl2, "lp32", regime="ton_scanning", dm="mlp"), 0.005)
+    check("5.9 v2 MLP ToN rescue +0.41", 0.410, val(cl2, "lp32_vs_naive", regime="ton_scanning", dm="mlp"), 0.005)
+    check("5.9 v2 RF PortScan boundary -0.011", -0.011, val(cl2, "lp32_vs_naive", regime="portscan", dm="random_forest"), 0.005)
     ex = pd.read_csv(f"{T}/../tables/paper2_phase3_extras_summary.csv") if False else pd.read_csv(
         "results/tables/paper2_phase3_extras_summary.csv")
     check("5.9 perf PortScan +5.40", 5.402, val(ex, "gain", regime="portscan", arm="perf_none"), 0.005)

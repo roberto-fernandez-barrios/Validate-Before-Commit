@@ -1,0 +1,15 @@
+\begin{table}
+\centering
+\caption{Real chronological streams (corrected runner, registered amendment 004; 30 fresh seeds each). Incumbent trained on Tuesday; candidates retrain on the last eight \emph{observed} windows; probes come from the stream's own past. BA = mean balanced accuracy over two-class windows (headline); acc = plain accuracy over all windows. The gate's premium is metric-dependent: it surrenders BA on attack-mixed windows while \emph{gaining} overall accuracy, because the gate inherits the metric and class composition of its probe.}
+\label{tab:temporal_streams}
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{lrrrrr}
+\toprule
+Stream (chronology) & No-adapt BA & Naive recovery (BA) & Gate recovery (BA) & Gate $-$ naive (BA) & Gate $-$ naive (acc) \\
+\midrule
+Friday (Botnet $\to$ PortScan $\to$ DDoS) & 71.97 & $+$13.55 [11.00, 16.07] & $+$7.22 [4.73, 9.61] & $-$6.34 [$-$6.83, $-$5.90] & $+$4.19 [3.85, 4.52] \\
+Wednesday (DoS/DDoS day) & 53.35 & $+$27.63 [27.16, 28.13] & $+$28.03 [27.47, 28.61] & $+$0.40 [0.09, 0.74] & $-$0.16 [$-$0.29, $-$0.06] \\
+Thursday (WebAttacks $\to$ Infiltration) & 61.08 & $+$22.74 [17.56, 28.10] & $+$17.76 [12.41, 23.09] & $-$4.98 [$-$9.21, $-$1.38] & $+$1.23 [0.61, 1.86] \\
+\bottomrule
+\end{tabular}}
+\end{table}

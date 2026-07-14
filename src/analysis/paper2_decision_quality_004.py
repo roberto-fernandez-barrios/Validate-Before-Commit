@@ -96,12 +96,26 @@ def main():
                 if term == "Intercept" or term.startswith("C(regime)"):
                     continue
                 ci = fit.conf_int().loc[term]
+                lo, hi, src = float(ci[0]), float(ci[1]), "mixedlm"
+                if not (np.isfinite(lo) and np.isfinite(hi)):
+                    # boundary MLE (singular random-effect variance): fall back to a
+                    # per-seed cluster bootstrap of the OLS coefficient
+                    import statsmodels.formula.api as smf2
+                    seeds_r = d.seed.unique(); betas = []
+                    for _ in range(2000):
+                        pick = rng.choice(seeds_r, len(seeds_r), replace=True)
+                        db = pd.concat([d[d.seed == s] for s in pick])
+                        try:
+                            betas.append(float(smf2.ols(formula, db).fit().params[term]))
+                        except Exception:
+                            pass
+                    lo, hi, src = float(np.percentile(betas, 2.5)), float(np.percentile(betas, 97.5)), "cluster_boot_ols"
                 hrows.append(dict(regime=reg, term=term, beta=round(float(fit.fe_params[term]), 4),
-                                  ci_lo=round(float(ci[0]), 4), ci_hi=round(float(ci[1]), 4),
-                                  n=len(d), converged=bool(fit.converged)))
+                                  ci_lo=round(lo, 4), ci_hi=round(hi, 4),
+                                  n=len(d), converged=bool(fit.converged), ci_source=src))
         except Exception as e:
             hrows.append(dict(regime=reg, term="FIT_FAILED", beta=np.nan, ci_lo=np.nan,
-                              ci_hi=np.nan, n=len(d), converged=str(e)[:80]))
+                              ci_hi=np.nan, n=len(d), converged=str(e)[:80], ci_source="none"))
     H = pd.DataFrame(hrows)
     H.to_csv(f"{OUT}/hierarchical_model.csv", index=False)
     print("== hierarchical_model =="); print(H.to_string(index=False)); print()

@@ -1,3 +1,5 @@
+# NOTE (amendment 004): this generator produced the INITIAL manuscript skeleton. The
+# manuscript of record is manuscript/main.tex, maintained directly since; do not regenerate over it.
 """Convert the Markdown manuscript into a compilable LaTeX document.
 
 Two targets:
@@ -34,7 +36,7 @@ FIGS = {
     "7":  ("docs/img/fig7_label_latency.png",
            "Gate robustness to label latency: safe with validation labels up to 20 windows stale."),
     "8":  ("docs/img/fig8_probe_poison.png",
-           "The gate fails safe under adversarial validation labels (up to 40\\% flipped)."),
+           "The gate remains harm-avoiding under randomly corrupted validation labels (up to 40\\% flipped)."),
 }
 TAB_FILES = {
     "1": "table1_regime_taxonomy.tex", "2": "table2_phase2_gate_summary.tex",
@@ -208,7 +210,7 @@ __ABSTRACT__
 \item Drift alarms do not reveal if retraining helps; model degradation does ($r\approx-0.85$)
 \item Naive drift-triggered retraining can be net-harmful; never adapting can win
 \item Validate before commit: deploy a retrained model only if a small probe confirms gain
-\item The gate needs only tens of labels and fails safe under 40\% poisoned labels
+\item Deploy a retrained candidate only when a small labeled probe confirms improvement
 \item Safe across two detectors and four classifiers; pre-registered, 30-seed CIs
 \end{highlights}
 
