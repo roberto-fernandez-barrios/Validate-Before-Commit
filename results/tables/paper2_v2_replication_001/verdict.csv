@@ -1,0 +1,6 @@
+criterion,value,passed
+B ToN lp32 >= -0.5 AND sig above naive (KS),0.788,True
+A PortScan lp32 >= naive-0.3 (KS),9.12,True
+C UNSW lp32 >= naive-0.3 (KS),1.352,True
+I detector invariance (QK-ZZ),0.719,True
+EXPL holdout(dedup) ~ lp32 (|diff|<=0.3),-0.77,False

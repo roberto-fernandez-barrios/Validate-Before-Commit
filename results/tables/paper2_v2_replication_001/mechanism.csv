@@ -1,0 +1,8 @@
+regime,n_triggers,n_seeds,r_deg,r_deg_lo,r_deg_hi,r_score,r_score_lo,r_score_hi
+portscan,96,30,-0.704,-0.761,-0.664,0.009,-0.106,0.373
+unsw_recon,78,30,-0.671,-0.76,-0.578,0.05,-0.141,0.241
+ton_scanning,76,30,-0.684,-0.756,-0.581,-0.011,-0.16,0.128
+POOLED,250,30,-0.566,-0.647,-0.405,0.025,-0.06,0.145
+LORO_wo_portscan,154,30,-0.604,,,0.032,,
+LORO_wo_unsw_recon,172,30,-0.669,,,0.02,,
+LORO_wo_ton_scanning,174,30,-0.517,,,0.011,,

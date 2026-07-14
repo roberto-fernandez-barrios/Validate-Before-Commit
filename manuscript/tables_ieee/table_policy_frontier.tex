@@ -1,0 +1,20 @@
+\begin{table*}[t]
+\centering
+\caption{The policy frontier (harness v2, seeds 104--133): no policy dominates. Gains in BA points vs no-adaptation per regime; total labels and commits shown for the harm regime (all regimes in the artifact). Under the four pre-registered operational-cost scenarios ($c_L \in \{0.1, 1\}$ error-equivalents per label, $c_U \in \{50, 500\}$ per deployment, $N = 12{,}800$ flows), the \emph{cheapest} policies (split two-stage, DDM trigger) win the utility in almost every cell --- the plain gate is the accuracy maximizer, and overtakes the two-stage gate in the harm regime only beyond ${\sim}46$k evaluated flows at $c_L = 0.1$. Choosing a policy is a cost decision, not a ranking.}
+\label{tab:policy_frontier}
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
+\begin{tabular}{lrrrrrcc}
+\toprule
+Policy & Benefit & Marginal & Harm & Labels (harm) & Commits (harm) & Model grows & No-deploy option \\
+\midrule
+naive (always deploy) & $+$8.25 & $+$1.21 & $-$1.64 & 2{,}594 & 2.53 & no & no \\
+labeled probe $b{=}32$ & $+$9.12 & $+$1.35 & $+$0.79 & 3{,}626 & 2.07 & no & yes \\
+holdout (dedup) & $+$9.08 & $+$0.90 & $-$0.77 & 3{,}413 & 2.03 & no & yes \\
+LCB $b{=}64$ & $+$8.51 & $+$1.24 & $+$0.34 & 6{,}202 & 0.63 & no & yes \\
+two-stage (split, $\delta{=}0.05$) & $+$7.87 & $+$1.38 & $+$0.15 & 1{,}341 & 0.77 & no & yes \\
+calibrated soft ensemble & $+$8.55 & $+$1.72 & $+$0.56 & 2{,}594 & 2.53 & yes & no \\
+DDM trigger (river, $b_m{=}8$) & $+$8.28 & $+$0.14 & $-$2.23 & 1{,}551 & 0.73 & no & no \\
+sliding window & $+$8.04 & $+$0.96 & $-$2.44 & 2{,}594 & 2.53 & no & no \\
+\bottomrule
+\end{tabular}}
+\end{table*}

@@ -1,0 +1,5 @@
+regime,n_triggers,n_commits,n_rejects,harmful_commit_rate,beneficial_rejection_rate,gate_precision,gate_recall,regret_gate,regret_always_commit,harmful_commit_rate_lo,harmful_commit_rate_hi,beneficial_rejection_rate_lo,beneficial_rejection_rate_hi,gate_precision_lo,gate_precision_hi,gate_recall_lo,gate_recall_hi,regret_gate_lo,regret_gate_hi,regret_always_commit_lo,regret_always_commit_hi
+portscan,114,90,24,0.1333,0.5,0.8667,0.8667,0.0028,0.014,0.0667,0.2046,0.2727,0.7188,0.7954,0.9334,0.7981,0.9383,0.0015,0.0041,0.0032,0.0267
+unsw_recon,92,70,22,0.3143,0.4545,0.6286,0.8148,0.0044,0.0037,0.2458,0.3788,0.25,0.6818,0.5571,0.7031,0.7222,0.9074,0.0029,0.0061,0.0026,0.005
+ton_scanning,102,61,41,0.2787,0.0488,0.6721,0.9535,0.002,0.0452,0.1636,0.3899,0.0,0.1136,0.5645,0.7857,0.8889,1.0,0.001,0.0031,0.0272,0.0626
+POOLED,308,221,87,0.2308,0.2759,0.7376,0.8717,0.003,0.0212,0.1935,0.2646,0.1935,0.3704,0.6923,0.7804,0.8289,0.9138,0.0024,0.0036,0.0136,0.0301

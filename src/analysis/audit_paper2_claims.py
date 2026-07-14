@@ -303,10 +303,10 @@ def main():
     check("5.9 v2 flip40 ToN -0.04", -0.043, val(rb, "gain", regime="ton_scanning", arm="lp32flip40"), 0.005)
     check("5.9 v2 flip40 ToN vs naive +1.60", 1.595,
           val(rb, "vs_naive", regime="ton_scanning", arm="lp32flip40"), 0.005)
-    check("5.9 two-stage ToN +0.16", 0.163, val(rb, "gain", regime="ton_scanning", arm="twostage"), 0.005)
-    check("5.9 two-stage ToN candidates 0.90", 0.90,
+    check("5.9 two-stage(004 probe-reuse, superseded) ToN +0.16", 0.163, val(rb, "gain", regime="ton_scanning", arm="twostage"), 0.005)
+    check("5.9 two-stage(004 superseded) candidates 0.90", 0.90,
           val(rb, "n_candidates_trained", regime="ton_scanning", arm="twostage"), 0.01)
-    check("5.9 two-stage PortScan vs lp32 -1.00", -0.998,
+    check("5.9 two-stage(004 superseded) PortScan vs lp32 -1.00", -0.998,
           val(rb, "vs_lp32", regime="portscan", arm="twostage"), 0.005)
     check("5.9 enscal ToN +0.56", 0.558, val(rb, "gain", regime="ton_scanning", arm="enscal_none"), 0.005)
     check("5.9 enscal UNSW +1.72", 1.721, val(rb, "gain", regime="unsw_recon", arm="enscal_none"), 0.005)
@@ -324,7 +324,7 @@ def main():
     lc = pd.read_csv(f"{T}/paper2_amendment_004/label_cost.csv")
     check("cost ToN lp32 total 3626", 3626, val(lc, "total_labels", regime="ton_scanning", policy="labeled_probe b=32"), 1.0)
     check("cost ToN naive total 2594", 2594, val(lc, "total_labels", regime="ton_scanning", policy="none (naive)"), 1.0)
-    check("cost ToN two-stage total 1182", 1182, val(lc, "total_labels", regime="ton_scanning", policy="two_stage b=32"), 1.0)
+    check("cost ToN two-stage(004 superseded) total 1182", 1182, val(lc, "total_labels", regime="ton_scanning", policy="two_stage b=32"), 1.0)
     check("cost ToN lp32 probe 110", 109.9, val(lc, "probe_labels", regime="ton_scanning", policy="labeled_probe b=32"), 0.5)
 
     # --- Amendment 004: decision-quality metrics + hierarchical model ---
@@ -339,7 +339,7 @@ def main():
     check("5.9 dq pooled harmful-commit 23%", 0.2308, val(dm, "harmful_commit_rate", regime="POOLED"), 0.0005)
     hm = pd.read_csv(f"{T}/paper2_decision_quality_004/hierarchical_model.csv")
     check("5.9 hm pooled beta_deg -1.02", -1.0192, val(hm, "beta", regime="POOLED", term="deg_pre5"), 0.005)
-    check("5.9 hm pooled beta_deg CI lo -1.17", -1.1714, val(hm, "ci_lo", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm(004 seed-cluster, superseded) CI lo -1.17", -1.1714, val(hm, "ci_lo", regime="POOLED", term="deg_pre5"), 0.005)
     check("5.9 hm pooled beta_score ~0", -0.0335, val(hm, "beta", regime="POOLED", term="score"), 0.005)
     check("5.9 hm ToN beta_deg -1.15", -1.1480, val(hm, "beta", regime="ton_scanning", term="deg_pre5"), 0.005)
     lo_r2 = pd.read_csv(f"{T}/paper2_decision_quality_004/loro_r2.csv")
@@ -366,6 +366,66 @@ def main():
     check("5.9 natprev ToN naive -2.63", -2.626, val(ex, "gain", regime="ton_scanning", arm="natprev_none"), 0.005)
     check("5.9 natprev ToN gate +0.80", 0.801, val(ex, "gain", regime="ton_scanning", arm="natprev_lp32"), 0.005)
     check("5.9 natprev PortScan naive +9.06", 9.061, val(ex, "gain", regime="portscan", arm="natprev_none"), 0.005)
+
+    # --- Amendment 005: split two-stage, monitor budget sweep, stratified/UNSW temporal ---
+    t5 = pd.read_csv(f"{T}/paper2_amendment_005/twostage_and_monitors.csv")
+    check("5.9 two-stage(split d05) ToN +0.15 (unresolved vs noadapt)", 0.154,
+          val(t5, "gain", regime="ton_scanning", arm="twostage_d05"), 0.005)
+    check("5.9 two-stage(split d05) ToN vs naive +1.79", 1.792,
+          val(t5, "vs_naive", regime="ton_scanning", arm="twostage_d05"), 0.005)
+    check("5.9 two-stage(split d05) ToN candidates 1.07", 1.07,
+          val(t5, "n_candidates_trained", regime="ton_scanning", arm="twostage_d05"), 0.01)
+    check("5.9 two-stage(split d03) ToN +0.34", 0.339,
+          val(t5, "gain", regime="ton_scanning", arm="twostage_d03"), 0.005)
+    check("5.9 two-stage(split d10) ToN +0.04", 0.041,
+          val(t5, "gain", regime="ton_scanning", arm="twostage_d10"), 0.005)
+    check("5.9 two-stage(split d03) PortScan vs lp32 -0.76", -0.760,
+          val(t5, "vs_lp32", regime="portscan", arm="twostage_d03"), 0.005)
+    check("5.9 two-stage(split d10) PortScan vs lp32 -1.80", -1.795,
+          val(t5, "vs_lp32", regime="portscan", arm="twostage_d10"), 0.005)
+    check("5.9 ddm_river 4x ToN -1.04", -1.043, val(t5, "gain", regime="ton_scanning", arm="ddmriver_m32"), 0.005)
+    check("5.9 ddm_river 10x ToN -0.45", -0.450, val(t5, "gain", regime="ton_scanning", arm="ddmriver_m80"), 0.005)
+    check("5.9 ddm_river 10x PortScan +7.08", 7.082, val(t5, "gain", regime="portscan", arm="ddmriver_m80"), 0.005)
+    check("5.9 adwin_river ToN silent at 4x", 0.0,
+          val(t5, "n_triggers", regime="ton_scanning", arm="adwinriver_m32"), 0.01)
+    ts5 = pd.read_csv(f"{T}/paper2_amendment_005/temporal_stratified.csv")
+    def t5v(stream, metric, quantity):
+        return val(ts5, "value", stream=stream, metric=metric, quantity=quantity)
+    check("5.9 strat fri strat-gate -0.05 (composition refuted)", -0.054,
+          t5v("fri", "BA_two_class", "strat_vs_gate"), 0.005)
+    check("5.9 UNSW chrono noadapt 82.30 (healthy incumbent)", 82.296,
+          t5v("unsw", "BA_two_class", "no_adapt_level"), 0.01)
+    check("5.9 UNSW chrono naive +7.33", 7.330, t5v("unsw", "BA_two_class", "naive_vs_noadapt"), 0.005)
+    check("5.9 UNSW chrono gate vs naive +0.16 (no premium)", 0.156,
+          t5v("unsw", "BA_two_class", "gate_vs_naive"), 0.005)
+    check("5.9 UNSW chrono acc gate vs naive +0.21", 0.213,
+          t5v("unsw", "accuracy_all", "gate_vs_naive"), 0.005)
+    hm5 = pd.read_csv(f"{T}/paper2_decision_quality_005/hierarchical_model.csv")
+    check("5.9 hm5 pooled(ks, regime x seed) beta_deg -1.02", -1.0195,
+          val(hm5, "beta", detector="ks", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm5 pooled CI lo -1.61", -1.6090, val(hm5, "ci_lo", detector="ks", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm5 pooled CI hi -0.43", -0.4300, val(hm5, "ci_hi", detector="ks", regime="POOLED", term="deg_pre5"), 0.005)
+    check("5.9 hm5 randslope -0.92", -0.9245,
+          val(hm5, "beta", detector="ks", regime="POOLED", term="deg_pre5_randslope"), 0.005)
+    check("5.9 hm5 qk PortScan score beta +5.49 (the reported exception)", 5.4929,
+          val(hm5, "beta", detector="qk", regime="portscan", term="score"), 0.005)
+    check("5.9 hm5 qk ToN beta_deg -0.99", -0.9881,
+          val(hm5, "beta", detector="qk", regime="ton_scanning", term="deg_pre5"), 0.005)
+    mech5 = pd.read_csv(f"{T}/paper2_decision_quality_005/mechanism_by_detector.csv")
+    check("5.9 qk pooled r_deg -0.59", -0.592, val(mech5, "r_deg", detector="qk", regime="POOLED"), 0.005)
+    check("5.9 qk pooled r_score ~0", 0.011, val(mech5, "r_score", detector="qk", regime="POOLED"), 0.005)
+    rh = pd.read_csv(f"{T}/paper2_decision_quality_005/regret_by_horizon.csv")
+    check("5.9 regret ToN h=1 gate 0.0032", 0.0032, val(rh, "regret_gate", regime="ton_scanning", horizon=1), 0.0002)
+    check("5.9 regret ToN h=1 always 0.0475", 0.0475, val(rh, "regret_always_commit", regime="ton_scanning", horizon=1), 0.0002)
+    check("5.9 regret ToN h=10 always 0.0446", 0.0446, val(rh, "regret_always_commit", regime="ton_scanning", horizon=10), 0.0002)
+    check("5.9 regret UNSW h=5 wash gate 0.0044", 0.0044, val(rh, "regret_gate", regime="unsw_recon", horizon=5), 0.0002)
+    check("5.9 regret UNSW h=5 wash always 0.0037", 0.0037, val(rh, "regret_always_commit", regime="unsw_recon", horizon=5), 0.0002)
+    fr = pd.read_csv(f"{T}/paper2_policy_frontier_005/frontier.csv")
+    check("frontier two-stage(split) ToN total 1341", 1341,
+          val(fr, "total_labels", regime="ton_scanning", policy="two_stage_split_d05"), 1.0)
+    check("frontier ensemble ToN +0.56", 0.558, val(fr, "gain", regime="ton_scanning", policy="ensemble_cal"), 0.005)
+    check("frontier lp32 ToN labels 3626", 3626,
+          val(fr, "total_labels", regime="ton_scanning", policy="labeled_probe_b32"), 1.0)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

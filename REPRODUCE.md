@@ -92,9 +92,18 @@ python -m src.analysis.aggregate_paper2_probe_prevalence    # Phase 2j: probe-pr
 python -m src.analysis.aggregate_paper2_size_dim_controls   # Phase 2k: candidate-size / full-dim controls
 python -m src.analysis.aggregate_paper2_v2_replication      # Harness-v2 registered replication verdict
 python -m src.analysis.aggregate_paper2_amendment_004       # v2 robustness suite, cost table, temporal streams
-python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model
+python -m src.analysis.aggregate_paper2_amendment_005       # split two-stage, monitor budgets, stratified/UNSW temporal
+python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
+python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
+python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
 python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cross-check vs river
 ```
+
+Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit).
+The small confirmatory CSVs are **committed** under `results/tables/` and pinned by
+`results/tables/MANIFEST.sha256`; regenerated outputs can be diffed against them. The
+UNSW chronological staging is `python -m src.analysis.prepare_paper2_unsw_chronological`
+(raw captures 1–4 sorted by Stime; train = first 30% of the timeline).
 
 Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 

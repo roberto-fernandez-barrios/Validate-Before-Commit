@@ -1,0 +1,10 @@
+regime,dm,naive,lp32,lp32_vs_naive,lvn_lo,lvn_hi,lp32_vs_na_lo,lp32_vs_na_hi
+portscan,random_forest,26.69,26.68,-0.011,-0.026,-0.0,25.589,27.578
+portscan,logreg,1.477,1.54,0.064,-0.009,0.16,1.15,2.069
+portscan,mlp,25.204,25.198,-0.006,-0.048,0.034,23.438,26.662
+unsw_recon,random_forest,1.998,2.008,0.01,-0.107,0.138,1.835,2.164
+unsw_recon,logreg,3.576,4.342,0.766,0.317,1.282,3.755,4.933
+unsw_recon,mlp,0.865,1.091,0.226,0.07,0.382,0.887,1.291
+ton_scanning,random_forest,1.398,1.377,-0.022,-0.071,0.01,0.834,2.092
+ton_scanning,logreg,6.656,6.734,0.078,0.001,0.176,4.948,8.646
+ton_scanning,mlp,-0.158,0.252,0.41,0.172,0.69,-0.209,0.738

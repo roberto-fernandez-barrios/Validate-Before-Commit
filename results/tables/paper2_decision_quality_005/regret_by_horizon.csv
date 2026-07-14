@@ -1,0 +1,17 @@
+regime,horizon,n,regret_gate,regret_always_commit,ratio
+portscan,1,114,0.0037,0.0155,4.2
+portscan,3,114,0.003,0.0143,4.8
+portscan,5,114,0.0028,0.014,5.1
+portscan,10,114,0.0028,0.0136,4.8
+unsw_recon,1,92,0.0071,0.007,1.0
+unsw_recon,3,92,0.004,0.004,1.0
+unsw_recon,5,92,0.0044,0.0037,0.8
+unsw_recon,10,92,0.0042,0.0033,0.8
+ton_scanning,1,102,0.0032,0.0475,14.8
+ton_scanning,3,102,0.0021,0.045,21.8
+ton_scanning,5,102,0.002,0.0452,23.0
+ton_scanning,10,102,0.002,0.0446,22.4
+POOLED,1,308,0.0046,0.0236,5.2
+POOLED,3,308,0.003,0.0214,7.2
+POOLED,5,308,0.003,0.0212,7.1
+POOLED,10,308,0.003,0.0208,7.0

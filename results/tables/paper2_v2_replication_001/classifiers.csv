@@ -1,0 +1,10 @@
+regime,downstream,naive_gain,hold_gain,hold_vs_naive,hvn_lo,hvn_hi,hold_vs_noadapt_lo,hold_vs_noadapt_hi
+portscan,random_forest,26.69,26.517,-0.174,-0.308,-0.076,25.491,27.399
+portscan,logreg,1.477,1.643,0.166,0.045,0.303,1.235,2.15
+portscan,mlp,25.204,25.285,0.082,0.025,0.139,23.548,26.73
+unsw_recon,random_forest,1.998,2.011,0.013,-0.11,0.15,1.828,2.199
+unsw_recon,logreg,3.576,4.197,0.621,0.153,1.211,3.573,4.794
+unsw_recon,mlp,0.865,1.045,0.18,0.091,0.274,0.853,1.237
+ton_scanning,random_forest,1.398,0.292,-1.107,-1.502,-0.734,-0.148,0.812
+ton_scanning,logreg,6.656,5.915,-0.741,-1.131,-0.317,3.998,8.005
+ton_scanning,mlp,-0.158,-1.381,-1.223,-1.69,-0.728,-1.833,-0.929

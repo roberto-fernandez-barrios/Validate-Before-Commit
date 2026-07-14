@@ -1,6 +1,6 @@
 # Validate Before Commit
 
-**Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection**
+**Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates in Network Intrusion Detection**
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -39,9 +39,10 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   partitions, pristine seeds) across two detectors and four downstream models; robust to 20-window label latency
   and harm-avoiding up to 40% randomly flipped probe labels (net benefit survives to 25%).
 - **Honest boundary:** on real chronological streams sitting deep in the benefit regime, the gate pays a measurable
-  insurance premium in balanced accuracy vs always-deploy (it inherits its probe's metric and composition); on the
-  same streams it *beats* always-deploy on overall accuracy. Where the incumbent stays healthy — where the gate's
-  value concentrates — it is net-positive everywhere we measured.
+  insurance premium in balanced accuracy vs always-deploy, while *beating* always-deploy on overall accuracy on the
+  same streams. A registered stratified-probe test rejected our first (composition) explanation; probe *staleness*
+  under fast drift is the surviving hypothesis, reported as such. Where the incumbent stays healthy — where the
+  gate's value concentrates — it is net-positive everywhere we measured.
 
 ---
 
@@ -81,8 +82,13 @@ numbers in the paper, §5.10).**
 Balanced-accuracy points vs. the shared no-adaptation baseline (truly paired: all arms process bit-identical
 streams). The v2 **label-budget sweep** puts the operating point at b = 32: at b = 8 the gate still reduces harm
 (+1.22 above naive) but is no longer net-positive vs never adapting — the initial study's "8 labels suffice" is
-corrected accordingly. A **two-stage** variant that health-checks the incumbent *before* training candidates cuts
-total labels below half of naive's (1,182 vs 2,594 per stream) and stays net-positive (+0.16 [0.03, 0.31]).
+corrected accordingly. A **two-stage** variant health-checks the incumbent on a disjoint probe half *before*
+training candidates (the earlier probe-reusing version was optimistically biased and is superseded): it cuts
+total labels to roughly half of naive's (1,341 vs 2,594 per stream), stays significantly above naive
+(+1.79 [0.69, 2.92]) — and its net gain over never adapting is honestly unresolved at 30 seeds (+0.15 [−0.15, 0.46]).
+On an **external chronological stream** (raw UNSW-NB15 captures sorted by flow start time) the incumbent stays
+healthy (82.3% BA) and the gate pays **no premium** (+0.16 [−0.31, 0.63] vs naive) — the insurance is free exactly
+where the commit decision is genuinely uncertain.
 
 ---
 

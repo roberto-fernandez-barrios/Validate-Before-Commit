@@ -1,0 +1,17 @@
+regime,term,beta,ci_lo,ci_hi,n,converged,ci_source
+portscan,deg_pre5,-1.0975,-1.5088,-0.6862,96,True,mixedlm
+portscan,score,-0.1251,-0.6484,0.3981,96,True,mixedlm
+portscan,severity_t,-0.1488,-0.8053,0.5077,96,True,mixedlm
+portscan,window_idx,0.0024,-0.0056,0.0105,96,True,mixedlm
+unsw_recon,deg_pre5,-0.4325,-0.6694,-0.1955,78,True,mixedlm
+unsw_recon,score,0.068,-0.0896,0.2256,78,True,mixedlm
+unsw_recon,severity_t,0.0912,-0.1085,0.2909,78,True,mixedlm
+unsw_recon,window_idx,-0.0008,-0.0032,0.0016,78,True,mixedlm
+ton_scanning,deg_pre5,-1.148,-1.3699,-0.8959,76,True,cluster_boot_ols
+ton_scanning,score,0.014,-0.5764,0.6043,76,True,mixedlm
+ton_scanning,severity_t,-0.3534,-1.1994,0.4927,76,True,mixedlm
+ton_scanning,window_idx,0.0048,-0.0055,0.015,76,True,mixedlm
+POOLED,deg_pre5,-1.0192,-1.1714,-0.8671,250,True,mixedlm
+POOLED,score,-0.0335,-0.3166,0.2497,250,True,mixedlm
+POOLED,severity_t,-0.108,-0.468,0.2521,250,True,mixedlm
+POOLED,window_idx,0.0017,-0.0027,0.006,250,True,mixedlm

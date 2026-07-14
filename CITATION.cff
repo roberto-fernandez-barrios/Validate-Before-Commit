@@ -24,7 +24,7 @@ doi: "10.5281/zenodo.21322256"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished
-  title: "Validate Before Commit: Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection"
+  title: "Validate Before Commit: Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates in Network Intrusion Detection"
   authors:
     - family-names: "Fernández-Barrios"
       given-names: "Roberto"

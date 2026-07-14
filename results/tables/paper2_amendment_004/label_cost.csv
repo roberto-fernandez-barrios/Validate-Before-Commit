@@ -1,0 +1,25 @@
+regime,policy,triggers,commits,rejected,candidates_trained,monitor_labels,candidate_labels,probe_labels,total_labels
+portscan,none (naive),3.2,3.2,0.0,3.2,0.0,3277.0,0.0,3277.0
+portscan,labeled_probe b=32,3.8,3.0,0.8,3.8,0.0,3891.0,121.6,4013.0
+portscan,holdout (dedup),4.03,2.8,1.23,4.03,0.0,4130.0,0.0,4130.0
+portscan,lcb b=64,5.73,1.63,4.1,5.73,0.0,5871.0,366.9,6238.0
+portscan,ddm (canonical),1.27,1.27,0.0,1.27,800.0,1297.0,0.0,2097.0
+portscan,sliding_window,3.2,3.2,0.0,3.2,0.0,3277.0,0.0,3277.0
+portscan,ensemble,3.2,3.2,0.0,3.2,0.0,3277.0,0.0,3277.0
+portscan,two_stage b=32,6.03,1.47,4.57,1.57,0.0,1604.0,257.1,1861.0
+unsw_recon,none (naive),2.6,2.6,0.0,2.6,0.0,2662.0,0.0,2662.0
+unsw_recon,labeled_probe b=32,3.07,2.33,0.73,3.07,0.0,3140.0,98.1,3238.0
+unsw_recon,holdout (dedup),3.4,2.47,0.93,3.4,0.0,3482.0,0.0,3482.0
+unsw_recon,lcb b=64,5.2,1.17,4.03,5.2,0.0,5325.0,332.8,5658.0
+unsw_recon,ddm (canonical),0.8,0.8,0.0,0.8,800.0,819.0,0.0,1619.0
+unsw_recon,sliding_window,2.6,2.6,0.0,2.6,0.0,2662.0,0.0,2662.0
+unsw_recon,ensemble,2.6,2.6,0.0,2.6,0.0,2662.0,0.0,2662.0
+unsw_recon,two_stage b=32,4.1,1.6,2.5,1.97,0.0,2014.0,195.2,2209.0
+ton_scanning,none (naive),2.53,2.53,0.0,2.53,0.0,2594.0,0.0,2594.0
+ton_scanning,labeled_probe b=32,3.43,2.07,1.37,3.43,0.0,3516.0,109.9,3626.0
+ton_scanning,holdout (dedup),3.33,2.03,1.3,3.33,0.0,3413.0,0.0,3413.0
+ton_scanning,lcb b=64,5.7,0.63,5.07,5.7,0.0,5837.0,364.8,6202.0
+ton_scanning,ddm (canonical),0.63,0.63,0.0,0.63,800.0,649.0,0.0,1449.0
+ton_scanning,sliding_window,2.53,2.53,0.0,2.53,0.0,2594.0,0.0,2594.0
+ton_scanning,ensemble,2.53,2.53,0.0,2.53,0.0,2594.0,0.0,2594.0
+ton_scanning,two_stage b=32,6.13,0.53,5.6,0.9,0.0,922.0,260.3,1182.0

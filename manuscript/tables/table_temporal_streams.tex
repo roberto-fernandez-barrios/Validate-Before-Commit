@@ -1,6 +1,6 @@
 \begin{table}
 \centering
-\caption{Real chronological streams (corrected runner, registered amendment 004; 30 fresh seeds each). Incumbent trained on Tuesday; candidates retrain on the last eight \emph{observed} windows; probes come from the stream's own past. BA = mean balanced accuracy over two-class windows (headline); acc = plain accuracy over all windows. The gate's premium is metric-dependent: it surrenders BA on attack-mixed windows while \emph{gaining} overall accuracy, because the gate inherits the metric and class composition of its probe.}
+\caption{Real chronological streams (corrected runner, registered amendments 004/005; 30 fresh seeds each). CICIDS incumbents train on Tuesday; the UNSW incumbent trains on the first 30\% of the raw captures sorted by flow start time (an external, non-CICIDS temporal stream). Candidates retrain on the last eight \emph{observed} windows; probes come from the stream's own past. BA = mean balanced accuracy over two-class windows (headline); acc = plain accuracy over all windows. The premium is metric-dependent and concentrates on the fast, deep-benefit CICIDS collapses; where the incumbent stays healthy (UNSW, 82.3\% BA; 163/200 two-class windows, ${\sim}$21 triggers/stream) the gate pays nothing. A registered stratified-probe arm left every premium unchanged, rejecting the probe-composition explanation where testable.}
 \label{tab:temporal_streams}
 \resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{lrrrrr}
@@ -10,6 +10,7 @@ Stream (chronology) & No-adapt BA & Naive recovery (BA) & Gate recovery (BA) & G
 Friday (Botnet $\to$ PortScan $\to$ DDoS) & 71.97 & $+$13.55 [11.00, 16.07] & $+$7.22 [4.73, 9.61] & $-$6.34 [$-$6.83, $-$5.90] & $+$4.19 [3.85, 4.52] \\
 Wednesday (DoS/DDoS day) & 53.35 & $+$27.63 [27.16, 28.13] & $+$28.03 [27.47, 28.61] & $+$0.40 [0.09, 0.74] & $-$0.16 [$-$0.29, $-$0.06] \\
 Thursday (WebAttacks $\to$ Infiltration) & 61.08 & $+$22.74 [17.56, 28.10] & $+$17.76 [12.41, 23.09] & $-$4.98 [$-$9.21, $-$1.38] & $+$1.23 [0.61, 1.86] \\
+UNSW-NB15 (raw captures, time-sorted) & 82.30 & $+$7.33 [6.80, 7.85] & $+$7.49 [6.75, 8.19] & $+$0.16 [$-$0.31, 0.63] & $+$0.21 [$-$0.00, 0.42] \\
 \bottomrule
 \end{tabular}}
 \end{table}

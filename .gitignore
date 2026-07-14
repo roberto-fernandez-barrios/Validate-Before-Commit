@@ -46,6 +46,16 @@ results/**
 !results/
 !results/**/
 !results/**/.gitkeep
+# ... but the small confirmatory tables ARE versioned (reproducibility: reviewers can diff
+# regenerated outputs against these committed values; MANIFEST.sha256 pins the full set)
+!results/tables/paper2_v2_replication_001/*.csv
+!results/tables/paper2_amendment_004/*.csv
+!results/tables/paper2_amendment_005/*.csv
+!results/tables/paper2_decision_quality_004/*.csv
+!results/tables/paper2_decision_quality_005/*.csv
+!results/tables/paper2_policy_frontier_005/*.csv
+!results/tables/paper2_monitor_validation_004.csv
+!results/tables/MANIFEST.sha256
 
 # Large artifacts
 *.pkl
