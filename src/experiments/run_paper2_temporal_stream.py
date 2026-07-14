@@ -41,7 +41,8 @@ def main():
     p.add_argument("--threshold-quantile", type=float, default=0.95)
     p.add_argument("--consecutive-k", type=int, default=3)
     p.add_argument("--cooldown-windows", type=int, default=10)
-    p.add_argument("--adaptation-gate", type=str, default="none", choices=["none", "labeled_probe"])
+    p.add_argument("--adaptation-gate", type=str, default="none",
+                   choices=["none", "labeled_probe", "labeled_probe_strat"])
     p.add_argument("--probe-size", type=int, default=32)
     args = p.parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
@@ -102,9 +103,25 @@ def main():
                         if len(np.unique(ya)) == 2:
                             cand = train_svc(transform_X(Xa_raw, scaler, pca), ya, seed + t)
                             commit = True
-                            if args.adaptation_gate == "labeled_probe":
+                            if args.adaptation_gate in ("labeled_probe", "labeled_probe_strat"):
                                 pst = starts[t - 9]
-                                pw = rng.choice(np.arange(pst, pst + args.window_rows), args.probe_size, replace=False)
+                                widx = np.arange(pst, pst + args.window_rows)
+                                if (args.adaptation_gate == "labeled_probe_strat"
+                                        and len(np.unique(ys[widx])) == 2):
+                                    # amendment 005: stratified probe (16 per class where
+                                    # available) — causal test of the composition-inheritance
+                                    # account of the deep-benefit premium
+                                    halves = []
+                                    for cls in (0, 1):
+                                        ci = widx[ys[widx] == cls]
+                                        take = min(args.probe_size // 2, len(ci))
+                                        halves.append(rng.choice(ci, take, replace=False))
+                                    pw = np.concatenate(halves)
+                                    if len(pw) < args.probe_size:
+                                        rest = np.setdiff1d(widx, pw)
+                                        pw = np.concatenate([pw, rng.choice(rest, args.probe_size - len(pw), replace=False)])
+                                else:
+                                    pw = rng.choice(widx, args.probe_size, replace=False)
                                 Xp, yp = transform_X(Xs[pw], scaler, pca), ys[pw]
                                 labels_used += args.probe_size
                                 f = (lambda mm: float((mm.predict(Xp) == yp).mean()))

@@ -122,10 +122,10 @@ class EnsembleModelCal(EnsembleModel):
         return np.column_stack([1 - p1, p1])
 
 
-FUTURE_K = 5  # future windows for per-trigger delta-BA logging
+FUTURE_K = 5  # primary lookahead horizon for per-trigger delta-BA logging
+FUTURE_HORIZONS = (1, 3, 5, 10)  # amendment 005: horizon-robust logging (logging ONLY)
 LCB_ALPHA_Z = 1.2816  # one-sided 90% normal quantile
-TWO_STAGE_DELTA = 0.05        # two_stage gate: train a candidate only if the incumbent's probe
-HEALTH_REF_PER_CLASS = 32     # accuracy fell >= DELTA below its severity-0 reference (64 labels)
+HEALTH_REF_PER_CLASS = 32     # two_stage: severity-0 health reference size per class (64 labels)
 
 
 def split_pools(pools: Pools, seed: int) -> dict[str, Pools]:
@@ -332,10 +332,19 @@ def run_arm(method: str, env: Environment, args, seed: int):
             skip_train = False
             inc_hacc = np.nan
             if gate == "two_stage":
-                probe = draw_probe(t, sev_probe)
-                labels_used += len(probe[1]); labels_probe += len(probe[1])
-                inc_hacc = float((model.predict(probe[0]) == probe[1]).mean())
-                skip_train = bool(inc_hacc >= health_ref - TWO_STAGE_DELTA)
+                # amendment 005: the 32-label draw is PARTITIONED per class into a health
+                # half and a commit half; no sample feeds both decisions (the amendment-004
+                # variant reused the full probe, inducing selection optimism)
+                Xp_all, yp_all = draw_probe(t, sev_probe)
+                labels_used += len(yp_all); labels_probe += len(yp_all)
+                h_idx, c_idx = [], []
+                for cls in (0, 1):
+                    ci = np.where(yp_all == cls)[0]
+                    h_idx.extend(ci[: len(ci) // 2]); c_idx.extend(ci[len(ci) // 2:])
+                h_idx, c_idx = np.asarray(h_idx), np.asarray(c_idx)
+                inc_hacc = float((model.predict(Xp_all[h_idx]) == yp_all[h_idx]).mean())
+                skip_train = bool(inc_hacc >= health_ref - args.two_stage_delta)
+                probe = (Xp_all[c_idx], yp_all[c_idx])
 
             candidate = None
             commit, cand_val = True, None
@@ -401,19 +410,25 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 elif gate != "none":
                     raise ValueError(f"Unknown gate: {gate}")
 
-            # per-trigger mechanism log (lookahead is for LOGGING only, never for the policy)
-            fut = env.stream[t + 1: t + 1 + FUTURE_K]
-            inc_f = float(np.mean([evaluate_model(model, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut])) if fut else np.nan
-            cand_f = (float(np.mean([evaluate_model(candidate, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut]))
-                      if fut and candidate is not None else np.nan)
-            trig_rows.append(dict(
+            # per-trigger mechanism log (lookahead is for LOGGING only, never for the policy);
+            # amendment 005 logs every horizon in FUTURE_HORIZONS (h=5 keeps the legacy names)
+            fut10 = env.stream[t + 1: t + 1 + max(FUTURE_HORIZONS)]
+            inc_seq = [evaluate_model(model, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut10]
+            cand_seq = ([evaluate_model(candidate, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut10]
+                        if candidate is not None else [])
+            trow = dict(
                 seed=seed, method=method, gate=gate, window_idx=t, severity_t=sev,
                 score=score, threshold=threshold,
                 deg_pre5=float(np.mean(ba_hist[-6:-1])) if len(ba_hist) > 1 else np.nan,
-                inc_future5=inc_f, cand_future5=cand_f,
-                delta_future5=cand_f - inc_f if (fut and candidate is not None) else np.nan,
                 probe_inc=p_inc, probe_cand=p_cand, committed=bool(commit),
-                trained=bool(candidate is not None)))
+                trained=bool(candidate is not None))
+            for h in FUTURE_HORIZONS:
+                inc_h = float(np.mean(inc_seq[:h])) if inc_seq else np.nan
+                cand_h = float(np.mean(cand_seq[:h])) if cand_seq else np.nan
+                trow[f"inc_future{h}"] = inc_h
+                trow[f"cand_future{h}"] = cand_h
+                trow[f"delta_future{h}"] = cand_h - inc_h if (inc_seq and cand_seq) else np.nan
+            trig_rows.append(trow)
 
             if commit:
                 n_adapt += 1
@@ -490,6 +505,9 @@ def main():
                    help="Probe reflects the stream as of window t-L (stale validation labels).")
     p.add_argument("--probe-flip-frac", type=float, default=0.0,
                    help="Fraction of probe labels flipped after drawing (label-noise robustness).")
+    p.add_argument("--two-stage-delta", type=float, default=0.05,
+                   help="two_stage gate: train a candidate only if incumbent health-half "
+                        "accuracy fell >= delta below the severity-0 reference.")
     p.add_argument("--gate-margin", type=float, default=0.0)
     p.add_argument("--gate-disagree-threshold", type=float, default=0.15)
     p.add_argument("--downstream-model", type=str, default="svc_rbf",
