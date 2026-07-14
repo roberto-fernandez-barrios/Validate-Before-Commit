@@ -6,7 +6,7 @@
 
 ## Title
 
-**Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift**
+**Validate Before Commit: Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection**
 
 *(Alternative hook, author's choice: "Knowing When Not to Retrain: …". Target venue: Knowledge-Based Systems (Elsevier); parallels Engineering Applications of AI / Expert Systems with Applications; security-branded backup IEEE TDSC. See `notes/paper2_venue_decision_003.md`.)*
 

@@ -24,7 +24,7 @@ doi: "10.5281/zenodo.21322256"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished
-  title: "Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift"
+  title: "Validate Before Commit: Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection"
   authors:
     - family-names: "Fernández-Barrios"
       given-names: "Roberto"

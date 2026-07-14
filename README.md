@@ -1,6 +1,6 @@
 # Validate Before Commit
 
-**Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift**
+**Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection**
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)

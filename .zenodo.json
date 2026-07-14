@@ -1,6 +1,6 @@
 {
   "title": "Validate Before Commit: reproducibility artifact (code and protocols)",
-  "description": "Code, protocols and reproducibility guide for the paper 'Validate Before Commit: Label-Efficient Safe Readaptation for Adaptive Network Intrusion Detection under Concept Drift'. Includes the progressive-drift readaptation experiment runner (drift monitors, the validate-before-commit gate, downstream classifiers), all analysis scripts that regenerate every table and figure, the pre-registered protocols, and a claims audit that verifies every number in the manuscript against the generated artifacts. Datasets (CICIDS2017, UNSW-NB15, ToN-IoT) are public and not redistributed.",
+  "description": "Code, protocols and reproducibility guide for the paper 'Validate Before Commit: Label-Efficient Empirical Gating of Drift-Triggered Classifier Updates for Network Intrusion Detection'. Includes the progressive-drift readaptation experiment runner (drift monitors, the validate-before-commit gate, downstream classifiers), all analysis scripts that regenerate every table and figure, the pre-registered protocols, and a claims audit that verifies every number in the manuscript against the generated artifacts. Datasets (CICIDS2017, UNSW-NB15, ToN-IoT) are public and not redistributed.",
   "upload_type": "software",
   "license": "MIT",
   "creators": [
