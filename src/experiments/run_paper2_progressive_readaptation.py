@@ -144,6 +144,39 @@ def sample_prevalence_from_distribution(
     return X[perm], y[perm]
 
 
+def sample_binomial_prevalence(
+    pools: Pools,
+    n_total: int,
+    attack_frac: float,
+    severity: float,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Honest prevalence sample (amendment 006): the attack count is drawn as
+    Binomial(n_total, attack_frac), so a probe MAY contain zero attack flows --- which is what
+    random inspection at low prevalence actually produces. Contrast with
+    `sample_prevalence_from_distribution`, which forces at least one attack (that function is
+    retained only to reproduce the superseded Phase-2j runs)."""
+    severity = float(np.clip(severity, 0.0, 1.0))
+    n_att = int(rng.binomial(n_total, attack_frac))
+    n_ben = n_total - n_att
+
+    def mixed(pool_ref, pool_cur, n):
+        if n == 0:
+            return np.empty((0, pools.ref_benign.shape[1]))
+        n_cur = int(round(n * severity))
+        return np.vstack([sample_rows(pool_ref, n - n_cur, rng), sample_rows(pool_cur, n_cur, rng)])
+
+    parts, ys = [], []
+    if n_ben:
+        parts.append(mixed(pools.ref_benign, pools.cur_benign, n_ben)); ys += [0] * n_ben
+    if n_att:
+        parts.append(mixed(pools.ref_attack, pools.cur_attack, n_att)); ys += [1] * n_att
+    X = np.vstack(parts)
+    y = np.array(ys)
+    perm = rng.permutation(len(y))
+    return X[perm], y[perm]
+
+
 def fit_transformer(X_train: np.ndarray, dim: int, seed: int):
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X_train)

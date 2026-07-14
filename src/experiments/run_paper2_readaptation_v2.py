@@ -41,11 +41,13 @@ from src.experiments.run_paper2_progressive_readaptation import (
     make_pools,
     progressive_severity,
     sample_balanced_from_distribution,
+    sample_binomial_prevalence,
     sample_prevalence_from_distribution,
     train_svc,
     transform_X,
     _labelfree_estimate,
 )
+from scipy.stats import binomtest
 
 ROLE_FRACS = {"window": 0.5, "train": 0.3, "probe": 0.2}
 
@@ -216,6 +218,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
     n_adapt = n_trig = n_reject = labels_used = 0
     labels_probe = labels_monitor = labels_candidate = 0   # amendment 004 accounting
     n_cand_trained = n_skip_train = 0
+    probe_zero_attack = n_probes = 0                       # amendment 006 (honest prevalence)
     adapt_windows: list[int] = []
     ba_hist: list[float] = []
     rows, trig_rows = [], []
@@ -230,13 +233,30 @@ def run_arm(method: str, env: Environment, args, seed: int):
         incumbent_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
 
     def draw_probe(t: int, sev_probe: float):
-        """Fresh probe draw. With default flags this reproduces the original draw
-        bit-for-bit; --probe-latency and --probe-flip-frac (amendment 004) only
-        change the severity argument / flip labels afterwards."""
+        """Probe draw. With default flags this reproduces the original draw bit-for-bit.
+        Amendment 004: --probe-latency / --probe-flip-frac. Amendment 006:
+          --probe-source observed : 32 rows sampled uniformly from the OBSERVED window t-9
+              (strictly past, disjoint from the sliding-window candidate's training windows,
+              whatever class composition that window has). Reads no severity, no pools.
+          --probe-prevalence p    : pool probe whose attack count is Binomial(b, p) --- zero
+              attacks allowed (honest random inspection at prevalence p).
+        """
         probe_rng = np.random.default_rng(seed * 200_003 + t)
-        Xp_raw, yp = sample_balanced_from_distribution(
-            env.probe_pools, n_per_class=max(1, args.probe_size // 2),
-            severity=sev_probe, rng=probe_rng)
+        if args.probe_source == "observed":
+            k = t - 9
+            if k < 0 or k >= len(seen):
+                return None
+            Xw_obs, yw_obs = seen[k]
+            idx = probe_rng.choice(len(yw_obs), min(args.probe_size, len(yw_obs)), replace=False)
+            return Xw_obs[idx], np.asarray(yw_obs)[idx].copy()
+        if args.probe_prevalence is not None:
+            Xp_raw, yp = sample_binomial_prevalence(
+                env.probe_pools, n_total=args.probe_size, attack_frac=args.probe_prevalence,
+                severity=sev_probe, rng=probe_rng)
+        else:
+            Xp_raw, yp = sample_balanced_from_distribution(
+                env.probe_pools, n_per_class=max(1, args.probe_size // 2),
+                severity=sev_probe, rng=probe_rng)
         yp = np.asarray(yp).copy()
         if args.probe_flip_frac > 0:
             flip_rng = np.random.default_rng(seed * 500_009 + t)
@@ -383,20 +403,49 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 n_cand_trained += 1
                 labels_candidate += int(len(ya))
 
-                if gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout", "two_stage"):
+                if gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
+                            "two_stage", "labeled_probe_mcnemar"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
-                        labels_used += len(probe[1]); labels_probe += len(probe[1])
+                        if probe is None:      # observed-source probe not available yet (t < 9)
+                            commit = True      # no evidence: behave as the naive loop
+                            probe = (np.empty((0, Xa.shape[1])), np.empty(0, int))
+                        else:
+                            labels_used += len(probe[1]); labels_probe += len(probe[1])
                     Xp, yp = probe
-                    if gate == "labeled_probe_lcb":
+                    if len(yp) == 0:
+                        pass                   # commit already set (no probe available)
+                    elif gate == "labeled_probe_lcb":
                         d = (candidate.predict(Xp) == yp).astype(float) - (model.predict(Xp) == yp).astype(float)
                         se = float(d.std(ddof=1) / np.sqrt(len(d))) if len(d) > 1 else np.inf
                         commit = bool(d.mean() - LCB_ALPHA_Z * se > 0.0)
                         p_inc, p_cand = float((model.predict(Xp) == yp).mean()), float((candidate.predict(Xp) == yp).mean())
+                    elif gate == "labeled_probe_mcnemar":
+                        # amendment 006: commit only on statistically resolved superiority
+                        # (exact one-sided McNemar on discordant pairs); ties never commit.
+                        ci = (model.predict(Xp) == yp)
+                        cc = (candidate.predict(Xp) == yp)
+                        b = int(np.sum(~cc & ci))   # candidate wrong, incumbent right
+                        c = int(np.sum(cc & ~ci))   # candidate right, incumbent wrong
+                        p_inc, p_cand = float(ci.mean()), float(cc.mean())
+                        commit = bool(b + c > 0 and
+                                      binomtest(c, b + c, 0.5, alternative="greater").pvalue
+                                      <= args.mcnemar_alpha)
                     else:
-                        p_inc = evaluate_model(model, Xp, yp)["balanced_accuracy"]
-                        p_cand = evaluate_model(candidate, Xp, yp)["balanced_accuracy"]
+                        # balanced-accuracy comparison where both classes are present; plain
+                        # accuracy otherwise (observed / binomial-prevalence probes may be
+                        # single-class -- amendment 006 reports this honestly rather than
+                        # forcing a minority-class flow into the probe)
+                        if len(np.unique(yp)) == 2:
+                            p_inc = evaluate_model(model, Xp, yp)["balanced_accuracy"]
+                            p_cand = evaluate_model(candidate, Xp, yp)["balanced_accuracy"]
+                        else:
+                            p_inc = float((model.predict(Xp) == yp).mean())
+                            p_cand = float((candidate.predict(Xp) == yp).mean())
                         commit = bool(p_cand >= p_inc + args.gate_margin)
+                    if len(yp):
+                        probe_zero_attack += int(not np.any(yp == 1))
+                        n_probes += 1
                 elif gate == "unsup_disagree":
                     commit = bool(float(np.mean(model.predict(Xw) != candidate.predict(Xw)))
                                   >= args.gate_disagree_threshold)
@@ -448,6 +497,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     riv = riv.clone()
                 if cand_val is not None:
                     incumbent_val = cand_val
+                if gate == "two_stage" and args.health_ref_mode == "per_incumbent":
+                    # amendment 006: the health reference belongs to the DEPLOYED model, so it
+                    # is reset to the new incumbent's accuracy on the (already labeled) commit
+                    # half -- zero extra labels. Under `static` it keeps the initial model's
+                    # severity-0 reference (the amendment-005 behaviour), which drifts away
+                    # from the incumbent after the first commit.
+                    if len(probe[1]):
+                        health_ref = float((model.predict(probe[0]) == probe[1]).mean())
                 detector = build_detector(method, args, seed + t + 1)
                 detector, threshold = calibrate(detector, env, sev, args,
                                                 np.random.default_rng(seed * 1_000 + 999 + t))
@@ -469,6 +526,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    labels_probe=labels_probe, labels_monitor=labels_monitor,
                    labels_candidate=labels_candidate, n_candidates_trained=n_cand_trained,
                    n_train_skipped=n_skip_train,
+                   n_probes=n_probes, n_probes_zero_attack=probe_zero_attack,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
                    mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in rows])),
@@ -498,7 +556,16 @@ def main():
     p.add_argument("--cooldown-windows", type=int, default=10)
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
-                            "unsup_disagree", "atc", "doc", "two_stage"])
+                            "labeled_probe_mcnemar", "unsup_disagree", "atc", "doc", "two_stage"])
+    p.add_argument("--probe-source", type=str, default="pools", choices=["pools", "observed"],
+                   help="observed = 32 rows of the OBSERVED window t-9 (no severity, no pools, "
+                        "natural composition); pools = simulator sample at the true severity.")
+    p.add_argument("--probe-prevalence", type=float, default=None,
+                   help="Pool probe with attack count ~ Binomial(b, p); zero attacks allowed.")
+    p.add_argument("--health-ref-mode", type=str, default="static",
+                   choices=["static", "per_incumbent"],
+                   help="two_stage: recalibrate the health reference on each commit.")
+    p.add_argument("--mcnemar-alpha", type=float, default=0.05)
     p.add_argument("--gate-val-size", type=int, default=256)
     p.add_argument("--probe-size", type=int, default=32)
     p.add_argument("--probe-latency", type=int, default=0,
@@ -564,6 +631,7 @@ def main():
                              n_adaptations=0, n_triggers=0, n_gate_rejections=0,
                              labels_used_total=0, labels_probe=0, labels_monitor=0,
                              labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
+                             n_probes=0, n_probes_zero_attack=0,
                              adaptation_gate="none", harness="v2",
                              first_adaptation_window=np.nan,
                              mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
