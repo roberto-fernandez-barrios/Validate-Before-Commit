@@ -1,0 +1,25 @@
+\begin{table}
+\centering
+\caption{\textbf{Net harm is not one constructed cell.} Top: the registered prediction test (amendment 006, locked before the runs). The degradation--headroom account predicts that \emph{lowering drift severity keeps the incumbent healthy and should therefore turn updating harmful even in benefit regimes}. At $\mathrm{sev}_{\max}{=}0.25$ naive always-deploy is net-harmful in \emph{all three} regimes --- including CICIDS-PortScan, the paper's benefit regime, and UNSW --- while the commit gate stays non-negative and is significantly above naive everywhere. Bottom: harm breadth on the hardened harness --- naive updating is also net-harmful in two further ToN-IoT regimes. All values are BA points vs no-adaptation, 30 pristine seeds, KS-max, SVC-RBF; the last column is the truly paired gate$-$naive contrast.}
+\label{tab:harm_generality}
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{llrrr}
+\toprule
+Setting & Regime (dataset) & Naive (always deploy) & Commit gate & Gate $-$ naive (paired) \\
+\midrule
+\multirow{3}{*}{Mild drift, $\mathrm{sev}_{\max}{=}0.25$}
+ & PortScan (CICIDS2017) & $-$0.46 [$-$1.57, 0.42] & $+$0.38 [0.10, 0.66] & $+$0.84 [0.02, 1.84] \\
+ & Reconnaissance (UNSW-NB15) & $-$0.15 [$-$0.21, $-$0.09] & $-$0.09 [$-$0.14, $-$0.04] & $+$0.06 [0.02, 0.11] \\
+ & Scanning (ToN-IoT) & $-$0.65 [$-$1.28, $-$0.16] & $-$0.04 [$-$0.16, 0.05] & $+$0.62 [0.14, 1.26] \\
+\midrule
+\multirow{3}{*}{Moderate drift, $\mathrm{sev}_{\max}{=}0.50$}
+ & PortScan (CICIDS2017) & $+$1.40 [$-$0.09, 2.77] & $+$2.88 [2.08, 3.63] & $+$1.48 [0.21, 3.09] \\
+ & Reconnaissance (UNSW-NB15) & $-$0.25 [$-$0.41, $-$0.10] & $-$0.09 [$-$0.21, 0.02] & $+$0.16 [0.03, 0.29] \\
+ & Scanning (ToN-IoT) & $-$3.63 [$-$6.11, $-$1.46] & $+$0.19 [0.05, 0.32] & $+$3.82 [1.62, 6.40] \\
+\midrule
+\multirow{2}{*}{Full drift, further regimes}
+ & DDoS (ToN-IoT) & $-$15.24 [$-$18.13, $-$12.32] & $+$1.02 [$-$0.09, 2.24] & $+$16.26 [13.63, 18.94] \\
+ & Injection (ToN-IoT) & $-$2.24 [$-$3.86, $-$0.84] & $+$0.43 [0.16, 0.71] & $+$2.67 [1.21, 4.39] \\
+\bottomrule
+\end{tabular}}
+\end{table}

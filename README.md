@@ -30,7 +30,7 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity
   drift-detector scores do not measure (at individual triggered decisions a hierarchical model gives
   β_deg = −1.02 [−1.17, −0.87] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
-  MMD — is **not the lever**.
+  MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
 - **The fix:** a **validate-before-commit gate** — the loop retrains its candidate as usual, and the gate decides
   **deployment**: commit only if the candidate beats the incumbent on a small labeled probe (32 flows — the
@@ -52,15 +52,17 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
 
 ![Regime spectrum](docs/img/fig1_regime_spectrum.png)
 
-**2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of an update is the deployed
+**2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of an update tracks the deployed
 model's headroom. Per-trigger, non-coupled test (hardened harness): pre-trigger incumbent degradation predicts the
-future value of committing; the detector score at the same triggers predicts nothing (coupling-aware analysis §5.3;
-hierarchical model §5.10).**
+future value of committing, while the detector score at the same triggers shows no consistent signal (both KS-max and
+QK-ZZ; one small exception in QK/PortScan is reported in the paper). Coupling-aware analysis §5.3; hierarchical model
+§5.10.**
 
 ![Per-trigger mechanism](docs/img/fig9_pertrigger.png)
 
-**3 — The validate-before-commit gate preserves benefit, avoids harm, and beats both naive retraining and
-never-adapting — identically for a classical (KS-max) and a quantum (QK-ZZ) detector.**
+**3 — In the three controlled regimes, the validate-before-commit gate preserves benefit, avoids net harm, and beats
+naive retraining in the harm regime — with the same sign pattern for a classical (KS-max) and a quantum (QK-ZZ)
+detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper, Table 5).**
 
 ![Gate results](docs/img/fig4_phase2_gate.png)
 
@@ -164,9 +166,10 @@ The three public benchmarks are **not redistributed** here (place them under `da
 
 ## Manuscript
 
-The working manuscript (§1–§8, solution-framed) and its bibliography are in
-[`manuscript/`](manuscript/). It is written for a top security / ML venue and is reproducible end-to-end from
-this repository.
+The working manuscript (§1–§8) and its bibliography are in [`manuscript/`](manuscript/). Every derived
+table, figure and numeric claim regenerates from this repository (`make reproduce`, then
+`src/analysis/audit_paper2_claims.py` re-verifies all 240+ pinned numbers); the experiment commands that
+populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.md`](REPRODUCE.md).
 
 ## Citation
 
@@ -175,8 +178,8 @@ The paper is under review; cite it as below. To cite the **software artifact** i
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
-  title  = {Validate Before Commit: Label-Efficient Empirical Gating of
-            Drift-Triggered Classifier Updates for Network Intrusion Detection},
+  title  = {Validate Before Commit: Label-Efficient Commit Decisions for
+            Drift-Triggered Classifier Updates in Network Intrusion Detection},
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},

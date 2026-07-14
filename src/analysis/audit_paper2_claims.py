@@ -129,7 +129,7 @@ def main():
     md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
     a = md.index("## Abstract"); b = md.index("## Contributions", a)
     abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words (md tokenization; tex=249)", 254, float(len(abstract.split())), 0.5)
+    check("abstract <= 250 words (md tokenization; tex=241)", 254, float(len(abstract.split())), 0.5)
     check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
@@ -426,6 +426,77 @@ def main():
     check("frontier ensemble ToN +0.56", 0.558, val(fr, "gain", regime="ton_scanning", policy="ensemble_cal"), 0.005)
     check("frontier lp32 ToN labels 3626", 3626,
           val(fr, "total_labels", regime="ton_scanning", policy="labeled_probe_b32"), 1.0)
+
+    # --- Amendment 006: causal probe, honest prevalence, McNemar, prediction test, harm breadth ---
+    a6 = pd.read_csv(f"{T}/paper2_amendment_006/summary.csv")
+    c6 = pd.read_csv(f"{T}/paper2_amendment_006/paired_ci.csv")
+    # causal observed-data arm (no severity, no pools)
+    check("5.9 causal naive ToN -2.44 (harm w/ observed candidates)", -2.437,
+          val(a6, "gain", regime="ton_scanning", arm="causal_none"), 0.005)
+    check("5.9 causal gate ToN +0.85", 0.849, val(a6, "gain", regime="ton_scanning", arm="causal_gate"), 0.005)
+    check("5.9 causal gate ToN vs naive +3.29", 3.287,
+          val(c6, "diff", regime="ton_scanning", contrast="causal_gate_vs_causal_naive"), 0.005)
+    check("5.9 causal gate PortScan +8.64", 8.643, val(a6, "gain", regime="portscan", arm="causal_gate"), 0.005)
+    check("5.9 causal gate UNSW +1.31", 1.313, val(a6, "gain", regime="unsw_recon", arm="causal_gate"), 0.005)
+    check("5.9 causal ~ oracle ToN +0.06 (ns)", 0.061,
+          val(c6, "diff", regime="ton_scanning", contrast="causal_gate_vs_lp32(pools)"), 0.005)
+    check("5.9 causal vs oracle PortScan -0.48", -0.477,
+          val(c6, "diff", regime="portscan", contrast="causal_gate_vs_lp32(pools)"), 0.005)
+    # honest binomial-prevalence probes (the retraction)
+    check("5.9 binom01 zero-attack probe frac 0.66 (ToN)", 0.661,
+          val(a6, "zero_attack_probe_frac", regime="ton_scanning", arm="binom01"), 0.005)
+    check("5.9 binom01 ToN +0.21 (CI straddles zero: claim retracted)", 0.214,
+          val(a6, "gain", regime="ton_scanning", arm="binom01"), 0.005)
+    check("5.9 binom01 ToN CI lo < 0", -1.388, val(a6, "ci_lo", regime="ton_scanning", arm="binom01"), 0.01)
+    check("5.9 binom05 ToN +0.91 (still holds)", 0.910,
+          val(a6, "gain", regime="ton_scanning", arm="binom05"), 0.005)
+    check("5.9 binom05 PortScan vs lp32 -0.44", -0.436,
+          val(c6, "diff", regime="portscan", contrast="binom05_vs_lp32"), 0.005)
+    # exact McNemar (risk axis)
+    check("5.9 mcnemar32 ToN +0.00 (never harmful, no power)", 0.002,
+          val(a6, "gain", regime="ton_scanning", arm="mcnemar32"), 0.005)
+    check("5.9 mcnemar32 ToN commits 0.03", 0.03,
+          val(a6, "n_adaptations", regime="ton_scanning", arm="mcnemar32"), 0.01)
+    check("5.9 mcnemar32 PortScan +5.45", 5.451, val(a6, "gain", regime="portscan", arm="mcnemar32"), 0.005)
+    check("5.9 mcnemar32 PortScan vs lp32 -3.67", -3.669,
+          val(c6, "diff", regime="portscan", contrast="mcnemar32_vs_lp32"), 0.005)
+    check("5.9 mcnemar64 PortScan +7.67", 7.671, val(a6, "gain", regime="portscan", arm="mcnemar64"), 0.005)
+    # THE REGISTERED PREDICTION TEST (mild drift -> harm in all three benchmarks)
+    check("5.9 sev025 PortScan naive -0.46 (prediction: net-harmful)", -0.463,
+          val(a6, "gain", regime="portscan", arm="sev025_none"), 0.005)
+    check("5.9 sev025 UNSW naive -0.15", -0.146, val(a6, "gain", regime="unsw_recon", arm="sev025_none"), 0.005)
+    check("5.9 sev025 ToN naive -0.65", -0.653, val(a6, "gain", regime="ton_scanning", arm="sev025_none"), 0.005)
+    check("5.9 sev025 PortScan gate +0.38", 0.376, val(a6, "gain", regime="portscan", arm="sev025_lp32"), 0.005)
+    check("5.9 sev025 UNSW gate -0.09 (>= -0.2)", -0.088,
+          val(a6, "gain", regime="unsw_recon", arm="sev025_lp32"), 0.005)
+    check("5.9 sev025 ToN gate -0.04 (>= -0.2)", -0.036,
+          val(a6, "gain", regime="ton_scanning", arm="sev025_lp32"), 0.005)
+    check("5.9 sev025 gate vs naive PortScan +0.84 (sig)", 0.839,
+          val(c6, "diff", regime="portscan", contrast="sev025_gate_vs_naive"), 0.005)
+    check("5.9 sev050 ToN naive -3.63", -3.629, val(a6, "gain", regime="ton_scanning", arm="sev050_none"), 0.005)
+    check("5.9 sev050 ToN gate +0.19", 0.187, val(a6, "gain", regime="ton_scanning", arm="sev050_lp32"), 0.005)
+    check("5.9 sev050 ToN gate vs naive +3.82", 3.816,
+          val(c6, "diff", regime="ton_scanning", contrast="sev050_gate_vs_naive"), 0.005)
+    # harm breadth on the hardened harness
+    check("5.9 v2 ToN DDoS naive -15.24", -15.244, val(a6, "gain", regime="ton_ddos", arm="none"), 0.005)
+    check("5.9 v2 ToN DDoS gate +1.02", 1.016, val(a6, "gain", regime="ton_ddos", arm="lp32"), 0.005)
+    check("5.9 v2 ToN DDoS gate vs naive +16.26", 16.260,
+          val(c6, "diff", regime="ton_ddos", contrast="gate_vs_naive"), 0.005)
+    check("5.9 v2 ToN Injection naive -2.24", -2.239, val(a6, "gain", regime="ton_injection", arm="none"), 0.005)
+    check("5.9 v2 ToN Injection gate +0.43", 0.431, val(a6, "gain", regime="ton_injection", arm="lp32"), 0.005)
+    # per-incumbent health reference (conclusions unchanged)
+    check("5.9 hr per-incumbent ToN +0.11", 0.113, val(a6, "gain", regime="ton_scanning", arm="hrperinc"), 0.005)
+    check("5.9 hr per-incumbent PortScan +7.88", 7.878, val(a6, "gain", regime="portscan", arm="hrperinc"), 0.005)
+    # Wednesday -> Thursday chronological attempt (another deep-benefit stream)
+    w6 = pd.read_csv(f"{T}/paper2_amendment_006/temporal_wed2thu.csv")
+    check("5.9 wed2thu noadapt 48.70 (collapses again)", 48.703,
+          val(w6, "value", metric="BA_two_class", quantity="no_adapt_level"), 0.01)
+    check("5.9 wed2thu naive +33.66", 33.658,
+          val(w6, "value", metric="BA_two_class", quantity="naive_vs_noadapt"), 0.005)
+    check("5.9 wed2thu gate premium -15.08 BA", -15.077,
+          val(w6, "value", metric="BA_two_class", quantity="gate_vs_naive"), 0.005)
+    check("5.9 wed2thu accuracy premium -0.08 (ns)", -0.083,
+          val(w6, "value", metric="accuracy_all", quantity="gate_vs_naive"), 0.005)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

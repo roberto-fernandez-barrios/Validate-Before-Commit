@@ -57,9 +57,13 @@ python -m src.experiments.run_paper2_readaptation_v2 \
   --outdir results/raw/paper2_v2_ton_scanning_ks_lp32
 ```
 Other arms swap `--adaptation-gate` (`none` = naive, `labeled_probe_holdout` → `..._holdout32b` dirs,
-`labeled_probe_lcb`, `two_stage`), `--methods` (`qk_mmd_zz`), `--downstream-model`, `--stream-prevalence 0.05`,
-`--adapt-strategy {ensemble,ensemble_cal,sliding_window}`, `--trigger-mode {ddm,adwin,ddm_river,adwin_river}`,
-`--probe-size {8,16,64,128}`, `--probe-latency {5,20}` and `--probe-flip-frac {0.10,0.25,0.40}`. The full arm
+`labeled_probe_lcb`, `labeled_probe_mcnemar`, `two_stage`), `--methods` (`qk_mmd_zz`), `--downstream-model`,
+`--stream-prevalence 0.05`, `--adapt-strategy {ensemble,ensemble_cal,sliding_window}`,
+`--trigger-mode {ddm,adwin,ddm_river,adwin_river}`, `--probe-size {8,16,64,128}`, `--probe-latency {5,20}`,
+`--probe-flip-frac {0.10,0.25,0.40}`, `--max-severity {0.25,0.50}` (the mild-drift prediction test), and the
+amendment-006 causal flags `--probe-source observed` (with `--adapt-strategy sliding_window`: candidate and
+probe come only from observed past traffic), `--probe-prevalence {0.10,0.05,0.01}` (Binomial probe composition,
+zero-attack probes allowed) and `--health-ref-mode per_incumbent`. The full arm
 lists, with seeds and output-dir naming, are enumerated in
 `notes/paper2_harness_v2_registered_replication_protocol_001.md` and amendments
 `notes/paper2_harness_v2_amendment_00{2,3,4}.md` (004 also carries the seed ledger).
@@ -93,6 +97,8 @@ python -m src.analysis.aggregate_paper2_size_dim_controls   # Phase 2k: candidat
 python -m src.analysis.aggregate_paper2_v2_replication      # Harness-v2 registered replication verdict
 python -m src.analysis.aggregate_paper2_amendment_004       # v2 robustness suite, cost table, temporal streams
 python -m src.analysis.aggregate_paper2_amendment_005       # split two-stage, monitor budgets, stratified/UNSW temporal
+python -m src.analysis.aggregate_paper2_amendment_006       # causal observed-data gate, binomial-prevalence probes,
+                                                           #   McNemar gate, mild-drift prediction test, harm breadth
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
