@@ -81,11 +81,12 @@ def main():
             for t, st in enumerate(starts):
                 Xw = transform_X(Xs[st:st + args.window_rows], scaler, pca)
                 yw = ys[st:st + args.window_rows]
-                if len(np.unique(yw)) < 2:
-                    ba = float((m.predict(Xw) == yw).mean())  # single-class window: plain acc
-                else:
-                    ba = evaluate_model(m, Xw, yw)["balanced_accuracy"]
                 pred = m.predict(Xw)
+                acc = float((pred == yw).mean())
+                two_class = len(np.unique(yw)) == 2
+                # metric homogeneity (amendment 004): BA only where defined; plain accuracy
+                # logged for every window; the headline averages BA over two-class windows only
+                ba = evaluate_model(m, Xw, yw)["balanced_accuracy"] if two_class else np.nan
                 fp = int(((pred == 1) & (yw == 0)).sum()); tn = int(((pred == 0) & (yw == 0)).sum())
                 trigger = False
                 if arm == "ks_max":
@@ -93,8 +94,11 @@ def main():
                     alarms.append(score > thr)
                     trigger = len(alarms) >= args.consecutive_k and all(alarms[-args.consecutive_k:]) and cooldown <= 0
                     if trigger and t >= 9:
-                        lo = starts[max(0, t - 8)]
-                        Xa_raw, ya = Xs[lo:st], ys[lo:st]
+                        # amendment 004: the candidate trains ONLY on the last 8 OBSERVED
+                        # windows (the stride made Xs[lo:st] span unobserved rows before)
+                        obs = [(Xs[starts[k]:starts[k] + args.window_rows],
+                                ys[starts[k]:starts[k] + args.window_rows]) for k in range(t - 8, t)]
+                        Xa_raw = np.vstack([x for x, _ in obs]); ya = np.concatenate([y for _, y in obs])
                         if len(np.unique(ya)) == 2:
                             cand = train_svc(transform_X(Xa_raw, scaler, pca), ya, seed + t)
                             commit = True
@@ -107,17 +111,22 @@ def main():
                                 commit = f(cand) >= f(m)
                             if commit:
                                 m = cand; n_adapt += 1
-                                ref = transform_X(Xs[lo:st][rng.choice(st - lo, min(512, st - lo), replace=False)], scaler, pca)
+                                # detector reference from the same OBSERVED windows
+                                ri = rng.choice(len(Xa_raw), min(512, len(Xa_raw)), replace=False)
+                                ref = transform_X(Xa_raw[ri], scaler, pca)
                         alarms, cooldown = [], args.cooldown_windows
                     else:
                         cooldown = max(0, cooldown - 1)
                 win_rows.append(dict(seed=seed, method=arm, window_idx=t,
-                                     balanced_accuracy=ba,
+                                     balanced_accuracy=ba, accuracy=acc, two_class=bool(two_class),
                                      fpr=fp / max(1, fp + tn), attack_frac=float((yw == 1).mean()),
                                      trigger=bool(trigger)))
             sub = [r for r in win_rows if r["seed"] == seed and r["method"] == arm]
+            ba2 = [r["balanced_accuracy"] for r in sub if r["two_class"]]
             sum_rows.append(dict(seed=seed, method=arm, n_adaptations=n_adapt, labels_used_total=labels_used,
-                                 mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in sub]))))
+                                 n_two_class=len(ba2),
+                                 mean_balanced_accuracy=float(np.mean(ba2)) if ba2 else np.nan,
+                                 mean_accuracy=float(np.mean([r["accuracy"] for r in sub]))))
         print(f"[seed {seed}] done", flush=True)
 
     pd.DataFrame(win_rows).to_csv(args.outdir / "paper2_progressive_readaptation_window_results.csv", index=False)

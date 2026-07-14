@@ -157,6 +157,27 @@ def main():
                                  hold_vs_noadapt_lo=round(hlo, 3), hold_vs_noadapt_hi=round(hhi, 3)))
     CL = pd.DataFrame(cls_rows)
 
+    # classifier generalization on v2 with the PRIMARY gate (naive vs fresh probe, paired) --
+    # this block produces classifiers_lp32.csv, the table the manuscript reports (amendment 004
+    # committed it; the runs are paper2_v2_{reg}_ks_lp32_{dm})
+    cls2_rows = []
+    for reg in REGIMES:
+        for dm in ["random_forest", "logreg", "mlp"]:
+            na_d = [f"paper2_v2_{reg}_ks_none_{dm}"]; lp_d = [f"paper2_v2_{reg}_ks_lp32_{dm}"]
+            base = read_by_seed(na_d, "no_adaptation"); nv = read_by_seed(na_d, "ks_max")
+            lb = read_by_seed(lp_d, "no_adaptation"); lp = read_by_seed(lp_d, "ks_max")
+            if base is None or nv is None or lb is None or lp is None:
+                print(f"[skip cls-lp32] {reg} {dm}"); continue
+            gn, gl = (nv - base) * 100, (lp - lb) * 100
+            dlo, dhi = boot_ci((gl - gn).values)
+            llo, lhi = boot_ci(gl.values)
+            cls2_rows.append(dict(regime=reg, dm=dm,
+                                  naive=round(float(gn.mean()), 3), lp32=round(float(gl.mean()), 3),
+                                  lp32_vs_naive=round(float((gl - gn).mean()), 3),
+                                  lvn_lo=round(dlo, 3), lvn_hi=round(dhi, 3),
+                                  lp32_vs_na_lo=round(llo, 3), lp32_vs_na_hi=round(lhi, 3)))
+    CL2 = pd.DataFrame(cls2_rows)
+
     # natural prevalence, natural calibration
     np_rows = []
     for reg in REGIMES:
@@ -178,7 +199,7 @@ def main():
     NP = pd.DataFrame(np_rows)
 
     for name, df in [("summary", R), ("paired_ci", C), ("verdict", V), ("mechanism", M),
-                     ("classifiers", CL), ("natprev", NP)]:
+                     ("classifiers", CL), ("classifiers_lp32", CL2), ("natprev", NP)]:
         df.to_csv(f"{OUT}/{name}.csv", index=False)
         print(f"== {name} =="); print(df.to_string(index=False)); print()
 

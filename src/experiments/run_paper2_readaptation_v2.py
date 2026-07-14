@@ -111,8 +111,21 @@ class EnsembleModel:
 
     def predict(self, X):
         return ((self._score(self.a, X) + self._score(self.b, X)) / 2 >= 0.5).astype(int)
+
+
+class EnsembleModelCal(EnsembleModel):
+    """Calibrated soft ensemble (amendment 004): members are Platt-calibrated
+    (SVC probability=True), and exposing predict_proba keeps nested ensembles
+    probabilistic instead of degrading to hard votes."""
+    def predict_proba(self, X):
+        p1 = (self._score(self.a, X) + self._score(self.b, X)) / 2
+        return np.column_stack([1 - p1, p1])
+
+
 FUTURE_K = 5  # future windows for per-trigger delta-BA logging
 LCB_ALPHA_Z = 1.2816  # one-sided 90% normal quantile
+TWO_STAGE_DELTA = 0.05        # two_stage gate: train a candidate only if the incumbent's probe
+HEALTH_REF_PER_CLASS = 32     # accuracy fell >= DELTA below its severity-0 reference (64 labels)
 
 
 def split_pools(pools: Pools, seed: int) -> dict[str, Pools]:
@@ -148,7 +161,7 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
     X_tr_raw, y_tr = sample_balanced_from_distribution(
         role["train"], n_per_class=args.train_size_per_class, severity=0.0, rng=train_rng)
     scaler, pca, X_tr = fit_transformer(X_tr_raw, args.dim, seed)
-    needs_proba = args.adaptation_gate in ("atc", "doc")
+    needs_proba = args.adaptation_gate in ("atc", "doc") or args.adapt_strategy == "ensemble_cal"
     initial_model = train_svc(X_tr, y_tr, seed, args.downstream_model, proba=needs_proba)
 
     env_rng = np.random.default_rng(seed)  # environment: depends on seed ONLY
@@ -201,11 +214,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
     alarms: list[bool] = []
     cooldown = 0
     n_adapt = n_trig = n_reject = labels_used = 0
+    labels_probe = labels_monitor = labels_candidate = 0   # amendment 004 accounting
+    n_cand_trained = n_skip_train = 0
     adapt_windows: list[int] = []
     ba_hist: list[float] = []
     rows, trig_rows = [], []
     gate = args.adaptation_gate
     needs_proba = gate in ("atc", "doc")
+    wants_proba = needs_proba or args.adapt_strategy == "ensemble_cal"
     incumbent_val = None
     if needs_proba:
         Xv_raw, yv = sample_balanced_from_distribution(
@@ -213,9 +229,42 @@ def run_arm(method: str, env: Environment, args, seed: int):
             rng=np.random.default_rng(seed + 999))
         incumbent_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
 
+    def draw_probe(t: int, sev_probe: float):
+        """Fresh probe draw. With default flags this reproduces the original draw
+        bit-for-bit; --probe-latency and --probe-flip-frac (amendment 004) only
+        change the severity argument / flip labels afterwards."""
+        probe_rng = np.random.default_rng(seed * 200_003 + t)
+        Xp_raw, yp = sample_balanced_from_distribution(
+            env.probe_pools, n_per_class=max(1, args.probe_size // 2),
+            severity=sev_probe, rng=probe_rng)
+        yp = np.asarray(yp).copy()
+        if args.probe_flip_frac > 0:
+            flip_rng = np.random.default_rng(seed * 500_009 + t)
+            k = int(round(args.probe_flip_frac * len(yp)))
+            if k:
+                fi = flip_rng.choice(len(yp), k, replace=False)
+                yp[fi] = 1 - yp[fi]
+        return transform_X(Xp_raw, env.scaler, env.pca), yp
+
+    # two_stage gate: severity-0 health reference for the incumbent (64 labels, once per arm)
+    health_ref = None
+    if gate == "two_stage":
+        hr_rng = np.random.default_rng(seed + 887)
+        Xh_raw, yh = sample_balanced_from_distribution(
+            env.probe_pools, n_per_class=HEALTH_REF_PER_CLASS, severity=0.0, rng=hr_rng)
+        Xh = transform_X(Xh_raw, env.scaler, env.pca)
+        health_ref = float((model.predict(Xh) == yh).mean())
+        labels_probe += 2 * HEALTH_REF_PER_CLASS
+        labels_used += 2 * HEALTH_REF_PER_CLASS
+
     # canonical performance-aware monitors (labels spent on MONITORING the incumbent's error)
     ddm = DDM() if args.trigger_mode == "ddm" else None
     adwin = ADWIN() if args.trigger_mode == "adwin" else None
+    riv = None   # reference implementations (river), amendment 004 validation
+    if args.trigger_mode in ("ddm_river", "adwin_river"):
+        from river import drift as river_drift
+        riv = (river_drift.binary.DDM() if args.trigger_mode == "ddm_river"
+               else river_drift.ADWIN(delta=0.002))
     # per-arm history of observed stream windows (for sliding-window retraining)
     seen: list[tuple[np.ndarray, np.ndarray]] = []
     # legacy custom performance trigger
@@ -239,23 +288,32 @@ def run_arm(method: str, env: Environment, args, seed: int):
         m["alerts"] = int((pred == 1).sum())
         ba_hist.append(m["balanced_accuracy"])
         score = float(detector.score(Xw))
-        if args.trigger_mode in ("performance", "ddm", "adwin"):
+        if args.trigger_mode in ("performance", "ddm", "adwin", "ddm_river", "adwin_river"):
             mon_rng = np.random.default_rng(seed * 400_009 + t)
             Xm_raw, ym = sample_balanced_from_distribution(
                 env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=sev, rng=mon_rng)
             Xm = transform_X(Xm_raw, env.scaler, env.pca)
             err = 1.0 - float((model.predict(Xm) == ym).mean())
             labels_used += args.monitor_labels
+            labels_monitor += args.monitor_labels
             if args.trigger_mode == "ddm":
                 alarms.append(ddm.update(err, args.monitor_labels))
             elif args.trigger_mode == "adwin":
                 alarms.append(adwin.update(err))
+            elif args.trigger_mode in ("ddm_river", "adwin_river"):
+                # reference implementations receive the SAME monitoring labels as
+                # INDIVIDUAL Bernoulli outcomes (their canonical input granularity)
+                fired = False
+                for e in (model.predict(Xm) != ym):
+                    riv.update(bool(e) if args.trigger_mode == "ddm_river" else int(e))
+                    fired = fired or bool(riv.drift_detected)
+                alarms.append(fired)
             else:
                 err_hist.append(err)
                 alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
         else:
             alarms.append(score > threshold)
-        if args.trigger_mode in ("ddm", "adwin"):
+        if args.trigger_mode in ("ddm", "adwin", "ddm_river", "adwin_river"):
             trigger = bool(alarms[-1]) and cooldown <= 0   # canonical monitors self-confirm
         else:
             recent = alarms[-args.consecutive_k:]
@@ -264,88 +322,115 @@ def run_arm(method: str, env: Environment, args, seed: int):
         adapted = False
         if trigger:
             n_trig += 1
-            cand_rng = np.random.default_rng(seed * 100_003 + t)
-            if args.adapt_strategy == "sliding_window":
-                # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
-                hist = seen[-8:]
-                Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
-            else:
-                Xa_raw, ya = sample_balanced_from_distribution(
-                    env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
-                Xa = transform_X(Xa_raw, env.scaler, env.pca)
+            # --probe-latency L: the probe reflects the stream as of window t-L (stale labels)
+            sev_probe = env.stream[max(0, t - args.probe_latency)][2] if args.probe_latency > 0 else sev
 
+            # two_stage gate (amendment 004): FIRST spend the probe on the incumbent alone;
+            # train a candidate only if the incumbent's probe accuracy fell >= TWO_STAGE_DELTA
+            # below its severity-0 health reference. Skipping saves ALL candidate labels/compute.
             probe = None
-            if gate == "labeled_probe_holdout":
-                # carve the probe out of the labeled training batch (zero incremental labels).
-                # Deduplicate first: with-replacement draws can place copies of one flow in
-                # both halves; training proceeds on rows that are identity-disjoint from the
-                # held-out probe.
-                _, uniq = np.unique(Xa, axis=0, return_index=True)
-                uniq = np.sort(uniq)
-                Xa, ya = Xa[uniq], ya[uniq]
-                nb = max(1, args.probe_size // 2)
-                ben = np.where(ya == 0)[0][:nb]
-                att = np.where(ya == 1)[0][:nb]
-                hold = np.concatenate([ben, att])
-                mask = np.ones(len(ya), bool); mask[hold] = False
-                probe = (Xa[hold], ya[hold])
-                Xa, ya = Xa[mask], ya[mask]
-            candidate = train_svc(Xa, ya, seed + t + 1, args.downstream_model, proba=needs_proba)
+            skip_train = False
+            inc_hacc = np.nan
+            if gate == "two_stage":
+                probe = draw_probe(t, sev_probe)
+                labels_used += len(probe[1]); labels_probe += len(probe[1])
+                inc_hacc = float((model.predict(probe[0]) == probe[1]).mean())
+                skip_train = bool(inc_hacc >= health_ref - TWO_STAGE_DELTA)
 
+            candidate = None
             commit, cand_val = True, None
             p_inc = p_cand = np.nan
-            if gate in ("labeled_probe", "labeled_probe_lcb") or (gate == "labeled_probe_holdout"):
-                if probe is None:
-                    probe_rng = np.random.default_rng(seed * 200_003 + t)
-                    Xp_raw, yp = sample_balanced_from_distribution(
-                        env.probe_pools, n_per_class=max(1, args.probe_size // 2),
-                        severity=sev, rng=probe_rng)
-                    probe = (transform_X(Xp_raw, env.scaler, env.pca), yp)
-                    labels_used += len(yp)
-                Xp, yp = probe
-                if gate == "labeled_probe_lcb":
-                    d = (candidate.predict(Xp) == yp).astype(float) - (model.predict(Xp) == yp).astype(float)
-                    se = float(d.std(ddof=1) / np.sqrt(len(d))) if len(d) > 1 else np.inf
-                    commit = bool(d.mean() - LCB_ALPHA_Z * se > 0.0)
-                    p_inc, p_cand = float((model.predict(Xp) == yp).mean()), float((candidate.predict(Xp) == yp).mean())
+            if skip_train:
+                commit = False
+                n_skip_train += 1
+                p_inc = inc_hacc
+            else:
+                cand_rng = np.random.default_rng(seed * 100_003 + t)
+                if args.adapt_strategy == "sliding_window":
+                    # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
+                    hist = seen[-8:]
+                    Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
                 else:
-                    p_inc = evaluate_model(model, Xp, yp)["balanced_accuracy"]
-                    p_cand = evaluate_model(candidate, Xp, yp)["balanced_accuracy"]
-                    commit = bool(p_cand >= p_inc + args.gate_margin)
-            elif gate == "unsup_disagree":
-                commit = bool(float(np.mean(model.predict(Xw) != candidate.predict(Xw)))
-                              >= args.gate_disagree_threshold)
-            elif gate in ("atc", "doc"):
-                Xv_raw, yv = sample_balanced_from_distribution(
-                    env.train_pools, n_per_class=max(1, args.gate_val_size // 2), severity=sev,
-                    rng=np.random.default_rng(seed * 300_007 + t))
-                cand_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
-                commit = bool(_labelfree_estimate(gate, candidate, cand_val, Xw)
-                              >= _labelfree_estimate(gate, model, incumbent_val, Xw) + args.gate_margin)
-            elif gate != "none":
-                raise ValueError(f"Unknown gate: {gate}")
+                    Xa_raw, ya = sample_balanced_from_distribution(
+                        env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
+                    Xa = transform_X(Xa_raw, env.scaler, env.pca)
+
+                if gate == "labeled_probe_holdout":
+                    # carve the probe out of the labeled training batch (zero incremental labels).
+                    # Deduplicate first: with-replacement draws can place copies of one flow in
+                    # both halves; training proceeds on rows that are identity-disjoint from the
+                    # held-out probe.
+                    _, uniq = np.unique(Xa, axis=0, return_index=True)
+                    uniq = np.sort(uniq)
+                    Xa, ya = Xa[uniq], ya[uniq]
+                    nb = max(1, args.probe_size // 2)
+                    ben = np.where(ya == 0)[0][:nb]
+                    att = np.where(ya == 1)[0][:nb]
+                    hold = np.concatenate([ben, att])
+                    mask = np.ones(len(ya), bool); mask[hold] = False
+                    probe = (Xa[hold], ya[hold])
+                    Xa, ya = Xa[mask], ya[mask]
+                candidate = train_svc(Xa, ya, seed + t + 1, args.downstream_model, proba=wants_proba)
+                n_cand_trained += 1
+                labels_candidate += int(len(ya))
+
+                if gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout", "two_stage"):
+                    if probe is None:
+                        probe = draw_probe(t, sev_probe)
+                        labels_used += len(probe[1]); labels_probe += len(probe[1])
+                    Xp, yp = probe
+                    if gate == "labeled_probe_lcb":
+                        d = (candidate.predict(Xp) == yp).astype(float) - (model.predict(Xp) == yp).astype(float)
+                        se = float(d.std(ddof=1) / np.sqrt(len(d))) if len(d) > 1 else np.inf
+                        commit = bool(d.mean() - LCB_ALPHA_Z * se > 0.0)
+                        p_inc, p_cand = float((model.predict(Xp) == yp).mean()), float((candidate.predict(Xp) == yp).mean())
+                    else:
+                        p_inc = evaluate_model(model, Xp, yp)["balanced_accuracy"]
+                        p_cand = evaluate_model(candidate, Xp, yp)["balanced_accuracy"]
+                        commit = bool(p_cand >= p_inc + args.gate_margin)
+                elif gate == "unsup_disagree":
+                    commit = bool(float(np.mean(model.predict(Xw) != candidate.predict(Xw)))
+                                  >= args.gate_disagree_threshold)
+                elif gate in ("atc", "doc"):
+                    Xv_raw, yv = sample_balanced_from_distribution(
+                        env.train_pools, n_per_class=max(1, args.gate_val_size // 2), severity=sev,
+                        rng=np.random.default_rng(seed * 300_007 + t))
+                    cand_val = (transform_X(Xv_raw, env.scaler, env.pca), yv)
+                    commit = bool(_labelfree_estimate(gate, candidate, cand_val, Xw)
+                                  >= _labelfree_estimate(gate, model, incumbent_val, Xw) + args.gate_margin)
+                elif gate != "none":
+                    raise ValueError(f"Unknown gate: {gate}")
 
             # per-trigger mechanism log (lookahead is for LOGGING only, never for the policy)
             fut = env.stream[t + 1: t + 1 + FUTURE_K]
             inc_f = float(np.mean([evaluate_model(model, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut])) if fut else np.nan
-            cand_f = float(np.mean([evaluate_model(candidate, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut])) if fut else np.nan
+            cand_f = (float(np.mean([evaluate_model(candidate, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut]))
+                      if fut and candidate is not None else np.nan)
             trig_rows.append(dict(
                 seed=seed, method=method, gate=gate, window_idx=t, severity_t=sev,
                 score=score, threshold=threshold,
                 deg_pre5=float(np.mean(ba_hist[-6:-1])) if len(ba_hist) > 1 else np.nan,
                 inc_future5=inc_f, cand_future5=cand_f,
-                delta_future5=cand_f - inc_f if fut else np.nan,
-                probe_inc=p_inc, probe_cand=p_cand, committed=bool(commit)))
+                delta_future5=cand_f - inc_f if (fut and candidate is not None) else np.nan,
+                probe_inc=p_inc, probe_cand=p_cand, committed=bool(commit),
+                trained=bool(candidate is not None)))
 
             if commit:
                 n_adapt += 1
                 adapt_windows.append(t)
                 adapted = True
-                model = EnsembleModel(model, candidate) if args.adapt_strategy == "ensemble" else candidate
+                if args.adapt_strategy == "ensemble":
+                    model = EnsembleModel(model, candidate)
+                elif args.adapt_strategy == "ensemble_cal":
+                    model = EnsembleModelCal(model, candidate)
+                else:
+                    model = candidate
                 if ddm is not None:
                     ddm.reset()
                 if adwin is not None:
                     adwin.reset()
+                if riv is not None:
+                    riv = riv.clone()
                 if cand_val is not None:
                     incumbent_val = cand_val
                 detector = build_detector(method, args, seed + t + 1)
@@ -366,6 +451,9 @@ def run_arm(method: str, env: Environment, args, seed: int):
 
     summary = dict(seed=seed, method=method, n_windows=args.post_windows, n_adaptations=n_adapt,
                    n_triggers=n_trig, n_gate_rejections=n_reject, labels_used_total=labels_used,
+                   labels_probe=labels_probe, labels_monitor=labels_monitor,
+                   labels_candidate=labels_candidate, n_candidates_trained=n_cand_trained,
+                   n_train_skipped=n_skip_train,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
                    mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in rows])),
@@ -395,9 +483,13 @@ def main():
     p.add_argument("--cooldown-windows", type=int, default=10)
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
-                            "unsup_disagree", "atc", "doc"])
+                            "unsup_disagree", "atc", "doc", "two_stage"])
     p.add_argument("--gate-val-size", type=int, default=256)
     p.add_argument("--probe-size", type=int, default=32)
+    p.add_argument("--probe-latency", type=int, default=0,
+                   help="Probe reflects the stream as of window t-L (stale validation labels).")
+    p.add_argument("--probe-flip-frac", type=float, default=0.0,
+                   help="Fraction of probe labels flipped after drawing (label-noise robustness).")
     p.add_argument("--gate-margin", type=float, default=0.0)
     p.add_argument("--gate-disagree-threshold", type=float, default=0.15)
     p.add_argument("--downstream-model", type=str, default="svc_rbf",
@@ -415,11 +507,12 @@ def main():
     p.add_argument("--policy-n", type=int, default=None)
     p.add_argument("--policy-name", type=str, default=None)
     p.add_argument("--adapt-strategy", type=str, default="full_replace",
-                   choices=["full_replace", "ensemble", "sliding_window"],
+                   choices=["full_replace", "ensemble", "ensemble_cal", "sliding_window"],
                    help="Update rule on commit: replace the incumbent, soft incumbent+candidate "
-                        "ensemble, or retrain on the last 8 observed stream windows.")
+                        "ensemble (ensemble_cal = Platt-calibrated members, probabilistic "
+                        "nesting), or retrain on the last 8 observed stream windows.")
     p.add_argument("--trigger-mode", type=str, default="detector",
-                   choices=["detector", "performance", "ddm", "adwin"],
+                   choices=["detector", "performance", "ddm", "adwin", "ddm_river", "adwin_river"],
                    help="performance = DDM-style trigger on the incumbent's monitored error "
                         "(labels spent on monitoring instead of gating).")
     p.add_argument("--monitor-labels", type=int, default=8,
@@ -451,7 +544,9 @@ def main():
         win_rows.extend(na)
         sum_rows.append(dict(seed=seed, method="no_adaptation", n_windows=args.post_windows,
                              n_adaptations=0, n_triggers=0, n_gate_rejections=0,
-                             labels_used_total=0, adaptation_gate="none", harness="v2",
+                             labels_used_total=0, labels_probe=0, labels_monitor=0,
+                             labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
+                             adaptation_gate="none", harness="v2",
                              first_adaptation_window=np.nan,
                              mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
                              mean_f1=float(np.mean([r["f1"] for r in na]))))
