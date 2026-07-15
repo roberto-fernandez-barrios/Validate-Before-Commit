@@ -648,6 +648,46 @@ def main():
     check("9 Tuesday chrono gate premium -5.66", -5.662,
           val(c9, "diff", block="chrono", contrast="gate_premium(lp32-naive)"), 0.05)
 
+    # --- Amendment 011: leakage-free causal, cumulative controls, EB-CS budget, harmful-commit, coverage ---
+    a11 = pd.read_csv(f"{T}/paper2_amendment_011/summary.csv")
+    c11 = pd.read_csv(f"{T}/paper2_amendment_011/contrasts.csv")
+    h11 = pd.read_csv(f"{T}/paper2_amendment_011/harmful_commit.csv")
+    cov = pd.read_csv(f"{T}/paper2_amendment_011/cs_coverage.csv")
+
+    def c11v(reg, drift, which, col="gate_vs_naive"):
+        return val(c11, col, block="causal", regime=reg, drift=drift, which=which)
+
+    # causal leakage-free: collisions -> ~0, harm-regime result survives
+    check("11 clean causal collisions ToN ~0", 1.1, c11v("ton_scanning", "full", "clean", "collisions"), 0.6)
+    check("11 leaky causal collisions ToN ~462", 462.1, c11v("ton_scanning", "full", "leaky", "collisions"), 1.0)
+    check("11 clean causal ToN full gate-vs-naive +2.95 (survives)", 2.949, c11v("ton_scanning", "full", "clean"), 0.03)
+    check("11 clean causal ToN mild gate-vs-naive +1.40", 1.398, c11v("ton_scanning", "mild", "clean"), 0.03)
+    check("11 clean causal PortScan full ~0 (premium was leak)", -0.064, c11v("portscan", "full", "clean"), 0.03)
+    # cumulative controls: none removes harm; dedup deepens; initobs flips UNSW positive
+    def a11v(reg, arm, col="gain"):
+        return val(a11, col, block="cumulative", regime=reg, arm=arm)
+    check("11 cum dedup ToN -10.74 (deepens)", -10.735, a11v("ton_scanning", "cum_dedup"), 0.05)
+    check("11 cum initobs ToN -8.27 (attenuates, persists)", -8.272, a11v("ton_scanning", "cum_initobs"), 0.05)
+    check("11 cum initobs UNSW +0.53 (flips positive)", 0.533, a11v("unsw_recon", "cum_initobs"), 0.03)
+    check("11 cum observed unique_frac ~0.83 (dupes)", 0.830, a11v("ton_scanning", "cum_initobs", "unique_frac"), 0.05)
+    # EB-CS budget sweep: recovers small benefits with more labels
+    def b11v(reg, arm, col="gain"):
+        return val(a11, col, block="ebcs_budget", regime=reg, arm=arm)
+    check("11 ebcs256 PortScan +8.07 (approaches fixed gate)", 8.068, b11v("portscan", "ebcs256"), 0.05)
+    check("11 ebcs256 UNSW +0.78 (resolves small benefit)", 0.776, b11v("unsw_recon", "ebcs256"), 0.03)
+    check("11 ebcs64 UNSW +0.00 (unresolved at b=64)", 0.0, b11v("unsw_recon", "ebcs64"), 0.005)
+    # harmful-commit rate: eps0 harmful, risk-controlled zero
+    def h11v(reg, gate, col):
+        return val(h11, col, regime=reg, gate=gate)
+    check("11 eps0 harmful frac-of-commits UNSW 0.32", 0.317, h11v("unsw_recon", "lp32_eps0", "harmful_frac_of_commits"), 0.02)
+    check("11 mcnemar harmful/stream ToN 0.00", 0.0, h11v("ton_scanning", "mcnemar_zero", "harmful_per_stream"), 0.001)
+    check("11 ebcs harmful/stream PortScan 0.00", 0.0, h11v("portscan", "ebcs_full", "harmful_per_stream"), 0.001)
+    # CS coverage: iid <= alpha; EB exceeds under autocorrelation
+    def covv(method, regime):
+        return val(cov, "rate", method=method, regime=regime)
+    check("11 coverage eb iid <= alpha (0.0018)", 0.0018, covv("eb", "iid_mean0"), 0.01)
+    check("11 coverage eb autocorr exceeds alpha (0.18)", 0.1789, covv("eb", "autocorr_mean0"), 0.03)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

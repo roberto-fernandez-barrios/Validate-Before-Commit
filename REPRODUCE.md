@@ -75,6 +75,10 @@ reference, 50/50), and the anytime-valid confidence-sequence gate `--adaptation-
 that note. The CICIDS Tuesday chronological stream is staged by
 `python -m src.analysis.prepare_paper2_cicids_tuesday_chronological` (train = first 30% of the timeline)
 and run with `run_paper2_temporal_stream` on seeds 401--430.
+Amendment 011 (`notes/paper2_harness_v2_amendment_011.md`) adds `--stream-disjoint-windows`
+(without-replacement, value-deduplicated stream: removes candidate-train/future-eval overlap in the
+causal arm) and `--cumulative-mode {initial_plus_observed,dedup,cn}` (cumulative-generator controls);
+its `paper2_v12_*` arms plus the standalone CS coverage simulation are enumerated in that note.
 
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
@@ -112,6 +116,9 @@ python -m src.analysis.aggregate_paper2_amendment_009       # amendment 009: 4-c
                                                            #   zero-drift generator sweep (ensemble/sliding/cumulative/replay),
                                                            #   confidence-sequence gate, Tuesday chronological
 python -m src.analysis.make_paper2_amendment009_table       # Table (tab:amendment009) -> tables/ and tables_ieee/
+python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: leakage-free causal, cumulative
+                                                           #   controls, EB-CS budget sweep, per-stream harmful-commit
+python -m src.analysis.paper2_cs_coverage_011               # amendment 011: CS empirical coverage (iid/no-replace/autocorr)
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios

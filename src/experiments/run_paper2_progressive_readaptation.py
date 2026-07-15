@@ -198,14 +198,16 @@ def transform_X(X: np.ndarray, scaler: StandardScaler, pca: PCA | None) -> np.nd
     return Xs
 
 
-def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf", proba: bool = False):
+def train_svc(X: np.ndarray, y: np.ndarray, seed: int, model_type: str = "svc_rbf",
+              proba: bool = False, C: float = 1.0):
     """Fit the downstream classifier. Name kept for backward compatibility.
 
     `proba=True` enables predict_proba on SVC (Platt scaling) for confidence-based gates (ATC/DoC).
+    `C` overrides the SVC penalty (amendment 011 cumulative `cn` control; default 1.0 = unchanged).
     """
     if model_type == "svc_rbf":
         model = SVC(kernel="rbf", gamma="scale", class_weight="balanced", random_state=seed,
-                    probability=proba)
+                    probability=proba, C=C)
     elif model_type == "random_forest":
         model = RandomForestClassifier(
             n_estimators=200, class_weight="balanced", random_state=seed, n_jobs=-1

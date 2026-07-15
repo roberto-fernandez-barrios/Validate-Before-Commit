@@ -211,6 +211,7 @@ class Environment:
     cal_scores_pools: Pools                                # window pools (for recalibration)
     train_pools: Pools
     probe_pools: Pools
+    init_train: tuple = None                               # (X_tr, y_tr) of the incumbent (amend 011)
 
 
 def build_environment(pools: Pools, args, seed: int) -> Environment:
@@ -224,6 +225,48 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
 
     env_rng = np.random.default_rng(seed)  # environment: depends on seed ONLY
     stream = []
+    if getattr(args, "stream_disjoint_windows", False):
+        # amendment 011: draw every stream window WITHOUT replacement within the window pool, so
+        # no original row appears in more than one window. Because the candidate (sliding_window)
+        # and the observed probe are built from stream windows, and train/probe pools are already
+        # ID-disjoint (split_pools), a candidate-training row can then never recur in a future
+        # evaluation window -- eliminating the train/future-test overlap the reviewer flagged. The
+        # stream still depends on seed + flag only, so it is bit-identical across arms.
+        if args.stream_prevalence != 0.5:
+            raise ValueError("stream_disjoint_windows currently supports balanced streams only")
+        wp = role["window"]
+        # dedup each window pool by VALUE first: the raw benchmarks contain distinct flows with
+        # identical feature vectors (~9-16%), so index-disjoint alone would still let a training
+        # row's VALUE recur downstream. Deduping makes each unique feature vector appear in at most
+        # one window, so a candidate-training row can never recur (by value) in a future window.
+        pool_arrays = {}
+        for n in ("ref_benign", "ref_attack", "cur_benign", "cur_attack"):
+            a = getattr(wp, n)
+            _, uq = np.unique(a, axis=0, return_index=True)
+            pool_arrays[n] = a[np.sort(uq)]
+        cur = {n: [pool_arrays[n], env_rng.permutation(len(pool_arrays[n])), 0]
+               for n in pool_arrays}
+        npc = args.window_size // 2
+
+        def take(name, n):
+            arr, order, pos = cur[name]
+            if n <= 0:
+                return arr[order[:0]]
+            if pos + n > len(order):                 # pool exhausted: reshuffle (should not happen
+                order = env_rng.permutation(len(arr))  # for the causal full/mild runs; pools >> need)
+                cur[name][1] = order; pos = 0
+            cur[name][2] = pos + n
+            return arr[order[pos:pos + n]]
+
+        for t in range(args.post_windows):
+            sev = float(np.clip(progressive_severity(t, args), 0.0, 1.0))
+            n_cur = int(round(npc * sev)); n_ref = npc - n_cur
+            X = np.vstack([take("ref_benign", n_ref), take("cur_benign", n_cur),
+                           take("ref_attack", n_ref), take("cur_attack", n_cur)])
+            y = np.array([0] * npc + [1] * npc)
+            perm = env_rng.permutation(len(y))
+            stream.append((transform_X(X[perm], scaler, pca), y[perm], sev))
+        return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"], (X_tr, y_tr))
     for t in range(args.post_windows):
         sev = progressive_severity(t, args)
         if args.stream_prevalence != 0.5:
@@ -234,7 +277,7 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
             Xw_raw, yw = sample_balanced_from_distribution(
                 role["window"], n_per_class=args.window_size // 2, severity=sev, rng=env_rng)
         stream.append((transform_X(Xw_raw, scaler, pca), yw, sev))
-    return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"])
+    return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"], (X_tr, y_tr))
 
 
 def calibrate(detector, env: Environment, severity: float, args, rng) -> tuple[object, float]:
@@ -296,6 +339,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
     probe_row_collisions = 0                               # amendment 007 (row-identity audit)
     probe_labels_seq: list[int] = []                       # amendment 007 (sequential gate)
     cand_future_collisions = 0                             # amendment 008 (train/future-eval audit)
+    cand_rows_total = cand_unique_total = 0                # amendment 011 (unique-row accounting)
     # amendment 008: exact feature identity of every future evaluation window's rows, so we can
     # both AUDIT candidate-training overlap with the future and (optionally) drop it
     future_row_sets = [ {r.tobytes() for r in np.ascontiguousarray(Xf)} for Xf, _, _ in env.stream ]
@@ -472,16 +516,30 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 p_inc = inc_hacc
             else:
                 cand_rng = np.random.default_rng(seed * 100_003 + t)
+                svc_C = 1.0  # amendment 011: cumulative `cn` control may override below
                 if args.adapt_strategy == "sliding_window":
                     # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
                     hist = seen[-8:]
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
                 elif args.adapt_strategy == "cumulative":
                     # amendment 009: candidate trains on ALL observed (labeled) windows so far,
-                    # not only the last 8 -- the "use every available data point" generator the
-                    # reviewer asked for. A growing training set should reduce estimation noise.
+                    # not only the last 8 -- the "use every available data point" generator.
+                    # amendment 011 adds controls (--cumulative-mode) requested by review:
+                    #   observed             = all observed windows (a009 default);
+                    #   initial_plus_observed= incumbent's initial training set + all observed;
+                    #   dedup                = row-identity dedup before fit;
+                    #   cn                   = C scaled ~ n_unique/512 so effective regularization
+                    #                          is not silently changed as the set grows (SVC only).
                     hist = seen if len(seen) else [seen[-1]]
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
+                    if args.cumulative_mode == "initial_plus_observed" and env.init_train is not None:
+                        Xa = np.vstack([env.init_train[0], Xa])
+                        ya = np.concatenate([env.init_train[1], ya])
+                    if args.cumulative_mode in ("dedup", "cn"):
+                        _, uq = np.unique(Xa, axis=0, return_index=True)
+                        uq = np.sort(uq); Xa, ya = Xa[uq], ya[uq]
+                    if args.cumulative_mode == "cn":
+                        svc_C = max(1e-3, len(np.unique(Xa, axis=0)) / float(args.train_size_per_class))
                 elif args.adapt_strategy == "replay":
                     # amendment 009: retrain on a current-severity sample plus an equal-size
                     # replay from the reference (severity-0) regime, 50/50 (mirrors Phase 2i's
@@ -514,9 +572,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     mask = np.ones(len(ya), bool); mask[hold] = False
                     probe = (Xa[hold], ya[hold])
                     Xa, ya = Xa[mask], ya[mask]
-                candidate = train_svc(Xa, ya, seed + t + 1, args.downstream_model, proba=wants_proba)
+                candidate = train_svc(Xa, ya, seed + t + 1, args.downstream_model,
+                                      proba=wants_proba, C=svc_C)
                 n_cand_trained += 1
                 labels_candidate += int(len(ya))
+                if args.adapt_strategy == "cumulative":   # amendment 011: unique-row accounting
+                    cand_rows_total += int(len(ya))
+                    cand_unique_total += int(len(np.unique(Xa, axis=0)))
 
                 if gate == "labeled_probe_seq":
                     # amendment 007: sequential probe. Buy labels in blocks of 16 and stop as
@@ -755,6 +817,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    n_probes=n_probes, n_probes_zero_attack=probe_zero_attack,
                    probe_row_collisions=probe_row_collisions,
                    cand_future_collisions=cand_future_collisions,
+                   cand_rows_total=cand_rows_total, cand_unique_total=cand_unique_total,
                    seq_labels_mean=float(np.mean(probe_labels_seq)) if probe_labels_seq else np.nan,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
@@ -849,6 +912,15 @@ def main():
     p.add_argument("--stream-prevalence", type=float, default=0.5,
                    help="Attack fraction of EVALUATION windows (0.5 = balanced; natural-"
                         "prevalence streams report FPR/recall/alert volume).")
+    p.add_argument("--stream-disjoint-windows", action="store_true",
+                   help="amendment 011: draw stream windows WITHOUT replacement within the window "
+                        "pool, so no row recurs across windows (removes candidate-train/future-eval "
+                        "overlap for the causal arm). Balanced streams only.")
+    p.add_argument("--cumulative-mode", type=str, default="observed",
+                   choices=["observed", "initial_plus_observed", "dedup", "cn"],
+                   help="amendment 011 cumulative controls: observed = all observed windows (a009 "
+                        "default); initial_plus_observed = incumbent training set + all observed; "
+                        "dedup = row-identity dedup before fit; cn = C scaled ~1/n_unique.")
     args = p.parse_args()
 
     seeds = [int(s) for s in str(args.seeds).split(",") if s.strip()]

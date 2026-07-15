@@ -145,7 +145,7 @@ def main():
         ax.axhline(0, color="k", lw=0.8)
         ax.set_xlabel("Poisoned probe labels (%)")
         ax.set_ylabel("Gate gain vs no-adaptation (BA pts)")
-        ax.set_title("Gate under adversarial validation labels (dotted = naive)")
+        ax.set_title("Gate under random label corruption (dotted = naive)")
         ax.legend(fontsize=8)
         fig.savefig(f"{OUTF}/fig8_probe_poison.png", dpi=200, bbox_inches="tight")
         fig.savefig(f"{OUTF}/fig8_probe_poison.pdf", bbox_inches="tight")
