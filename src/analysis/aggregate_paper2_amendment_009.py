@@ -117,14 +117,38 @@ def main():
                 if smg:
                     srows.append(dict(block="generators", regime=reg, family=label, drift="mild", arm="lp32", **smg))
 
-    # Item 6: confidence-sequence gate (labels/decision reported).
+    # Item 6: confidence-sequence gates (labels/decision reported).
+    # Robbins normal-mixture (amendment 009) and empirical-Bernstein (amendment 010).
     for reg in REGIMES:
         for drift, tag in [("zero", "rz_cs64"), ("mild", "mild_cs64")]:
             s = summarize(f"paper2_v11_{reg}_{tag}")
             if s:
                 lab = means_col(f"paper2_v11_{reg}_{tag}", "seq_labels_mean")
                 s["labels_per_decision"] = round(lab, 1) if lab == lab else np.nan
-                srows.append(dict(block="cs_gate", regime=reg, family="CS", drift=drift, arm="cs64", **s))
+                srows.append(dict(block="cs_gate", regime=reg, family="Robbins-CS", drift=drift, arm="cs64", **s))
+        for drift, tag in [("full", "full_ebcs64"), ("mild", "mild_ebcs64"), ("zero", "rz_ebcs64")]:
+            s = summarize(f"paper2_v11_{reg}_{tag}")
+            if s:
+                lab = means_col(f"paper2_v11_{reg}_{tag}", "seq_labels_mean")
+                s["labels_per_decision"] = round(lab, 1) if lab == lab else np.nan
+                srows.append(dict(block="cs_gate", regime=reg, family="EB-CS", drift=drift, arm="ebcs64", **s))
+        # full-drift reference: fixed 32-probe gate and naive, to show EB-CS captures the benefit
+        for tag, arm in [("paper2_v2_" + reg + "_ks_lp32", "lp32_full"),
+                         ("paper2_v2_" + reg + "_ks_none", "naive_full")]:
+            s = summarize(tag)
+            if s:
+                srows.append(dict(block="cs_gate", regime=reg, family="reference", drift="full", arm=arm, **s))
+        # paired: EB-CS full vs fixed lp32 full (does the anytime-valid gate keep the benefit?)
+        c = paired(f"paper2_v11_{reg}_full_ebcs64", f"paper2_v2_{reg}_ks_lp32")
+        if c:
+            crows.append(dict(block="cs_gate", regime=reg, family="EB-CS", drift="full",
+                              contrast="ebcs_vs_lp32", diff=c[0], lo=c[1], hi=c[2], n=c[3]))
+        # paired: EB-CS full vs naive full (captures benefit over never-adapting is the summary gain;
+        # this contrast shows how much of naive's benefit EB-CS retains)
+        c = paired(f"paper2_v11_{reg}_full_ebcs64", f"paper2_v2_{reg}_ks_none")
+        if c:
+            crows.append(dict(block="cs_gate", regime=reg, family="EB-CS", drift="full",
+                              contrast="ebcs_vs_naive", diff=c[0], lo=c[1], hi=c[2], n=c[3]))
 
     # Item 7: CICIDS Tuesday chronological (healthy-incumbent attempt).
     sn = summarize("paper2_v11_tue_chrono_none", CHRONO_SEEDS)

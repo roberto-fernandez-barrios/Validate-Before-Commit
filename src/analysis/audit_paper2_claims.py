@@ -631,7 +631,17 @@ def main():
     check("9 tail ToN naive CVaR@10 -4.74", -4.742, tail("ton_scanning", "cvar10", "naive_gap"), 0.03)
     check("9 tail ToN gate worst-window +0.72 (protected)", 0.723, tail("ton_scanning", "worst", "gate_gap"), 0.03)
     # CS gate: conservative, never commits at small budget
-    check("9 CS gate ToN zero +0.00 (conservative)", 0.0, s9("cs_gate", "ton_scanning", "CS", "zero", "cs64"), 0.005)
+    check("9 CS gate ToN zero +0.00 (conservative)", 0.0, s9("cs_gate", "ton_scanning", "Robbins-CS", "zero", "cs64"), 0.005)
+    # amendment 010: empirical-Bernstein CS captures large benefit, stays safe elsewhere
+    check("10 EB-CS PortScan full +5.17 (captures benefit)", 5.172,
+          s9("cs_gate", "portscan", "EB-CS", "full", "ebcs64"), 0.05)
+    check("10 EB-CS UNSW full +0.00 (1-pt benefit unresolved)", 0.0,
+          s9("cs_gate", "unsw_recon", "EB-CS", "full", "ebcs64"), 0.005)
+    check("10 EB-CS ToN full +0.00 (safe, avoids harm)", 0.0,
+          s9("cs_gate", "ton_scanning", "EB-CS", "full", "ebcs64"), 0.005)
+    check("10 EB-CS ToN zero +0.00 (safe)", 0.0, s9("cs_gate", "ton_scanning", "EB-CS", "zero", "ebcs64"), 0.005)
+    check("10 EB-CS ToN full vs naive +1.38 (avoids harm)", 1.376,
+          val(c9, "diff", block="cs_gate", regime="ton_scanning", family="EB-CS", contrast="ebcs_vs_naive"), 0.05)
     # Tuesday chronological: incumbent collapses (deep benefit, not healthy)
     check("9 Tuesday chrono no-adapt BA 49.5 (collapse)", 49.51,
           val(a9, "noadapt_ba", block="chrono", arm="naive"), 0.2)

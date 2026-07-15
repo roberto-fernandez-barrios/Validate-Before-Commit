@@ -149,6 +149,40 @@ def cs_lower_bound(d, alpha, rho2):
     margin = _np.sqrt((2.0 * s2 * (n * rho2 + 1.0)) / (n * n * rho2)
                       * _np.log(_np.sqrt(n * rho2 + 1.0) / alpha))
     return mean - margin
+
+
+def cs_lower_bound_eb(d, alpha):
+    """Predictable-plug-in empirical-Bernstein LOWER confidence sequence for the mean of
+    d in [-1,1] (Waudby-Smith & Ramdas 2023, "Estimating means of bounded random variables
+    by betting"; Howard et al. 2021).
+
+    amendment 010. Maps d to x=(d+1)/2 in [0,1] and returns a lower bound on E[d] that holds
+    uniformly over all n: P(exists n : E[d] < LCB_n) <= alpha. Unlike the sub-Gaussian Robbins
+    mixture (which must budget for the worst-case variance 1), this uses the EMPIRICAL variance
+    of the correctness differences -- which are mostly ties (d=0), hence low-variance -- so the
+    interval is far tighter and the gate can actually commit when a candidate is genuinely
+    better, while still bounding the harmful-commit probability by alpha. Predictable betting
+    fractions lambda_i and a 1/2, 1/4 prior on the running mean/variance keep it anytime-valid."""
+    import numpy as _np
+    x = (_np.asarray(d, float) + 1.0) / 2.0        # map [-1,1] -> [0,1]
+    t = len(x)
+    if t == 0:
+        return -_np.inf
+    loginv = _np.log(1.0 / alpha)
+    num = den = s_x = s_v = 0.0
+    for i in range(1, t + 1):
+        muhat = (0.5 + s_x) / i                    # predictable mean (data before i)
+        sighat = (0.25 + s_v) / i                  # predictable variance
+        lam = min(0.75, _np.sqrt(2.0 * loginv / max(sighat * i * _np.log(i + 1), 1e-12)))
+        xi = float(x[i - 1])
+        v = (xi - muhat) ** 2
+        psi = -_np.log(1.0 - lam) - lam            # psi_E(lambda)
+        num += lam * xi - psi * v
+        den += lam
+        s_x += xi
+        s_v += v
+    lcb_x = (num - loginv) / den if den > 0 else -_np.inf
+    return 2.0 * lcb_x - 1.0                        # convert E[x] bound to E[d] bound
 HEALTH_REF_PER_CLASS = 32     # two_stage: severity-0 health reference size per class (64 labels)
 
 
@@ -519,7 +553,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
                 elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
                               "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav",
-                              "labeled_probe_cs"):
+                              "labeled_probe_cs", "labeled_probe_ebcs"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
@@ -588,6 +622,25 @@ def run_arm(method: str, env: Environment, args, seed: int):
                             n_look = min(n_look + args.seq_block, len(d))
                             if cs_lower_bound(d[:n_look], args.seqav_alpha,
                                               rho2=1.0 / max(1, args.probe_size)) > 0.0:
+                                commit = True; break
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
+                        probe_labels_seq.append(n_look)
+                    elif gate == "labeled_probe_ebcs":
+                        # amendment 010: the same anytime-valid guarantee, but a TIGHTER
+                        # predictable-plug-in empirical-Bernstein confidence sequence (Waudby-Smith
+                        # & Ramdas 2023) that uses the empirical variance of the correctness
+                        # differences. Because those differences are mostly ties, the interval is
+                        # far tighter than the sub-Gaussian Robbins CS, so the gate keeps the same
+                        # alpha-uniform harmful-commit bound yet can actually commit when the
+                        # candidate is genuinely better. Sequential looks; risk-averse default.
+                        d = ((candidate.predict(Xp) == yp).astype(float)
+                             - (model.predict(Xp) == yp).astype(float))
+                        commit = False
+                        n_look = 0
+                        while n_look < len(d):
+                            n_look = min(n_look + args.seq_block, len(d))
+                            if cs_lower_bound_eb(d[:n_look], args.seqav_alpha) > 0.0:
                                 commit = True; break
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
@@ -733,7 +786,8 @@ def main():
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
                             "labeled_probe_mcnemar", "labeled_probe_seq", "labeled_probe_seqav",
-                            "labeled_probe_cs", "unsup_disagree", "atc", "doc", "two_stage"])
+                            "labeled_probe_cs", "labeled_probe_ebcs", "unsup_disagree",
+                            "atc", "doc", "two_stage"])
     p.add_argument("--seqav-alpha", type=float, default=0.10,
                    help="labeled_probe_seqav: family-wise alpha, split across looks (Bonferroni).")
     p.add_argument("--recal-source", type=str, default="pools", choices=["pools", "observed"],
