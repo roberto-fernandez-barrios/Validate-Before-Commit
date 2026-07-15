@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{The zero-drift replacement harm generalizes across downstream models and update generators (amendment 009).} Mean gain of naive always-deploy vs.\ never-adapting, and of the risk-controlled (exact-McNemar) gate, under \emph{zero drift} (drift-independent random triggers, no distribution change), balanced-accuracy points, 30 seeds. Naive is net-harmful in every downstream model and in every update generator except the calibrated ensemble on PortScan (which happens to help, $+0.84$; the risk-averse gate forgoes that gain). The McNemar gate recovers essentially all of the loss ($+0.00$) by committing only on statistically resolved superiority. The cumulative candidate (trained on \emph{all} observed windows) is the most harmful generator, so the harm is not a small-sample effect that more data removes.}
+\label{tab:amendment009}
+\small
+\begin{tabular}{l cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{PortScan} & \multicolumn{2}{c}{UNSW-Recon} & \multicolumn{2}{c}{ToN-IoT} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Downstream model / generator & naive & gate & naive & gate & naive & gate \\
+\midrule
+\multicolumn{7}{l}{\emph{Downstream models (full replacement)}} \\
+Random forest & $-$0.33 & +0.00 & $-$1.06 & +0.00 & $-$0.41 & +0.00 \\
+Logistic regression & $-$0.29 & +0.00 & $-$0.08 & +0.00 & $-$0.18 & +0.00 \\
+MLP & $-$0.81 & +0.00 & $-$1.15 & +0.00 & $-$2.15 & +0.00 \\
+SVC-RBF, full features (no PCA) & $-$0.90 & +0.00 & $-$1.16 & +0.00 & $-$4.76 & +0.00 \\
+\addlinespace
+\multicolumn{7}{l}{\emph{Update generators (SVC-RBF)}} \\
+Calibrated ensemble & +0.84 & +0.00 & $-$0.53 & +0.00 & $-$0.23 & +0.00 \\
+Sliding window & $-$3.99 & +0.00 & $-$0.92 & +0.00 & $-$7.21 & +0.00 \\
+Cumulative (all observed data) & $-$7.04 & +0.00 & $-$0.07 & +0.00 & $-$9.46 & +0.00 \\
+Replay 50/50 & $-$2.93 & +0.00 & $-$0.74 & +0.00 & $-$4.03 & +0.00 \\
+\bottomrule
+\end{tabular}
+
+\end{table*}

@@ -127,6 +127,28 @@ class EnsembleModelCal(EnsembleModel):
 FUTURE_K = 5  # primary lookahead horizon for per-trigger delta-BA logging
 FUTURE_HORIZONS = (1, 3, 5, 10)  # amendment 005: horizon-robust logging (logging ONLY)
 LCB_ALPHA_Z = 1.2816  # one-sided 90% normal quantile
+
+
+def cs_lower_bound(d, alpha, rho2):
+    """Robbins normal-mixture LOWER confidence sequence for the mean of d in [-1,1].
+
+    amendment 009. d is 1-sub-Gaussian on [-1,1] (sigma^2 <= 1). The mixture boundary
+    (Howard, Ramdas, McAuliffe & Sekhon 2021, "Time-uniform Chernoff bounds") gives a
+    lower bound that holds simultaneously for all sample sizes n:
+        P( exists n : true_mean < LCB_n ) <= alpha.
+    So a gate that commits only when LCB_n > 0 has harmful-commit probability
+    P(commit | true_mean <= 0) <= alpha, uniformly over the inspection schedule -- a valid
+    confidence sequence, not a repeatedly-inspected fixed-sample interval. rho2 tunes the
+    mixture; set from the target probe size (predictable, fixed before seeing data)."""
+    import numpy as _np
+    n = len(d)
+    if n == 0:
+        return -_np.inf
+    mean = float(_np.mean(d))
+    s2 = 1.0  # sub-Gaussian variance proxy for the range [-1, 1]
+    margin = _np.sqrt((2.0 * s2 * (n * rho2 + 1.0)) / (n * n * rho2)
+                      * _np.log(_np.sqrt(n * rho2 + 1.0) / alpha))
+    return mean - margin
 HEALTH_REF_PER_CLASS = 32     # two_stage: severity-0 health reference size per class (64 labels)
 
 
@@ -420,6 +442,24 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
                     hist = seen[-8:]
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
+                elif args.adapt_strategy == "cumulative":
+                    # amendment 009: candidate trains on ALL observed (labeled) windows so far,
+                    # not only the last 8 -- the "use every available data point" generator the
+                    # reviewer asked for. A growing training set should reduce estimation noise.
+                    hist = seen if len(seen) else [seen[-1]]
+                    Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
+                elif args.adapt_strategy == "replay":
+                    # amendment 009: retrain on a current-severity sample plus an equal-size
+                    # replay from the reference (severity-0) regime, 50/50 (mirrors Phase 2i's
+                    # replay, but inside the v2 causal-capable harness).
+                    n_half = max(1, args.adapt_size_per_class // 2)
+                    Xc_raw, yc = sample_balanced_from_distribution(
+                        env.train_pools, n_per_class=n_half, severity=sev, rng=cand_rng)
+                    Xr_raw, yr = sample_balanced_from_distribution(
+                        env.train_pools, n_per_class=n_half, severity=0.0, rng=cand_rng)
+                    Xa = np.vstack([transform_X(Xc_raw, env.scaler, env.pca),
+                                    transform_X(Xr_raw, env.scaler, env.pca)])
+                    ya = np.concatenate([yc, yr])
                 else:
                     Xa_raw, ya = sample_balanced_from_distribution(
                         env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
@@ -478,7 +518,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         n_probes += 1
                         probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
                 elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
-                              "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav"):
+                              "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav",
+                              "labeled_probe_cs"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
@@ -531,6 +572,26 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         p_inc = float((model.predict(Xp[:seen_n]) == yp[:seen_n]).mean())
                         p_cand = float((candidate.predict(Xp[:seen_n]) == yp[:seen_n]).mean())
                         probe_labels_seq.append(seen_n)
+                    elif gate == "labeled_probe_cs":
+                        # amendment 009: a genuine anytime-valid CONFIDENCE SEQUENCE (Robbins
+                        # normal-mixture, Howard et al. 2021) on the per-flow correctness
+                        # difference d in [-1,1]. The lower CS holds UNIFORMLY over all n, so
+                        # committing only when it exceeds 0 bounds the harmful-commit probability
+                        # P(commit | mean d <= 0) <= seqav-alpha at EVERY inspection point -- the
+                        # explicit risk control the reviewer asked for, unlike repeated
+                        # fixed-sample intervals (optional stopping). Risk-averse default: no commit.
+                        d = ((candidate.predict(Xp) == yp).astype(float)
+                             - (model.predict(Xp) == yp).astype(float))
+                        commit = False
+                        n_look = 0
+                        while n_look < len(d):
+                            n_look = min(n_look + args.seq_block, len(d))
+                            if cs_lower_bound(d[:n_look], args.seqav_alpha,
+                                              rho2=1.0 / max(1, args.probe_size)) > 0.0:
+                                commit = True; break
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
+                        probe_labels_seq.append(n_look)
                     else:
                         # balanced-accuracy comparison where both classes are present; plain
                         # accuracy otherwise (observed / binomial-prevalence probes may be
@@ -672,7 +733,7 @@ def main():
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
                             "labeled_probe_mcnemar", "labeled_probe_seq", "labeled_probe_seqav",
-                            "unsup_disagree", "atc", "doc", "two_stage"])
+                            "labeled_probe_cs", "unsup_disagree", "atc", "doc", "two_stage"])
     p.add_argument("--seqav-alpha", type=float, default=0.10,
                    help="labeled_probe_seqav: family-wise alpha, split across looks (Bonferroni).")
     p.add_argument("--recal-source", type=str, default="pools", choices=["pools", "observed"],
@@ -717,10 +778,13 @@ def main():
     p.add_argument("--policy-n", type=int, default=None)
     p.add_argument("--policy-name", type=str, default=None)
     p.add_argument("--adapt-strategy", type=str, default="full_replace",
-                   choices=["full_replace", "ensemble", "ensemble_cal", "sliding_window"],
+                   choices=["full_replace", "ensemble", "ensemble_cal", "sliding_window",
+                            "cumulative", "replay"],
                    help="Update rule on commit: replace the incumbent, soft incumbent+candidate "
                         "ensemble (ensemble_cal = Platt-calibrated members, probabilistic "
-                        "nesting), or retrain on the last 8 observed stream windows.")
+                        "nesting), retrain on the last 8 observed stream windows, cumulative "
+                        "(retrain on ALL observed windows), or replay (current-severity sample "
+                        "+ equal-size severity-0 reference replay, 50/50).")
     p.add_argument("--trigger-mode", type=str, default="detector",
                    choices=["detector", "performance", "ddm", "adwin", "ddm_river", "adwin_river",
                             "random"],

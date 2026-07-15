@@ -595,6 +595,49 @@ def main():
     check("8 cand-future collisions ToN gate ~462 (audited)", 462.10,
           val(a8, "cand_future_collisions", regime="ton_scanning", arm="c8_gate"), 1.0)
 
+    # --- Amendment 009: model/generator generalization, tail, CS gate, Tuesday chrono ---
+    a9 = pd.read_csv(f"{T}/paper2_amendment_009/summary.csv")
+    c9 = pd.read_csv(f"{T}/paper2_amendment_009/contrasts.csv")
+    t9 = pd.read_csv(f"{T}/paper2_amendment_009/tail.csv")
+
+    def s9(block, reg, family, drift, arm):
+        return val(a9, "gain", block=block, regime=reg, family=family, drift=drift, arm=arm)
+
+    # zero-drift naive net-harm across 4 downstream models (+ no-PCA), McNemar recovers all
+    check("9 zero RF naive PortScan -0.33", -0.327, s9("models", "portscan", "RF", "zero", "naive"), 0.02)
+    check("9 zero RF naive UNSW -1.06", -1.060, s9("models", "unsw_recon", "RF", "zero", "naive"), 0.02)
+    check("9 zero MLP naive ToN -2.15", -2.155, s9("models", "ton_scanning", "MLP", "zero", "naive"), 0.03)
+    check("9 zero SVC-fulldim naive ToN -4.76", -4.760, s9("models", "ton_scanning", "SVC-fulldim", "zero", "naive"), 0.03)
+    check("9 zero RF mcnemar ToN +0.00", 0.0, s9("models", "ton_scanning", "RF", "zero", "mcnemar"), 0.005)
+    check("9 zero MLP mcnemar ToN +0.00", 0.0, s9("models", "ton_scanning", "MLP", "zero", "mcnemar"), 0.005)
+    check("9 zero RF mcnemar-vs-naive UNSW +1.06", 1.060,
+          val(c9, "diff", block="models", regime="unsw_recon", family="RF", drift="zero", contrast="mcnemar_vs_naive"), 0.02)
+    # zero-drift update generators: cumulative worst, McNemar recovers all
+    check("9 zero cumulative naive ToN -9.46 (worst generator)", -9.455,
+          s9("generators", "ton_scanning", "cumulative", "zero", "naive"), 0.05)
+    check("9 zero cumulative naive PortScan -7.04", -7.036, s9("generators", "portscan", "cumulative", "zero", "naive"), 0.05)
+    check("9 zero sliding naive ToN -7.21", -7.212, s9("generators", "ton_scanning", "sliding", "zero", "naive"), 0.05)
+    check("9 zero replay naive ToN -4.03", -4.033, s9("generators", "ton_scanning", "replay", "zero", "naive"), 0.05)
+    check("9 zero ensemble-cal naive PortScan +0.84 (helps)", 0.841,
+          s9("generators", "portscan", "ensemble-cal", "zero", "naive"), 0.02)
+    check("9 zero cumulative mcnemar ToN +0.00", 0.0, s9("generators", "ton_scanning", "cumulative", "zero", "mcnemar"), 0.005)
+    # cumulative/replay mild: naive harm, gate neutralizes
+    check("9 mild cumulative naive ToN -2.57", -2.571, s9("generators", "ton_scanning", "cumulative", "mild", "naive"), 0.03)
+    check("9 mild cumulative gate ToN -0.14 (neutralized)", -0.136, s9("generators", "ton_scanning", "cumulative", "mild", "lp32"), 0.02)
+    # tail metrics: harm concentrates in the tail, gate protects it
+    def tail(reg, level, col):
+        return val(t9, col, regime=reg, level=level)
+    check("9 tail ToN naive worst-window -5.24", -5.237, tail("ton_scanning", "worst", "naive_gap"), 0.03)
+    check("9 tail ToN naive CVaR@10 -4.74", -4.742, tail("ton_scanning", "cvar10", "naive_gap"), 0.03)
+    check("9 tail ToN gate worst-window +0.72 (protected)", 0.723, tail("ton_scanning", "worst", "gate_gap"), 0.03)
+    # CS gate: conservative, never commits at small budget
+    check("9 CS gate ToN zero +0.00 (conservative)", 0.0, s9("cs_gate", "ton_scanning", "CS", "zero", "cs64"), 0.005)
+    # Tuesday chronological: incumbent collapses (deep benefit, not healthy)
+    check("9 Tuesday chrono no-adapt BA 49.5 (collapse)", 49.51,
+          val(a9, "noadapt_ba", block="chrono", arm="naive"), 0.2)
+    check("9 Tuesday chrono gate premium -5.66", -5.662,
+          val(c9, "diff", block="chrono", contrast="gate_premium(lp32-naive)"), 0.05)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

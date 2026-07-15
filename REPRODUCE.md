@@ -67,6 +67,14 @@ zero-attack probes allowed) and `--health-ref-mode per_incumbent`. The full arm
 lists, with seeds and output-dir naming, are enumerated in
 `notes/paper2_harness_v2_registered_replication_protocol_001.md` and amendments
 `notes/paper2_harness_v2_amendment_00{2,3,4}.md` (004 also carries the seed ledger).
+Amendment 009 (`notes/paper2_harness_v2_amendment_009.md`) adds `--downstream-model {random_forest,logreg,mlp}`
+and `--dim 100` (no PCA) under `--max-severity {0.25,0}`, the update generators
+`--adapt-strategy {cumulative,replay}` (cumulative = all observed windows; replay = current + severity-0
+reference, 50/50), and the anytime-valid confidence-sequence gate `--adaptation-gate labeled_probe_cs`
+(Robbins normal-mixture, `--seqav-alpha` the harmful-commit bound); its `paper2_v11_*` arm/seed ledger is in
+that note. The CICIDS Tuesday chronological stream is staged by
+`python -m src.analysis.prepare_paper2_cicids_tuesday_chronological` (train = first 30% of the timeline)
+and run with `run_paper2_temporal_stream` on seeds 401--430.
 
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
@@ -99,6 +107,11 @@ python -m src.analysis.aggregate_paper2_amendment_004       # v2 robustness suit
 python -m src.analysis.aggregate_paper2_amendment_005       # split two-stage, monitor budgets, stratified/UNSW temporal
 python -m src.analysis.aggregate_paper2_amendment_006       # causal observed-data gate, binomial-prevalence probes,
                                                            #   McNemar gate, mild-drift prediction test, harm breadth
+python -m src.analysis.aggregate_paper2_amendment_009_tail  # amendment 009: tail/worst-case/CVaR metrics (item 8)
+python -m src.analysis.aggregate_paper2_amendment_009       # amendment 009: 4-classifier + no-PCA mild/zero drift,
+                                                           #   zero-drift generator sweep (ensemble/sliding/cumulative/replay),
+                                                           #   confidence-sequence gate, Tuesday chronological
+python -m src.analysis.make_paper2_amendment009_table       # Table (tab:amendment009) -> tables/ and tables_ieee/
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
