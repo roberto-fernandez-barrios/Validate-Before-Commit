@@ -74,11 +74,24 @@ def harmful_commit(dirname, horizon="delta_future5"):
         per.append((len(com), len(harm)))
     per = np.array(per, float)
     n_streams = len(per)
+    n_commits = int(per[:, 0].sum()); n_harm = int(per[:, 1].sum())
+    # Clopper-Pearson (exact binomial) CI on the per-commit harmful fraction; when there are no
+    # commits, fall back to the per-stream harmful-commit CI so "0 observed" gets an honest bound.
+    from scipy.stats import binomtest
+    if n_commits > 0:
+        ci = binomtest(n_harm, n_commits).proportion_ci(0.95, method="exact")
+        num, den, lbl = n_harm, n_commits, "per-commit"
+    else:
+        s_harm = int((per[:, 1] > 0).sum())
+        ci = binomtest(s_harm, n_streams).proportion_ci(0.95, method="exact")
+        num, den, lbl = s_harm, n_streams, "per-stream"
     return dict(streams=n_streams,
                 commits_per_stream=round(per[:, 0].mean(), 3),
                 harmful_per_stream=round(per[:, 1].mean(), 3),
-                frac_streams_with_harm=round(float((per[:, 1] > 0).mean()), 3),
-                harmful_frac_of_commits=round(float(per[:, 1].sum() / max(per[:, 0].sum(), 1)), 3))
+                n_commits_total=n_commits, n_harmful_total=n_harm,
+                harmful_frac_of_commits=round(float(n_harm / max(n_commits, 1)), 3),
+                ci_basis=lbl, ci_num=num, ci_den=den,
+                ci_lo=round(float(ci.low), 4), ci_hi=round(float(ci.high), 4))
 
 
 def main():

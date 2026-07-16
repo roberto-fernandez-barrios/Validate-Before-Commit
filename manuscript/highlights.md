@@ -3,8 +3,8 @@
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
-- Drift alarms do not reveal whether an update helps; incumbent headroom does        [77]
-- Deploying every drift-triggered update can be net-harmful; never adapting can win  [82]
+- Under fixed generators, incumbent health predicts update value better than drift  [82]
+- Under mild drift, always-deploy turns negative in all three, resolved in two       [76]
 - Deploy a retrained candidate only when a small labeled probe confirms improvement  [83]
 - Registered replication on a hardened harness confirms every pre-specified criterion [85]
 - Boundary mapped honestly: a measurable premium on deep-benefit chronological streams [85]

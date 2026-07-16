@@ -688,6 +688,41 @@ def main():
     check("11 coverage eb iid <= alpha (0.0018)", 0.0018, covv("eb", "iid_mean0"), 0.01)
     check("11 coverage eb autocorr exceeds alpha (0.18)", 0.1789, covv("eb", "autocorr_mean0"), 0.03)
 
+    # --- Amendment 012: bug fixes + confounds (Sol 4th round) ---
+    a12 = pd.read_csv(f"{T}/paper2_amendment_012/summary.csv")
+    hc = pd.read_csv(f"{T}/paper2_amendment_011/harmful_commit.csv")
+
+    def a12v(block, reg, arm, col="gain"):
+        return val(a12, col, block=block, regime=reg, arm=arm)
+
+    # BUG1 fix: corrected cn (C~1/n) still net-harmful, deeper than C=1
+    check("12 cn corrected ToN -10.62 (harm persists under 1/n reg)", -10.623,
+          a12v("cn_fix", "ton_scanning", "cn_corrected_1overN"), 0.05)
+    check("12 cn corrected PortScan -9.82", -9.820, a12v("cn_fix", "portscan", "cn_corrected_1overN"), 0.05)
+    # BUG2 fix: McNemar at alpha=0.10 still 0 commits under zero drift
+    check("12 McNemar a0.10 ToN 0 commits", 0.0, a12v("mcnemar_a10", "ton_scanning", "mcnemar_a0.10", "commits"), 0.001)
+    check("12 McNemar a0.10 ToN gain 0.00", 0.0, a12v("mcnemar_a10", "ton_scanning", "mcnemar_a0.10"), 0.005)
+    # BUG3 fix: causal reject-policy -> 0 unvalidated commits; result survives
+    check("12 causal reject ToN full commit_no_probe 0", 0.0,
+          val(a12, "commit_no_probe", block="causal_reject", regime="ton_scanning", drift="full"), 0.001)
+    check("12 causal reject ToN full gate-vs-naive +3.24", 3.236,
+          val(a12, "gate_vs_naive", block="causal_reject", regime="ton_scanning", drift="full"), 0.03)
+    # CONFOUND4: size-matched removes zero-drift harm for robust models, persists for SVC
+    check("12 sizematch RF ToN ~0 (harm removed)", -0.004,
+          a12v("sizematch_models", "ton_scanning", "random_forest_sz2000"), 0.03)
+    check("12 sizematch MLP UNSW ~0 (harm removed)", -0.007,
+          a12v("sizematch_models", "unsw_recon", "mlp_sz2000"), 0.03)
+    check("12 sizematch RF UNSW 512 was -1.06", -1.060,
+          a12v("sizematch_models", "unsw_recon", "random_forest_sz2000", "gain_512"), 0.02)
+    # #6 strict-> baseline recovers most of eps0 harm
+    check("12 strict-> ToN -0.065 (vs eps0 -0.25)", -0.065, a12v("strict_baseline", "ton_scanning", "strict_gt"), 0.03)
+    check("12 strict-> PortScan -0.13 (vs eps0 -1.11)", -0.128, a12v("strict_baseline", "portscan", "strict_gt"), 0.03)
+    # #8 harmful-commit Clopper-Pearson: eps0 CI excludes 0, McNemar upper bound
+    check("12 eps0 UNSW harmful CI lo > 0 (0.206)", 0.2058,
+          val(hc, "ci_lo", regime="unsw_recon", gate="lp32_eps0"), 0.01)
+    check("12 McNemar ToN harmful CI upper 0.116 (0 observed)", 0.1157,
+          val(hc, "ci_hi", regime="ton_scanning", gate="mcnemar_zero"), 0.01)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

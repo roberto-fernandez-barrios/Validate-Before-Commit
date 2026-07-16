@@ -42,17 +42,18 @@ def main():
     L = []
     L.append(r"\begin{table*}[t]")
     L.append(r"\centering")
-    L.append(r"\caption{\textbf{The zero-drift replacement harm generalizes across downstream "
-             r"models and update generators (amendment 009).} Mean gain of naive always-deploy "
-             r"vs.\ never-adapting, and of the risk-controlled (exact-McNemar) gate, under "
-             r"\emph{zero drift} (drift-independent random triggers, no distribution change), "
-             r"balanced-accuracy points, 30 seeds. Naive is net-harmful in every downstream model "
-             r"and in every update generator except the calibrated ensemble on PortScan (which "
-             r"happens to help, $+0.84$; the risk-averse gate forgoes that gain). The McNemar gate "
-             r"recovers essentially all of the loss ($+0.00$) by committing only on statistically "
-             r"resolved superiority. The cumulative candidate (trained on \emph{all} observed "
-             r"windows) is the most harmful generator, so the harm is not a small-sample effect "
-             r"that more data removes.}")
+    L.append(r"\caption{\textbf{The zero-drift replacement harm across downstream models "
+             r"(default budget) and update generators (amendment 009).} Mean gain of naive "
+             r"always-deploy vs.\ never-adapting, and of the risk-controlled (exact-McNemar) gate, "
+             r"under \emph{zero drift} (drift-independent random triggers, no distribution change), "
+             r"balanced-accuracy points, 30 seeds. At the default candidate budget (512 vs.\ 2{,}000 "
+             r"flows/class) naive is net-harmful in every downstream model and in every generator "
+             r"except the calibrated ensemble on PortScan ($+0.84$). \textbf{Size matters differently "
+             r"by learner:} a size-matched control (amendment 012, \S\ref{sec:v2}) \emph{removes} the "
+             r"harm for random forest, logistic regression and MLP (all within $\pm0.1$ of zero) but "
+             r"\emph{deepens} it for SVC-RBF, so the size-robust replacement harm is specific to the "
+             r"fragile SVC-RBF learner; the generator sweep is for SVC-RBF. The McNemar gate recovers "
+             r"essentially all of the loss ($+0.00$) where it is present.}")
     L.append(r"\label{tab:amendment009}")
     L.append(r"__RESIZE_OPEN__")
     L.append(r"\begin{tabular}{l cc cc cc}")

@@ -340,6 +340,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
     probe_labels_seq: list[int] = []                       # amendment 007 (sequential gate)
     cand_future_collisions = 0                             # amendment 008 (train/future-eval audit)
     cand_rows_total = cand_unique_total = 0                # amendment 011 (unique-row accounting)
+    n_no_probe = n_commit_no_probe = 0                     # amendment 012 (no-probe accounting)
     # amendment 008: exact feature identity of every future evaluation window's rows, so we can
     # both AUDIT candidate-training overlap with the future and (optionally) drop it
     future_row_sets = [ {r.tobytes() for r in np.ascontiguousarray(Xf)} for Xf, _, _ in env.stream ]
@@ -528,7 +529,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     #   observed             = all observed windows (a009 default);
                     #   initial_plus_observed= incumbent's initial training set + all observed;
                     #   dedup                = row-identity dedup before fit;
-                    #   cn                   = C scaled ~ n_unique/512 so effective regularization
+                    #   cn                   = C scaled ~ 1/n_unique (matches incumbent C*N; amend 012)
                     #                          is not silently changed as the set grows (SVC only).
                     hist = seen if len(seen) else [seen[-1]]
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
@@ -539,7 +540,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         _, uq = np.unique(Xa, axis=0, return_index=True)
                         uq = np.sort(uq); Xa, ya = Xa[uq], ya[uq]
                     if args.cumulative_mode == "cn":
-                        svc_C = max(1e-3, len(np.unique(Xa, axis=0)) / float(args.train_size_per_class))
+                        # amendment 012 (fix): C must DECREASE with n to keep the margin/empirical-
+                        # loss balance matched to the incumbent (sklearn C-SVC minimizes
+                        # 1/2||w||^2 + C*sum_i xi_i, so a growing n with fixed C weakens
+                        # regularization). Match the incumbent's C*N product (C_0=1, N_0=2*train):
+                        # C_n = 2*train_size_per_class / n_unique  (proportional to 1/n).
+                        n_uni = max(1, len(np.unique(Xa, axis=0)))
+                        svc_C = max(1e-3, (2.0 * args.train_size_per_class) / n_uni)
                 elif args.adapt_strategy == "replay":
                     # amendment 009: retrain on a current-severity sample plus an equal-size
                     # replay from the reference (severity-0) regime, 50/50 (mirrors Phase 2i's
@@ -619,7 +626,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
-                            commit = True      # no evidence: behave as the naive loop
+                            # amendment 012 (fix): a risk gate must not treat "no evidence" as
+                            # "deploy". --no-probe-policy reject keeps the incumbent (the correct
+                            # default for validate-before-commit); commit reproduces the old
+                            # naive-loop behaviour. Either way we count these decisions.
+                            n_no_probe += 1
+                            commit = (args.no_probe_policy == "commit")
+                            n_commit_no_probe += int(commit)
                             probe = (np.empty((0, Xa.shape[1])), np.empty(0, int))
                         else:
                             labels_used += len(probe[1]); labels_probe += len(probe[1])
@@ -818,6 +831,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    probe_row_collisions=probe_row_collisions,
                    cand_future_collisions=cand_future_collisions,
                    cand_rows_total=cand_rows_total, cand_unique_total=cand_unique_total,
+                   n_no_probe=n_no_probe, n_commit_no_probe=n_commit_no_probe,
                    seq_labels_mean=float(np.mean(probe_labels_seq)) if probe_labels_seq else np.nan,
                    adaptation_gate=gate, harness="v2",
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
@@ -916,11 +930,15 @@ def main():
                    help="amendment 011: draw stream windows WITHOUT replacement within the window "
                         "pool, so no row recurs across windows (removes candidate-train/future-eval "
                         "overlap for the causal arm). Balanced streams only.")
+    p.add_argument("--no-probe-policy", type=str, default="commit", choices=["commit", "reject"],
+                   help="amendment 012: behaviour when the observed probe is unavailable at an early "
+                        "trigger (t<9). commit = old naive-loop behaviour; reject = keep incumbent "
+                        "(the correct validate-before-commit default).")
     p.add_argument("--cumulative-mode", type=str, default="observed",
                    choices=["observed", "initial_plus_observed", "dedup", "cn"],
                    help="amendment 011 cumulative controls: observed = all observed windows (a009 "
                         "default); initial_plus_observed = incumbent training set + all observed; "
-                        "dedup = row-identity dedup before fit; cn = C scaled ~1/n_unique.")
+                        "dedup = row-identity dedup before fit; cn = C = 2*train_size/n_unique (~1/n).")
     args = p.parse_args()
 
     seeds = [int(s) for s in str(args.seeds).split(",") if s.strip()]

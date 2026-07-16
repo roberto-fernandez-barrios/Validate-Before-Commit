@@ -79,6 +79,11 @@ Amendment 011 (`notes/paper2_harness_v2_amendment_011.md`) adds `--stream-disjoi
 (without-replacement, value-deduplicated stream: removes candidate-train/future-eval overlap in the
 causal arm) and `--cumulative-mode {initial_plus_observed,dedup,cn}` (cumulative-generator controls);
 its `paper2_v12_*` arms plus the standalone CS coverage simulation are enumerated in that note.
+Amendment 012 (`notes/paper2_harness_v2_amendment_012.md`) fixes three code bugs and adds
+`--no-probe-policy {commit,reject}` (early-trigger behaviour when the observed probe is unavailable),
+corrects the `cn` regularization to `C = 2*train_size/n_unique` (C∝1/n), and its `paper2_v13_*` arms
+(corrected cn; McNemar α=0.10; causal reject-policy; size-matched RF/LogReg/MLP; strict-`>` baseline)
+are enumerated there.
 
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
@@ -119,6 +124,8 @@ python -m src.analysis.make_paper2_amendment009_table       # Table (tab:amendme
 python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: leakage-free causal, cumulative
                                                            #   controls, EB-CS budget sweep, per-stream harmful-commit
 python -m src.analysis.paper2_cs_coverage_011               # amendment 011: CS empirical coverage (iid/no-replace/autocorr)
+python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn fix, McNemar a=0.10, causal reject-policy,
+                                                           #   size-matched RF/LogReg/MLP zero-drift, strict-> baseline
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
