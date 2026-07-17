@@ -355,6 +355,20 @@ def run_arm(method: str, env: Environment, args, seed: int):
     detector, threshold = calibrate(detector, env, 0.0, args,
                                     np.random.default_rng(seed + 888))
     model = env.initial_model
+    # amendment 014: deployment-long risk budget. With --lifetime-alpha A and
+    # --lifetime-max-proposals M, every risk gate runs at A/M (Bonferroni over the stream's
+    # proposals), so the lifetime false-commit probability is bounded by A.
+    proposal_ctr = 0          # final-kbs: proposal index for lifetime alpha spending
+
+    def eff_alpha(j: int) -> float:
+        if getattr(args, "lifetime_alpha", 0.0) > 0:
+            if getattr(args, "alpha_spending", "bonferroni") == "pseries":
+                return args.lifetime_alpha * 6.0 / (np.pi ** 2 * max(1, j) ** 2)
+            return args.lifetime_alpha / max(1, args.lifetime_max_proposals)
+        return args.seqav_alpha
+
+    alpha_eff = eff_alpha(1)
+    pending = None            # amendment 014 / final-kbs: defer cross-window state
     alarms: list[bool] = []
     cooldown = 0
     n_adapt = n_trig = n_reject = labels_used = 0
@@ -463,6 +477,64 @@ def run_arm(method: str, env: Environment, args, seed: int):
         perf_thr = float(np.mean(errs) + 3.0 * (np.std(errs) if np.std(errs) > 0 else 0.02))
 
     for t, (Xw, yw, sev) in enumerate(env.stream):
+        # amendment 014 (ebcs_defer): continue a deferred decision with fresh labels.
+        if pending is not None:
+            pr = np.random.default_rng(seed * 911_003 + t)
+            Xq_raw, yq = sample_balanced_from_distribution(
+                env.probe_pools, n_per_class=max(1, args.seq_block // 2), severity=sev, rng=pr)
+            Xq = transform_X(Xq_raw, env.scaler, env.pca)
+            dq = ((pending["cand"].predict(Xq) == yq).astype(float)
+                  - (model.predict(Xq) == yq).astype(float))
+            pending["d"].extend(dq.tolist())
+            labels_used += len(yq); labels_probe += len(yq)
+            da = np.asarray(pending["d"])
+            if pending.get("kind") == "strat":
+                # final-kbs (vbc_sg): stratified continuation with the proposal's own alpha
+                pending["y"].extend(list(np.asarray(yq)))
+                ya_ = np.asarray(pending["y"]); a_p = pending["alpha"]
+                lbs, ubs = [], []
+                for cls in (0, 1):
+                    dc = da[ya_ == cls]
+                    if len(dc) < 2:
+                        lbs = None; break
+                    lbs.append(cs_lower_bound_eb(dc, a_p / 4.0))
+                    ubs.append(-cs_lower_bound_eb(-dc, a_p / 4.0))
+                if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
+                    n_adapt += 1; adapt_windows.append(t)
+                    model = pending["cand"]
+                    detector = build_detector(method, args, seed + t + 1)
+                    if args.recal_source == "observed":
+                        detector, _nt = calibrate_observed(detector, seen, args)
+                        if _nt is not None:
+                            threshold = _nt
+                    else:
+                        detector, threshold = calibrate(detector, env, sev, args,
+                                                        np.random.default_rng(seed * 1_000 + 999 + t))
+                    alarms = []; cooldown = args.cooldown_windows
+                    pending = None
+                elif (lbs is not None and 0.5 * (ubs[0] + ubs[1]) < 0.0) or pending["left"] <= 1:
+                    n_reject += 1
+                    pending = None
+                else:
+                    pending["left"] -= 1
+            elif cs_lower_bound_eb(da, alpha_eff / 2.0) > 0.0:
+                n_adapt += 1; adapt_windows.append(t)
+                model = pending["cand"]
+                detector = build_detector(method, args, seed + t + 1)
+                if args.recal_source == "observed":
+                    detector, _nt = calibrate_observed(detector, seen, args)
+                    if _nt is not None:
+                        threshold = _nt
+                else:
+                    detector, threshold = calibrate(detector, env, sev, args,
+                                                    np.random.default_rng(seed * 1_000 + 999 + t))
+                alarms = []; cooldown = args.cooldown_windows
+                pending = None
+            elif cs_lower_bound_eb(-da, alpha_eff / 2.0) > 0.0 or pending["left"] <= 1:
+                n_reject += 1
+                pending = None
+            else:
+                pending["left"] -= 1
         m = evaluate_model(model, Xw, yw)
         pred = model.predict(Xw)
         fp = int(((pred == 1) & (yw == 0)).sum()); tn = int(((pred == 0) & (yw == 0)).sum())
@@ -542,10 +614,16 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 p_inc = inc_hacc
             else:
                 cand_rng = np.random.default_rng(seed * 100_003 + t)
+                proposal_ctr += 1
+                alpha_eff = eff_alpha(proposal_ctr)   # final-kbs: per-proposal spending
                 svc_C = 1.0  # amendment 011: cumulative `cn` control may override below
                 if args.adapt_strategy == "sliding_window":
-                    # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows
-                    hist = seen[-8:]
+                    # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows;
+                    # amendment 014: --candidate-latency L delays ALL training labels by L windows
+                    cl = getattr(args, "candidate_latency", 0)
+                    hist = (seen[-(8 + cl):-cl] if cl > 0 else seen[-8:])
+                    if not hist:
+                        hist = seen[:1]
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
                 elif args.adapt_strategy == "cumulative":
                     # amendment 009: candidate trains on ALL observed (labeled) windows so far,
@@ -585,8 +663,10 @@ def run_arm(method: str, env: Environment, args, seed: int):
                                     transform_X(Xr_raw, env.scaler, env.pca)])
                     ya = np.concatenate([yc, yr])
                 else:
+                    cl = getattr(args, "candidate_latency", 0)
+                    sev_c = env.stream[max(0, t - cl)][2] if cl > 0 else sev
                     Xa_raw, ya = sample_balanced_from_distribution(
-                        env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev, rng=cand_rng)
+                        env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev_c, rng=cand_rng)
                     Xa = transform_X(Xa_raw, env.scaler, env.pca)
 
                 if gate == "labeled_probe_holdout":
@@ -647,7 +727,9 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
                 elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
                               "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav",
-                              "labeled_probe_cs", "labeled_probe_ebcs", "labeled_probe_strat"):
+                              "labeled_probe_cs", "labeled_probe_ebcs", "labeled_probe_strat",
+                              "labeled_probe_ebcs_strat", "labeled_probe_ebcs_defer",
+                              "labeled_probe_exact_strat", "vbc_sg"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
@@ -688,7 +770,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         # undecided at 64 -> reject (risk-averse default).
                         from scipy.stats import norm
                         K = max(1, args.probe_size // args.seq_block)
-                        z = float(norm.ppf(1 - args.seqav_alpha / K))
+                        z = float(norm.ppf(1 - alpha_eff / K))
                         commit = False
                         seen_n = 0
                         while seen_n < len(yp):
@@ -720,7 +802,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         n_look = 0
                         while n_look < len(d):
                             n_look = min(n_look + args.seq_block, len(d))
-                            if cs_lower_bound(d[:n_look], args.seqav_alpha,
+                            if cs_lower_bound(d[:n_look], alpha_eff,
                                               rho2=1.0 / max(1, args.probe_size)) > 0.0:
                                 commit = True; break
                         p_inc = float((model.predict(Xp) == yp).mean())
@@ -740,11 +822,105 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         n_look = 0
                         while n_look < len(d):
                             n_look = min(n_look + args.seq_block, len(d))
-                            if cs_lower_bound_eb(d[:n_look], args.seqav_alpha) > 0.0:
+                            if cs_lower_bound_eb(d[:n_look], alpha_eff) > 0.0:
                                 commit = True; break
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(n_look)
+                    elif gate == "labeled_probe_exact_strat":
+                        # final-kbs P0.2: FIXED exact stratified baseline. Per-class one-sided
+                        # exact McNemar at alpha/2 (Bonferroni over classes); commit iff BOTH
+                        # classes reject -- conservative (requires per-class strict superiority,
+                        # which implies dBA > 0), but exactly valid at fixed sample size.
+                        ci_ = (model.predict(Xp) == yp)
+                        cc_ = (candidate.predict(Xp) == yp)
+                        ok = True
+                        for cls in (0, 1):
+                            m_ = (yp == cls)
+                            b_ = int(np.sum(~cc_[m_] & ci_[m_]))
+                            c_ = int(np.sum(cc_[m_] & ~ci_[m_]))
+                            if b_ + c_ == 0 or binomtest(c_, b_ + c_, 0.5,
+                                                         alternative="greater").pvalue > alpha_eff / 2:
+                                ok = False; break
+                        commit = bool(ok)
+                        p_inc = float(ci_.mean()); p_cand = float(cc_.mean())
+                    elif gate == "vbc_sg":
+                        # final-kbs P1.1: VBC-SG (Validate-Before-Commit Sequential Gate).
+                        # STRATIFIED per-class empirical-Bernstein confidence sequences with
+                        # lifetime alpha spending and a three-action decision:
+                        #   COMMIT  iff 1/2(L_ben + L_att) > 0  (commit side, alpha_j/4 per class)
+                        #   REJECT  iff 1/2(U_ben + U_att) < 0  (futility side, alpha_j/4 per class)
+                        #   DEFER   otherwise: keep the candidate and continue the SAME sequences
+                        #           with fresh stratified labels at later windows (anytime validity
+                        #           permits continuation), up to --defer-windows, then reject.
+                        if args.adapt_strategy != "full_replace" or args.probe_source == "observed":
+                            raise ValueError("vbc_sg supports full_replace + pool probes")
+                        d = ((candidate.predict(Xp) == yp).astype(float)
+                             - (model.predict(Xp) == yp).astype(float))
+                        lbs, ubs = [], []
+                        for cls in (0, 1):
+                            dc = d[yp == cls]
+                            if len(dc) < 2:
+                                lbs = None; break
+                            lbs.append(cs_lower_bound_eb(dc, alpha_eff / 4.0))
+                            ubs.append(-cs_lower_bound_eb(-dc, alpha_eff / 4.0))
+                        commit = False
+                        if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
+                            commit = True
+                        elif lbs is not None and 0.5 * (ubs[0] + ubs[1]) < 0.0:
+                            commit = False                        # resolved futility
+                        else:
+                            pending = dict(kind="strat", cand=candidate,
+                                           d=list(d), y=list(np.asarray(yp)),
+                                           alpha=alpha_eff, left=args.defer_windows)
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
+                        probe_labels_seq.append(len(d))
+                    elif gate == "labeled_probe_ebcs_strat":
+                        # amendment 014: TRUE stratified anytime-valid gate. Per-class
+                        # empirical-Bernstein confidence sequence at alpha/2 (Bonferroni over the
+                        # two classes), inspected sequentially; commit iff the balanced-accuracy
+                        # lower bound 1/2(L_ben + L_att) clears zero at any look. Matches both the
+                        # fixed-quota probe design AND the anytime-valid claim.
+                        d = ((candidate.predict(Xp) == yp).astype(float)
+                             - (model.predict(Xp) == yp).astype(float))
+                        commit = False
+                        n_look = 0
+                        while n_look < len(d):
+                            n_look = min(n_look + args.seq_block, len(d))
+                            lbs = []
+                            for cls in (0, 1):
+                                dc = d[:n_look][yp[:n_look] == cls]
+                                if len(dc) < 2:
+                                    lbs = None; break
+                                lbs.append(cs_lower_bound_eb(dc, alpha_eff / 2.0))
+                            if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
+                                commit = True; break
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
+                        probe_labels_seq.append(n_look)
+                    elif gate == "labeled_probe_ebcs_defer":
+                        # amendment 014: commit/reject/DEFER with adaptive acquisition. Two-sided
+                        # EB-CS spending (alpha/2 commit side, alpha/2 futility side). Undecided at
+                        # the window budget -> DEFER: keep the candidate and continue the SAME
+                        # confidence sequence with fresh labels at subsequent windows (anytime
+                        # validity permits continuation), up to --defer-windows; reject at the cap.
+                        # Supported with full_replace + pool probes.
+                        if args.adapt_strategy != "full_replace" or args.probe_source == "observed":
+                            raise ValueError("ebcs_defer supports full_replace + pool probes")
+                        d = list(((candidate.predict(Xp) == yp).astype(float)
+                                  - (model.predict(Xp) == yp).astype(float)))
+                        da = np.asarray(d)
+                        commit = False
+                        if cs_lower_bound_eb(da, alpha_eff / 2.0) > 0.0:
+                            commit = True
+                        elif cs_lower_bound_eb(-da, alpha_eff / 2.0) > 0.0:
+                            commit = False                       # resolved futility: reject now
+                        else:
+                            pending = dict(cand=candidate, d=d, left=args.defer_windows)
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
+                        probe_labels_seq.append(len(d))
                     elif gate == "labeled_probe_strat":
                         # amendment 013: STRATIFIED guarantee matched to the fixed-class-quota probe.
                         # BA gain = 1/2 dAcc_benign + 1/2 dAcc_attack; we lower-bound each class's
@@ -753,7 +929,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         # P(commit | true dBA <= 0) <= alpha under the stratified sampling actually
                         # used, unlike a pooled i.i.d. test. Requires both classes present.
                         from scipy.stats import norm as _norm
-                        z = float(_norm.ppf(1.0 - args.seqav_alpha / 2.0))
+                        z = float(_norm.ppf(1.0 - alpha_eff / 2.0))
                         d = ((candidate.predict(Xp) == yp).astype(float)
                              - (model.predict(Xp) == yp).astype(float))
                         lbs = []
@@ -802,6 +978,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         if candidate is not None else [])
             trow = dict(
                 seed=seed, method=method, gate=gate, window_idx=t, severity_t=sev,
+                proposal_idx=proposal_ctr, alpha_allocated=round(alpha_eff, 6),
                 score=score, threshold=threshold,
                 deg_pre5=float(np.mean(ba_hist[-6:-1])) if len(ba_hist) > 1 else np.nan,
                 probe_inc=p_inc, probe_cand=p_cand, committed=bool(commit),
@@ -912,6 +1089,8 @@ def main():
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
                             "labeled_probe_mcnemar", "labeled_probe_seq", "labeled_probe_seqav",
                             "labeled_probe_cs", "labeled_probe_ebcs", "labeled_probe_strat",
+                            "labeled_probe_ebcs_strat", "labeled_probe_ebcs_defer",
+                            "labeled_probe_exact_strat", "vbc_sg",
                             "unsup_disagree",
                             "atc", "doc", "two_stage"])
     p.add_argument("--seqav-alpha", type=float, default=0.10,
@@ -983,6 +1162,17 @@ def main():
                    help="amendment 013: window-partition share for --stream-disjoint-windows "
                         "(0.5 = standard split). The causal arm draws candidates/probes from "
                         "stream windows, so raising this only feeds the no-replacement stream.")
+    p.add_argument("--lifetime-alpha", type=float, default=0.0,
+                   help="amendment 014: deployment-long risk budget; each risk gate runs at "
+                        "lifetime-alpha / lifetime-max-proposals (0 = per-proposal seqav-alpha).")
+    p.add_argument("--lifetime-max-proposals", type=int, default=10)
+    p.add_argument("--alpha-spending", type=str, default="bonferroni",
+                   choices=["bonferroni", "pseries"],
+                   help="final-kbs P0.3: lifetime spending schedule; pseries = 6a/(pi^2 j^2).")
+    p.add_argument("--defer-windows", type=int, default=5,
+                   help="amendment 014 (ebcs_defer): max windows a deferred decision may continue.")
+    p.add_argument("--candidate-latency", type=int, default=0,
+                   help="amendment 014: ALL candidate-training labels lag L windows (end-to-end lite).")
     p.add_argument("--min-calib-windows", type=int, default=0,
                    help="amendment 013: minimum observed score-windows before the causal detector "
                         "threshold is recomputed; below it, keep the previous threshold. 0 = a007 behaviour.")

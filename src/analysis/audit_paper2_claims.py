@@ -756,6 +756,65 @@ def main():
     check("13 symAB ToN A-fit -10.45 (harm = transformer advantage)", -10.454, abv("ton_scanning", "A_fit_transformer"), 0.05)
     check("13 symAB UNSW independent 0.00", 0.0, abv("unsw_recon", "independent_transformer"), 0.01)
 
+    # --- Amendment 014 + final-kbs: stratified/defer/lifetime gates, causal-64, 4-condition A/B ---
+    a14 = pd.read_csv(f"{T}/paper2_amendment_014/summary.csv")
+    fk = pd.read_csv(f"{T}/paper2_final_kbs/summary.csv")
+    abf = pd.read_csv(f"{T}/paper2_final_kbs/symmetric_ab.csv")
+
+    def a14v(block, reg, drift, col="gain"):
+        return val(a14, col, block=block, regime=reg, drift=drift)
+
+    def fkv(block, reg, drift, arm=None, col="gain"):
+        kw = dict(block=block, regime=reg, drift=drift)
+        if arm is not None:
+            kw["arm"] = arm
+        return val(fk, col, **kw)
+
+    # stratified anytime-valid gate: safe at zero drift, conservative at full
+    check("14 ebcs_strat zero ToN 0 commits", 0.0, a14v("ebcs_strat", "ton_scanning", "zero", "commits"), 0.001)
+    check("14 ebcs_strat full PortScan +0.42", 0.420, a14v("ebcs_strat", "portscan", "full"), 0.03)
+    # defer recovers power
+    check("14 ebcs_defer full PortScan +6.76", 6.757, a14v("ebcs_defer", "portscan", "full"), 0.05)
+    check("14 ebcs_defer mild ToN 0.00 (safe)", 0.0, a14v("ebcs_defer", "ton_scanning", "mild"), 0.005)
+    # lifetime Bonferroni costs benefit
+    check("14 ebcs_lifetime full PortScan +1.01", 1.009, a14v("ebcs_lifetime", "portscan", "full"), 0.03)
+    # causal-64 unified matrix
+    check("fk causal64 ToN full naive -2.85", -2.851, fkv("causal64", "ton_scanning", "full", "none"), 0.03)
+    check("fk causal64 ToN full lp32 vs naive +4.05", 4.054,
+          fkv("causal64", "ton_scanning", "full", "lp32", "vs_naive"), 0.03)
+    check("fk causal64 ToN mild lp32 vs naive +4.83", 4.828,
+          fkv("causal64", "ton_scanning", "mild", "lp32", "vs_naive"), 0.03)
+    check("fk causal64 ToN full strict vs naive +3.86", 3.864,
+          fkv("causal64", "ton_scanning", "full", "strict", "vs_naive"), 0.03)
+    check("fk causal64 collisions 0 (ToN full lp32)", 0.0,
+          fkv("causal64", "ton_scanning", "full", "lp32", "collisions"), 0.001)
+    check("fk causal64 UNSW full lp32 below no-adapt (-1.18)", -1.180,
+          fkv("causal64", "unsw_recon", "full", "lp32"), 0.03)
+    # 4-condition symmetric A/B (rand contrast), ToN SVC
+    def abv2(reg, cond):
+        return val(abf, "gap", dataset=reg, model="svc_rbf", condition=cond, contrast="rand")
+    check("fk AB ToN independent -1.78 (~0)", -1.779, abv2("ton_scanning", "independent"), 0.05)
+    check("fk AB ToN incumbent-fit -12.35", -12.347, abv2("ton_scanning", "incumbent_fit"), 0.05)
+    check("fk AB ToN challenger-fit +17.77 (inverts)", 17.767, abv2("ton_scanning", "challenger_fit"), 0.05)
+    check("fk AB ToN own-transformer +0.05 (eliminated)", 0.047, abv2("ton_scanning", "own_transformer"), 0.02)
+    check("fk AB ToN RF independent ~0 (learner-specific)", 0.020,
+          val(abf, "gap", dataset="ton_scanning", model="random_forest",
+              condition="independent", contrast="rand"), 0.02)
+    # prevalence sweep: detector starvation at low pi in ToN
+    check("fk prev ToN pi0.01 naive ~0 (0.03 triggers)", 0.001,
+          fkv("prev_sweep", "ton_scanning", "pi0.01", "none"), 0.005)
+    check("fk prev PortScan pi0.10 naive +4.76", 4.760, fkv("prev_sweep", "portscan", "pi0.10", "none"), 0.05)
+
+    # final-kbs: VBC-SG per-proposal cells (read raw; not in fk summary)
+    def vbc_gain(reg, tag):
+        d = pd.read_csv(f"results/raw/paper2_fk_{reg}_{tag}/paper2_progressive_readaptation_by_seed.csv")
+        d = d[d.seed.isin(set(range(104, 134)))]
+        g = d[d.method == "ks_max"].set_index("seed")["mean_balanced_accuracy"]
+        b = d[d.method == "no_adaptation"].set_index("seed")["mean_balanced_accuracy"]
+        return float(((g - b) * 100).mean())
+    check("fk VBC-SG per-proposal PortScan full +3.02", 3.016, vbc_gain("portscan", "full_vbcpp"), 0.03)
+    check("fk VBC-SG per-proposal ToN zero 0.00 (safe)", 0.0, vbc_gain("ton_scanning", "rz_vbcpp"), 0.005)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

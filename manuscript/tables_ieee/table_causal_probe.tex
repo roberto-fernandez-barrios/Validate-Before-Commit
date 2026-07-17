@@ -1,20 +1,18 @@
 \begin{table*}[t]
 \centering
-\caption{\textbf{The gate does not need the simulator --- final leakage-free causal arm (Algorithm 1B, amendments 011--013).} Candidate = last eight \emph{observed} windows; probe = 32 observed rows ($t{-}9$), row-identity disjoint from training; detector recalibrated from observed windows only (threshold updated only once $\ge$30 observed score-windows exist; the result is insensitive to this minimum, \S\ref{sec:v2}). The stream draws every window \emph{without replacement} from a globally value-deduplicated pool, so no identical feature vector appears in more than one window: audited candidate-training/future-evaluation collisions are \emph{exactly zero}. When no observed probe exists yet (early triggers, 0.6--1.0 per stream) the gate \emph{rejects} --- zero unvalidated commits, so the \S\ref{sec:riskgates} guarantee scope covers every committed update. Pool-size feasibility, surfaced by the abort-on-exhaustion assertion, requires a larger window-partition share for the no-replacement stream (0.75; UNSW 0.9) and, for UNSW at full drift, 64-flow windows (its attack pool holds 2{,}664 unique rows, fewer than the ${\sim}3{,}900$ that 128-flow windows would consume) --- naive and gate share the identical stream in every cell, so all contrasts remain paired. Earlier versions of this arm (amendments 006--008; pool-sampled recalibration, then residual train/future-eval overlap) are superseded and retained only in the registered amendment notes. Balanced-accuracy points vs.\ never adapting, 30 seeds, 95\% bootstrap CIs.}
+\caption{\textbf{Final observed-data (causal) arm --- unified leakage-free matrix (final-kbs protocol).} All three datasets at 64-flow windows (the largest size UNSW's attack pool supports without replacement; a 128-flow sensitivity for PortScan/ToN-IoT appears in the amendment notes with the same conclusions). Stream drawn without replacement from globally value-deduplicated pools --- candidate/future-evaluation collisions \emph{exactly zero} in every cell; no probe $\Rightarrow$ reject (zero unvalidated commits); observed threshold recomputed only at $\ge$30 score-windows. Policies: naive always-deploy, the point gate ($\ge$, $b{=}32$) and the strict reject-ties gate ($>$). Balanced-accuracy points vs.\ never adapting, 30 seeds, 95\% bootstrap CIs.}
 \label{tab:causal_probe}
 \resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
-\begin{tabular}{lrrr}
+\begin{tabular}{llrrr}
 \toprule
-Regime & Naive (observed candidates) & Causal gate (1B) & Gate $-$ naive (paired) \\
+Regime & Drift & Naive & Point gate ($\ge$) & Strict gate ($>$) \\
 \midrule
-PortScan (benefit) & $+$10.21 [7.79, 12.66] & $+$10.62 [8.30, 12.96] & $+$0.41 [0.19, 0.63] \\
-UNSW Recon (marginal) & $-$1.69 [$-$2.05, $-$1.36] & $-$1.18 [$-$1.44, $-$0.90] & $+$0.51 [0.18, 0.87] \\
-ToN-IoT (harm) & $-$4.41 [$-$7.13, $-$2.00] & $+$1.16 [0.78, 1.55] & $+$5.57 [3.19, 8.30] \\
-\midrule
-\multicolumn{4}{l}{\emph{Mild drift ($\mathrm{sev}_{\max}{=}0.25$), same pipeline --- both defenses in one leakage-free experiment:}} \\
-PortScan (benefit) & $-$0.84 [$-$2.47, 0.40] & $+$0.04 [$-$0.56, 0.65] & $+$0.88 [$-$0.21, 2.48] \\
-UNSW Recon (marginal) & $-$0.47 [$-$0.68, $-$0.26] & $+$0.02 [$-$0.09, 0.14] & $+$0.49 [0.32, 0.66] \\
-ToN-IoT (harm) & $-$3.85 [$-$8.11, $-$0.58] & $+$0.36 [0.21, 0.51] & $+$4.21 [0.95, 8.45] \\
+PortScan (benefit) & full & $+$8.85 [6.46, 11.33] & $+$9.41 [7.16, 11.78] & $+$9.48 [7.32, 11.79] \\
+PortScan (benefit) & mild & $-$0.84 [$-$1.60, $-$0.07] & $-$0.24 [$-$0.97, 0.50] & $+$0.02 [$-$0.66, 0.72] \\
+UNSW Recon (marginal) & full & $-$1.69 [$-$2.05, $-$1.36] & $-$1.18 [$-$1.44, $-$0.90] & $-$1.05 [$-$1.38, $-$0.71] \\
+UNSW Recon (marginal) & mild & $-$0.78 [$-$0.99, $-$0.56] & $-$0.25 [$-$0.41, $-$0.09] & $-$0.23 [$-$0.38, $-$0.08] \\
+ToN-IoT (harm) & full & $-$2.85 [$-$5.29, $-$0.74] & $+$1.20 [0.85, 1.57] & $+$1.01 [0.67, 1.40] \\
+ToN-IoT (harm) & mild & $-$4.75 [$-$8.80, $-$1.49] & $+$0.08 [$-$0.18, 0.30] & $+$0.03 [$-$0.20, 0.21] \\
 \bottomrule
 \end{tabular}}
 \end{table*}

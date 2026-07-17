@@ -88,6 +88,12 @@ Amendment 013 (`notes/paper2_harness_v2_amendment_013.md`) adds the exact-zero-c
 (global value-dedup + abort-on-exhaustion; `--disjoint-window-frac`, UNSW-full at window 64 for
 pool feasibility), `--min-calib-windows`, the stratified per-class gate `labeled_probe_strat`, and
 the symmetric-A/B mechanism control; its `paper2_v14*_*` arms are enumerated there.
+The final-kbs protocol (`notes/final_kbs_protocol.md`, frozen copy of the reviewer's max-ceiling plan)
+adds the named VBC-SG policy (`--adaptation-gate vbc_sg`: stratified per-class EB-CS + commit/reject/
+defer + lifetime alpha spending via `--lifetime-alpha/--alpha-spending {bonferroni,pseries}`), the
+exact stratified baseline (`labeled_probe_exact_strat`), `--candidate-latency` (end-to-end lite), the
+unified window-64 causal matrix (`paper2_fk_*_c64_*`), the operational-prevalence sweep
+(`paper2_fk_*_e2e*`), and the 4-condition disjoint role-randomized symmetric A/B.
 
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
@@ -132,8 +138,13 @@ python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn
                                                            #   size-matched RF/LogReg/MLP zero-drift, strict-> baseline
 python -m src.analysis.aggregate_paper2_amendment_013        # amendment 013: FINAL leakage-free causal arm, stratified gate,
                                                            #   strict outside zero drift, calib-min sweep
-python -m src.analysis.paper2_symmetric_ab_013               # amendment 013: symmetric-A/B mechanism control
-python -m src.analysis.make_paper2_causal_final_table        # Table 8 (tab:causal_probe) final emitter
+python -m src.analysis.paper2_symmetric_ab_013               # amendment 013: symmetric-A/B mechanism control (superseded)
+python -m src.analysis.make_paper2_causal_final_table        # Table 8 emitter (superseded by final-kbs)
+python -m src.analysis.aggregate_paper2_amendment_014        # amendment 014: stratified/defer/lifetime gates, e2e-lite
+python -m src.analysis.paper2_symmetric_ab_014               # amendment 014: A/B disjoint + role-randomized (2 conditions)
+python -m src.analysis.aggregate_paper2_final_kbs             # final-kbs: causal-64 matrix, VBC-SG, prevalence sweep
+python -m src.analysis.paper2_symmetric_ab_final              # final-kbs: A/B 4 conditions (the mechanism table)
+python -m src.analysis.make_paper2_final_tables               # final tables: causal-64 (tab:causal_probe) + tab:symmetric_ab
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
