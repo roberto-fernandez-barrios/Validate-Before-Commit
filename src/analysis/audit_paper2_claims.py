@@ -723,6 +723,39 @@ def main():
     check("12 McNemar ToN harmful CI upper 0.116 (0 observed)", 0.1157,
           val(hc, "ci_hi", regime="ton_scanning", gate="mcnemar_zero"), 0.01)
 
+    # --- Amendment 013: final causal arm, stratified gate, strict outside zero drift, symmetric A/B ---
+    a13 = pd.read_csv(f"{T}/paper2_amendment_013/summary.csv")
+    ab = pd.read_csv(f"{T}/paper2_amendment_013/symmetric_ab.csv")
+
+    def cf(reg, drift, arm, col="gain"):
+        return val(a13, col, block="causal_final", regime=reg, drift=drift, arm=arm)
+
+    # final causal: collisions exactly 0, zero unvalidated commits, result stands
+    check("13 causal-final ToN full collisions 0", 0.0, cf("ton_scanning", "full", "gate", "collisions"), 0.001)
+    check("13 causal-final ToN full commit_no_probe 0", 0.0, cf("ton_scanning", "full", "gate", "commit_no_probe"), 0.001)
+    check("13 causal-final ToN full gate-vs-naive +5.57", 5.566, cf("ton_scanning", "full", "gate", "gate_vs_naive"), 0.03)
+    check("13 causal-final ToN mild gate-vs-naive +4.21", 4.209, cf("ton_scanning", "mild", "gate", "gate_vs_naive"), 0.03)
+    check("13 causal-final PortScan full gate-vs-naive +0.41", 0.409, cf("portscan", "full", "gate", "gate_vs_naive"), 0.02)
+    check("13 causal-final UNSW full gate-vs-naive +0.51 (both arms below no-adapt)", 0.509,
+          cf("unsw_recon", "full", "gate", "gate_vs_naive"), 0.02)
+    check("13 causal-final UNSW full naive -1.69 (window-64 cell)", -1.690, cf("unsw_recon", "full", "naive"), 0.03)
+    # calib sweep stability
+    check("13 calib sweep ToN cw8 +5.44 (stable)", 5.438,
+          val(a13, "gate_vs_naive", block="calib_sweep", regime="ton_scanning", arm="fc_lp32_cw8"), 0.03)
+    # stratified gate: safe at zero drift, conservative benefit at full
+    check("13 strat zero ToN 0.00 commits", 0.0,
+          val(a13, "commits", block="stratified", regime="ton_scanning", drift="zero"), 0.001)
+    check("13 strat full PortScan +6.93", 6.926, val(a13, "gain", block="stratified", regime="portscan", drift="full"), 0.05)
+    # strict outside zero drift
+    check("13 strict full PortScan +8.78", 8.780, val(a13, "gain", block="strict_baseline", regime="portscan", drift="full"), 0.05)
+    check("13 strict full ToN +0.60", 0.595, val(a13, "gain", block="strict_baseline", regime="ton_scanning", drift="full"), 0.03)
+    # symmetric A/B mechanism: independent transformer ~0 / positive; A-fit reproduces harm
+    def abv(ds, cond):
+        return val(ab, "gap_B_minus_A", dataset=ds, model="svc_rbf", condition=cond)
+    check("13 symAB ToN independent +4.99 (no harm under symmetry)", 4.988, abv("ton_scanning", "independent_transformer"), 0.05)
+    check("13 symAB ToN A-fit -10.45 (harm = transformer advantage)", -10.454, abv("ton_scanning", "A_fit_transformer"), 0.05)
+    check("13 symAB UNSW independent 0.00", 0.0, abv("unsw_recon", "independent_transformer"), 0.01)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

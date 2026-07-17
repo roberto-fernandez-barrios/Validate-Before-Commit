@@ -1,20 +1,20 @@
 \begin{table}
 \centering
-\caption{\textbf{The gate does not need the simulator (Algorithm 1B).} In the core harness the candidate, the probe \emph{and the post-commit detector reference} are drawn from the environment's pools at the true current severity --- information a deployment does not have. The registered causal arm (amendment 007) removes all three: the candidate trains only on the last eight \emph{observed} windows; the probe is 32 rows of the observed window $t{-}9$, excluded by \emph{row identity} from the candidate's training rows (27--38 colliding rows per stream were removed --- the pools are sampled with replacement, so window-disjoint was not row-disjoint); and the detector is recalibrated from observed windows alone. Nothing reads $\mathrm{sev}(t)$. Both pre-registered criteria pass, and the causal gate remains statistically indistinguishable from the oracle-probe gate in the harm regime. An earlier version of this arm (amendment 006) still recalibrated the detector with the simulator's severity; those numbers are superseded by the ones below. A further audit (amendment 008) confirms that candidate-training rows recur in later evaluation windows (387--1{,}529 per stream, since pools are sampled with replacement), but the count is essentially equal for the gate and naive arms, so the paired gate$-$naive contrast that carries every claim is unaffected; only absolute BA levels of any committing arm are marginally optimistic, and equally so.}
+\caption{\textbf{The gate does not need the simulator --- final leakage-free causal arm (Algorithm 1B, amendments 011--013).} Candidate = last eight \emph{observed} windows; probe = 32 observed rows ($t{-}9$), row-identity disjoint from training; detector recalibrated from observed windows only (threshold updated only once $\ge$30 observed score-windows exist; the result is insensitive to this minimum, \S\ref{sec:v2}). The stream draws every window \emph{without replacement} from a globally value-deduplicated pool, so no identical feature vector appears in more than one window: audited candidate-training/future-evaluation collisions are \emph{exactly zero}. When no observed probe exists yet (early triggers, 0.6--1.0 per stream) the gate \emph{rejects} --- zero unvalidated commits, so the \S\ref{sec:riskgates} guarantee scope covers every committed update. Pool-size feasibility, surfaced by the abort-on-exhaustion assertion, requires a larger window-partition share for the no-replacement stream (0.75; UNSW 0.9) and, for UNSW at full drift, 64-flow windows (its attack pool holds 2{,}664 unique rows, fewer than the ${\sim}3{,}900$ that 128-flow windows would consume) --- naive and gate share the identical stream in every cell, so all contrasts remain paired. Earlier versions of this arm (amendments 006--008; pool-sampled recalibration, then residual train/future-eval overlap) are superseded and retained only in the registered amendment notes. Balanced-accuracy points vs.\ never adapting, 30 seeds, 95\% bootstrap CIs.}
 \label{tab:causal_probe}
 \resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrr}
 \toprule
-Regime & Naive (observed candidates) & Causal gate (1B) & Gate $-$ naive (paired) & Causal $-$ oracle gate \\
+Regime & Naive (observed candidates) & Causal gate (1B) & Gate $-$ naive (paired) \\
 \midrule
-PortScan (benefit) & $+$7.62 [5.27, 9.76] & $+$8.57 [6.62, 10.41] & $+$0.95 [0.13, 2.02] & $-$0.55 [$-$0.87, $-$0.26] \\
-UNSW Recon (marginal) & $+$0.87 [0.58, 1.14] & $+$0.98 [0.74, 1.21] & $+$0.11 [$-$0.11, 0.36] & $-$0.37 [$-$0.64, $-$0.12] \\
-ToN-IoT (harm) & $-$3.19 [$-$5.92, $-$0.99] & $+$0.67 [0.35, 1.00] & $+$3.86 [1.67, 6.73] & $-$0.12 [$-$0.45, 0.21] \\
+PortScan (benefit) & $+$10.21 [7.79, 12.66] & $+$10.62 [8.30, 12.96] & $+$0.41 [0.19, 0.63] \\
+UNSW Recon (marginal) & $-$1.69 [$-$2.05, $-$1.36] & $-$1.18 [$-$1.44, $-$0.90] & $+$0.51 [0.18, 0.87] \\
+ToN-IoT (harm) & $-$4.41 [$-$7.13, $-$2.00] & $+$1.16 [0.78, 1.55] & $+$5.57 [3.19, 8.30] \\
 \midrule
-\multicolumn{5}{l}{\emph{Mild drift ($\mathrm{sev}_{\max}{=}0.25$) under the same fully causal pipeline --- both defenses in one experiment:}} \\
-PortScan (benefit) & $-$0.98 [$-$3.22, 0.37] & $+$0.09 [$-$0.45, 0.50] & $+$1.07 [$-$0.03, 3.11] & --- \\
-UNSW Recon (marginal) & $-$0.11 [$-$0.17, $-$0.06] & $-$0.08 [$-$0.15, $-$0.03] & $+$0.03 [0.01, 0.05] & --- \\
-ToN-IoT (harm) & $-$0.42 [$-$0.95, $-$0.07] & $-$0.12 [$-$0.28, 0.01] & $+$0.30 [0.00, 0.79] & --- \\
+\multicolumn{4}{l}{\emph{Mild drift ($\mathrm{sev}_{\max}{=}0.25$), same pipeline --- both defenses in one leakage-free experiment:}} \\
+PortScan (benefit) & $-$0.84 [$-$2.47, 0.40] & $+$0.04 [$-$0.56, 0.65] & $+$0.88 [$-$0.21, 2.48] \\
+UNSW Recon (marginal) & $-$0.47 [$-$0.68, $-$0.26] & $+$0.02 [$-$0.09, 0.14] & $+$0.49 [0.32, 0.66] \\
+ToN-IoT (harm) & $-$3.85 [$-$8.11, $-$0.58] & $+$0.36 [0.21, 0.51] & $+$4.21 [0.95, 8.45] \\
 \bottomrule
 \end{tabular}}
 \end{table}

@@ -186,19 +186,25 @@ def cs_lower_bound_eb(d, alpha):
 HEALTH_REF_PER_CLASS = 32     # two_stage: severity-0 health reference size per class (64 labels)
 
 
-def split_pools(pools: Pools, seed: int) -> dict[str, Pools]:
-    """Deterministic per-seed split of every class pool into disjoint role partitions."""
+def split_pools(pools: Pools, seed: int, fracs: dict | None = None) -> dict[str, Pools]:
+    """Deterministic per-seed split of every class pool into disjoint role partitions.
+
+    `fracs` overrides ROLE_FRACS (amendment 013): the exact-zero-collision disjoint stream needs a
+    larger window share on the smaller benchmarks (the observed-data causal arm draws candidates
+    and probes from STREAM windows, so the probe partition is unused and train is only the initial
+    model/reference -- giving window more mass there is sound and disclosed)."""
+    fr = fracs or ROLE_FRACS
     part_rng = np.random.default_rng(seed + 500_000)
-    parts: dict[str, dict[str, np.ndarray]] = {r: {} for r in ROLE_FRACS}
+    parts: dict[str, dict[str, np.ndarray]] = {r: {} for r in fr}
     for name in ("ref_benign", "ref_attack", "cur_benign", "cur_attack"):
         pool = getattr(pools, name)
         idx = part_rng.permutation(len(pool))
-        a = int(len(pool) * ROLE_FRACS["window"])
-        b = a + int(len(pool) * ROLE_FRACS["train"])
+        a = int(len(pool) * fr["window"])
+        b = a + int(len(pool) * fr["train"])
         parts["window"][name] = pool[idx[:a]]
         parts["train"][name] = pool[idx[a:b]]
         parts["probe"][name] = pool[idx[b:]]
-    return {role: Pools(**parts[role]) for role in ROLE_FRACS}
+    return {role: Pools(**parts[role]) for role in fr}
 
 
 @dataclass
@@ -215,7 +221,12 @@ class Environment:
 
 
 def build_environment(pools: Pools, args, seed: int) -> Environment:
-    role = split_pools(pools, seed)
+    dw = getattr(args, "disjoint_window_frac", 0.5)
+    if getattr(args, "stream_disjoint_windows", False) and dw != 0.5:
+        rest = 1.0 - dw
+        role = split_pools(pools, seed, {"window": dw, "train": rest * 0.6, "probe": rest * 0.4})
+    else:
+        role = split_pools(pools, seed)
     train_rng = np.random.default_rng(seed + 777)
     X_tr_raw, y_tr = sample_balanced_from_distribution(
         role["train"], n_per_class=args.train_size_per_class, severity=0.0, rng=train_rng)
@@ -235,15 +246,22 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
         if args.stream_prevalence != 0.5:
             raise ValueError("stream_disjoint_windows currently supports balanced streams only")
         wp = role["window"]
-        # dedup each window pool by VALUE first: the raw benchmarks contain distinct flows with
-        # identical feature vectors (~9-16%), so index-disjoint alone would still let a training
-        # row's VALUE recur downstream. Deduping makes each unique feature vector appear in at most
-        # one window, so a candidate-training row can never recur (by value) in a future window.
+        # amendment 013 (fix): dedup by VALUE GLOBALLY across all four window pools, not per-pool,
+        # so a feature vector that occurs in more than one pool (e.g. a benign flow present in both
+        # the reference and current regimes) is assigned to exactly ONE pool. Combined with the
+        # without-replacement draw and an assertion on exhaustion (never silently reuse), this makes
+        # the guarantee exact: no identical feature vector can appear in more than one window, so a
+        # candidate-training row can never recur (by value) in a future evaluation window.
+        seen_hashes: set[bytes] = set()
         pool_arrays = {}
         for n in ("ref_benign", "ref_attack", "cur_benign", "cur_attack"):
             a = getattr(wp, n)
-            _, uq = np.unique(a, axis=0, return_index=True)
-            pool_arrays[n] = a[np.sort(uq)]
+            keep = []
+            for i in range(len(a)):
+                h = np.ascontiguousarray(a[i]).tobytes()
+                if h not in seen_hashes:
+                    seen_hashes.add(h); keep.append(i)
+            pool_arrays[n] = a[np.asarray(keep, dtype=int)]
         cur = {n: [pool_arrays[n], env_rng.permutation(len(pool_arrays[n])), 0]
                for n in pool_arrays}
         npc = args.window_size // 2
@@ -252,9 +270,9 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
             arr, order, pos = cur[name]
             if n <= 0:
                 return arr[order[:0]]
-            if pos + n > len(order):                 # pool exhausted: reshuffle (should not happen
-                order = env_rng.permutation(len(arr))  # for the causal full/mild runs; pools >> need)
-                cur[name][1] = order; pos = 0
+            if pos + n > len(order):                 # exhausted: abort rather than reuse a row
+                raise RuntimeError(f"disjoint window pool '{name}' exhausted at draw of {n} "
+                                   f"(have {len(order) - pos}); no-replacement guarantee would break")
             cur[name][2] = pos + n
             return arr[order[pos:pos + n]]
 
@@ -319,8 +337,15 @@ def calibrate_observed(detector, seen: list[tuple[np.ndarray, np.ndarray]], args
     detector.fit(ref)
     hist = seen[-(8 + args.calibration_windows):-8]
     scores = [float(detector.score(x)) for x, _ in hist]
-    if not scores:                       # too early in the stream: fall back to the ref windows
-        scores = [float(detector.score(x)) for x, _ in seen[-8:]]
+    # amendment 013: require at least --min-calib-windows scored windows before recomputing the
+    # threshold; otherwise return None so the caller KEEPS the previous threshold (avoids a
+    # threshold set from only 2-3 early scores). min=0 (default) reproduces the a007 behaviour.
+    min_cw = getattr(args, "min_calib_windows", 0)
+    if len(scores) < max(1, min_cw):
+        if min_cw > 0:
+            return detector, None        # keep previous threshold
+        if not scores:                   # a007 fallback: use the ref windows
+            scores = [float(detector.score(x)) for x, _ in seen[-8:]]
     return detector, float(np.quantile(scores, args.threshold_quantile))
 
 
@@ -622,7 +647,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         probe_zero_attack += int(not np.any(yp_all[:spent] == 1))
                 elif gate in ("labeled_probe", "labeled_probe_lcb", "labeled_probe_holdout",
                               "two_stage", "labeled_probe_mcnemar", "labeled_probe_seqav",
-                              "labeled_probe_cs", "labeled_probe_ebcs"):
+                              "labeled_probe_cs", "labeled_probe_ebcs", "labeled_probe_strat"):
                     if probe is None:
                         probe = draw_probe(t, sev_probe)
                         if probe is None:      # observed-source probe not available yet (t < 9)
@@ -720,6 +745,27 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(n_look)
+                    elif gate == "labeled_probe_strat":
+                        # amendment 013: STRATIFIED guarantee matched to the fixed-class-quota probe.
+                        # BA gain = 1/2 dAcc_benign + 1/2 dAcc_attack; we lower-bound each class's
+                        # mean correctness difference at alpha/2 (Bonferroni over the two classes,
+                        # one-sided normal LCB) and commit iff 1/2(L_ben + L_att) > 0. This bounds
+                        # P(commit | true dBA <= 0) <= alpha under the stratified sampling actually
+                        # used, unlike a pooled i.i.d. test. Requires both classes present.
+                        from scipy.stats import norm as _norm
+                        z = float(_norm.ppf(1.0 - args.seqav_alpha / 2.0))
+                        d = ((candidate.predict(Xp) == yp).astype(float)
+                             - (model.predict(Xp) == yp).astype(float))
+                        lbs = []
+                        for cls in (0, 1):
+                            dc = d[yp == cls]
+                            if len(dc) < 2:
+                                lbs = None; break
+                            se = float(dc.std(ddof=1) / np.sqrt(len(dc)))
+                            lbs.append(float(dc.mean()) - z * se)
+                        commit = bool(lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0)
+                        p_inc = float((model.predict(Xp) == yp).mean())
+                        p_cand = float((candidate.predict(Xp) == yp).mean())
                     else:
                         # balanced-accuracy comparison where both classes are present; plain
                         # accuracy otherwise (observed / binomial-prevalence probes may be
@@ -805,7 +851,9 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 detector = build_detector(method, args, seed + t + 1)
                 if args.recal_source == "observed":
                     # amendment 007: recalibrate from observed traffic only (no sev, no pools)
-                    detector, threshold = calibrate_observed(detector, seen, args)
+                    detector, new_thr = calibrate_observed(detector, seen, args)
+                    if new_thr is not None:            # amendment 013: keep prev threshold if too early
+                        threshold = new_thr
                 else:
                     detector, threshold = calibrate(detector, env, sev, args,
                                                     np.random.default_rng(seed * 1_000 + 999 + t))
@@ -863,7 +911,8 @@ def main():
     p.add_argument("--adaptation-gate", type=str, default="none",
                    choices=["none", "labeled_probe", "labeled_probe_holdout", "labeled_probe_lcb",
                             "labeled_probe_mcnemar", "labeled_probe_seq", "labeled_probe_seqav",
-                            "labeled_probe_cs", "labeled_probe_ebcs", "unsup_disagree",
+                            "labeled_probe_cs", "labeled_probe_ebcs", "labeled_probe_strat",
+                            "unsup_disagree",
                             "atc", "doc", "two_stage"])
     p.add_argument("--seqav-alpha", type=float, default=0.10,
                    help="labeled_probe_seqav: family-wise alpha, split across looks (Bonferroni).")
@@ -930,6 +979,13 @@ def main():
                    help="amendment 011: draw stream windows WITHOUT replacement within the window "
                         "pool, so no row recurs across windows (removes candidate-train/future-eval "
                         "overlap for the causal arm). Balanced streams only.")
+    p.add_argument("--disjoint-window-frac", type=float, default=0.5,
+                   help="amendment 013: window-partition share for --stream-disjoint-windows "
+                        "(0.5 = standard split). The causal arm draws candidates/probes from "
+                        "stream windows, so raising this only feeds the no-replacement stream.")
+    p.add_argument("--min-calib-windows", type=int, default=0,
+                   help="amendment 013: minimum observed score-windows before the causal detector "
+                        "threshold is recomputed; below it, keep the previous threshold. 0 = a007 behaviour.")
     p.add_argument("--no-probe-policy", type=str, default="commit", choices=["commit", "reject"],
                    help="amendment 012: behaviour when the observed probe is unavailable at an early "
                         "trigger (t<9). commit = old naive-loop behaviour; reject = keep incumbent "

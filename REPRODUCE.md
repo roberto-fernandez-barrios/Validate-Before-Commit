@@ -84,6 +84,10 @@ Amendment 012 (`notes/paper2_harness_v2_amendment_012.md`) fixes three code bugs
 corrects the `cn` regularization to `C = 2*train_size/n_unique` (C∝1/n), and its `paper2_v13_*` arms
 (corrected cn; McNemar α=0.10; causal reject-policy; size-matched RF/LogReg/MLP; strict-`>` baseline)
 are enumerated there.
+Amendment 013 (`notes/paper2_harness_v2_amendment_013.md`) adds the exact-zero-collision stream
+(global value-dedup + abort-on-exhaustion; `--disjoint-window-frac`, UNSW-full at window 64 for
+pool feasibility), `--min-calib-windows`, the stratified per-class gate `labeled_probe_strat`, and
+the symmetric-A/B mechanism control; its `paper2_v14*_*` arms are enumerated there.
 
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
@@ -126,6 +130,10 @@ python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: le
 python -m src.analysis.paper2_cs_coverage_011               # amendment 011: CS empirical coverage (iid/no-replace/autocorr)
 python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn fix, McNemar a=0.10, causal reject-policy,
                                                            #   size-matched RF/LogReg/MLP zero-drift, strict-> baseline
+python -m src.analysis.aggregate_paper2_amendment_013        # amendment 013: FINAL leakage-free causal arm, stratified gate,
+                                                           #   strict outside zero drift, calib-min sweep
+python -m src.analysis.paper2_symmetric_ab_013               # amendment 013: symmetric-A/B mechanism control
+python -m src.analysis.make_paper2_causal_final_table        # Table 8 (tab:causal_probe) final emitter
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
 python -m src.analysis.paper2_decision_quality_005          # regime x seed clusters, VIFs, QK extension, horizon regret
 python -m src.analysis.paper2_policy_frontier_005           # policy frontier + operational-utility scenarios
