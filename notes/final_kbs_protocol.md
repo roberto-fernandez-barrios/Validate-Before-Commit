@@ -945,7 +945,25 @@ Ese es el techo máximo que ofrece este set sin convertirlo en otro paper comple
   sustituye por un resumen de 1 párrafo (\S sec:v1summary) con los 3 hechos que se re-establecen
   en v2. fig:9 (per-trigger) se queda en el cuerpo. 24 refs textuales \S5.x re-apuntadas a
   Supplementary S1.x. Cuerpo: 39 → **33 pp CAS / 26 pp IEEE**, 0 refs indefinidas, audit 415/415.
-- PENDIENTE de la Fase E (próxima pasada): extraer del §sec:v2 los párrafos históricos
-  (monitor-validation vs river, v1-robustness-envelope, two-stage history, natural-prevalence
-  retraction) → supplement S2 (~2 pp más), recorte quantum, consolidación §5 → objetivo 24–28 pp;
-  revisión interna hostil final; make final-paper + tests.
+- FASE E PARTE 2 (2026-07-19) EJECUTADA:
+  * S2 creado en el suplemento ("Registered-extension details relocated from the main paper"):
+    S2.1 canonical monitors vs river + budget sweep, S2.2 v1-robustness-envelope en v2,
+    S2.3 natural-prevalence (retraction + variante exploratoria), S2.4 two-stage health reference,
+    S2.5 cumulative-generator controls, S2.6 historia completa de los 6 replays cronológicos.
+    El cuerpo conserva resúmenes con las cifras clave y punteros a S2.x.
+  * S3 creado: el apéndice v1 completo del cuerpo (figs 2/2b/3/7, tablas 4/5/7) migra al
+    suplemento; el cuerpo pierde \appendix. fig1+tabla1+2 párrafos v1 que quedaban en §5.2
+    migran a S1.1. El cuerpo queda con fig:9 como única figura numerada.
+  * Fusión de los párrafos "sequential probe" + "risk axis" en uno; recorte quantum en Discussion
+    a invariance-check; eliminada frase duplicada en Limitations.
+  * BUGS heredados de la parte 1 corregidos: (a) \ref{sec:v2} corrupto en la intro (un \r comido
+    por bash renderizaba "§ef{sec:v2}" en el PDF); (b) off-by-one en TODAS las refs S1.x del
+    cuerpo (el suplemento tiene 7 subsecciones, no 8: viejas 5.2+5.3 fusionadas en S1.1);
+    (c) roadmap "5.2 establishes…5.9" obsoleto reescrito; (d) ~15 refs colgantes del suplemento
+    standalone (fig:2/3/7/9, sec:v2, §5.5–5.7, §3.5, tab:table4/5/7) resueltas (locales tras S3
+    o textuales "of the main paper"); (e) suplemento sin bibliografía ([?] en 9 citas) → natbib
+    + unsrtnat + references.bib propios; (f) "These five replays" → "These replays" (eran seis).
+  * Resultado: cuerpo 27 pp CAS (objetivo 24–28 CUMPLIDO) / 20 pp IEEE, suplemento 20 pp;
+    0 refs/citas indefinidas en los tres PDFs; audit 415/415.
+- PENDIENTE Fase E (cierre): revisión interna hostil final (paso 24); make final-paper + tests
+  + results/final_manifest.json (P10); release v1.17.0 SOLO con autorización explícita.
