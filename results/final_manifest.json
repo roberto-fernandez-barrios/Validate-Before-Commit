@@ -1,0 +1,276 @@
+{
+  "commit_sha": "26b92a9e3d38a21307a960ad4dc186afb1de4c2f",
+  "artifact_version": "1.16.0",
+  "datasets": {
+    "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
+    "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
+    "data/processed/unsw_nb15/unsw_ref_no_reconnaissance_binary.csv": "0e5b6ce84c2745a7c68d9170533f0a12231e6d0ba3ebbb3fdd279dc7442775f8",
+    "data/processed/unsw_nb15/unsw_cur_reconnaissance_binary.csv": "5bdad7b1404c2cbd65dfaa13be3f0ac3d23ab9bdd27c11a0f2f0700bb9f5b534",
+    "data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv": "e214fcd65ddeb6c1ffd3a9d7c09fa5dc30fb444f0acb042bc187b55c5ca9435a",
+    "data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv": "b12f2afa66ab13a44146dcc8ee84d6c1e6dfa7553af63b6d3ed51b806cac546d"
+  },
+  "seeds": {
+    "confirmatory_v2": "104-133 (30 pristine seeds; smokes on 164/195/226 excluded)",
+    "temporal_friday": "165-194",
+    "temporal_wednesday": "196-225",
+    "temporal_thursday": "227-256",
+    "unsw_chronological": "301-330",
+    "cicids_tuesday_chronological": "401-430"
+  },
+  "window_sizes": {
+    "core": 128,
+    "causal_matrix": 64,
+    "causal_sensitivity": 128,
+    "chronological": 256
+  },
+  "prevalences": {
+    "balanced": 0.5,
+    "operational": [
+      0.01,
+      0.05,
+      0.1
+    ]
+  },
+  "label_latencies": {
+    "probe": [
+      0,
+      5,
+      10,
+      20
+    ],
+    "candidate": [
+      0,
+      5,
+      20
+    ]
+  },
+  "models": [
+    "svc_rbf",
+    "random_forest",
+    "logreg",
+    "mlp"
+  ],
+  "generators": [
+    "full_replace",
+    "sliding_window",
+    "ensemble",
+    "ensemble_cal",
+    "cumulative",
+    "replay"
+  ],
+  "gates": [
+    "none",
+    "labeled_probe",
+    "labeled_probe_holdout",
+    "labeled_probe_lcb",
+    "labeled_probe_mcnemar",
+    "labeled_probe_seq",
+    "labeled_probe_seqav",
+    "labeled_probe_cs",
+    "labeled_probe_ebcs",
+    "labeled_probe_strat",
+    "labeled_probe_ebcs_strat",
+    "labeled_probe_ebcs_defer",
+    "labeled_probe_exact_strat",
+    "vbc_sg",
+    "unsup_disagree",
+    "atc",
+    "doc",
+    "two_stage"
+  ],
+  "risk_control": {
+    "per_proposal_alpha_cs": 0.1,
+    "mcnemar_alpha": 0.05,
+    "mcnemar_alpha_sensitivity": 0.1,
+    "lifetime_alpha": 0.1,
+    "lifetime_max_proposals": 10,
+    "alpha_spending_schedules": [
+      "bonferroni",
+      "pseries"
+    ],
+    "defer_windows": 5
+  },
+  "collision_counts": {
+    "arms": [
+      {
+        "arm": "paper2_fk_portscan_c64_full_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 3136,
+        "labels_probe": 3136
+      },
+      {
+        "arm": "paper2_fk_portscan_c64_full_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_portscan_c64_full_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 4896,
+        "labels_probe": 4896
+      },
+      {
+        "arm": "paper2_fk_portscan_c64_mild_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 1632,
+        "labels_probe": 1632
+      },
+      {
+        "arm": "paper2_fk_portscan_c64_mild_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_portscan_c64_mild_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 2368,
+        "labels_probe": 2368
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_full_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 3008,
+        "labels_probe": 3008
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_full_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_full_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 4768,
+        "labels_probe": 4768
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_mild_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 1216,
+        "labels_probe": 1216
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_mild_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_ton_scanning_c64_mild_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 1824,
+        "labels_probe": 1824
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_full_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 2656,
+        "labels_probe": 2656
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_full_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_full_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 3040,
+        "labels_probe": 3040
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_mild_lp32",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 1856,
+        "labels_probe": 1856
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_mild_none",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 0,
+        "labels_probe": 0
+      },
+      {
+        "arm": "paper2_fk_unsw_recon_c64_mild_strict",
+        "n_seeds": 30,
+        "probe_row_collisions": 0,
+        "cand_future_collisions": 0,
+        "n_commit_no_probe": 0,
+        "labels_used_total": 2144,
+        "labels_probe": 2144
+      }
+    ],
+    "total_probe_row_collisions": 0,
+    "total_cand_future_collisions": 0,
+    "total_commit_no_probe": 0
+  },
+  "outputs": {
+    "tables_manifest_sha256": "3b35d9fcfffabaad6e5f6c8c70e221b8373347242a8ea6359c338b609433ad40",
+    "n_table_csvs": 150,
+    "pdfs": [
+      "manuscript/main.pdf",
+      "manuscript/supplement.pdf",
+      "manuscript/main_ieee.pdf"
+    ]
+  },
+  "audit": {
+    "status": "pass",
+    "checks_passed": 415,
+    "checks_total": 415
+  }
+}
