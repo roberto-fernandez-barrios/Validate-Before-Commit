@@ -932,3 +932,20 @@ Ese es el techo máximo que ofrece este set sin convertirlo en otro paper comple
   Se declara, no se fabrica.
 - Stopping rule aceptada: este es el último plan de ampliación. Sin commit/push/tag/release/Zenodo
   sin autorización explícita de Roberto.
+
+---
+# FASE E — PROGRESO (2026-07-19)
+- Graphical abstract REDISEÑADO desde cero (`make_paper2_graphical_abstract_final.py`): pipeline
+  Alarm→Challenger→Validate→Commit/Reject/Defer, dos líneas de política, badge "Controlled
+  SVC-RBF harm case", scope honesto, tipografía grande, 2299×857.
+- Contribuciones reescritas a las 4 del plan (candidate governance / cuenta condicional /
+  VBC-SG / evaluación causal+operacional con frontera).
+- SUPLEMENTO creado (`manuscript/supplement.tex`, standalone, 9 pp): recibe el estudio
+  exploratorio v1 completo (antes §5.2–5.9, figs 1/4/5/6/8, tablas 1/2/3/6); el cuerpo lo
+  sustituye por un resumen de 1 párrafo (\S sec:v1summary) con los 3 hechos que se re-establecen
+  en v2. fig:9 (per-trigger) se queda en el cuerpo. 24 refs textuales \S5.x re-apuntadas a
+  Supplementary S1.x. Cuerpo: 39 → **33 pp CAS / 26 pp IEEE**, 0 refs indefinidas, audit 415/415.
+- PENDIENTE de la Fase E (próxima pasada): extraer del §sec:v2 los párrafos históricos
+  (monitor-validation vs river, v1-robustness-envelope, two-stage history, natural-prevalence
+  retraction) → supplement S2 (~2 pp más), recorte quantum, consolidación §5 → objetivo 24–28 pp;
+  revisión interna hostil final; make final-paper + tests.
