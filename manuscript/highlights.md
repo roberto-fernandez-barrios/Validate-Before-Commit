@@ -11,7 +11,7 @@ Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 
 ## Graphical abstract
 
-`docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract`;
-above Elsevier's 1328×531 minimum). Problem → insight (detection ≠ decision; update value = incumbent
-headroom) → solution (validate-before-commit gate) → result (registered replication: harm → net benefit,
-benefit preserved), with an honest-scope badge strip (total cost accounted; boundary disclosed).
+`docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
+2299×857, above Elsevier's 1328×531 minimum). Pipeline Alarm → Challenger → Validate → Commit/Reject/Defer,
+with the two policy lines (point/strict gate: more power; risk-controlled gate: formal control, more labels),
+an explicit "Controlled SVC-RBF harm case" badge, and an honest-scope strip (no universal claims).

@@ -151,7 +151,9 @@ python -m src.analysis.paper2_policy_frontier_005           # policy frontier + 
 python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cross-check vs river
 ```
 
-Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit).
+Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit;
+`make final-paper` = hash verification + invariant tests (`tests/`) + analysis + final tables + figures +
+`results/final_manifest.json` + CAS/supplement/IEEE compilation + the 415-check audit — the P10 workflow).
 The small confirmatory CSVs are **committed** under `results/tables/` and pinned by
 `results/tables/MANIFEST.sha256`; regenerated outputs can be diffed against them. The
 UNSW chronological staging is `python -m src.analysis.prepare_paper2_unsw_chronological`
@@ -163,28 +165,29 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 
 | Claim | Artifact |
 |---|---|
-| Readaptation ranges benefit→harm across 3 datasets | `paper2_metrics_ba_f1_summary_001/`, Table 1, Fig 1 |
-| Benefit ~ deployed-model degradation, r = −0.89 | Fig 2 (`make_paper2_figures`) |
-| The law survives disaggregation (r = −0.91 per-seed) and any leave-one-out | `paper2_mechanism_law_robustness_001/`, Table 7 |
-| Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, §5.6 |
-| The probe need not be balanced: full safety/benefit at natural prevalence (π=0.10/0.01) | `paper2_phase2j_probe_prevalence_001/`, §5.6 |
-| Harm is not a size/PCA artifact: deepens with size-matched candidates; persists point-wise at full dim | `paper2_phase2k_size_dim_controls_001/`, §5.6 |
-| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.10, tag `harness-v2-protocol` |
-| Hierarchical per-trigger model (β_deg −1.02 [−1.17,−0.87]; score/severity/time ≈ 0) + decision metrics (regret 22× lower than always-commit in the harm regime) | `paper2_decision_quality_004/` |
+| Readaptation ranges benefit→harm across 3 datasets | `paper2_metrics_ba_f1_summary_001/`, Supp §S1.1 |
+| Benefit ~ deployed-model degradation, r = −0.89 (descriptive; coupling-aware) | Supp §S1.1/S3 (`make_paper2_figures`) |
+| The law survives disaggregation (r = −0.91 per-seed) and any leave-one-out | `paper2_mechanism_law_robustness_001/`, Supp §S3 |
+| Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, Supp §S1.5 |
+| Natural-prevalence probes: the initial "probe need not be balanced" claim is RETRACTED; the corrected Binomial rerun holds to π≈0.05 and dissolves at π=0.01 | `paper2_phase2j_probe_prevalence_001/` (superseded) + amendment-006 binomial arms; main §5.3, Supp §S2.3 |
+| Harm is not a size/PCA artifact: deepens with size-matched candidates; persists point-wise at full dim | `paper2_phase2k_size_dim_controls_001/`, Supp §S1.5 |
+| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.3, tag `harness-v2-protocol` |
+| Hierarchical per-trigger model, regime×seed clusters (β_deg −1.02 [−1.61,−0.43]; score ≈ 0) + decision metrics (local per-decision regret ~22× lower than always-commit in the harm regime) | `paper2_decision_quality_004/` + `paper2_decision_quality_005/` |
 | v2 robustness: budget (b=32 operating point; b=8 corrected), latency 20, corruption (harm-avoidance to 40%, net benefit to 25%) | `paper2_amendment_004/robustness.csv` |
-| Two-stage gate: 74% fewer candidates, ~½ of naive's total labels, still net-positive in the harm regime | `paper2_amendment_004/robustness.csv` + `label_cost.csv` |
-| Total label/compute accounting per policy (candidates dominate; probe ≈3% of the gate's bill) | `paper2_amendment_004/label_cost.csv`, Table 9 |
+| Split two-stage gate: 69% fewer candidates, ~½ of naive's total labels, above naive; net gain vs never-adapt honestly unresolved at 30 seeds | `paper2_amendment_005/` + `paper2_amendment_004/label_cost.csv` |
+| Total label/compute accounting per policy (candidates dominate; probe ≈3% of the gate's bill) | `paper2_amendment_004/label_cost.csv`, label-cost table (§5.3) |
 | DDM/ADWIN validated vs reference implementations (river): DDM net-harm replicates; our ADWIN variant under-fires, reference reported | `paper2_monitor_validation_004.csv`, `paper2_v6_*_{ddm,adwin}river_none/` |
 | Calibrated soft ensemble: strongest label-free rule, harm-avoiding everywhere, beats gate in marginal regime, cannot decline updates | `paper2_v6_*_enscal_none/`, `paper2_amendment_004/robustness.csv` |
-| Chronological streams (corrected runner): deep-benefit recoveries on all three days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday | `paper2_amendment_004/temporal.csv`, Table 8 |
-| Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Table 4, Fig 3 |
-| Simple k-of-n/cooldown policies fail (pre-registered) | Table 5; `notes/paper2_safe_readaptation_phase1_*` |
-| Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Tables 2-3, Fig 4 |
-| ~how few labels suffice (label-efficiency frontier) | `paper2_phase2b_budget_curve_001/`, Fig 5 |
+| Chronological streams (corrected runner): deep-benefit recoveries on all CICIDS days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday or external UNSW | `paper2_amendment_004/temporal.csv`, temporal-streams table (§5.3), Supp §S2.6 |
+| Causal-64 matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
+| Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |
+| Simple k-of-n/cooldown policies fail (pre-registered) | Supp §S1.3/S3; `notes/paper2_safe_readaptation_phase1_*` |
+| Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Supp §S1.4 |
+| ~how few labels suffice (label-efficiency frontier) | `paper2_phase2b_budget_curve_001/`, Supp §S1.5 |
 
 ## 6. Notes
 
 - Quantum kernels are classically simulated; runtimes are simulation figures.
-- The gate assumes a small labeled probe at decision time; the probe budget is the reported cost (Fig 5).
+- The gate assumes a small labeled probe at decision time; the probe budget is the reported cost (Supp §S1.5).
 - Pre-registration precedes the confirmatory 30-seed run; Phase 2b (budget curve, extra benefit regimes) is
   explicitly labeled post-registration robustness.

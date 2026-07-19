@@ -24,12 +24,12 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
 ## TL;DR
 
 - Across **three public benchmarks** (CICIDS2017, UNSW-NB15, ToN-IoT) and multiple attack regimes, the value of
-  drift-triggered retraining spans **+19.5 to −4.5 balanced-accuracy points**. For a fragile downstream model,
+  drift-triggered retraining spans **+19.5 to −4.6 balanced-accuracy points**. For a fragile downstream model,
   *never adapting* can beat every triggered strategy.
 - Whether an update helps tracks **how degraded the deployed model already is**: retraining restores
   accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity
-  drift-detector scores do not measure (at individual triggered decisions a hierarchical model gives
-  β_deg = −1.02 [−1.17, −0.87] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
+  drift-detector scores do not measure (at individual triggered decisions a hierarchical model clustered
+  on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
   MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
 - **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each.
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
@@ -59,20 +59,20 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
 **2 — Retraining restores accuracy to a nearly regime-invariant level, so the benefit of an update tracks the deployed
 model's headroom. Per-trigger, non-coupled test (hardened harness): pre-trigger incumbent degradation predicts the
 future value of committing, while the detector score at the same triggers shows no consistent signal (both KS-max and
-QK-ZZ; one small exception in QK/PortScan is reported in the paper). Coupling-aware analysis §5.3; hierarchical model
-§5.10.**
+QK-ZZ; one small exception in QK/PortScan is reported in the paper). Coupling-aware analysis in Supplement §S1.1;
+hierarchical model in the paper, §5.3.**
 
 ![Per-trigger mechanism](docs/img/fig9_pertrigger.png)
 
 **3 — In the three controlled regimes, the validate-before-commit gate preserves benefit, avoids net harm, and beats
 naive retraining in the harm regime — with the same sign pattern for a classical (KS-max) and a quantum (QK-ZZ)
-detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper, Table 5).**
+detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper, policy-frontier table).**
 
 ![Gate results](docs/img/fig4_phase2_gate.png)
 
 **4 — The gate is harm-avoiding under randomly corrupted validation labels: at up to 40% flipped labels it stays
 significantly above naive in the harm regime; net benefit over no-adaptation survives to 25% (hardened-harness
-numbers in the paper, §5.10).**
+numbers in the paper, §5.3).**
 
 ![Adversarial probe](docs/img/fig8_probe_poison.png)
 
@@ -108,33 +108,44 @@ itself (and its ~1,024 labels). Ablations delimit the method: among the evaluate
 (disagreement, ATC, DoC) either fail or sacrifice benefit; a properly *calibrated* soft ensemble is the strongest
 label-free update rule (harm-avoiding everywhere, ahead of the gate in the marginal regime) but commits every
 trigger and cannot decline an update; simple **k-of-n / cooldown** policies fail because they act on
-distributional change rather than estimated model improvement. See `manuscript/` §3 (Algorithm 1) for the
-full specification.
+distributional change rather than estimated model improvement. The named risk-controlled policy is
+**VBC-SG** (Validate-Before-Commit Sequential Gate): stratified per-class empirical-Bernstein confidence
+sequences driving commit/reject/defer, with an optional deployment-long alpha-spending budget. See
+`manuscript/` §3 (Algorithm 1, §3.5) for the full specification.
 
 Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.py`):
-`--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,labeled_probe_mcnemar,labeled_probe_seq,labeled_probe_seqav,unsup_disagree,atc,doc,two_stage}`,
+`--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,labeled_probe_mcnemar,labeled_probe_seq,labeled_probe_seqav,labeled_probe_cs,labeled_probe_ebcs,labeled_probe_strat,labeled_probe_ebcs_strat,labeled_probe_ebcs_defer,labeled_probe_exact_strat,vbc_sg,unsup_disagree,atc,doc,two_stage}`,
 `--probe-size`, `--probe-latency`, `--probe-flip-frac`, `--probe-source {pools,observed}`,
 `--probe-prevalence`, `--recal-source {pools,observed}`, `--gate-margin`, `--two-stage-delta`,
-`--health-ref-mode {static,per_incumbent}`, `--seqav-alpha`,
-`--adapt-strategy {full_replace,ensemble,ensemble_cal,sliding_window}`, `--adapt-size-per-class`,
+`--health-ref-mode {static,per_incumbent}`, `--seqav-alpha`, `--mcnemar-alpha`,
+`--adapt-strategy {full_replace,ensemble,ensemble_cal,sliding_window,cumulative,replay}`,
+`--cumulative-mode {observed,initial_plus_observed,dedup,cn}`, `--adapt-size-per-class`,
 `--trigger-mode {detector,performance,ddm,adwin,ddm_river,adwin_river,random}`, `--trigger-prob`, `--max-severity`,
-`--downstream-model {svc_rbf,random_forest,logreg,mlp}`.
-The **observed-data (causal) gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`;
-the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **anytime-valid sequential gate** is
-`--adaptation-gate labeled_probe_seqav`.
+`--downstream-model {svc_rbf,random_forest,logreg,mlp}`, `--stream-prevalence`,
+`--stream-disjoint-windows`, `--disjoint-window-frac`, `--min-calib-windows`, `--no-probe-policy {commit,reject}`,
+`--lifetime-alpha`, `--lifetime-max-proposals`, `--alpha-spending {bonferroni,pseries}`, `--defer-windows`,
+`--candidate-latency`.
+The **observed-data (causal) gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`
+(final leakage-free form adds `--stream-disjoint-windows --no-probe-policy reject --min-calib-windows 30`);
+the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **anytime-valid gates** are
+`--adaptation-gate labeled_probe_ebcs` (pooled) and `labeled_probe_ebcs_strat` (stratified); the named policy is
+`--adaptation-gate vbc_sg` (add `--lifetime-alpha 0.10 --alpha-spending {bonferroni,pseries}` for the
+deployment-long budget).
 
 ---
 
 ## Repository structure
 
 ```
-manuscript/     Manuscript draft (§1–§8) + references.bib
+manuscript/     Manuscript (main.tex, CAS) + supplement.tex + references.bib
 src/experiments/  Progressive-drift readaptation runner (detectors, gate, downstream models)
 src/analysis/     Reproducible aggregation, statistics, tables and figures
-results/          Generated tables/figures (git-ignored; rebuilt by the scripts)
+results/          Generated tables/figures (mostly git-ignored; small confirmatory CSVs are
+                  committed under results/tables/ and pinned by MANIFEST.sha256)
 data/             Public benchmark datasets (git-ignored; see Data availability)
 docs/img/         Figures used in this README
 notes/            Protocols, pre-registrations, and checkpoints
+tests/            Invariant tests run by `make final-paper` (disjointness, gate validity, claims)
 REPRODUCE.md      One-command regeneration of every table and figure
 ```
 
@@ -176,8 +187,8 @@ The three public benchmarks are **not redistributed** here (place them under `da
 ## Manuscript
 
 The working manuscript (§1–§8) and its bibliography are in [`manuscript/`](manuscript/). Every derived
-table, figure and numeric claim regenerates from this repository (`make reproduce`, then
-`src/analysis/audit_paper2_claims.py` re-verifies all 240+ pinned numbers); the experiment commands that
+table, figure and numeric claim regenerates from this repository (`make reproduce`, or the full
+`make final-paper`, whose audit re-verifies all 415 pinned numbers); the experiment commands that
 populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.md`](REPRODUCE.md).
 
 ## Citation
