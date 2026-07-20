@@ -10,6 +10,7 @@ final 70% -> unsw_chrono_stream_binary.csv.
 """
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import numpy as np
@@ -23,6 +24,12 @@ TRAIN_FRAC = 0.30
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--train-frac", type=float, default=TRAIN_FRAC,
+                    help="final-q1 D4: sensitivity beyond the original 30%% split (0.20, 0.40).")
+    args = ap.parse_args()
+    train_frac = args.train_frac
+
     feats = pd.read_csv(RAW / "NUSW-NB15_features.csv", encoding="latin-1")
     names = [str(n).strip() for n in feats["Name"]]
     print(f"[FEATURES] {len(names)} columns")
@@ -46,15 +53,17 @@ def main() -> None:
     X = df.drop(columns=DROP + [label_col], errors="ignore")
     X = X.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
 
-    n_train = int(len(X) * TRAIN_FRAC)
+    n_train = int(len(X) * train_frac)
     med = X.iloc[:n_train].median(numeric_only=True)
     X = X.fillna(med).fillna(0.0)
     X["Label"] = y
 
     train, stream = X.iloc[:n_train], X.iloc[n_train:]
     OUT.mkdir(parents=True, exist_ok=True)
-    train.to_csv(OUT / "unsw_chrono_train_binary.csv", index=False)
-    stream.to_csv(OUT / "unsw_chrono_stream_binary.csv", index=False)
+    tf = str(int(round(train_frac * 100)))
+    suffix = "" if train_frac == TRAIN_FRAC else tf   # keep the original filenames at 30%
+    train.to_csv(OUT / f"unsw_chrono_train{suffix}_binary.csv", index=False)
+    stream.to_csv(OUT / f"unsw_chrono_stream{suffix}_binary.csv", index=False)
     for name, part in [("train", train), ("stream", stream)]:
         frac = float((part["Label"] == "ATTACK").mean())
         print(f"[{name.upper()}] rows={len(part)} features={len(part.columns)-1} attack_frac={frac:.4f}")

@@ -88,6 +88,34 @@ Amendment 013 (`notes/paper2_harness_v2_amendment_013.md`) adds the exact-zero-c
 (global value-dedup + abort-on-exhaustion; `--disjoint-window-frac`, UNSW-full at window 64 for
 pool feasibility), `--min-calib-windows`, the stratified per-class gate `labeled_probe_strat`, and
 the symmetric-A/B mechanism control; its `paper2_v14*_*` arms are enumerated there.
+The final-q1 protocol (`notes/q1_max_protocol.md`, frozen with registered deltas D1–D7 over
+`PLAN_Q1_CLAUDE_CODE.md`) adds `--vbc-defer-mode {accumulate,cohort,refresh}` (defer-continuation
+semantics; the accumulate mode's weak-conditional-null guarantee is Proposition 1 / supplement §S4),
+the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--seed-start/--seed-end`,
+`--out-suffix` on `paper2_symmetric_ab_final`), and the TOST equivalence analysis
+(`python -m src.analysis.paper2_ab_equivalence`). Its four experiment blocks:
+
+- **Budget frontier (D3)**, seeds 501–530: `run_paper2_readaptation_v2` with
+  `--adaptation-gate {labeled_probe_ebcs_defer,vbc_sg}`, `--probe-size {64,128,256,512,1024}`,
+  `--seq-block 16 --defer-windows 5 --lifetime-alpha 0.10 --alpha-spending {bonferroni,pseries}`,
+  on {PortScan full, ToN full, ToN zero-drift}; anchors `none` / `labeled_probe` /
+  `labeled_probe --gate-margin 0.001` (strict). Aggregate:
+  `python -m src.analysis.make_paper2_q1_frontier` (endpoints e1–e6 + non-vacuity verdict).
+- **Confirmatory A/B (D2)**, seeds 2001–2100:
+  `python -m src.analysis.paper2_symmetric_ab_final --seed-start 2001 --seed-end 2100
+  --models svc_rbf --conditions independent,own_transformer --decompose
+  --out-suffix _conf2001_2100`, then `paper2_ab_equivalence`.
+- **Chronological matrix (D4)**, seeds 601–630: `run_paper2_temporal_stream` over the seven
+  pre-enumerated streams (Tue→Wed+Thu+Fri, Wed→Fri, Thu→Fri, Wednesday and Thursday intra-day
+  splits staged by `prepare_paper2_cicids_intraday_chronological --day {wednesday,thursday}`,
+  and UNSW at `prepare_paper2_unsw_chronological --train-frac {0.20,0.40}`), each under
+  `--adaptation-gate {none,labeled_probe,labeled_probe + --gate-margin 0.001,vbc_sg}`
+  (`--vbc-defer-mode cohort`). Aggregate: `make_paper2_q1_chronological`.
+- **Operational end-to-end (D5)**, seeds 701–730: `run_paper2_operational_e2e` with
+  `--probe-prevalence {0.005,0.01,0.05,0.10}`,
+  `--acquisition-policy {random,alert_enriched,disagreement,hybrid}`,
+  `--candidate-latency/--probe-latency {5,20}` and the new `--training-delay {0,5}`.
+  Aggregate: `make_paper2_q1_e2e`. Tables for all four: `make_paper2_q1_tables`.
 The final-kbs protocol (`notes/final_kbs_protocol.md`, frozen copy of the reviewer's max-ceiling plan)
 adds the named VBC-SG policy (`--adaptation-gate vbc_sg`: stratified per-class EB-CS + commit/reject/
 defer + lifetime alpha spending via `--lifetime-alpha/--alpha-spending {bonferroni,pseries}`), the
@@ -153,7 +181,7 @@ python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cro
 
 Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit;
 `make final-paper` = hash verification + invariant tests (`tests/`) + analysis + final tables + figures +
-`results/final_manifest.json` + CAS/supplement/IEEE compilation + the 415-check audit — the P10 workflow).
+`results/final_manifest.json` + CAS/supplement/IEEE compilation + the 439-check audit — the P10 workflow).
 The small confirmatory CSVs are **committed** under `results/tables/` and pinned by
 `results/tables/MANIFEST.sha256`; regenerated outputs can be diffed against them. The
 UNSW chronological staging is `python -m src.analysis.prepare_paper2_unsw_chronological`

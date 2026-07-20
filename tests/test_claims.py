@@ -4,7 +4,7 @@ test_main_tables_final_only  -- the main body inputs exactly the final table set
                                 or v1 tables); the v1 tables live only in the supplement.
 test_no_superseded_claims    -- the living documents carry none of the retracted/stale claims
                                 the final hostile review removed.
-test_claim_table_consistency -- every pinned numeric claim matches the artifacts (the 415-check
+test_claim_table_consistency -- every pinned numeric claim matches the artifacts (the 439-check
                                 audit passes end to end).
 """
 from __future__ import annotations
@@ -18,12 +18,17 @@ from tests.conftest import REPO
 FINAL_BODY_TABLES = {
     "table_v2_confirmatory", "table_policy_frontier", "table_label_cost",
     "table_causal_probe", "table_zero_drift", "table_amendment009",
-    "table_symmetric_ab", "table_harm_generality", "table_temporal_streams",
+    "table_harm_generality",
+    # final-q1 additions (table_symmetric_ab and table_temporal_streams moved to the
+    # supplement: superseded in scope by the merged mechanism table and the pre-enumerated
+    # chronological matrix respectively)
+    "table_budget_frontier", "table_ab_equivalence",
+    "table_chronological_q1", "table_operational_e2e",
 }
 V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",
     "table4_oracle_regret", "table5_phase1_negative", "table6_downstream_generalization",
-    "table7_mechanism_law_robustness",
+    "table7_mechanism_law_robustness", "table_temporal_streams",
 }
 
 
@@ -51,6 +56,16 @@ SUPERSEDED_PATTERNS = [
     (r"full safety/benefit at natural prevalence", "retracted claim (amendment 006)"),
     (r"all 240\+", "stale audit count"),
     (r"19\.5 to [-−]4\.5[^0-9]", "worst adaptive gain is -4.6"),
+    # final-q1 P0.4 overclaim sweep (protocol q1_max_protocol.md)
+    (r"empirically,? safe across", "point gate is harm-reducing, not 'safe' (Sol blocker 4)"),
+    (r"is fully safe", "banned: risk gates 'commit nothing', they are not 'fully safe'"),
+    (r"gap statistically zero", "D2: non-significance is not equivalence"),
+    (r"mechanism we (now )?identify\b", "D2: representation-ownership interaction wording"),
+    (r"so we say ``identified''", "D2: equivalence not established at pilot precision"),
+    (r"modeled for the probe but not for the candidate", "P0.2: candidate latency IS modeled"),
+    (r"anytime validity permits continuation", "D1: replaced by the three continuation modes"),
+    (r"universally safe", "banned vocabulary (P0.4)"),
+    (r"predicts nothing", "banned since amendment 011"),
 ]
 
 LIVING_DOCS = ["manuscript/main.tex", "manuscript/main_ieee.tex", "manuscript/supplement.tex",

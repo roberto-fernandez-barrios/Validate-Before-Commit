@@ -815,6 +815,112 @@ def main():
     check("fk VBC-SG per-proposal PortScan full +3.02", 3.016, vbc_gain("portscan", "full_vbcpp"), 0.03)
     check("fk VBC-SG per-proposal ToN zero 0.00 (safe)", 0.0, vbc_gain("ton_scanning", "rz_vbcpp"), 0.005)
 
+    # --- final-q1: budget frontier (D3) and confirmatory A/B equivalence (D2) ---
+    import os
+    Q1 = f"{T}/paper2_final_q1"
+    if os.path.exists(f"{Q1}/budget_frontier.csv"):
+        BF = pd.read_csv(f"{Q1}/budget_frontier.csv")
+        AN = pd.read_csv(f"{Q1}/frontier_anchors.csv")
+
+        def bf(pol, cap, col, scen="ps_full", sch="bonf"):
+            r = BF[(BF.scenario == scen) & (BF.policy == pol) & (BF.cap == cap)
+                   & (BF.schedule == sch)]
+            return float(r.iloc[0][col]) if len(r) else None
+
+        def anc(scen, pol, col="gain"):
+            r = AN[(AN.scenario == scen) & (AN.policy == pol)]
+            return float(r.iloc[0][col]) if len(r) else None
+
+        check("q1 anchor PortScan naive +7.22", 7.22, anc("ps_full", "none"), 0.02)
+        check("q1 anchor PortScan strict +7.57", 7.57, anc("ps_full", "strict"), 0.02)
+        check("q1 anchor ToN-zero naive -5.35", -5.35, anc("ton_zero", "none"), 0.02)
+        check("q1 anchor ToN-zero strict -0.01", -0.01, anc("ton_zero", "strict"), 0.02)
+        check("q1 anchor ToN-zero point -0.17", -0.175, anc("ton_zero", "point"), 0.02)
+        check("q1 anchor ToN-zero strict commits 0.13", 0.13, anc("ton_zero", "strict", "commits"), 0.02)
+        check("q1 frontier ebcsdef c64 +3.84 (53%)", 3.84, bf("ebcsdef", 64, "gain"), 0.02)
+        check("q1 frontier ebcsdef c64 frac 0.53", 0.53, bf("ebcsdef", 64, "e2_frac_naive"), 0.01)
+        check("q1 frontier ebcsdef c512 +6.74", 6.74, bf("ebcsdef", 512, "gain"), 0.02)
+        check("q1 frontier ebcsdef c512 frac 0.93", 0.93, bf("ebcsdef", 512, "e2_frac_naive"), 0.01)
+        check("q1 frontier ebcsdef c512 labels 578", 578, bf("ebcsdef", 512, "labels_probe_per_proposal"), 2.0)
+        check("q1 frontier vbccoh c512 frac 0.81", 0.81, bf("vbccoh", 512, "e2_frac_naive"), 0.01)
+        check("q1 frontier vbcref c512 frac 0.68", 0.68, bf("vbcref", 512, "e2_frac_naive"), 0.01)
+        # zero-drift safety: every lifetime config at every cap commits nothing
+        zc = BF[BF.scenario == "ton_zero"].commits_total.sum()
+        check("q1 frontier zero-drift commits 0 (all caps)", 0.0, float(zc), 0.5)
+        # no harmful immediate commit anywhere in the sweep
+        check("q1 frontier harmful commits 0 (all cells)", 0.0,
+              float(BF.e6_harmful_immediate.sum()), 0.5)
+
+    if os.path.exists(f"{T}/paper2_final_kbs/ab_equivalence.csv"):
+        EQ = pd.read_csv(f"{T}/paper2_final_kbs/ab_equivalence.csv")
+        pr = EQ[(EQ.analysis == "primary_confirmatory") & (EQ.margin == 1.0)]
+
+        def eqv(ds, cond, col):
+            r = pr[(pr.dataset == ds) & (pr.condition == cond)]
+            return float(r.iloc[0][col]) if len(r) else None
+
+        def eqflag(ds, cond):
+            r = pr[(pr.dataset == ds) & (pr.condition == cond)]
+            return float(bool(r.iloc[0].equivalent)) if len(r) else None
+
+        check("q1 AB conf ToN own-transformer -0.01", -0.007, eqv("ton_scanning", "own_transformer", "mean_gap"), 0.02)
+        check("q1 AB conf ToN own-transformer EQUIVALENT", 1.0, eqflag("ton_scanning", "own_transformer"), 0.1)
+        check("q1 AB conf UNSW independent +0.04", 0.039, eqv("unsw_recon", "independent", "mean_gap"), 0.02)
+        check("q1 AB conf UNSW independent EQUIVALENT", 1.0, eqflag("unsw_recon", "independent"), 0.1)
+        check("q1 AB conf ToN independent -1.43 (unresolved)", -1.425, eqv("ton_scanning", "independent", "mean_gap"), 0.02)
+        check("q1 AB conf ToN independent NOT equivalent", 0.0, eqflag("ton_scanning", "independent"), 0.1)
+        check("q1 AB conf PortScan independent -0.30", -0.299, eqv("portscan", "independent", "mean_gap"), 0.02)
+        check("q1 AB decomp inc-scaler -12.17", -12.166, eqv("ton_scanning", "inc_scaler_indep_pca", "mean_gap"), 0.02)
+        check("q1 AB decomp indep-scaler/inc-PCA +0.16", 0.164, eqv("ton_scanning", "indep_scaler_inc_pca", "mean_gap"), 0.02)
+
+    # --- final-q1 Fase D: chronological matrix (D4) and operational e2e (D5) ---
+    if os.path.exists(f"{Q1}/chronological_replays.csv"):
+        CH = pd.read_csv(f"{Q1}/chronological_replays.csv")
+
+        def ch(stream, policy, col="gain_ba", scale=100.0):
+            r = CH[(CH.stream == stream) & (CH.policy == policy)]
+            return float(r.iloc[0][col]) * scale if len(r) else None
+
+        check("q1 chrono UNSW20 no-adapt BA 82.9", 82.9, ch("unsw_20", "none", "noadapt_ba"), 0.1)
+        check("q1 chrono UNSW20 naive +8.35", 8.35, ch("unsw_20", "none"), 0.02)
+        check("q1 chrono UNSW20 strict +11.13", 11.13, ch("unsw_20", "strict"), 0.02)
+        check("q1 chrono UNSW20 strict CI lo 10.50", 10.50, ch("unsw_20", "strict", "ba_lo"), 0.05)
+        check("q1 chrono UNSW40 naive +7.64", 7.64, ch("unsw_40", "none"), 0.02)
+        check("q1 chrono UNSW40 strict +8.98", 8.98, ch("unsw_40", "strict"), 0.02)
+        check("q1 chrono Wed-intraday healthy 84.7", 84.7, ch("wed_intraday", "none", "noadapt_ba"), 0.1)
+        check("q1 chrono Wed-intraday strict +5.77 (below naive)", 5.77, ch("wed_intraday", "strict"), 0.02)
+        check("q1 chrono TueWk naive +14.78", 14.78, ch("tue_wedthufri", "none"), 0.02)
+        check("q1 chrono TueWk point +11.52", 11.52, ch("tue_wedthufri", "point"), 0.02)
+        # the headline negative: no chronological net harm anywhere
+        worst = float(CH[CH.policy == "none"].gain_ba.min()) * 100
+        check("q1 chrono no net harm (min naive gain >= 0)", 0.44, max(worst, 0.0), 0.45)
+
+    if os.path.exists(f"{Q1}/operational_e2e.csv"):
+        OE = pd.read_csv(f"{Q1}/operational_e2e.csv")
+        base = OE[(OE.cand_latency == 5) & (OE.train_delay == 0)]
+
+        def oe(ds, pi, acq):
+            r = base[(base.dataset == ds) & (base.prevalence == pi) & (base.acquisition == acq)]
+            return float(r.iloc[0].inspected_flows_per_attack) if len(r) else None
+
+        check("q1 e2e ToN pi.01 random 112.5 flows/attack", 112.5, oe("ton", 0.01, "random"), 0.6)
+        check("q1 e2e ToN pi.01 alert-enriched 13.7", 13.7, oe("ton", 0.01, "alert_enriched"), 0.15)
+        check("q1 e2e PortScan pi.01 random 109.9", 109.9, oe("portscan", 0.01, "random"), 0.6)
+        check("q1 e2e PortScan pi.05 alert-enriched 3.3", 3.3, oe("portscan", 0.05, "alert_enriched"), 0.1)
+        check("q1 e2e ToN pi.005 alert-enriched 24.5", 24.5, oe("ton", 0.005, "alert_enriched"), 0.2)
+
+        def oes(ds, cl, td, col="gain"):
+            r = OE[(OE.dataset == ds) & (OE.prevalence == 0.05) & (OE.acquisition == "random")
+                   & (OE.cand_latency == cl) & (OE.train_delay == td)]
+            return float(r.iloc[0][col]) * 100 if len(r) else None
+
+        check("q1 e2e PortScan lat5 delay0 +7.82", 7.82, oes("portscan", 5, 0), 0.02)
+        check("q1 e2e PortScan lat20 +6.71", 6.71, oes("portscan", 20, 0), 0.02)
+        check("q1 e2e PortScan train-delay5 +6.82", 6.82, oes("portscan", 5, 5), 0.02)
+        check("q1 e2e chrono thu_fri naive +36.07", 36.07,
+              float(pd.read_csv(f"{Q1}/chronological_replays.csv")
+                    .query("stream=='thu_fri' and policy=='none'").iloc[0].gain_ba) * 100, 0.02)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")

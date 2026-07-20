@@ -1,6 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
-\usepackage{graphicx,booktabs,amsmath,multirow}
+\usepackage{graphicx,booktabs,amsmath,amssymb,multirow}
 \graphicspath{{../}{./}}
 \usepackage[numbers]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
@@ -16,7 +16,7 @@ for Drift-Triggered Classifier Updates in Network Intrusion Detection''}
 \begin{document}
 \maketitle
 
-\noindent This supplement contains the initial exploratory study (harness v1) in full (\S S1; its additional figures and tables in \S S3), as summarized in \S5.2 of the main paper, together with the verbatim detail of several registered extensions summarized in \S5.3 of the main paper (\S S2). Section numbering, figures and tables are prefixed S.
+\noindent This supplement contains the initial exploratory study (harness v1) in full (\S S1; its additional figures and tables in \S S3), as summarized in \S5.2 of the main paper, together with the verbatim detail of several registered extensions summarized in \S5.3 of the main paper (\S S2), and the proof of Proposition 1 of the main paper (\S S4). Section numbering, figures and tables are prefixed S.
 The registered confirmatory evidence lives in the main paper; material here is context, and is
 superseded by the main paper's v2 numbers where noted. Bibliographic references are resolved
 against the same bibliography file as the main paper; numbering is local to this supplement.
@@ -154,9 +154,71 @@ Separately, on natural-prevalence \emph{evaluation} streams, the corrected exper
 
 \subsection{Chronological replays: the full per-replay account}
 
-\textbf{Chronologically ordered subsampled replays: the gate's honest boundary, measured properly.} A first Friday replay (seeds 134--163) contained two implementation flaws, caught in external review: a stride mismatch let candidates train on ${\sim}$28k rows the stream never presented as evaluation windows, and its summary averaged plain accuracy (single-class windows) with balanced accuracy. We corrected the runner, registered the correction (amendment 004), and re-ran on fresh seeds with two additional CICIDS streams; a further registered amendment (005) added an \emph{external} chronological stream --- the raw UNSW-NB15 captures, 2.54M flows sorted by flow start time, incumbent trained on the first 30\% of the timeline (temporal-streams table in the main paper). The corrected picture is stronger in both directions, and the fourth stream completes it. The phenomenon is real: Tuesday-trained CICIDS incumbents collapse on all three days (BA 53--72\%) and drift-triggered retraining recovers +13.6 to +27.6 points --- deep-benefit territory, confirming the ramps did not manufacture the recovery. The gate's boundary is sharper than the flawed run suggested: on Friday the gate surrenders 6.3 of naive's 13.6 recovered BA points ($-$6.34 [$-$6.83, $-$5.90]) and on Thursday 5.0 of 22.7, while on Wednesday it pays nothing (+0.40 [0.09, 0.74]). \emph{And on the external stream the account's central prediction holds}: the UNSW incumbent stays healthy (82.3\% BA, no collapse; 163/200 two-class windows, ${\sim}$21 triggers/stream), updating helps moderately (+7.33 [6.80, 7.85]), and the gate pays \emph{no premium at all} (+0.16 [$-$0.31, 0.63] vs naive on BA; +0.21 on accuracy) --- the insurance is free precisely where the incumbent's health makes the commit decision genuinely uncertain, which is where the gate's value concentrates. A fifth registered replay attempted to engineer chronological harm --- train on Wednesday (DoS-rich) and replay Thursday (sparse WebAttacks $\to$ Infiltration), hoping for a healthy incumbent facing weak candidates --- but the Wednesday-trained model collapses on Thursday too (48.7\% BA), producing another deep-benefit stream (naive +33.66, gate +18.58; premium $-$15.08 on BA, $-$0.08 [$-$0.30, 0.15] on accuracy --- the same metric-dependent pattern, at its most extreme). A sixth registered replay (amendment 009) targeted the healthy-incumbent corner directly --- a purely \emph{intra-day} CICIDS stream (Tuesday, train on the first 30\% of the timeline, stream the rest) so the incumbent faces the same day it trained on --- but it collapses there too (no-adaptation BA 49.5\%, naive +43.8, gate premium $-$5.66 [$-$8.62, $-$3.85]), because Tuesday's brute-force phase switches attack sub-type over the day (the training window contains only FTP-Patator, the stream only SSH-Patator), so a new variant appears that the incumbent never saw: deep benefit again, not a healthy incumbent. \emph{Chronological net-harm therefore remains unobserved across six replays, and a healthy-incumbent chronological stream remains confined to the external UNSW-NB15 timeline}: every CICIDS incumbent collapses on a later window --- even within a single day --- which is exactly the deep-benefit corner where the account says the gate has least to offer. This is a real limit on external validity for the harm result, and \S7 of the main paper states it --- though the mild-drift prediction test in the main paper shows that the harm is not confined to one dataset once the incumbent is allowed to stay healthy.
+\textbf{Chronologically ordered subsampled replays: the gate's honest boundary, measured properly.} A first Friday replay (seeds 134--163) contained two implementation flaws, caught in external review: a stride mismatch let candidates train on ${\sim}$28k rows the stream never presented as evaluation windows, and its summary averaged plain accuracy (single-class windows) with balanced accuracy. We corrected the runner, registered the correction (amendment 004), and re-ran on fresh seeds with two additional CICIDS streams; a further registered amendment (005) added an \emph{external} chronological stream --- the raw UNSW-NB15 captures, 2.54M flows sorted by flow start time, incumbent trained on the first 30\% of the timeline (temporal-streams table in the main paper). The corrected picture is stronger in both directions, and the fourth stream completes it. The phenomenon is real: Tuesday-trained CICIDS incumbents collapse on all three days (BA 53--72\%) and drift-triggered retraining recovers +13.6 to +27.6 points --- deep-benefit territory, confirming the ramps did not manufacture the recovery. The gate's boundary is sharper than the flawed run suggested: on Friday the gate surrenders 6.3 of naive's 13.6 recovered BA points ($-$6.34 [$-$6.83, $-$5.90]) and on Thursday 5.0 of 22.7, while on Wednesday it pays nothing (+0.40 [0.09, 0.74]). \emph{And on the external stream the account's central prediction holds}: the UNSW incumbent stays healthy (82.3\% BA, no collapse; 163/200 two-class windows, ${\sim}$21 triggers/stream), updating helps moderately (+7.33 [6.80, 7.85]), and the gate pays \emph{no premium at all} (+0.16 [$-$0.31, 0.63] vs naive on BA; +0.21 on accuracy) --- the insurance is free precisely where the incumbent's health makes the commit decision genuinely uncertain, which is where the gate's value concentrates. A fifth registered replay attempted to engineer chronological harm --- train on Wednesday (DoS-rich) and replay Thursday (sparse WebAttacks $\to$ Infiltration), hoping for a healthy incumbent facing weak candidates --- but the Wednesday-trained model collapses on Thursday too (48.7\% BA), producing another deep-benefit stream (naive +33.66, gate +18.58; premium $-$15.08 on BA, $-$0.08 [$-$0.30, 0.15] on accuracy --- the same metric-dependent pattern, at its most extreme). A sixth registered replay (amendment 009) targeted the healthy-incumbent corner directly --- a purely \emph{intra-day} CICIDS stream (Tuesday, train on the first 30\% of the timeline, stream the rest) so the incumbent faces the same day it trained on --- but it collapses there too (no-adaptation BA 49.5\%, naive +43.8, gate premium $-$5.66 [$-$8.62, $-$3.85]), because Tuesday's brute-force phase switches attack sub-type over the day (the training window contains only FTP-Patator, the stream only SSH-Patator), so a new variant appears that the incumbent never saw: deep benefit again, not a healthy incumbent. \emph{Chronological net-harm is therefore unobserved across these six replays, and within this first set the only healthy-incumbent chronological stream is the external UNSW-NB15 timeline (the pre-enumerated matrix of \S5.5 of the main paper adds two more)}: every CICIDS incumbent collapses on a later window --- even within a single day --- which is exactly the deep-benefit corner where the account says the gate has least to offer. This is a real limit on external validity for the harm result, and \S7 of the main paper states it --- though the mild-drift prediction test in the main paper shows that the harm is not confined to one dataset once the incumbent is allowed to stay healthy.
+
+\input{tables/table_temporal_streams.tex}
 
 These replays are \emph{chronologically ordered subsampled replays}, not full-capture replays: each processes 200 windows of 256 flows, strided to span the day, so a fraction of the capture is evaluated. The ordering, the labels and the causal availability of every probe are real; the sampling density is not. The premium is \emph{metric-dependent}: on overall accuracy the gate \emph{beats} naive on the same streams (Friday +4.19 [3.85, 4.52]; Thursday +1.23) while losing balanced accuracy on attack-mixed windows. Our first diagnosis --- that the gate inherits the benign-dominated \emph{class composition} of a natural-composition probe --- was put to a registered causal test (amendment 005): a stratified probe (16 per class wherever the past window contains both classes) leaves the premium unchanged (stratified$-$plain: $-$0.05 [$-$0.49, 0.41] on Friday), so the composition account is \emph{not supported} where it is testable --- with the caveat that roughly two-thirds of past windows are single-class, where stratification cannot act. The surviving explanation is probe \emph{staleness}: on a stream whose regime changes within a few windows, a nine-window-old probe --- whatever its composition --- misranks candidates whose relative merits have already shifted, and it systematically misranks them on the minority class first (which is why balanced accuracy pays and overall accuracy does not). We report this as a hypothesis consistent with the data, not a demonstrated mechanism; on streams known to sit deep in the benefit regime, naive triggering is already adequate. This is the one registered check where the gate costs real benefit, reported as such.
+
+\subsection{How the leakage-free causal arm was reached (three registered iterations)}
+
+\textbf{Each iteration closed a flaw that external review or our own assertions surfaced},
+and the harm-regime conclusion survived all of them. (i) Amendment 011 removed the
+with-replacement stream, cutting candidate-training/future-evaluation collisions from
+387--1{,}319 per stream to ${\approx}0$; (ii) amendment 012 replaced the naive-loop fallback
+at early no-probe triggers with \texttt{reject}, so no commit is ever made without a
+validating probe; (iii) amendment 013 made the value-deduplication \emph{global} with an
+abort-on-exhaustion assertion (collisions \emph{exactly} zero) and added a minimum-window
+rule before the observed detector threshold is recomputed. The ToN-IoT gate$-$naive contrast
+across the four versions was $+3.86$ (leaky) $\to$ $+2.95$ $\to$ $+3.24$ $\to$ $+5.57$
+(final): the effect was never an artifact of the leakage, and tightening the pipeline
+\emph{strengthened} rather than weakened it. CICIDS-PortScan moved the other way --- its
+small benefit-regime premium was partly leakage and settles at $+0.41$ --- which is the
+honest counterpart and the reason we report both. The superseded intermediate numbers are
+preserved in the registered amendment notes in the artifact repository, not in the paper.
+
+\subsection{The pooled EB-CS probe-budget sweep (superseded in scope by the budget frontier)}
+
+Amendment 011 asked whether the pooled empirical-Bernstein gate's abstention at $b{=}64$ was
+a property of the rule or of the budget, using a three-point sweep on the per-proposal gate.
+Raising the probe to 128 and 256 flows lifts it monotonically: CICIDS-PortScan
+$+5.17 \to +7.31 \to +8.07$ (approaching the fixed 32-probe point gate's $+8.70$), and the
+small benefits it had missed become resolvable (UNSW-Recon $+0.00 \to +0.12 \to +0.78$;
+ToN-IoT at full drift $+0.00 \to +0.01 \to +0.12$), at a proportional labeling cost of
+63/124/239 labels per decision. The conclusion --- \emph{the binding constraint is the label
+budget, not the decision rule} --- is the same one the far larger registered budget frontier
+of \S5.4 of the main paper reaches for the \emph{lifetime-budgeted} policies, which is why
+the main text now carries that experiment and this three-point sweep is retained here as its
+antecedent.
+
+\subsection{Superseded risk-gate implementations: the Robbins CS and the Bonferroni sequential probe}
+
+Two risk-controlled rules preceded the empirical-Bernstein machinery the paper now recommends,
+and both are dominated by it. We record them here so the frontier's endpoints are documented.
+
+\textbf{Robbins normal-mixture confidence sequence.} Commits only when a normal-mixture lower
+confidence sequence on the per-flow correctness difference exceeds zero, bounding the
+per-proposal probability of falsely establishing positive expected paired correctness on the
+probe distribution by $\alpha$, uniformly over the inspection schedule (\S3.5 of the main
+paper states the guarantee and its scope). Because the bound must budget for the worst-case
+sub-Gaussian variance ($\sigma^2 \le 1$) rather than the observed one, at probe budgets
+$\le 64$ flows it essentially never commits (gain $+0.00$ across all mild- and zero-drift
+regimes). That is correct behaviour where there is no headroom, and it is the
+maximally risk-averse endpoint of the point/LCB/McNemar/sequential frontier --- but it forgoes
+benefit wherever headroom exists, which is exactly what the empirical-Bernstein sequence
+recovers by using the empirical variance of a mostly-tied difference sequence.
+
+\textbf{Bonferroni sequential probe.} Draws 16 flows, decides as soon as the evidence resolves
+the sign, and buys more (to 64) only while the decision is in doubt, spending $\alpha/K$ at
+each of $K{=}4$ looks so that stopping is valid. (A first heuristic version inspected a
+fixed-sample interval at each look, which inflates the error rate under optional stopping;
+external review noted this and the registered rule replaced it.) It spends 58--61 labels per
+decision and is deliberately conservative: CICIDS-PortScan $+8.04$, i.e.\ $-1.08$
+[$-1.38$, $-0.79$] below the fixed 32-label probe; UNSW-Recon $+1.00$; ToN-IoT $+0.16$. It is
+also the rule that recovers essentially all of the zero-drift loss by refusing to commit
+without evidence. The confidence sequences of \S3.5 subsume it: they are valid at every sample
+size rather than at four pre-declared looks, and the empirical-Bernstein version is
+strictly tighter at the same $\alpha$.
 
 \section{Additional figures and tables (initial study)}
 The floats below support the initial exploratory study of \S S1: the descriptive mechanism-law views, oracle-regret, label-latency, and the Phase-1 negative-policy table.
@@ -193,6 +255,58 @@ The floats below support the initial exploratory study of \S S1: the descriptive
 \end{figure}
 
 
+
+\section{Proof of Proposition 1 (conditional validity of the commit e-process)}
+\label{sec:s4proof}
+
+\noindent\textbf{Setting.} Per class, the gate observes per-flow correctness differences
+$d_1, d_2, \dots \in \{-1, 0, +1\}$ in adjudication order, mapped to $x_i = (d_i+1)/2 \in [0,1]$.
+The implementation maintains, before observing $x_i$, the predictable plug-ins
+$\hat\mu_{i-1} = (1/2 + \sum_{j<i} x_j)/i$ and
+$\hat\sigma^2_{i-1} = (1/4 + \sum_{j<i} (x_j - \hat\mu_{j-1})^2)/i$, and the predictable betting
+fraction $\lambda_i = \min\{3/4,\ \sqrt{2\log(1/\alpha) / (\hat\sigma^2_{i-1}\, i \log(i+1))}\}$.
+With $\psi_E(\lambda) = -\log(1-\lambda) - \lambda$, define the wealth process
+$$W_n \;=\; \exp\Big(\sum_{i\le n} \lambda_i \big(x_i - \tfrac12\big) \;-\; \sum_{i\le n} \psi_E(\lambda_i)\,\big(x_i - \hat\mu_{i-1}\big)^2\Big), \qquad W_0 = 1 .$$
+The gate's commit condition --- the empirical-Bernstein lower bound on $\mathbb{E}[d]$
+exceeding $0$, i.e.\ the lower bound on $\mathbb{E}[x]$ exceeding $1/2$ --- rearranges exactly to
+$\sum_i \lambda_i (x_i - \tfrac12) - \sum_i \psi_E(\lambda_i)(x_i - \hat\mu_{i-1})^2 > \log(1/\alpha)$,
+i.e.\ the event $\{W_n > 1/\alpha\}$: the confidence-sequence inversion and the e-process
+threshold are the same object.
+
+\medskip
+\noindent\textbf{Claim.} If $\mathbb{E}[x_i \mid \mathcal F_{i-1}] \le 1/2$ for every $i$ (the weak
+null: the challenger is at no time conditionally better), with no stationarity or identical-distribution
+assumption, then $(W_n)$ is a nonnegative supermartingale and
+$\Pr(\exists n : W_n > 1/\alpha) \le \alpha$.
+
+\medskip
+\noindent\textbf{Proof.} Write $\mu_i = \mathbb{E}[x_i \mid \mathcal F_{i-1}] \le 1/2$ and
+$y_i = x_i - \hat\mu_{i-1}$. Since $x_i \in [0,1]$ and $\hat\mu_{i-1} \in (0,1)$ is
+$\mathcal F_{i-1}$-measurable, $y_i > -1$; and $\lambda_i \in [0, 3/4] \subset [0,1)$ is
+$\mathcal F_{i-1}$-measurable. Fan's inequality states that for all $y \ge -1$ and
+$\lambda \in [0,1)$,
+$\exp\big(\lambda y - \psi_E(\lambda)\, y^2\big) \le 1 + \lambda y$.
+Multiplying both sides by the $\mathcal F_{i-1}$-measurable factor
+$\exp\big(\lambda_i(\hat\mu_{i-1} - \tfrac12)\big)$ and using
+$\lambda_i(x_i - \tfrac12) = \lambda_i y_i + \lambda_i(\hat\mu_{i-1} - \tfrac12)$,
+$$\exp\Big(\lambda_i \big(x_i - \tfrac12\big) - \psi_E(\lambda_i)\, y_i^2\Big) \;\le\; \big(1 + \lambda_i y_i\big)\, e^{\lambda_i (\hat\mu_{i-1} - 1/2)} .$$
+Taking $\mathbb{E}[\,\cdot \mid \mathcal F_{i-1}]$ of the right-hand side and using
+$\mathbb{E}[y_i \mid \mathcal F_{i-1}] = \mu_i - \hat\mu_{i-1}$ together with $1 + u \le e^u$:
+$$\big(1 + \lambda_i(\mu_i - \hat\mu_{i-1})\big)\, e^{\lambda_i(\hat\mu_{i-1} - 1/2)} \;\le\; e^{\lambda_i(\mu_i - \hat\mu_{i-1})}\, e^{\lambda_i(\hat\mu_{i-1} - 1/2)} \;=\; e^{\lambda_i(\mu_i - 1/2)} \;\le\; 1,$$
+the last step because $\mu_i \le 1/2$ and $\lambda_i \ge 0$. Hence
+$\mathbb{E}[W_i \mid \mathcal F_{i-1}] \le W_{i-1}$: $(W_n)$ is a nonnegative supermartingale with
+$W_0 = 1$, and Ville's inequality yields $\Pr(\exists n: W_n \ge 1/\alpha) \le \alpha$. $\square$
+
+\medskip
+\noindent\textbf{Scope.} The argument is the standard testing-by-betting supermartingale bound
+\cite{waudbysmith2023betting,howard2021timeuniform}; we claim only the correspondence to this
+implementation. Rejecting the weak null establishes that the challenger was conditionally better
+at \emph{some} point of the adjudication stream --- not that it is better at commit time, which is
+why the cohort and refresh continuation modes of \S3.5 of the main paper exist. The stratified
+gates run one such process per class at $\alpha/2$ (or $\alpha/4$ with a futility side) and
+Bonferroni preserves the level. A registered null simulation with time-varying conditional means
+(all $\le 0$) and time-varying tie probabilities verifies the bound empirically
+(\texttt{test\_weak\_null\_drifting\_means} in the artifact).
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}

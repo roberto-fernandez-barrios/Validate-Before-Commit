@@ -3,11 +3,11 @@
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
-- Under fixed generators, incumbent health predicts update value better than drift  [82]
-- For SVC-RBF, mild-drift always-deploy turns negative in all three, resolved in two  [82]
-- Deploy a retrained candidate only when a small labeled probe confirms improvement  [83]
-- Registered replication on a hardened harness confirms every pre-specified criterion [85]
-- Boundary mapped honestly: a measurable premium on deep-benefit chronological streams [85]
+- Drift alarms propose candidates; they do not establish deployment benefit  [73]
+- Healthy-incumbent updates turn negative in three benchmarks, resolved in two  [76]
+- Candidate-incumbent validation reduces harmful SVC-RBF replacement  [66]
+- Point, strict and risk-controlled gates define a labels-benefit-risk frontier  [77]
+- Chronological net harm remains unobserved: the main external-validity boundary  [78]
 
 ## Graphical abstract
 

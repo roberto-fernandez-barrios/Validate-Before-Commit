@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{The registered chronological matrix (final-q1).} Seven pre-enumerated
+replays on genuinely time-ordered captures --- every train$\to$future day pair of CICIDS2017
+with an attack-bearing training day, two intra-day splits, and the UNSW-NB15 timeline at two
+training fractions --- each processed as 200 windows of 256 flows in capture order, seeds
+601--630. Columns are balanced-accuracy points over never-adapting (two-class windows only);
+\emph{no-adapt} is the frozen incumbent's absolute BA, the health indicator that governs
+which regime a stream is in. \textbf{No stream shows net harm}, consistent with the six
+earlier replays. Where the incumbent collapses (CICIDS), updating helps a lot and the gates
+cost almost nothing; where it stays healthy (both UNSW timelines), all three gates are
+\emph{above} always-deploying, and the zero-cost strict rule is the best of them.}
+\label{tab:chronological_q1}
+\small
+\begin{tabular}{l r r r r r}
+\toprule
+Replay & no-adapt BA & naive & point & strict & VBC-SG \\
+\midrule
+Tue $\to$ Wed+Thu+Fri & 59.0 & $+14.78$ & $+11.52$ & $+11.50$ & $+0.16$ \\
+Wed $\to$ Fri & 51.8 & $+35.29$ & $+27.64$ & $+28.81$ & $+0.91$ \\
+Thu $\to$ Fri & 49.0 & $+36.07$ & $+27.71$ & $+26.51$ & $+1.56$ \\
+Wed intra-day & 84.7 & $+6.47$ & $+6.02$ & $+5.77$ & $+0.56$ \\
+Thu intra-day & 48.3 & $+0.88$ & $+0.88$ & $+0.42$ & $+0.00$ \\
+UNSW (train 20\%) & 82.9 & $+8.35$ & $+9.90$ & $+11.13$ & $+10.76$ \\
+UNSW (train 40\%) & 84.2 & $+7.64$ & $+8.38$ & $+8.98$ & $+6.92$ \\
+\bottomrule
+\end{tabular}
+\end{table}

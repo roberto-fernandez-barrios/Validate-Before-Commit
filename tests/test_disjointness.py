@@ -31,11 +31,15 @@ def test_symmetric_ab_disjoint(synth, monkeypatch):
                 for j in range(i + 1, 4):
                     assert not (sets[i] & sets[j]), f"blocks {i}/{j} overlap (seed {seed}, class {cls})"
 
-    # (b) the script's own path (its internal asserts run) on two seeds
-    monkeypatch.setattr(ab, "SEEDS", range(104, 106))
+    # (b) the script's own path (its internal asserts run) on two seeds, including the
+    # final-q1 scaler/PCA decomposition conditions
     monkeypatch.setattr(ab, "DIM", 4)   # synthetic data has 5 features; PCA dim must fit
-    rows = ab.one_dataset("synthetic", str(synth["ref"]), "svc_rbf")
+    rows, perseed = ab.one_dataset("synthetic", str(synth["ref"]), "svc_rbf",
+                                   seeds=range(104, 106),
+                                   conds=ab.BASE_CONDS + ab.DECOMP_CONDS)
     assert rows and all(r["n_per_block"] == n for r in rows)
+    assert {p["condition"] for p in perseed} == set(ab.BASE_CONDS + ab.DECOMP_CONDS)
+    assert len(perseed) == 2 * len(ab.BASE_CONDS + ab.DECOMP_CONDS)
 
 
 def _disjoint_env(synth, seed=1):

@@ -380,6 +380,10 @@ def run_arm(method: str, env: Environment, args, seed: int):
     cand_future_collisions = 0                             # amendment 008 (train/future-eval audit)
     cand_rows_total = cand_unique_total = 0                # amendment 011 (unique-row accounting)
     n_no_probe = n_commit_no_probe = 0                     # amendment 012 (no-probe accounting)
+    n_defer_cont = n_defer_at_sev0 = 0                     # final-q1 D1 (defer-mode audit)
+    defer_evidence_max = 0
+    defer_delay_sum = n_defer_resolved = 0                 # final-q1 D3 endpoint e5 (delay)
+    n_defer_cap_reject = 0                                 # final-q1 D3 endpoint e4 (abstention)
     # amendment 008: exact feature identity of every future evaluation window's rows, so we can
     # both AUDIT candidate-training overlap with the future and (optionally) drop it
     future_row_sets = [ {r.tobytes() for r in np.ascontiguousarray(Xf)} for Xf, _, _ in env.stream ]
@@ -478,19 +482,35 @@ def run_arm(method: str, env: Environment, args, seed: int):
 
     for t, (Xw, yw, sev) in enumerate(env.stream):
         # amendment 014 (ebcs_defer): continue a deferred decision with fresh labels.
+        # final-q1 D1 (--vbc-defer-mode): what the continuation estimates.
+        #   accumulate: same e-process, labels at the CURRENT mixture (weak conditional null);
+        #   cohort:     same e-process, labels at the PROPOSAL-time mixture (fixed target);
+        #   refresh:    this window's labels ONLY, fresh evidence set at alpha/(1+defer cap).
         if pending is not None:
             pr = np.random.default_rng(seed * 911_003 + t)
+            sev_draw = pending["sev0"] if args.vbc_defer_mode == "cohort" else sev
             Xq_raw, yq = sample_balanced_from_distribution(
-                env.probe_pools, n_per_class=max(1, args.seq_block // 2), severity=sev, rng=pr)
+                env.probe_pools, n_per_class=max(1, args.seq_block // 2), severity=sev_draw, rng=pr)
             Xq = transform_X(Xq_raw, env.scaler, env.pca)
             dq = ((pending["cand"].predict(Xq) == yq).astype(float)
                   - (model.predict(Xq) == yq).astype(float))
-            pending["d"].extend(dq.tolist())
+            if args.vbc_defer_mode == "refresh":
+                pending["d"] = dq.tolist()
+                if "y" in pending:
+                    pending["y"] = []
+            else:
+                pending["d"].extend(dq.tolist())
             labels_used += len(yq); labels_probe += len(yq)
+            n_defer_cont += 1
+            n_defer_at_sev0 += int(sev_draw == pending["sev0"])
+            defer_evidence_max = max(defer_evidence_max, len(pending["d"]))
             da = np.asarray(pending["d"])
             if pending.get("kind") == "strat":
                 # final-kbs (vbc_sg): stratified continuation with the proposal's own alpha
-                pending["y"].extend(list(np.asarray(yq)))
+                if args.vbc_defer_mode == "refresh":
+                    pending["y"] = list(np.asarray(yq))
+                else:
+                    pending["y"].extend(list(np.asarray(yq)))
                 ya_ = np.asarray(pending["y"]); a_p = pending["alpha"]
                 lbs, ubs = [], []
                 for cls in (0, 1):
@@ -511,13 +531,17 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         detector, threshold = calibrate(detector, env, sev, args,
                                                         np.random.default_rng(seed * 1_000 + 999 + t))
                     alarms = []; cooldown = args.cooldown_windows
+                    defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
                     pending = None
                 elif (lbs is not None and 0.5 * (ubs[0] + ubs[1]) < 0.0) or pending["left"] <= 1:
                     n_reject += 1
+                    n_defer_cap_reject += int(not (lbs is not None
+                                                   and 0.5 * (ubs[0] + ubs[1]) < 0.0))
+                    defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
                     pending = None
                 else:
                     pending["left"] -= 1
-            elif cs_lower_bound_eb(da, alpha_eff / 2.0) > 0.0:
+            elif cs_lower_bound_eb(da, pending["alpha"] / 2.0) > 0.0:
                 n_adapt += 1; adapt_windows.append(t)
                 model = pending["cand"]
                 detector = build_detector(method, args, seed + t + 1)
@@ -529,9 +553,12 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     detector, threshold = calibrate(detector, env, sev, args,
                                                     np.random.default_rng(seed * 1_000 + 999 + t))
                 alarms = []; cooldown = args.cooldown_windows
+                defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
                 pending = None
-            elif cs_lower_bound_eb(-da, alpha_eff / 2.0) > 0.0 or pending["left"] <= 1:
+            elif cs_lower_bound_eb(-da, pending["alpha"] / 2.0) > 0.0 or pending["left"] <= 1:
                 n_reject += 1
+                n_defer_cap_reject += int(not (cs_lower_bound_eb(-da, pending["alpha"] / 2.0) > 0.0))
+                defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
                 pending = None
             else:
                 pending["left"] -= 1
@@ -573,10 +600,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
         else:
             alarms.append(score > threshold)
         if args.trigger_mode in ("ddm", "adwin", "ddm_river", "adwin_river", "random"):
-            trigger = bool(alarms[-1]) and cooldown <= 0   # self-confirming triggers
+            trigger = bool(alarms[-1]) and cooldown <= 0 and pending is None
         else:
             recent = alarms[-args.consecutive_k:]
-            trigger = len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
+            trigger = (len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
+                       and pending is None)
+        # final-q1 (pending-candidate policy, registered): an unresolved DEFER blocks new
+        # proposals -- a fresh alarm during a pending decision is absorbed exactly like a
+        # cooldown window (unreachable under defer_windows < cooldown, but now explicit).
         seen.append((Xw, yw))
         adapted = False
         if trigger:
@@ -608,6 +639,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
             candidate = None
             commit, cand_val = True, None
             p_inc = p_cand = np.nan
+            cand_sev_used = cand_newest_win = np.nan   # final-q1 latency instrumentation
             if skip_train:
                 commit = False
                 n_skip_train += 1
@@ -619,11 +651,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 svc_C = 1.0  # amendment 011: cumulative `cn` control may override below
                 if args.adapt_strategy == "sliding_window":
                     # retrain on the last 8 OBSERVED (already-seen, labeled) stream windows;
-                    # amendment 014: --candidate-latency L delays ALL training labels by L windows
+                    # amendment 014: --candidate-latency L shifts the WHOLE training batch
+                    # (features AND labels) to the 8 windows ending at t-L
                     cl = getattr(args, "candidate_latency", 0)
                     hist = (seen[-(8 + cl):-cl] if cl > 0 else seen[-8:])
                     if not hist:
                         hist = seen[:1]
+                    cand_newest_win = len(seen) - 1 - cl   # final-q1 latency instrumentation
                     Xa = np.vstack([x for x, _ in hist]); ya = np.concatenate([y for _, y in hist])
                 elif args.adapt_strategy == "cumulative":
                     # amendment 009: candidate trains on ALL observed (labeled) windows so far,
@@ -663,8 +697,13 @@ def run_arm(method: str, env: Environment, args, seed: int):
                                     transform_X(Xr_raw, env.scaler, env.pca)])
                     ya = np.concatenate([yc, yr])
                 else:
+                    # full_replace: --candidate-latency L samples the batch at the mixture of
+                    # window t-L (the labeled batch AVAILABLE at t is the one adjudicated L
+                    # windows ago -- features and labels lag together)
                     cl = getattr(args, "candidate_latency", 0)
                     sev_c = env.stream[max(0, t - cl)][2] if cl > 0 else sev
+                    cand_sev_used = sev_c                  # final-q1 latency instrumentation
+                    cand_newest_win = max(0, t - cl)
                     Xa_raw, ya = sample_balanced_from_distribution(
                         env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev_c, rng=cand_rng)
                     Xa = transform_X(Xa_raw, env.scaler, env.pca)
@@ -855,6 +894,10 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         #           permits continuation), up to --defer-windows, then reject.
                         if args.adapt_strategy != "full_replace" or args.probe_source == "observed":
                             raise ValueError("vbc_sg supports full_replace + pool probes")
+                        # final-q1 D1: refresh mode Bonferroni-splits the proposal's alpha over
+                        # the (1 + defer_windows) independent evidence sets it may open.
+                        a_prop = (alpha_eff / (1 + args.defer_windows)
+                                  if args.vbc_defer_mode == "refresh" else alpha_eff)
                         d = ((candidate.predict(Xp) == yp).astype(float)
                              - (model.predict(Xp) == yp).astype(float))
                         lbs, ubs = [], []
@@ -862,8 +905,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
                             dc = d[yp == cls]
                             if len(dc) < 2:
                                 lbs = None; break
-                            lbs.append(cs_lower_bound_eb(dc, alpha_eff / 4.0))
-                            ubs.append(-cs_lower_bound_eb(-dc, alpha_eff / 4.0))
+                            lbs.append(cs_lower_bound_eb(dc, a_prop / 4.0))
+                            ubs.append(-cs_lower_bound_eb(-dc, a_prop / 4.0))
                         commit = False
                         if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
                             commit = True
@@ -872,7 +915,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         else:
                             pending = dict(kind="strat", cand=candidate,
                                            d=list(d), y=list(np.asarray(yp)),
-                                           alpha=alpha_eff, left=args.defer_windows)
+                                           alpha=a_prop, sev0=sev_probe, t0=t,
+                                           left=args.defer_windows)
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(len(d))
@@ -908,16 +952,19 @@ def run_arm(method: str, env: Environment, args, seed: int):
                         # Supported with full_replace + pool probes.
                         if args.adapt_strategy != "full_replace" or args.probe_source == "observed":
                             raise ValueError("ebcs_defer supports full_replace + pool probes")
+                        a_prop = (alpha_eff / (1 + args.defer_windows)
+                                  if args.vbc_defer_mode == "refresh" else alpha_eff)
                         d = list(((candidate.predict(Xp) == yp).astype(float)
                                   - (model.predict(Xp) == yp).astype(float)))
                         da = np.asarray(d)
                         commit = False
-                        if cs_lower_bound_eb(da, alpha_eff / 2.0) > 0.0:
+                        if cs_lower_bound_eb(da, a_prop / 2.0) > 0.0:
                             commit = True
-                        elif cs_lower_bound_eb(-da, alpha_eff / 2.0) > 0.0:
+                        elif cs_lower_bound_eb(-da, a_prop / 2.0) > 0.0:
                             commit = False                       # resolved futility: reject now
                         else:
-                            pending = dict(cand=candidate, d=d, left=args.defer_windows)
+                            pending = dict(cand=candidate, d=d, alpha=a_prop, sev0=sev_probe, t0=t,
+                                           left=args.defer_windows)
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(len(d))
@@ -982,7 +1029,9 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 score=score, threshold=threshold,
                 deg_pre5=float(np.mean(ba_hist[-6:-1])) if len(ba_hist) > 1 else np.nan,
                 probe_inc=p_inc, probe_cand=p_cand, committed=bool(commit),
-                trained=bool(candidate is not None))
+                trained=bool(candidate is not None),
+                cand_latency=int(getattr(args, "candidate_latency", 0)),
+                cand_sev_used=cand_sev_used, cand_newest_window=cand_newest_win)
             for h in FUTURE_HORIZONS:
                 inc_h = float(np.mean(inc_seq[:h])) if inc_seq else np.nan
                 cand_h = float(np.mean(cand_seq[:h])) if cand_seq else np.nan
@@ -1048,6 +1097,11 @@ def run_arm(method: str, env: Environment, args, seed: int):
                          trigger=bool(trigger), adapted_now=bool(adapted)))
 
     summary = dict(seed=seed, method=method, n_windows=args.post_windows, n_adaptations=n_adapt,
+                   vbc_defer_mode=getattr(args, "vbc_defer_mode", "accumulate"),
+                   n_defer_continuations=n_defer_cont, n_defer_draws_at_sev0=n_defer_at_sev0,
+                   defer_evidence_max=defer_evidence_max,
+                   defer_delay_sum=defer_delay_sum, n_defer_resolved=n_defer_resolved,
+                   n_defer_cap_reject=n_defer_cap_reject,
                    n_triggers=n_trig, n_gate_rejections=n_reject, labels_used_total=labels_used,
                    labels_probe=labels_probe, labels_monitor=labels_monitor,
                    labels_candidate=labels_candidate, n_candidates_trained=n_cand_trained,
@@ -1171,6 +1225,15 @@ def main():
                    help="final-kbs P0.3: lifetime spending schedule; pseries = 6a/(pi^2 j^2).")
     p.add_argument("--defer-windows", type=int, default=5,
                    help="amendment 014 (ebcs_defer): max windows a deferred decision may continue.")
+    p.add_argument("--vbc-defer-mode", type=str, default="accumulate",
+                   choices=["accumulate", "cohort", "refresh"],
+                   help="final-q1 D1: what a DEFER continues on. accumulate = extend the SAME "
+                        "e-process with labels drawn at the CURRENT window's mixture (valid for "
+                        "the weak conditional null E[d_t|F_{t-1}]<=0 -- see q1_max_protocol D1); "
+                        "cohort = extend it with labels drawn at the PROPOSAL-time mixture "
+                        "(fixed target; clean fixed-mean guarantee); refresh = each continuation "
+                        "window is a FRESH evidence set at the current mixture, every set tested "
+                        "at alpha/(1+defer_windows) (Bonferroni within the proposal).")
     p.add_argument("--candidate-latency", type=int, default=0,
                    help="amendment 014: ALL candidate-training labels lag L windows (end-to-end lite).")
     p.add_argument("--min-calib-windows", type=int, default=0,

@@ -42,11 +42,20 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **causal arm** (candidate, probe and detector recalibration from observed traffic only).
-- **Honest boundary:** on real chronological streams sitting deep in the benefit regime, the gate pays a measurable
-  insurance premium in balanced accuracy vs always-deploy, while *beating* always-deploy on overall accuracy on the
-  same streams. A registered stratified-probe test rejected our first (composition) explanation; probe *staleness*
-  under fast drift is the surviving hypothesis, reported as such. Where the incumbent stays healthy — where the
-  gate's value concentrates — it is net-positive everywhere we measured.
+- **A named policy with a guarantee you can afford:** **VBC-SG** — stratified per-class anytime-valid bounds driving
+  commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
+  vacuous: at a 512-flow probe cap a lifetime-budgeted gate recovers **93% of always-deploying's benefit** (81% for
+  the fully stratified VBC-SG) while committing **nothing at all** under zero drift. The mechanism behind the harm is named too — a role-randomized A/B
+  control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**
+  (per-model scaling removes it; equivalence-tested on 100 fresh seeds).
+- **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the
+  paper's principal limit on external validity, stated as such. Where the incumbent collapses, always-deploy is
+  excellent and the gate pays a real premium. But on the timelines that keep the incumbent healthy — the condition
+  under which the account says the decision is genuinely hard — **every gate beats always-deploy**, the zero-cost
+  strict rule by up to +2.8 points while committing 2.5 times per stream against naive's 13.
+- **Priced end to end:** at operating prevalence the honest unit is *inspected flows*, not adjudicated labels.
+  Alert-guided inspection finds an attack **5–8× more cheaply** than random inspection; ranking by candidate/incumbent
+  disagreement barely helps (a negative we report as it came out).
 
 ---
 
@@ -124,7 +133,9 @@ Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.p
 `--downstream-model {svc_rbf,random_forest,logreg,mlp}`, `--stream-prevalence`,
 `--stream-disjoint-windows`, `--disjoint-window-frac`, `--min-calib-windows`, `--no-probe-policy {commit,reject}`,
 `--lifetime-alpha`, `--lifetime-max-proposals`, `--alpha-spending {bonferroni,pseries}`, `--defer-windows`,
-`--candidate-latency`.
+`--vbc-defer-mode {accumulate,cohort,refresh}` (what a DEFER continues on: same e-process at the current
+mixture — weak conditional null, Proposition 1; same e-process at the proposal-time cohort; or fresh
+per-window evidence at α/(1+D)), `--candidate-latency`.
 The **observed-data (causal) gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`
 (final leakage-free form adds `--stream-disjoint-windows --no-probe-policy reject --min-calib-windows 30`);
 the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **anytime-valid gates** are
@@ -188,7 +199,7 @@ The three public benchmarks are **not redistributed** here (place them under `da
 
 The working manuscript (§1–§8) and its bibliography are in [`manuscript/`](manuscript/). Every derived
 table, figure and numeric claim regenerates from this repository (`make reproduce`, or the full
-`make final-paper`, whose audit re-verifies all 415 pinned numbers); the experiment commands that
+`make final-paper`, whose audit re-verifies all 439 pinned numbers); the experiment commands that
 populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.md`](REPRODUCE.md).
 
 ## Citation

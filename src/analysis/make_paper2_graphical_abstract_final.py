@@ -34,7 +34,7 @@ ax.text(50, 94, "A drift alarm proposes a challenger — it does not justify dep
         ha="center", fontsize=FS_BIG, fontweight="bold")
 
 # ---- pipeline: Alarm -> Challenger -> Validation -> three actions ----
-y0, h0 = 56, 16
+y0, h0 = 58, 17
 box(2, y0, 16, h0, "Drift alarm\n(or schedule,\nor false alarm)", "#fff3e0", "#e65100")
 arrow(19.5, y0 + h0 / 2, 24.5, y0 + h0 / 2)
 box(25, y0, 16, h0, "Challenger\ntrained\n(a proposal)", "#e3f2fd", "#1565c0")
@@ -48,25 +48,23 @@ box(77, 73, 21, 11, "COMMIT\nevidence of improvement", "#e8f5e9", "#1b5e20", fs=
 box(77, y0 + 2.0, 21, 11, "REJECT\nkeep the incumbent", "#ffebee", "#b71c1c", fs=FS_SM)
 box(77, 41, 21, 11, "DEFER\nbuy more labels later", "#ede7f6", "#4527a0", fs=FS_SM)
 
-# ---- two policy lines ----
-box(2, 22, 46, 13,
-    "Point / strict gate:  max benefit capture\n"
-    "(PortScan +9.4 of naive's +8.8; strict rejects ties at zero cost)",
-    "#f5f5f5", "#455a64", fs=FS_SM)
-box(52, 22, 46, 13,
-    "Risk gate (VBC-SG): per-class anytime-valid bounds,\n"
-    "lifetime $\\alpha$ budget — safety costs labels and small gains",
-    "#f5f5f5", "#455a64", fs=FS_SM)
-
-# ---- honest-scope badges ----
-box(2, 4, 46, 12,
-    "Controlled SVC-RBF harm case:  healthy incumbent + frozen\n"
-    "feature pipeline $\\Rightarrow$ replacement can hurt (mechanism identified)",
-    "#fff8e1", "#795548", fs=FS_SM)
-box(52, 4, 46, 12,
-    "Scope: three NIDS benchmarks; leakage-free observed-data arm;\n"
-    "chronological net-harm not observed — reported honestly",
-    "#fff8e1", "#795548", fs=FS_SM)
+# ---- three messages (final-q1: simplified per external review -- one sentence each, no
+# crowded caveat strip; larger type, generous spacing) ----
+box(1.5, 7, 31.5, 27,
+    "Controlled harm case\n\n"
+    "Healthy SVC-RBF incumbent,\n"
+    "frozen pipeline: swapping hurts",
+    "#fff8e1", "#795548", fs=14)
+box(34, 7, 31.5, 27,
+    "The trade-off\n\n"
+    "Point / strict: most benefit\n"
+    "Risk gates: control, more labels",
+    "#f5f5f5", "#455a64", fs=14)
+box(66.5, 7, 32, 27,
+    "The boundary\n\n"
+    "On real chronological streams\n"
+    "net harm was not observed",
+    "#eceff1", "#37474f", fs=14)
 
 fig.savefig("docs/img/graphical_abstract.png", dpi=200, bbox_inches="tight",
             facecolor="white")

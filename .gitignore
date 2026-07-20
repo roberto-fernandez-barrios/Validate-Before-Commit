@@ -100,6 +100,7 @@ manuscript/*.pdf
 # Internal planning / strategy / submission-logistics documents (kept locally, not part of
 # the public research artifact — protocols, pre-registrations and checkpoints remain tracked)
 /PAPER_2_execution_plan_Q1.md
+/PLAN_Q1_CLAUDE_CODE.md
 notes/paper2_director_summary_001.md
 notes/paper2_final_salvage_decision_001.md
 notes/paper2_final_salvage_review_001.md

@@ -35,6 +35,10 @@ reproduce: analysis manifest audit
 verify-hashes:
 	$(PY) -m src.analysis.verify_results_manifest
 
+# NOTE: every line of a recipe is handed to the shell, so `#` comments belong at column 0,
+# outside the recipe — an indented one is executed and fails on Windows.
+# final-analysis also covers the final-q1 blocks: budget frontier, A/B equivalence + TOST,
+# chronological matrix and operational end-to-end.
 final-analysis: analysis
 	$(PY) -m src.analysis.aggregate_paper2_amendment_006
 	$(PY) -m src.analysis.aggregate_paper2_amendment_007
@@ -46,10 +50,15 @@ final-analysis: analysis
 	$(PY) -m src.analysis.aggregate_paper2_amendment_013
 	$(PY) -m src.analysis.aggregate_paper2_amendment_014
 	$(PY) -m src.analysis.aggregate_paper2_final_kbs
+	$(PY) -m src.analysis.make_paper2_q1_frontier
+	$(PY) -m src.analysis.paper2_ab_equivalence
+	$(PY) -m src.analysis.make_paper2_q1_chronological
+	$(PY) -m src.analysis.make_paper2_q1_e2e
 
 final-tables:
 	$(PY) -m src.analysis.make_paper2_amendment009_table
 	$(PY) -m src.analysis.make_paper2_final_tables
+	$(PY) -m src.analysis.make_paper2_q1_tables
 
 final-figures:
 	$(PY) -m src.analysis.make_paper2_pertrigger_figure
@@ -61,7 +70,10 @@ final-manifest:
 test:
 	$(PY) -m pytest tests -q
 
+# `pdf` regenerates main_ieee.tex from main.tex first: the IEEE manuscript is a mechanical
+# port, and without this step it silently drifts out of sync (it had).
 pdf:
+	$(PY) -m src.analysis.port_ieee
 	$(PY) -m src.analysis.build_pdfs
 
 final-paper: verify-hashes final-analysis final-tables final-figures manifest final-manifest test pdf audit

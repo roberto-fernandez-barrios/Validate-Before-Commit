@@ -28,7 +28,8 @@
   "keywords": [
     "concept drift",
     "intrusion detection",
-    "safe model updating",
+    "risk-aware model updating",
+    "candidate governance",
     "label-efficient learning",
     "retraining policy",
     "machine learning",
