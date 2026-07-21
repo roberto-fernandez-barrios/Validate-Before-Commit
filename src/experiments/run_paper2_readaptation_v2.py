@@ -383,6 +383,59 @@ def run_arm(method: str, env: Environment, args, seed: int):
     n_defer_cont = n_defer_at_sev0 = 0                     # final-q1 D1 (defer-mode audit)
     defer_evidence_max = 0
     defer_delay_sum = n_defer_resolved = 0                 # final-q1 D3 endpoint e5 (delay)
+    res_rows: list[dict] = []                              # final-q1 B: proposal-resolution log
+
+    def log_resolution(prop_idx, t_prop, t_res, kind, deferred, incumbent, challenger):
+        """final-q1 blocker B: score EVERY resolved proposal from its REAL resolution window.
+
+        The trigger log scores a decision at the window the proposal was raised, which is
+        correct only for decisions resolved immediately; a deferred commit takes effect
+        several windows later, against a different stretch of stream. Here we record, for
+        every resolution, the incumbent-vs-challenger balanced accuracy over the windows that
+        FOLLOW the resolution (horizons 1/3/5/10 and 'until the next decision'), so harm can
+        be counted for deferred commits too. Lookahead is used for LOGGING ONLY, never by the
+        policy, exactly as in the existing per-trigger log. Proposals whose horizon runs past
+        the end of the stream are marked censored rather than silently scored short.
+        """
+        row = dict(seed=seed, method=method, gate=gate,
+                   proposal_idx=prop_idx, proposal_window=t_prop, resolution_window=t_res,
+                   resolution_type=kind, deferred=bool(deferred),
+                   delay_windows=int(t_res - t_prop))
+        fut = env.stream[t_res + 1: t_res + 1 + max(FUTURE_HORIZONS)]
+        n_avail = len(fut)
+        inc_seq = [evaluate_model(incumbent, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut]
+        cand_seq = ([evaluate_model(challenger, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in fut]
+                    if challenger is not None else [])
+        for h in FUTURE_HORIZONS:
+            ok = challenger is not None and n_avail >= h
+            row[f"delta_res{h}"] = (float(np.mean(cand_seq[:h])) - float(np.mean(inc_seq[:h]))
+                                    if ok else np.nan)
+            row[f"censored_h{h}"] = bool(not ok)
+        row["n_future_windows"] = n_avail
+        row["_incumbent"], row["_challenger"] = incumbent, challenger
+        res_rows.append(row)
+        return len(res_rows) - 1   # index, so 'until next decision' can be filled in later
+
+    def close_until_next(idx_prev, t_next):
+        """Fill delta_until_next_decision on the previous resolution, once we know when the
+        next decision happened (or at end of stream)."""
+        if idx_prev is None:
+            return
+        r = res_rows[idx_prev]
+        t0 = r["resolution_window"]
+        span = env.stream[t0 + 1: t_next + 1]
+        cand = r.pop("_challenger", None)
+        inc = r.pop("_incumbent", None)
+        if cand is None or inc is None or not span:
+            r["delta_until_next"] = np.nan
+            r["censored_until_next"] = True
+            return
+        i = float(np.mean([evaluate_model(inc, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in span]))
+        c = float(np.mean([evaluate_model(cand, Xf, yf)["balanced_accuracy"] for Xf, yf, _ in span]))
+        r["delta_until_next"] = c - i
+        r["censored_until_next"] = False
+
+    last_res_idx = None
     n_defer_cap_reject = 0                                 # final-q1 D3 endpoint e4 (abstention)
     # amendment 008: exact feature identity of every future evaluation window's rows, so we can
     # both AUDIT candidate-training overlap with the future and (optionally) drop it
@@ -487,6 +540,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
         #   cohort:     same e-process, labels at the PROPOSAL-time mixture (fixed target);
         #   refresh:    this window's labels ONLY, fresh evidence set at alpha/(1+defer cap).
         if pending is not None:
+            _inc_before = model          # final-q1 B: incumbent as of this resolution
             pr = np.random.default_rng(seed * 911_003 + t)
             sev_draw = pending["sev0"] if args.vbc_defer_mode == "cohort" else sev
             Xq_raw, yq = sample_balanced_from_distribution(
@@ -532,12 +586,19 @@ def run_arm(method: str, env: Environment, args, seed: int):
                                                         np.random.default_rng(seed * 1_000 + 999 + t))
                     alarms = []; cooldown = args.cooldown_windows
                     defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
+                    close_until_next(last_res_idx, t)
+                    last_res_idx = log_resolution(pending["prop"], pending["t0"], t,
+                                                  "commit", True, _inc_before, pending["cand"])
                     pending = None
                 elif (lbs is not None and 0.5 * (ubs[0] + ubs[1]) < 0.0) or pending["left"] <= 1:
                     n_reject += 1
-                    n_defer_cap_reject += int(not (lbs is not None
-                                                   and 0.5 * (ubs[0] + ubs[1]) < 0.0))
+                    _cap = int(not (lbs is not None and 0.5 * (ubs[0] + ubs[1]) < 0.0))
+                    n_defer_cap_reject += _cap
                     defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
+                    close_until_next(last_res_idx, t)
+                    last_res_idx = log_resolution(pending["prop"], pending["t0"], t,
+                                                  "cap_reject" if _cap else "futility",
+                                                  True, model, pending["cand"])
                     pending = None
                 else:
                     pending["left"] -= 1
@@ -554,11 +615,19 @@ def run_arm(method: str, env: Environment, args, seed: int):
                                                     np.random.default_rng(seed * 1_000 + 999 + t))
                 alarms = []; cooldown = args.cooldown_windows
                 defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
+                close_until_next(last_res_idx, t)
+                last_res_idx = log_resolution(pending["prop"], pending["t0"], t,
+                                              "commit", True, _inc_before, pending["cand"])
                 pending = None
             elif cs_lower_bound_eb(-da, pending["alpha"] / 2.0) > 0.0 or pending["left"] <= 1:
                 n_reject += 1
-                n_defer_cap_reject += int(not (cs_lower_bound_eb(-da, pending["alpha"] / 2.0) > 0.0))
+                _cap = int(not (cs_lower_bound_eb(-da, pending["alpha"] / 2.0) > 0.0))
+                n_defer_cap_reject += _cap
                 defer_delay_sum += t - pending["t0"]; n_defer_resolved += 1
+                close_until_next(last_res_idx, t)
+                last_res_idx = log_resolution(pending["prop"], pending["t0"], t,
+                                              "cap_reject" if _cap else "futility",
+                                              True, model, pending["cand"])
                 pending = None
             else:
                 pending["left"] -= 1
@@ -916,7 +985,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                             pending = dict(kind="strat", cand=candidate,
                                            d=list(d), y=list(np.asarray(yp)),
                                            alpha=a_prop, sev0=sev_probe, t0=t,
-                                           left=args.defer_windows)
+                                           prop=proposal_ctr, left=args.defer_windows)
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(len(d))
@@ -964,7 +1033,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                             commit = False                       # resolved futility: reject now
                         else:
                             pending = dict(cand=candidate, d=d, alpha=a_prop, sev0=sev_probe, t0=t,
-                                           left=args.defer_windows)
+                                           prop=proposal_ctr, left=args.defer_windows)
                         p_inc = float((model.predict(Xp) == yp).mean())
                         p_cand = float((candidate.predict(Xp) == yp).mean())
                         probe_labels_seq.append(len(d))
@@ -1039,6 +1108,15 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 trow[f"cand_future{h}"] = cand_h
                 trow[f"delta_future{h}"] = cand_h - inc_h if (inc_seq and cand_seq) else np.nan
             trig_rows.append(trow)
+
+            # final-q1 B: log every IMMEDIATELY resolved proposal too, on the same footing as
+            # the deferred ones, so the harmful-commit rate covers both. A proposal that was
+            # deferred is logged at its resolution instead (pending is not None here).
+            if pending is None and candidate is not None:
+                close_until_next(last_res_idx, t)
+                last_res_idx = log_resolution(proposal_ctr, t, t,
+                                              "commit" if commit else "reject",
+                                              False, model, candidate)
 
             if commit:
                 n_adapt += 1
@@ -1116,7 +1194,14 @@ def run_arm(method: str, env: Environment, args, seed: int):
                    first_adaptation_window=adapt_windows[0] if adapt_windows else np.nan,
                    mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in rows])),
                    mean_f1=float(np.mean([r["f1"] for r in rows])))
-    return rows, trig_rows, summary
+    # final-q1 B: close the last open resolution against the end of the stream, then drop the
+    # model handles that were only needed to score 'until next decision'.
+    close_until_next(last_res_idx, len(env.stream) - 1)
+    for r in res_rows:
+        r.pop("_incumbent", None); r.pop("_challenger", None)
+        r.setdefault("delta_until_next", np.nan)
+        r.setdefault("censored_until_next", True)
+    return rows, trig_rows, summary, res_rows
 
 
 def main():
@@ -1259,7 +1344,7 @@ def main():
     common = sorted(set(X_ref.columns).intersection(X_cur.columns))
     pools = make_pools(X_ref, y_ref, X_cur, y_cur, common)
 
-    win_rows, trig_rows, sum_rows = [], [], []
+    win_rows, trig_rows, sum_rows, res_all = [], [], [], []
     for seed in seeds:
         print(f"[v2 SEED={seed}]", flush=True)
         env = build_environment(pools, args, seed)
@@ -1281,13 +1366,16 @@ def main():
                              mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
                              mean_f1=float(np.mean([r["f1"] for r in na]))))
         for method in methods:
-            rows, trows, summary = run_arm(method, env, args, seed)
+            rows, trows, summary, rres = run_arm(method, env, args, seed)
+            res_all.extend(rres)
             win_rows.extend(rows); trig_rows.extend(trows); sum_rows.append(summary)
 
     pd.DataFrame(win_rows).to_csv(args.outdir / "paper2_progressive_readaptation_window_results.csv", index=False)
     pd.DataFrame(sum_rows).to_csv(args.outdir / "paper2_progressive_readaptation_by_seed.csv", index=False)
     if trig_rows:
         pd.DataFrame(trig_rows).to_csv(args.outdir / "paper2_v2_trigger_log.csv", index=False)
+    if res_all:
+        pd.DataFrame(res_all).to_csv(args.outdir / "paper2_v2_resolution_log.csv", index=False)
     s = pd.DataFrame(sum_rows)
     agg = s.groupby("method").agg(n_seeds=("seed", "nunique"),
                                   mean_balanced_accuracy=("mean_balanced_accuracy", "mean"),

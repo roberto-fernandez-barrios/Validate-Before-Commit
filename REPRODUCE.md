@@ -111,11 +111,36 @@ the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--
   and UNSW at `prepare_paper2_unsw_chronological --train-frac {0.20,0.40}`), each under
   `--adaptation-gate {none,labeled_probe,labeled_probe + --gate-margin 0.001,vbc_sg}`
   (`--vbc-defer-mode cohort`). Aggregate: `make_paper2_q1_chronological`.
-- **Operational end-to-end (D5)**, seeds 701–730: `run_paper2_operational_e2e` with
-  `--probe-prevalence {0.005,0.01,0.05,0.10}`,
+- **Operational label-acquisition and delay simulation (D5)**, seeds **801–830** (the earlier
+  701–730 window is a pilot: it was inspected before the dual-sample redesign):
+  `run_paper2_operational_e2e` with `--probe-prevalence {0.005,0.01,0.05,0.10}`,
   `--acquisition-policy {random,alert_enriched,disagreement,hybrid}`,
-  `--candidate-latency/--probe-latency {5,20}` and the new `--training-delay {0,5}`.
+  `--candidate-latency/--probe-latency {5,20}`, `--training-delay {0,5}`, `--probe-size 64`
+  and **`--dual-sample`**. The last flag is what makes the arm statistically valid: it splits
+  the budget into an enriched *discovery* half (measures acquisition cost only) and an
+  independent uniform *validation* half at operating prevalence (the only sample the commit
+  rule sees). This arm runs inside the pool-based harness and is **not** the causal arm.
   Aggregate: `make_paper2_q1_e2e`. Tables for all four: `make_paper2_q1_tables`.
+
+Three cross-cutting artifacts complete the final phase:
+
+```bash
+python -m src.analysis.make_final_experiment_ledger   # results/final_experiment_ledger.csv:
+                                                      #   block -> tier, script, seeds,
+                                                      #   protocol, manuscript table
+python -m src.analysis.make_paper2_q1_multiplicity    # Holm (confirmatory core) + BH
+                                                      #   (follow-up blocks); supplement S5
+python -m src.analysis.make_final_manifest            # manifest incl. ledger summary and the
+                                                      #   immediate/deferred harm accounting
+```
+
+**Harmful-commit accounting.** Every risk gate writes `paper2_v2_resolution_log.csv`: one row
+per resolved proposal with its *real* resolution window, whether it was immediate or deferred,
+the delay, and the incumbent-vs-challenger balanced accuracy over the windows that follow the
+**resolution** at horizons 1/3/5/10 and until the next decision. Commits whose horizon runs
+past the end of the stream are marked censored. This is what lets the harmful-commit rate
+cover deferred commits; scoring only the immediate ones left ~35% of the frontier's commits
+unevaluated in the previous release.
 The final-kbs protocol (`notes/final_kbs_protocol.md`, frozen copy of the reviewer's max-ceiling plan)
 adds the named VBC-SG policy (`--adaptation-gate vbc_sg`: stratified per-class EB-CS + commit/reject/
 defer + lifetime alpha spending via `--lifetime-alpha/--alpha-spending {bonferroni,pseries}`), the

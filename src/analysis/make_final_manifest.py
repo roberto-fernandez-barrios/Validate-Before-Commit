@@ -13,12 +13,16 @@ import json
 import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "results" / "final_manifest.json"
+
+# Bump when the manifest's field layout changes so consumers can branch on it.
+MANIFEST_SCHEMA_VERSION = "1.1.0"
 
 CORE_DATASETS = [
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
@@ -78,6 +82,46 @@ def causal_matrix_counters() -> dict:
     )
 
 
+def ledger_summary() -> dict:
+    """final-q1 Fase A2: the ledger is part of the manifest, so a reviewer can see at a glance
+    which blocks feed which manuscript table and whether any is missing."""
+    f = REPO / "results" / "final_experiment_ledger.csv"
+    if not f.exists():
+        return {"status": "missing"}
+    L = pd.read_csv(f)
+    # M3: surface the orphan-directory check (a final-family raw dir claimed by no block) in
+    # the manifest, recomputed from the ledger's own declared scope/superseded rules so the
+    # two can never disagree.
+    from src.analysis.make_final_experiment_ledger import compute_orphans
+    orphans = compute_orphans()
+    return dict(path="results/final_experiment_ledger.csv", n_blocks=int(len(L)),
+                n_arm_dirs=int(L.n_arm_dirs.sum()),
+                missing_blocks=L[L.status == "MISSING"].block_id.tolist(),
+                n_orphan_dirs=len(orphans), orphan_dirs=orphans)
+
+
+def harm_summary() -> dict:
+    """final-q1 blocker B: immediate AND deferred commits, with censoring, from the budget
+    frontier. The manifest must never let 'zero harmful commits' rest on partial data."""
+    f = REPO / "results" / "tables" / "paper2_final_q1" / "budget_frontier.csv"
+    if not f.exists():
+        return {"status": "missing"}
+    B = pd.read_csv(f)
+    cols = ("commits_total", "n_commits_immediate", "n_commits_deferred",
+            "e6_n_evaluable", "e6_n_censored", "e6_harmful_h5",
+            "e6_harmful_immediate", "e6_harmful_deferred")
+    if not all(c in B.columns for c in cols):
+        return {"status": "stale (rerun make_paper2_q1_frontier)"}
+    ev = int(B.e6_n_evaluable.sum()); k = int(B.e6_harmful_h5.sum())
+    return dict(commits_total=int(B.commits_total.sum()),
+                immediate=int(B.n_commits_immediate.sum()),
+                deferred=int(B.n_commits_deferred.sum()),
+                evaluable_h5=ev, censored_h5=int(B.e6_n_censored.sum()),
+                harmful_h5=k, harmful_immediate=int(B.e6_harmful_immediate.sum()),
+                harmful_deferred=int(B.e6_harmful_deferred.sum()),
+                harmful_rate_h5=(round(k / ev, 4) if ev else None))
+
+
 def run_audit() -> dict:
     r = subprocess.run([sys.executable, "-m", "src.analysis.audit_paper2_claims"],
                        cwd=REPO, capture_output=True, text=True)
@@ -91,7 +135,18 @@ def main() -> None:
     tables = REPO / "results" / "tables"
     manifest_file = tables / "MANIFEST.sha256"
     payload = dict(
-        commit_sha=git_sha(),
+        manifest_schema_version=MANIFEST_SCHEMA_VERSION,
+        generated_at_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        # This is the SOURCE commit the manifest describes: git HEAD at generation time, which
+        # is necessarily the PARENT of the commit that will seal this file (a file cannot carry
+        # the hash of the commit that adds it). The release commit's SHA is recorded AFTER the
+        # commit/tag as `release_commit_sha` in a separate release_manifest.json (or the release
+        # notes/assets), never here. Do not assert source_commit_sha == HEAD after committing.
+        source_commit_sha=git_sha(),
+        source_commit_sha_note=(
+            "git HEAD when this manifest was generated -- the source commit it describes, and "
+            "the parent of the sealing commit. The release SHA is stamped post-tag as "
+            "release_commit_sha in release_manifest.json / the release notes, not in this file."),
         artifact_version=artifact_version(),
         datasets={p: (sha256(REPO / p) if (REPO / p).exists() else "missing")
                   for p in CORE_DATASETS},
@@ -101,7 +156,10 @@ def main() -> None:
             unsw_chronological="301-330", cicids_tuesday_chronological="401-430",
             # final-q1 (all fresh; smokes 499/599/699/1999 excluded from every window)
             q1_budget_frontier="501-530", q1_chronological_matrix="601-630",
-            q1_operational_e2e="701-730", q1_ab_confirmatory="2001-2100 (pilot 104-133)",
+            # M1: the reported operational e2e table is the dual-sample (blocker D) arm on
+            # seeds 801-830; 701-730 was the single-sample pilot. Kept in sync with the ledger.
+            q1_operational_e2e="801-830 (pilot 701-730)",
+            q1_ab_confirmatory="2001-2100 (pilot 104-133)",
         ),
         acquisition_policies=["random", "alert_enriched", "disagreement", "hybrid"],
         chronological_streams=[
@@ -109,7 +167,9 @@ def main() -> None:
             "unsw_20", "unsw_40",
         ],
         window_sizes=dict(core=128, causal_matrix=64, causal_sensitivity=128, chronological=256),
-        prevalences=dict(balanced=0.5, operational=[0.01, 0.05, 0.10]),
+        # final-q1: 0.005 belongs here -- it is the lowest prevalence the operational
+        # simulation actually runs, and the cell where random inspection is most punishing.
+        prevalences=dict(balanced=0.5, operational=[0.005, 0.01, 0.05, 0.10]),
         label_latencies=dict(probe=[0, 5, 10, 20], candidate=[0, 5, 20]),
         models=["svc_rbf", "random_forest", "logreg", "mlp"],
         generators=["full_replace", "sliding_window", "ensemble", "ensemble_cal",
@@ -131,11 +191,13 @@ def main() -> None:
             vbc_defer_modes=["accumulate", "cohort", "refresh"],
             accumulate_mode_guarantee="weak conditional null (Proposition 1; supplement S4)",
         ),
-        training_delay_windows=0,
+        training_delay_windows=[0, 5],
         evidence_tiers=["registered confirmatory core", "registered follow-ups",
                         "causal/operational feasibility", "external boundary (chronological)",
                         "exploratory"],
         collision_counts=causal_matrix_counters(),
+        experiment_ledger=ledger_summary(),
+        harmful_commits=harm_summary(),
         outputs=dict(
             tables_manifest_sha256=sha256(manifest_file) if manifest_file.exists() else "missing",
             n_table_csvs=len(list(tables.rglob("*.csv"))),
@@ -147,7 +209,7 @@ def main() -> None:
     OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     cc = payload["collision_counts"]
     print(f"wrote {OUT}")
-    print(f"  commit {payload['commit_sha'][:12]}  version {payload['artifact_version']}  "
+    print(f"  source-commit {payload['source_commit_sha'][:12]}  version {payload['artifact_version']}  "
           f"audit {payload['audit']['checks_passed']}/{payload['audit']['checks_total']} "
           f"({payload['audit']['status']})")
     print(f"  causal-64 collisions: probe={cc['total_probe_row_collisions']} "

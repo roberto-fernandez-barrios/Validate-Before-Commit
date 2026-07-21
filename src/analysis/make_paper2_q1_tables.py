@@ -63,7 +63,8 @@ already costs 1{{,}}024); \\emph{{abst.}} is the fraction of proposals resolved 
 nor futility; \\emph{{delay}} is deferral windows to a decision; the last column is commits under
 \\emph{{zero drift}} across 91 proposals. The pre-declared non-vacuity target (commits,
 $\\ge$50\\% of naive, zero zero-drift commits, $<$1{{,}}024 labels) is met by twelve
-configurations --- the deployment-long guarantee is a matter of budget, not of the rule. For
+configurations across both alpha-spending schedules (the seven Bonferroni rows shown here plus
+five $p$-series) --- the deployment-long guarantee is a matter of budget, not of the rule. For
 reference, the zero-cost strict gate scores ${strict.gain:+.2f}$ here and ${strict_z.gain:+.2f}$
 under zero drift (vs the point gate's ${point_z.gain:+.2f}$).}}
 \\label{{tab:budget_frontier}}
@@ -209,24 +210,29 @@ def operational() -> None:
             for pi in (0.005, 0.01, 0.05, 0.10):
                 r = base[(base.dataset == ds) & (base.prevalence == pi)
                          & (base.acquisition == acq)]
-                v = r.iloc[0].inspected_flows_per_attack if len(r) else float("nan")
+                v = r.iloc[0].discovery_flows_per_attack if len(r) else float("nan")
                 cells.append(f"{v:.0f}" if v == v else "---")
             rows.append(f"{dsn[ds]} & {acqn[acq]} & " + " & ".join(cells) + " \\\\")
         rows.append("\\addlinespace")
     body = "\n".join(rows[:-1])
     tex = f"""\\begin{{table}}[t]
 \\centering
-\\caption{{\\textbf{{What 32 adjudicated probe labels actually cost, end to end (final-q1).}}
-Inspected flows per adjudicated \\emph{{attack}} label, under an operational pipeline in which
-the stream, the probe and \\emph{{all}} labels sit at operating prevalence $\\pi$ and every
-label arrives five windows late (seeds 701--730). Acquisition policies rank candidate flows by
-model \\emph{{predictions}} only --- never by ground truth --- so they are implementable: an
-analyst inspects the queue the deployed detector already produces. Alert-enriched inspection
-finds an attack 5--8$\\times$ more cheaply than random inspection at every prevalence, and
-hybrid 4--6$\\times$; ranking by candidate/incumbent \\emph{{disagreement}} barely helps,
-because the two models differ near the decision boundary rather than on the minority class.
-The honest headline is therefore not ``32 labels suffice'' but: 32 adjudicated labels, costing
-this many inspected flows under this policy at this prevalence.}}
+\\caption{{\\textbf{{What the commit decision costs in inspected flows (final-q1).}}
+Inspected flows per adjudicated \\emph{{attack}} label in the \\emph{{discovery}} half of the
+budget, under an operational label-acquisition and delay simulation in which the stream, the
+probe and \\emph{{all}} labels sit at operating prevalence $\\pi$ and every label arrives five
+windows late (seeds 801--830; the earlier 701--730 window is a pilot). The budget is split in
+two: this enriched half measures \\emph{{cost}}, while an independent uniform
+\\emph{{validation}} half at operating prevalence is the only sample the commit rule is shown
+--- so an enriched sample is never used as an estimate of deployed performance. Acquisition
+policies rank candidate flows by model \\emph{{predictions}} only, never by ground truth, so
+they are implementable: an analyst inspects the queue the deployed detector already produces.
+Alert-enriched inspection finds an attack 5--8$\\times$ more cheaply than random inspection at
+every prevalence, and hybrid 3--6$\\times$; ranking by candidate/incumbent
+\\emph{{disagreement}} barely helps, because the two models differ near the decision boundary
+rather than on the minority class. The honest headline is therefore not ``32 labels suffice''
+but: 32 adjudicated \\emph{{validation}} labels for the decision, costing this many inspected
+flows to obtain under this policy at this prevalence.}}
 \\label{{tab:operational_e2e}}
 \\small
 \\begin{{tabular}}{{l l r r r r}}

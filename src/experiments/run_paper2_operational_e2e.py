@@ -110,6 +110,13 @@ def main():
     p.add_argument("--acquisition-policy", type=str, default="random",
                    choices=["random", "alert_enriched", "disagreement", "hybrid"])
     p.add_argument("--pool-multiplier", type=int, default=8)
+    p.add_argument("--dual-sample", action="store_true",
+                   help="final-q1 blocker D: split the label budget into a DISCOVERY half "
+                        "(selected by --acquisition-policy, used only to measure acquisition "
+                        "cost and attacks found) and a VALIDATION half (an independent "
+                        "uniform draw at operating prevalence, the ONLY sample the commit "
+                        "decision may use). Without it, an enriched sample is used directly "
+                        "as an unweighted performance estimate, which it is not.")
     p.add_argument("--gate-margin", type=float, default=0.0,
                    help="0 = point gate, 0.001 = strict.")
     args = p.parse_args()
@@ -143,6 +150,7 @@ def main():
         model = env.initial_model
         alarms, cooldown = [], 0
         n_trig = n_adapt = labels_used = attacks_found_total = 0
+        discovery_attacks = validation_attacks = 0
         pending = None   # dict(cand, ready_at) while maturing (training-delay)
         ba_hist = []
         for t, (Xw, yw, sev) in enumerate(env.stream):
@@ -172,13 +180,33 @@ def main():
                 pl = args.probe_latency
                 sev_p = env.stream[max(0, t - pl)][2] if pl > 0 else sev
                 probe_rng = np.random.default_rng(seed * 200_003 + t)
-                Xp_raw, yp, n_att = sample_acquisition(
-                    env.probe_pools, args.probe_size, args.probe_prevalence, sev_p, probe_rng,
-                    args.acquisition_policy, env.scaler, env.pca,
-                    incumbent=model, candidate=pending["cand"],
-                    pool_multiplier=args.pool_multiplier)
+                if args.dual_sample:
+                    # final-q1 blocker D: DISCOVERY half measures what enriched inspection
+                    # costs; VALIDATION half -- an independent uniform draw at operating
+                    # prevalence -- is the only sample the commit decision may see, so the
+                    # gate's estimate stays an estimate on the deployment distribution.
+                    half = max(1, args.probe_size // 2)
+                    _Xd, _yd, n_att_d = sample_acquisition(
+                        env.probe_pools, half, args.probe_prevalence, sev_p, probe_rng,
+                        args.acquisition_policy, env.scaler, env.pca,
+                        incumbent=model, candidate=pending["cand"],
+                        pool_multiplier=args.pool_multiplier)
+                    Xp_raw, yp, n_att_v = sample_acquisition(
+                        env.probe_pools, half, args.probe_prevalence, sev_p,
+                        np.random.default_rng(seed * 200_011 + t),
+                        "random", env.scaler, env.pca, pool_multiplier=args.pool_multiplier)
+                    n_att = n_att_d + n_att_v
+                    n_labels = 2 * half
+                    discovery_attacks += n_att_d; validation_attacks += n_att_v
+                else:
+                    Xp_raw, yp, n_att = sample_acquisition(
+                        env.probe_pools, args.probe_size, args.probe_prevalence, sev_p, probe_rng,
+                        args.acquisition_policy, env.scaler, env.pca,
+                        incumbent=model, candidate=pending["cand"],
+                        pool_multiplier=args.pool_multiplier)
+                    n_labels = args.probe_size
                 Xp = transform_X(Xp_raw, env.scaler, env.pca)
-                labels_used += args.probe_size; attacks_found_total += n_att
+                labels_used += n_labels; attacks_found_total += n_att
                 if len(np.unique(yp)) == 2:
                     f = lambda mm: float((mm.predict(Xp) == yp).mean())
                     commit = f(pending["cand"]) >= f(model) + args.gate_margin
@@ -197,6 +225,8 @@ def main():
             labels_used=labels_used, attacks_found_total=attacks_found_total,
             inspected_flows_per_attack=(labels_used / attacks_found_total
                                         if attacks_found_total else np.nan),
+            dual_sample=bool(args.dual_sample),
+            discovery_attacks=discovery_attacks, validation_attacks=validation_attacks,
             mean_balanced_accuracy=float(np.mean(ba_hist))))
         print(f"[seed {seed}] triggers={n_trig} adapt={n_adapt} "
               f"attacks_found={attacks_found_total}/{labels_used}", flush=True)

@@ -57,15 +57,40 @@ def boot_ci(x, n=10000, seed=0):
     return float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5))
 
 
-def unique_class_pools(ref):
+def unique_class_pools(ref, report=None):
+    """final-q1 E1: deduplicate GLOBALLY (across classes), not per class.
+
+    Deduplicating within each class independently lets one feature vector survive in BOTH
+    classes -- a label-contradictory duplicate, which would then land in two different
+    blocks and silently break the disjointness the control depends on. We therefore hash
+    every row once, drop rows whose feature vector carries contradictory labels (declared
+    rule: exclude, never arbitrate), deduplicate globally, and only then split by class.
+    Counts are reported rather than swallowed.
+    """
     Xr, yr = load_binary_dataset(ref, "Label")
     Xr = np.asarray(Xr, dtype=float); yr = np.asarray(yr)
-    out = {}
-    for cls in (0, 1):
-        a = Xr[yr == cls]
-        _, uq = np.unique(a, axis=0, return_index=True)
-        out[cls] = a[np.sort(uq)]
-    return out
+    seen: dict[bytes, int] = {}
+    conflict: set[bytes] = set()
+    for i in range(len(Xr)):
+        h = np.ascontiguousarray(Xr[i]).tobytes()
+        if h in seen:
+            if seen[h] != yr[i]:
+                conflict.add(h)
+        else:
+            seen[h] = int(yr[i])
+    keep_idx, used = [], set()
+    for i in range(len(Xr)):
+        h = np.ascontiguousarray(Xr[i]).tobytes()
+        if h in conflict or h in used:
+            continue
+        used.add(h); keep_idx.append(i)
+    keep = np.asarray(keep_idx, dtype=int)
+    Xk, yk = Xr[keep], yr[keep]
+    if report is not None:
+        report.update(n_raw=int(len(Xr)), n_unique_global=int(len(Xk)),
+                      n_label_conflicts=int(len(conflict)),
+                      n_dropped_duplicate=int(len(Xr) - len(Xk) - len(conflict)))
+    return {cls: Xk[yk == cls] for cls in (0, 1)}
 
 
 def _split_transformer(X_scaler_src, X_pca_src, dim, seed):
@@ -79,9 +104,10 @@ def _split_transformer(X_scaler_src, X_pca_src, dim, seed):
     return sc, pca
 
 
-def one_dataset(name, ref, model_type="svc_rbf", seeds=None, conds=BASE_CONDS):
+def one_dataset(name, ref, model_type="svc_rbf", seeds=None, conds=BASE_CONDS, report=None):
     seeds = list(seeds if seeds is not None else SEEDS)
-    pools = unique_class_pools(ref)
+    rep = {} if report is None else report
+    pools = unique_class_pools(ref, report=rep)
     n = min(2000, min(len(pools[0]), len(pools[1])) // 4)
     rows = {(c, k): [] for c in conds for k in ("rand", "m2_minus_m1")}
     perseed = []
@@ -92,10 +118,20 @@ def one_dataset(name, ref, model_type="svc_rbf", seeds=None, conds=BASE_CONDS):
             perm = rng.permutation(len(pools[cls]))
             for i, b in enumerate(("T", "M1", "M2", "E")):
                 blocks.setdefault(b, {})[cls] = pools[cls][perm[i * n:(i + 1) * n]]
-        # disjointness assertion (by construction of the permutation, but verify on values)
+        # final-q1 E2: verify EVERY pairwise intersection by value, per class and globally,
+        # rather than the two spot checks the earlier version made.
         h = lambda a: {r.tobytes() for r in np.ascontiguousarray(a)}
-        assert not (h(blocks["M1"][0]) & h(blocks["M2"][0])), "M1/M2 benign overlap"
-        assert not (h(blocks["M1"][1]) & h(blocks["E"][1])), "M1/E attack overlap"
+        names = ("T", "M1", "M2", "E")
+        for i in range(len(names)):
+            for j in range(i + 1, len(names)):
+                for cls in (0, 1):
+                    inter = h(blocks[names[i]][cls]) & h(blocks[names[j]][cls])
+                    assert not inter, (f"{names[i]}/{names[j]} overlap in class {cls}: "
+                                       f"{len(inter)} shared rows (seed {seed})")
+                gi = h(np.vstack([blocks[names[i]][0], blocks[names[i]][1]]))
+                gj = h(np.vstack([blocks[names[j]][0], blocks[names[j]][1]]))
+                assert not (gi & gj), (f"{names[i]}/{names[j]} overlap across classes: "
+                                       f"{len(gi & gj)} shared rows (seed {seed})")
 
         def xy(b):
             X = np.vstack([blocks[b][0], blocks[b][1]])
@@ -144,7 +180,10 @@ def one_dataset(name, ref, model_type="svc_rbf", seeds=None, conds=BASE_CONDS):
     for (cond, kind), vals in rows.items():
         v = np.array(vals) * 100
         lo, hi = boot_ci(v)
-        out.append(dict(dataset=name, model=model_type, condition=cond, contrast=kind,
+        out.append(dict(**{k: rep.get(k) for k in
+                           ("n_raw", "n_unique_global", "n_label_conflicts",
+                            "n_dropped_duplicate")},
+                        dataset=name, model=model_type, condition=cond, contrast=kind,
                         n_seeds=len(v), n_per_block=n,
                         gap=round(float(v.mean()), 3), lo=round(lo, 3), hi=round(hi, 3)))
     return out, perseed

@@ -53,9 +53,15 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   excellent and the gate pays a real premium. But on the timelines that keep the incumbent healthy — the condition
   under which the account says the decision is genuinely hard — **every gate beats always-deploy**, the zero-cost
   strict rule by up to +2.8 points while committing 2.5 times per stream against naive's 13.
-- **Priced end to end:** at operating prevalence the honest unit is *inspected flows*, not adjudicated labels.
-  Alert-guided inspection finds an attack **5–8× more cheaply** than random inspection; ranking by candidate/incumbent
-  disagreement barely helps (a negative we report as it came out).
+- **Priced end to end, and measured on the right sample:** at operating prevalence the honest unit is *inspected
+  flows*, not adjudicated labels. Alert-guided inspection finds an attack **5–8× more cheaply** than random
+  inspection; ranking by candidate/incumbent disagreement barely helps (a negative we report as it came out).
+  The label budget is split so that cost and validity are never measured on the same sample: an enriched
+  **discovery** half prices the search, an independent uniform **validation** half is the only sample the commit
+  rule ever sees.
+- **Every commit is scored, including the deferred ones:** each risk gate logs the *real* resolution window of
+  every proposal, so harmful-commit rates cover commits that took effect several windows after they were raised,
+  with end-of-stream cases declared censored rather than counted as harmless.
 
 ---
 

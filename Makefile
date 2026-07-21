@@ -59,12 +59,14 @@ final-tables:
 	$(PY) -m src.analysis.make_paper2_amendment009_table
 	$(PY) -m src.analysis.make_paper2_final_tables
 	$(PY) -m src.analysis.make_paper2_q1_tables
+	$(PY) -m src.analysis.make_paper2_q1_multiplicity
 
 final-figures:
 	$(PY) -m src.analysis.make_paper2_pertrigger_figure
 	$(PY) -m src.analysis.make_paper2_graphical_abstract_final
 
 final-manifest:
+	$(PY) -m src.analysis.make_final_experiment_ledger
 	$(PY) -m src.analysis.make_final_manifest
 
 test:

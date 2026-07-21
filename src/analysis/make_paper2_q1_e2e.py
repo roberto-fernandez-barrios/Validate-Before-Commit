@@ -19,14 +19,14 @@ OUT = "results/tables/paper2_final_q1"
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     rows = []
-    for d in sorted(glob.glob(f"{RAW}/q1fd5_*")):
+    for d in sorted(glob.glob(f"{RAW}/q1fd5b_*")):
         if not os.path.isdir(d):
             continue
         f = f"{d}/paper2_progressive_readaptation_by_seed.csv"
         if not os.path.exists(f):
             continue
         tag = os.path.basename(d)
-        parts = tag[len("q1fd5_"):].split("_")
+        parts = tag[len("q1fd5b_"):].split("_")
         ds = parts[0]
         # tag encodes prevalence with 3 digits in the main grid (pi005 = 0.005, pi050 = 0.05)
         # and 2 digits in the latency/delay sensitivity arms (pi05 = 0.05)
@@ -58,6 +58,15 @@ def main() -> None:
             inspected_flows_per_attack=(round(labels_total / attacks_total, 1)
                                         if attacks_total else np.nan),
             expected_random_ratio=round(1.0 / pi, 1),
+            # final-q1 blocker D: acquisition COST (the enriched discovery half) is reported
+            # separately from decision VALIDITY (the validation half is an independent
+            # uniform draw at operating prevalence -- the only sample the gate ever sees).
+            dual_sample=bool(arm.dual_sample.iloc[0]) if "dual_sample" in arm else False,
+            discovery_attacks=int(arm.discovery_attacks.sum()) if "discovery_attacks" in arm else 0,
+            validation_attacks=int(arm.validation_attacks.sum()) if "validation_attacks" in arm else 0,
+            discovery_flows_per_attack=(
+                round((labels_total / 2) / arm.discovery_attacks.sum(), 1)
+                if "discovery_attacks" in arm and arm.discovery_attacks.sum() else np.nan),
         ))
     R = pd.DataFrame(rows).sort_values(["dataset", "prevalence", "acquisition"])
     R.to_csv(f"{OUT}/operational_e2e.csv", index=False)
@@ -69,14 +78,14 @@ def main() -> None:
         for pi in sorted(base.prevalence.unique()):
             cell = base[(base.dataset == ds) & (base.prevalence == pi)]
             r = cell[cell.acquisition == "random"]
-            if not len(r) or r.iloc[0].inspected_flows_per_attack != r.iloc[0].inspected_flows_per_attack:
+            if not len(r) or r.iloc[0].discovery_flows_per_attack != r.iloc[0].discovery_flows_per_attack:
                 continue
-            r_ratio = r.iloc[0].inspected_flows_per_attack
+            r_ratio = r.iloc[0].discovery_flows_per_attack
             for acq in ("alert_enriched", "disagreement", "hybrid"):
                 a = cell[cell.acquisition == acq]
-                if len(a) and a.iloc[0].inspected_flows_per_attack == a.iloc[0].inspected_flows_per_attack:
-                    factor = r_ratio / a.iloc[0].inspected_flows_per_attack
-                    print(f"  {ds}/pi={pi}: {acq} needs {a.iloc[0].inspected_flows_per_attack:.1f} "
+                if len(a) and a.iloc[0].discovery_flows_per_attack == a.iloc[0].discovery_flows_per_attack:
+                    factor = r_ratio / a.iloc[0].discovery_flows_per_attack
+                    print(f"  {ds}/pi={pi}: {acq} needs {a.iloc[0].discovery_flows_per_attack:.1f} "
                           f"flows/attack vs random's {r_ratio:.1f} ({factor:.1f}x)")
 
     print("\n== latency/training-delay sensitivity (pi=0.05, random) ==")

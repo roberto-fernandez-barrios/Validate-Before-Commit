@@ -19,9 +19,21 @@ Output: results/tables/paper2_final_kbs/ab_equivalence.csv + console verdicts.
 from __future__ import annotations
 
 import glob
+import hashlib
 
 import numpy as np
 import pandas as pd
+
+
+def stable_seed(*parts) -> int:
+    """Deterministic seed from a key, reproducible ACROSS PROCESSES.
+
+    Python's built-in hash() is salted per interpreter run (PYTHONHASHSEED), so seeding a
+    bootstrap with hash(...) makes the output non-reproducible -- the defect this replaces.
+    SHA-256 of the joined key is stable everywhere.
+    """
+    key = "|".join(str(p) for p in parts).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(key).digest()[:8], "big") % (2 ** 32)
 
 OUT = "results/tables/paper2_final_kbs"
 MARGINS = (0.5, 1.0, 2.0)
@@ -60,11 +72,13 @@ def main() -> None:
                 continue
             gaps = gg.gap_rand.to_numpy(float)
             for m in MARGINS:
-                r = tost(gaps, m, seed=hash((ds, mt, cond, label, m)) % (2**31))
+                sd = stable_seed(ds, mt, cond, label, m)
+                r = tost(gaps, m, seed=sd)
                 rows.append(dict(dataset=ds, model=mt, condition=cond, analysis=label,
                                  n_seeds=len(gg), margin=m, mean_gap=round(gaps.mean(), 3),
-                                 **r, primary=(m == PRIMARY_MARGIN and
-                                               label == "primary_confirmatory")))
+                                 **r, bootstrap_seed=sd,
+                                 primary=(m == PRIMARY_MARGIN and
+                                          label == "primary_confirmatory")))
     R = pd.DataFrame(rows)
     R.to_csv(f"{OUT}/ab_equivalence.csv", index=False)
     print(R.to_string(index=False))

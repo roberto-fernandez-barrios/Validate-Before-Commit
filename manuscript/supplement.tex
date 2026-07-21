@@ -163,7 +163,16 @@ These replays are \emph{chronologically ordered subsampled replays}, not full-ca
 \subsection{How the leakage-free causal arm was reached (three registered iterations)}
 
 \textbf{Each iteration closed a flaw that external review or our own assertions surfaced},
-and the harm-regime conclusion survived all of them. (i) Amendment 011 removed the
+and the harm-regime conclusion survived all of them. Two earlier ones preceded the three
+listed below. Amendment 006's arm drew the candidate and probe causally but still
+\emph{recalibrated} the detector after every commit from the pools at the true severity ---
+and because the gate and the naive loop commit at different times, that oracle state
+interacts with the policy instead of cancelling between arms; amendment 007 rebuilt the
+post-commit reference from the last eight \emph{observed} windows and its threshold from the
+preceding observed windows' scores. The same amendment closed a second flaw we had missed:
+because pools are sampled with replacement, window-disjoint was not \emph{row}-disjoint, so
+the probe now excludes by exact row identity every flow that also occurs in the candidate's
+training windows (27--38 such rows per stream had been shared). (i) Amendment 011 removed the
 with-replacement stream, cutting candidate-training/future-evaluation collisions from
 387--1{,}319 per stream to ${\approx}0$; (ii) amendment 012 replaced the naive-loop fallback
 at early no-probe triggers with \texttt{reject}, so no commit is ever made without a
@@ -307,6 +316,48 @@ gates run one such process per class at $\alpha/2$ (or $\alpha/4$ with a futilit
 Bonferroni preserves the level. A registered null simulation with time-varying conditional means
 (all $\le 0$) and time-varying tie probabilities verifies the bound empirically
 (\texttt{test\_weak\_null\_drifting\_means} in the artifact).
+
+\section{Total label and compute ledger per policy}
+
+The accounting behind \S5.3 of the main paper: candidates dominate every policy's label
+bill, the gate's \emph{total} cost exceeds naive's (rejected candidates are trained and
+discarded, and rejections keep the detector reference, producing more triggers), and the
+probe is about 3\% of the gate's total. This is why ``label-efficient'' in this paper means
+the incremental cost of the \emph{decision}, never the cost of the pipeline.
+
+\input{tables/table_label_cost.tex}
+
+\section{Multiplicity: every family and its adjustment}
+\label{sec:s5multiplicity}
+
+The main paper states the policy; this is the table behind it. Families are defined by
+evidence tier, not by convenience, and a block is treated as a family only where several
+inferential statements are made together.
+
+\textbf{Confirmatory core (Holm).} The six registered gate-versus-naive contrasts --- the
+primary $b{=}32$ gate against always-deploying, on the benefit, marginal and harm regimes,
+under both the classical and the quantum-kernel detector. Three are nominally significant
+(ToN-IoT under both detectors, and CICIDS-PortScan under QK-ZZ) and \emph{all three survive}
+Holm step-down control at $\alpha{=}0.05$. The three that do not reach significance are the
+benefit- and marginal-regime cells where the paper's claim is \emph{preservation}, not
+superiority --- non-inferiority against a pre-registered margin, which is the criterion those
+cells were registered under and which Table~1 of the main paper reports.
+
+\textbf{Registered follow-ups (Benjamini--Hochberg within block).} The budget frontier
+(thirteen committing configurations on CICIDS-PortScan at full drift) and the chronological
+matrix (the strict gate on seven pre-enumerated replays) each form a within-block family.
+All thirteen and all seven survive BH control of the false-discovery rate.
+
+\textbf{Descriptive tier (uncorrected, and labelled).} Ablations, sensitivity sweeps and
+auxiliary negative results are reported without correction and without confirmatory language.
+
+\emph{The point of the table is what it does not change.} Every nominally significant contrast
+in this paper survives its adjustment, so no conclusion rests on an uncorrected comparison;
+the correction is reported because a reader is entitled to check that, not because it rescues
+anything. $p$-values are normal-approximation inversions of the per-seed paired bootstrap
+intervals (each contrast is a mean over 30 seeds), which we state as the approximation it is.
+The full machine-readable table is \texttt{results/tables/paper2\_final\_q1/multiplicity.csv}
+in the artifact.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}

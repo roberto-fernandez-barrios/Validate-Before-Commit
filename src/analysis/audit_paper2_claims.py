@@ -847,9 +847,29 @@ def main():
         # zero-drift safety: every lifetime config at every cap commits nothing
         zc = BF[BF.scenario == "ton_zero"].commits_total.sum()
         check("q1 frontier zero-drift commits 0 (all caps)", 0.0, float(zc), 0.5)
-        # no harmful immediate commit anywhere in the sweep
-        check("q1 frontier harmful commits 0 (all cells)", 0.0,
-              float(BF.e6_harmful_immediate.sum()), 0.5)
+        # final-q1 blocker B: harmful commits over ALL resolved commits (immediate AND
+        # deferred), scored from the real resolution window. Pinned to whatever the complete
+        # accounting says -- the audit must not be able to certify "zero" from partial data.
+        # final-q1 blocker B: every commit must be either evaluated or explicitly censored.
+        # If the frontier CSV predates the resolution-log accounting, say so as a FAILING
+        # check rather than crashing -- a stale artifact must never look like a pass.
+        if {"e6_n_evaluable", "e6_n_censored"} <= set(BF.columns):
+            check("q1 frontier commits fully accounted (evaluable + censored = commits)", 0.0,
+                  float((BF.e6_n_evaluable + BF.e6_n_censored - BF.commits_total).abs().sum()), 0.5)
+        else:
+            check("q1 frontier commits fully accounted (STALE: rerun make_paper2_q1_frontier)",
+                  0.0, None, 0.5)
+
+        # final-q1 blocker B: the complete harm accounting the manuscript now quotes.
+        if "e6_harmful_h5" in BF.columns:
+            check("q1 harm: risk-gate commits 520", 520, float(BF.commits_total.sum()), 0.5)
+            check("q1 harm: deferred 180", 180, float(BF.n_commits_deferred.sum()), 0.5)
+            check("q1 harm: evaluable H5 506", 506, float(BF.e6_n_evaluable.sum()), 0.5)
+            check("q1 harm: censored H5 14", 14, float(BF.e6_n_censored.sum()), 0.5)
+            check("q1 harm: harmful H5 = 0 over the COMPLETE accounting", 0.0,
+                  float(BF.e6_harmful_h5.sum()), 0.5)
+            check("q1 harm: harmful until next decision = 0", 0.0,
+                  float(BF.e6_harmful_until_next.sum()), 0.5)
 
     if os.path.exists(f"{T}/paper2_final_kbs/ab_equivalence.csv"):
         EQ = pd.read_csv(f"{T}/paper2_final_kbs/ab_equivalence.csv")
@@ -865,7 +885,7 @@ def main():
 
         check("q1 AB conf ToN own-transformer -0.01", -0.007, eqv("ton_scanning", "own_transformer", "mean_gap"), 0.02)
         check("q1 AB conf ToN own-transformer EQUIVALENT", 1.0, eqflag("ton_scanning", "own_transformer"), 0.1)
-        check("q1 AB conf UNSW independent +0.04", 0.039, eqv("unsw_recon", "independent", "mean_gap"), 0.02)
+        check("q1 AB conf UNSW independent +0.00 (global dedup)", 0.004, eqv("unsw_recon", "independent", "mean_gap"), 0.02)
         check("q1 AB conf UNSW independent EQUIVALENT", 1.0, eqflag("unsw_recon", "independent"), 0.1)
         check("q1 AB conf ToN independent -1.43 (unresolved)", -1.425, eqv("ton_scanning", "independent", "mean_gap"), 0.02)
         check("q1 AB conf ToN independent NOT equivalent", 0.0, eqflag("ton_scanning", "independent"), 0.1)
@@ -901,22 +921,22 @@ def main():
 
         def oe(ds, pi, acq):
             r = base[(base.dataset == ds) & (base.prevalence == pi) & (base.acquisition == acq)]
-            return float(r.iloc[0].inspected_flows_per_attack) if len(r) else None
+            return float(r.iloc[0].discovery_flows_per_attack) if len(r) else None
 
-        check("q1 e2e ToN pi.01 random 112.5 flows/attack", 112.5, oe("ton", 0.01, "random"), 0.6)
-        check("q1 e2e ToN pi.01 alert-enriched 13.7", 13.7, oe("ton", 0.01, "alert_enriched"), 0.15)
-        check("q1 e2e PortScan pi.01 random 109.9", 109.9, oe("portscan", 0.01, "random"), 0.6)
-        check("q1 e2e PortScan pi.05 alert-enriched 3.3", 3.3, oe("portscan", 0.05, "alert_enriched"), 0.1)
-        check("q1 e2e ToN pi.005 alert-enriched 24.5", 24.5, oe("ton", 0.005, "alert_enriched"), 0.2)
+        check("q1 e2e ToN pi.01 random 92.2 flows/attack (discovery half)", 92.2, oe("ton", 0.01, "random"), 0.6)
+        check("q1 e2e ToN pi.01 alert-enriched 14.7", 14.7, oe("ton", 0.01, "alert_enriched"), 0.15)
+        check("q1 e2e PortScan pi.01 random 109.1", 109.1, oe("portscan", 0.01, "random"), 0.6)
+        check("q1 e2e PortScan pi.05 alert-enriched 3.3", 3.3, oe("portscan", 0.05, "alert_enriched"), 0.15)
+        check("q1 e2e ToN pi.005 alert-enriched 28.8", 28.8, oe("ton", 0.005, "alert_enriched"), 0.25)
 
         def oes(ds, cl, td, col="gain"):
             r = OE[(OE.dataset == ds) & (OE.prevalence == 0.05) & (OE.acquisition == "random")
                    & (OE.cand_latency == cl) & (OE.train_delay == td)]
             return float(r.iloc[0][col]) * 100 if len(r) else None
 
-        check("q1 e2e PortScan lat5 delay0 +7.82", 7.82, oes("portscan", 5, 0), 0.02)
-        check("q1 e2e PortScan lat20 +6.71", 6.71, oes("portscan", 20, 0), 0.02)
-        check("q1 e2e PortScan train-delay5 +6.82", 6.82, oes("portscan", 5, 5), 0.02)
+        check("q1 e2e PortScan lat5 delay0 +5.83", 5.83, oes("portscan", 5, 0), 0.02)
+        check("q1 e2e PortScan lat20 +4.81", 4.81, oes("portscan", 20, 0), 0.02)
+        check("q1 e2e PortScan train-delay5 +5.37", 5.37, oes("portscan", 5, 5), 0.02)
         check("q1 e2e chrono thu_fri naive +36.07", 36.07,
               float(pd.read_csv(f"{Q1}/chronological_replays.csv")
                     .query("stream=='thu_fri' and policy=='none'").iloc[0].gain_ba) * 100, 0.02)

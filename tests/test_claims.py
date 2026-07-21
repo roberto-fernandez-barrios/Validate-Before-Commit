@@ -16,7 +16,7 @@ import sys
 from tests.conftest import REPO
 
 FINAL_BODY_TABLES = {
-    "table_v2_confirmatory", "table_policy_frontier", "table_label_cost",
+    "table_v2_confirmatory", "table_policy_frontier",
     "table_causal_probe", "table_zero_drift", "table_amendment009",
     "table_harm_generality",
     # final-q1 additions (table_symmetric_ab and table_temporal_streams moved to the
@@ -29,6 +29,8 @@ V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",
     "table4_oracle_regret", "table5_phase1_negative", "table6_downstream_generalization",
     "table7_mechanism_law_robustness", "table_temporal_streams",
+    # final-q1: moved out of the body to hold it at 27 pages; the text keeps the summary
+    "table_label_cost",
 }
 
 

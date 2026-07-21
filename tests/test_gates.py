@@ -98,7 +98,10 @@ def test_effective_alpha_manifest(vbc_trigger_log):
     assert risk["mcnemar_alpha"] == 0.05
     assert set(risk["alpha_spending_schedules"]) == {"bonferroni", "pseries"}
     assert risk["lifetime_alpha"] == 0.10
-    for key in ("commit_sha", "artifact_version", "datasets", "seeds", "window_sizes",
+    for key in ("source_commit_sha", "manifest_schema_version", "generated_at_utc",
+                "artifact_version", "datasets", "seeds", "window_sizes",
                 "prevalences", "label_latencies", "models", "generators", "gates",
                 "collision_counts", "outputs", "audit"):
         assert key in m, f"final_manifest.json missing field {key}"
+    # the legacy circular-reference field must not come back
+    assert "commit_sha" not in m, "commit_sha renamed to source_commit_sha (no self-reference)"

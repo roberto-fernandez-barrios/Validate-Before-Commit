@@ -48,6 +48,41 @@ def paired_gain(s):
     return (float(d.mean()), float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5)))
 
 
+def harm_from_resolution_log(tag: str) -> dict:
+    """final-q1 blocker B: harmful-commit accounting over ALL resolved commits.
+
+    Reads the per-proposal resolution log, keeps the commits (immediate and deferred alike),
+    and scores each from the window where it actually took effect. A commit whose horizon
+    runs off the end of the stream is CENSORED, never silently scored short and never
+    counted as harmless. Returns the counts the manuscript and the manifest both quote.
+    """
+    f = f"{RAW}/{tag}/paper2_v2_resolution_log.csv"
+    out = dict(n_immediate=0, n_deferred=0, n_commits=0, n_evaluable_h5=0, n_censored_h5=0,
+               harmful_h5=0, harmful_h5_immediate=0, harmful_h5_deferred=0,
+               n_evaluable_until_next=0, harmful_until_next=0, mean_delta_h5=float("nan"))
+    if not os.path.exists(f):
+        return out
+    r = pd.read_csv(f)
+    c = r[r.resolution_type == "commit"]
+    if not len(c):
+        return out
+    ev = c[~c.censored_h5.astype(bool)]
+    evn = c[~c.censored_until_next.astype(bool)] if "censored_until_next" in c else c.iloc[:0]
+    out.update(
+        n_commits=len(c),
+        n_immediate=int((~c.deferred.astype(bool)).sum()),
+        n_deferred=int(c.deferred.astype(bool).sum()),
+        n_evaluable_h5=len(ev), n_censored_h5=int(c.censored_h5.astype(bool).sum()),
+        harmful_h5=int((ev.delta_res5 < 0).sum()),
+        harmful_h5_immediate=int(((ev.delta_res5 < 0) & (~ev.deferred.astype(bool))).sum()),
+        harmful_h5_deferred=int(((ev.delta_res5 < 0) & (ev.deferred.astype(bool))).sum()),
+        n_evaluable_until_next=len(evn),
+        harmful_until_next=int((evn.delta_until_next < 0).sum()) if len(evn) else 0,
+        mean_delta_h5=round(float(ev.delta_res5.mean()), 4) if len(ev) else float("nan"),
+    )
+    return out
+
+
 def clopper_pearson(k, n, a=0.05):
     if n == 0:
         return (np.nan, np.nan)
@@ -88,15 +123,15 @@ def main() -> None:
                     lp = int(arm.labels_probe.sum())
                     cap_rej = int(arm.get("n_defer_cap_reject", pd.Series([0])).fillna(0).sum())
                     delay = float(arm.get("defer_delay_sum", pd.Series([0])).fillna(0).sum())
-                    # e6: immediate commits judged by the proposal lookahead
-                    tlog_f = f"{RAW}/{tag}/paper2_v2_trigger_log.csv"
-                    k_harm = n_imm = 0
-                    if os.path.exists(tlog_f):
-                        tl = pd.read_csv(tlog_f)
-                        imm = tl[tl.committed & tl.trained]
-                        n_imm = len(imm)
-                        k_harm = int((imm.delta_future5 < 0).sum())
-                    cp_lo, cp_hi = clopper_pearson(k_harm, n_imm)
+                    # e6 (final-q1 blocker B): score EVERY resolved commit -- immediate AND
+                    # deferred -- from its REAL resolution window, with explicit censoring for
+                    # commits whose horizon runs past the end of the stream. The earlier
+                    # version scored only immediate commits off the proposal-time lookahead,
+                    # which left ~35% of the sweep's commits unevaluated.
+                    h = harm_from_resolution_log(tag)
+                    n_imm, n_def = h["n_immediate"], h["n_deferred"]
+                    k_harm, n_eval = h["harmful_h5"], h["n_evaluable_h5"]
+                    cp_lo, cp_hi = clopper_pearson(k_harm, n_eval)
                     ng = naive_gain.get(sc, np.nan)
                     rows.append(dict(
                         scenario=sc, policy=pol, cap=cap, schedule=sch,
@@ -110,11 +145,17 @@ def main() -> None:
                         labels_probe_per_stream=round(float(arm.labels_probe.mean()), 1),
                         e4_abstention=(round(cap_rej / props, 3) if props else np.nan),
                         e5_delay_windows=(round(delay / props, 2) if props else np.nan),
-                        n_commits_immediate=n_imm,
-                        n_commits_deferred=commits - n_imm,
-                        e6_harmful_immediate=k_harm,
+                        n_commits_immediate=n_imm, n_commits_deferred=n_def,
+                        e6_n_evaluable=n_eval, e6_n_censored=h["n_censored_h5"],
+                        e6_harmful_h5=k_harm,
+                        e6_harmful_immediate=h["harmful_h5_immediate"],
+                        e6_harmful_deferred=h["harmful_h5_deferred"],
+                        e6_rate=(round(k_harm / n_eval, 3) if n_eval else np.nan),
                         e6_cp_lo=round(cp_lo, 3) if cp_lo == cp_lo else np.nan,
                         e6_cp_hi=round(cp_hi, 3) if cp_hi == cp_hi else np.nan,
+                        e6_harmful_until_next=h["harmful_until_next"],
+                        e6_n_eval_until_next=h["n_evaluable_until_next"],
+                        e6_mean_delta_h5=h["mean_delta_h5"],
                     ))
     A = pd.DataFrame(anchors); R = pd.DataFrame(rows)
     A.to_csv(f"{OUT}/frontier_anchors.csv", index=False)
