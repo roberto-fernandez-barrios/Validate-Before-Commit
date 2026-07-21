@@ -11,13 +11,16 @@ Endpoints, per (scenario, policy, cap, schedule):
   e3 probe labels per commit
   e4 abstention rate: deferral-cap rejections / proposals (neither commit nor futility)
   e5 decision delay: mean windows from proposal to resolution (0 for immediate)
-  e6 harmful-commit rate with Clopper-Pearson 95% CI, over ALL resolved commits (immediate AND
-     deferred), read from paper2_v2_resolution_log.csv and scored from the REAL resolution
-     window -- horizons H1/H3/H5/H10 plus 'until the next decision'. A commit whose horizon runs
-     past the end of the stream is right-censored (e6_n_censored), never scored short; the
-     reported rate is harmful / H5-evaluable. (The earlier trigger-log proxy, which scored only
-     immediate commits off the proposal-window lookahead and counted deferred ones separately,
-     is retired -- see harm_from_resolution_log below.)
+  e6 harmful-commit counts over ALL resolved commits (immediate AND deferred), read from
+     paper2_v2_resolution_log.csv and scored from the REAL resolution window -- horizons
+     H1/H3/H5/H10 plus 'until the next decision'. A commit whose horizon runs past the end of
+     the stream is right-censored (e6_n_censored), never scored short. (The earlier
+     trigger-log proxy, which scored only immediate commits off the proposal-window lookahead
+     and counted deferred ones separately, is retired -- see harm_from_resolution_log below.)
+     The per-arm e6_cp_lo/e6_cp_hi columns are DESCRIPTIVE within-sweep Clopper-Pearson
+     intervals kept for artifact continuity; commits are clustered within shared seeds and
+     configurations, so neither these columns nor the pooled 0/506 count support a binomial
+     population-rate bound, and no claim surface may quote one (q1-final-patch v1.20.1).
 """
 from __future__ import annotations
 

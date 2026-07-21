@@ -85,7 +85,7 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 \caption{Label-efficiency frontier: gain over no-adaptation versus probe budget; a small probe suffices to avoid harm.}
 \label{fig:5}
 \end{figure}
-Ten extensions beyond the pre-specified design (explicitly labeled as robustness, not part of the confirmatory claim) probe the gate's limits. \emph{Label efficiency:} sweeping the probe budget from 8 to 128 flows (KS-max, 30 seeds; Fig.~\ref{fig:5}) shows the gate is remarkably label-cheap --- in this initial study even the smallest budget avoided harm, ~8 labeled flows per confirmed drift ($\approx$23 per stream) lifting ToN-IoT gain from $-$1.36 (naive) to +0.38, plateauing near +1.1 by budget 32--64 (the hardened-harness re-run sharpens this: at $b{=}8$ harm is reduced but not converted to net benefit, fixing the operating point at $b{=}32$; \S5.3 of the main paper); benefit-regime gain is flat at every budget. A few dozen labels, not hundreds, suffice. \emph{Benefit breadth:} beyond PortScan the gate preserves --- and slightly improves --- the benefit in the two strongest benefit regimes, Wednesday (naive +15.39 $\to$ +16.32) and DDoS (naive +24.81 $\to$ +25.27), preserving benefit in all three benefit regimes tested --- the exception being the deep-benefit chronological replays, where a stale probe imposes a measured, metric-dependent premium (\S5.3 of the main paper).
+Ten extensions beyond the pre-specified design (explicitly labeled as robustness, not part of the confirmatory claim) probe the gate's limits. \emph{Label efficiency:} sweeping the probe budget from 8 to 128 flows (KS-max, 30 seeds; Fig.~\ref{fig:5}) shows the gate is remarkably label-cheap --- in this initial study even the smallest budget avoided harm, ~8 labeled flows per confirmed drift ($\approx$23 per stream) lifting ToN-IoT gain from $-$1.36 (naive) to +0.38, plateauing near +1.1 by budget 32--64 (the hardened-harness re-run sharpens this: at $b{=}8$ harm is reduced but not converted to net benefit, fixing the operating point at $b{=}32$; \S5.3 of the main paper); benefit-regime gain is flat at every budget. A few dozen labels, not hundreds, suffice in this balanced-probe setting. \emph{Benefit breadth:} beyond PortScan the gate preserves --- and slightly improves --- the benefit in the two strongest benefit regimes, Wednesday (naive +15.39 $\to$ +16.32) and DDoS (naive +24.81 $\to$ +25.27), preserving benefit in all three benefit regimes tested --- the exception being the deep-benefit chronological replays, where a stale probe imposes a measured, metric-dependent premium (\S5.3 of the main paper).
 
 
 \begin{figure}
@@ -344,9 +344,13 @@ superiority --- non-inferiority against a pre-registered margin, which is the cr
 cells were registered under and which Table~1 of the main paper reports.
 
 \textbf{Registered follow-ups (Benjamini--Hochberg within block).} The budget frontier
-(thirteen committing configurations on CICIDS-PortScan at full drift) and the chronological
-matrix (the strict gate on seven pre-enumerated replays) each form a within-block family.
-All thirteen and all seven survive BH control of the false-discovery rate.
+(the fifteen pre-declared cells --- 3 policies $\times$ 5 caps --- on CICIDS-PortScan at
+full drift under the Bonferroni schedule, including the two configurations that never
+commit) and the chronological matrix (the strict gate on seven pre-enumerated replays) each
+form a within-block family fixed in advance of the results. Thirteen of the fifteen
+frontier cells and all seven replays survive BH control of the false-discovery rate; the
+two non-survivors are exactly the never-committing cells, whose paired gain is identically
+zero.
 
 \textbf{Descriptive tier (uncorrected, and labelled).} Ablations, sensitivity sweeps and
 auxiliary negative results are reported without correction and without confirmatory language.
@@ -354,13 +358,24 @@ auxiliary negative results are reported without correction and without confirmat
 \emph{The point of the table is what it does not change.} Every nominally significant contrast
 in this paper survives its adjustment, so no conclusion rests on an uncorrected comparison;
 the correction is reported because a reader is entitled to check that, not because it rescues
-anything. $p$-values are computed directly from the per-seed paired differences by a
-deterministic seed-level paired bootstrap (20{,}000 resamples, fixed per-contrast seeds,
-two-sided $p = 2\min\{\Pr(\bar d \le 0), \Pr(\bar d \ge 0)\}$ floored at $1/20{,}000$; each
-contrast is a mean over 30 seeds). Where a re-run lacks the per-seed files, the generating
-script falls back to a normal-approximation inversion of the published interval and labels
-each row's provenance in a \texttt{p\_method} column; in the shipped artifact all 26 rows use
-the exact paired bootstrap. The full machine-readable table is
+anything. Multiplicity-adjusted $p$-values are computed directly from the paired per-seed
+contrasts using a \emph{deterministic centered paired bootstrap test}: with $d$ the seed-level
+paired differences (each contrast is a mean over 30 seeds, the unit of inference), the
+observed statistic is $|\bar d|$, resampling is performed on $d - \bar d$ (imposing the null),
+$B = 100{,}000$, and the two-sided Monte-Carlo--corrected $p$ is
+$(\#\{|\bar d^{*}_0| \ge |\bar d|\} + 1)/(B+1)$, with per-contrast RNG seeds derived from the
+contrast label (bit-reproducible, order-independent); this is a bootstrap approximation of
+the null distribution, not an exact test. Holm controls the six-test confirmatory family, and
+Benjamini--Hochberg is applied separately to the pre-declared 15-cell budget-frontier block
+(3 policies $\times$ 5 caps on PortScan-full under the Bonferroni schedule, \emph{including}
+the two configurations that never commit --- the family is fixed in advance and does not
+condition on observed outcomes) and to the seven-replay chronological block. Two pre-declared
+sensitivities (paired $t$-test and Wilcoxon signed-rank on $d$) are reported alongside in the
+table and agree with the primary analysis; they never replace it. Survival under adjustment:
+3 of the 6 core contrasts are nominally significant and all 3 survive Holm; 13 of the 15
+frontier cells survive BH (the two non-survivors are exactly the never-committing
+configurations, whose paired gain is identically zero); all 7 chronological replays survive
+BH. The full machine-readable table is
 \texttt{results/tables/paper2\_final\_q1/multiplicity.csv} in the artifact.
 
 \bibliographystyle{unsrtnat}

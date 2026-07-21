@@ -42,11 +42,11 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **causal arm** (candidate, probe and detector recalibration from observed traffic only).
-- **A named policy with a guarantee you can afford:** **VBC-SG** — stratified per-class anytime-valid bounds driving
+- **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
   vacuous: at a 512-flow probe cap a lifetime-budgeted pooled gate recovers **93% of always-deploying's benefit**
   under an approximate pooled analysis (81% for the fully stratified VBC-SG variant carrying the formal per-class
-  guarantee) while committing **nothing at all** under zero drift. The mechanism behind the harm is named too — a role-randomized A/B
+  guarantee) while committing **nothing at all** under zero drift (the inspected-flow acquisition cost of these balanced probes under operational class imbalance is not measured; the Cohort continuation is a proposal-target resampling simulation, Cohort-sim, not a retained production cohort). The mechanism behind the harm is named too — a role-randomized A/B
   control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**
   (per-model scaling removes it; equivalence-tested on 100 fresh seeds).
 - **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the

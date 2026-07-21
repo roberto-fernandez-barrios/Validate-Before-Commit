@@ -126,8 +126,8 @@ the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--
   only) and an independent uniform *validation* half at operating prevalence (the only sample
   the commit rule sees, compared by plain accuracy). Scope: the evaluation stream and detector
   calibration remain balanced, and the candidate training batch remains balanced per class
-  with its acquisition cost not modeled — the arm measures label-acquisition yield, not the
-  end-to-end cost of the commit pipeline. It runs inside the pool-based harness and is
+  with its acquisition cost not modeled — the arm measures label-acquisition yield; it does not
+  price the commit pipeline end to end. It runs inside the pool-based harness and is
   **not** the causal arm.
   Aggregate: `make_paper2_q1_e2e`. Tables for all four: `make_paper2_q1_tables`.
 

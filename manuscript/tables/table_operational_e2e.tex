@@ -2,26 +2,20 @@
 \centering
 \caption{\textbf{Attack-label acquisition yield under operational prevalence (final-q1).}
 Inspected flows per adjudicated \emph{attack} label found in the auxiliary
-\emph{discovery} queue of a pool-based operational acquisition-yield simulation (seeds
-801--830; the earlier 701--730 window is a pilot). Adjudication candidates are drawn at
-operating prevalence $\pi$ and every probe label arrives five windows late; the evaluation
-stream and detector calibration remain balanced, and the candidate training batch remains
-balanced per class with its acquisition cost \emph{not} modeled --- so this arm measures
-label-acquisition yield, not the end-to-end cost of the commit decision. The adjudication
-budget is split in two: the enriched discovery half measures attack-\emph{finding} yield
-only, while an independent \emph{uniform} validation half at operating prevalence is the
-only sample the commit rule is shown (32 adjudications per decision, compared by plain
-accuracy; at extreme prevalence it may contain no attacks) --- so an enriched sample is never
-used as an estimate of deployed performance, and enrichment neither reduces the validation
-adjudications nor cheapens the commit decision itself. Acquisition policies rank candidate
-flows by model \emph{predictions} only, never by ground truth, so they are implementable:
-an analyst inspects the queue the deployed detector already produces. Alert-enriched
-inspection \emph{finds an attack} 5--8$\times$ more cheaply than random inspection at
-every prevalence, and hybrid 3--6$\times$; ranking by candidate/incumbent
-\emph{disagreement} barely helps, because the two models differ near the decision boundary
-rather than on the minority class. The honest headline: the decision still requires its 32
-uniform validation adjudications; what enrichment changes is the cost of \emph{finding
-attack labels} in the discovery queue, at the yields tabulated here.}
+\emph{discovery} queue (seeds 801--830; 701--730 is a pilot). Adjudication candidates are
+drawn at operating prevalence $\pi$, labels arrive five windows late; the evaluation stream,
+detector calibration and candidate training batch remain balanced per class, with the
+candidate batch's acquisition cost \emph{not} modeled --- the arm measures acquisition
+yield and delay; it does not price the commit pipeline end to end. Discovery never decides:
+the commit rule sees only an independent \emph{uniform} validation half at operating
+prevalence (32 adjudications per decision, plain accuracy; at extreme prevalence it may
+consist mostly or entirely of benign flows, so no balanced-accuracy guarantee is claimed),
+and enrichment reduces neither those 32 adjudications nor the decision's own cost.
+Acquisition policies rank flows by model \emph{predictions} only, so an analyst can work
+the queue the detector already produces. Alert-enriched inspection \emph{finds an attack}
+5--8$\times$ more cheaply than random inspection, hybrid 3--6$\times$; candidate/incumbent
+\emph{disagreement} barely helps (the models differ near the boundary, not on the minority
+class).}
 \label{tab:operational_e2e}
 \small
 \begin{tabular}{l l r r r r}

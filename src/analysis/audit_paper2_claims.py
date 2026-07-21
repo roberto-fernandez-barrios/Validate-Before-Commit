@@ -953,10 +953,16 @@ def main():
     # q1-final-patch (Block G): README.md and highlights.md are claim surfaces too -- the
     # published "every gate beats always-deploy" README overclaim slipped past these guards
     # precisely because only the .tex sources were scanned.
-    for _p in ("manuscript/main.tex", "manuscript/main_ieee.tex", "manuscript/supplement.tex",
-               "README.md", "manuscript/highlights.md"):
+    # v1.20.1: REPRODUCE.md and every generated table caption are claim surfaces too.
+    import glob as _glob
+    _claim_files = ["manuscript/main.tex", "manuscript/main_ieee.tex",
+                    "manuscript/supplement.tex", "README.md", "manuscript/highlights.md",
+                    "REPRODUCE.md"]
+    _claim_files += sorted(_glob.glob("manuscript/tables/*.tex"))
+    _claim_files += sorted(_glob.glob("manuscript/tables_ieee/*.tex"))
+    for _p in _claim_files:
         if os.path.exists(_p):
-            _texts[os.path.basename(_p)] = _re.sub(
+            _texts[_p.replace("\\", "/")] = _re.sub(
                 r"\s+", " ", open(_p, encoding="utf-8").read().lower())
 
     def _hits(pat):
@@ -1040,7 +1046,7 @@ def main():
           float(_hits(r"(?:every|all) gates? (?:beats?|outperforms?|(?:sit |are )?above) always")), 0.5)
     check("q1fp D1: Wednesday counterexample stated wherever UNSW win is claimed (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
-                    if _n in ("main.tex", "main_ieee.tex")
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
                     and "unresolved counterexample" in _t)), 0.5)
     # G1: temporal serving semantics -- the v2 runner must evaluate/score the window BEFORE
     # the pending-resolution block can swap the model or rebuild the detector (Block A).
@@ -1053,6 +1059,84 @@ def main():
           float(_i_eval < _i_pend and _i_score < _i_pend), 0.5)
     check("q1fp G1: v2 loop logs served_model_version", 1.0,
           float("served_model_version" in _v2), 0.5)
+
+    # --- q1-final-patch v1.20.1 guards (statistical + claim-scope) --------------------------
+    # v2A: the 0/506 count must never be dressed as a binomial population-rate bound.
+    check("v121 A: no '0.73%'/'0.726' harm-rate bound anywhere", 0.0,
+          float(_hits(r"0\.73\\?%") + _hits(r"0\.726")), 0.5)
+    check("v121 A: no 'Clopper' on the claim surfaces", 0.0, float(_hits(r"clopper")), 0.5)
+    check("v121 A: clustering caveat present with the 506 count (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items() if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "not treated as 506 independent bernoulli trials" in _t)), 0.5)
+    check("v121 A: no 'bounded rate' phrasing for the harm count", 0.0,
+          float(_prox_hits(r"bounded rate", ("harmful", "commit"), span=80)), 0.5)
+    # v2B: multiplicity naming and family structure.
+    check("v121 B: no 'exact paired bootstrap' / 'exact bootstrap p'", 0.0,
+          float(_hits(r"exact paired bootstrap") + _hits(r"exact bootstrap \$?p")), 0.5)
+    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp)", 3.0,
+          float(sum(1 for _t in _texts.values()
+                    if "centered paired bootstrap" in _t)), 0.5)
+    if os.path.exists(f"{Q1}/multiplicity.csv"):
+        _M = pd.read_csv(f"{Q1}/multiplicity.csv")
+        check("v121 B: multiplicity total = 28", 28.0, float(len(_M)), 0.5)
+        _fc = _M.groupby("family").size()
+        check("v121 B: families sized 6/15/7", 1.0,
+              float(sorted(_fc.tolist()) == [6, 7, 15]), 0.5)
+        check("v121 B: zero normal-approximation fallbacks", 0.0,
+              float((~_M.p_method.str.contains("centered paired bootstrap")).sum()), 0.5)
+        check("v121 B: sensitivity columns present", 1.0,
+              float({"p_ttest_sensitivity", "p_wilcoxon_sensitivity",
+                     "family_size"} <= set(_M.columns)), 0.5)
+    _mx = open("src/analysis/make_paper2_q1_multiplicity.py", encoding="utf-8").read()
+    check("v121 B: no outcome-dependent frontier filter in the generator", 0.0,
+          float(("commits_total > 0" in _mx) or ("commits_total>0" in _mx)), 0.5)
+    # v2C: operational-arm scope coherence.
+    check("v121 C: no undisambiguated 'stream and the probe at operating prevalence'", 0.0,
+          float(_hits(r"with the stream and the probe at operating prevalence")), 0.5)
+    check("v121 C: no 'end-to-end cost of (the )?commit'", 0.0,
+          float(_hits(r"end[- ]to[- ]end cost of (?:the )?commit")), 0.5)
+    check("v121 C: no 'cheapens the commit decision'", 0.0,
+          float(_hits(r"cheapens the commit decision")), 0.5)
+    check("v121 C: no 'validation costs little and protects'", 0.0,
+          float(_hits(r"validation costs little and protects")), 0.5)
+    check("v121 C: manifest declares the operational scope fields", 1.0,
+          float(os.path.exists("results/final_manifest.json") and all(
+              k in open("results/final_manifest.json", encoding="utf-8").read()
+              for k in ("operational_arm_scope", "acquisition_yield_and_delay_only",
+                        "uniform_at_operating_prevalence", "plain_accuracy",
+                        "end_to_end_pipeline_cost_modeled"))), 0.5)
+    # v2D: Cohort-sim naming + affordable + 32-label scope.
+    check("v121 D: Cohort described as Cohort-sim (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items() if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "cohort-sim" in _t)), 0.5)
+    check("v121 D: Cohort-sim retention disclaimer present", 1.0,
+          float(any("does not model retention and delayed adjudication" in _t
+                    or "not model a retained production cohort" in _t
+                    or "not a retained production cohort" in _t
+                    for _t in _texts.values())), 0.5)
+    check("v121 D: no unqualified 'affordable'", 0.0, float(_hits(r"affordab")), 0.5)
+    check("v121 D: 'non-vacuous within the evaluated' qualification present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items() if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "non-vacuous within the evaluated" in _t)), 0.5)
+    check("v121 D: no '32 labels suffice'/'labeled flows ... suffice' claim", 0.0,
+          float(_hits(r"32 labels suffice")
+                + _hits(r"32 labeled flows per confirmed drift suffice")), 0.5)
+    check("v121 D: no 'cheap and robust' / 'both budgets are realistic'", 0.0,
+          float(_hits(r"cheap and robust") + _hits(r"both budgets are realistic")), 0.5)
+    check("v121 D: 32-label claim carries the controlled balanced-probe scope (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items() if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "controlled balanced-probe" in _t)), 0.5)
+    check("v121 E: no 'zero probability of harm' / 'eliminates harmful commits'", 0.0,
+          float(_hits(r"zero probability of harm") + _hits(r"eliminates harmful commits")), 0.5)
+    # v2E: claim-scope audit table generated and fully verified.
+    _csa = f"{Q1}/claim_scope_audit.csv"
+    if os.path.exists(_csa):
+        _A = pd.read_csv(_csa)
+        check("v121 E: claim_scope_audit rows >= 12", 1.0, float(len(_A) >= 12), 0.5)
+        check("v121 E: claim_scope_audit zero FAIL rows", 0.0,
+              float(_A.status.str.startswith("FAIL").sum()), 0.5)
+    else:
+        check("v121 E: claim_scope_audit.csv missing", 1.0, None, 0.5)
     # B1: every 93% benefit claim must be marked as the approximate pooled analysis
     _bad93 = 0
     for _t in _texts.values():

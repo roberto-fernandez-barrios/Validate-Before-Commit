@@ -1,19 +1,19 @@
 \begin{table}[t]
 \centering
 \caption{\textbf{The registered budget frontier for the deployment-long guarantee (final-q1).}
-Lifetime-budgeted risk gates ($\alpha_{\mathrm{life}}{=}0.10$, Bonferroni spending; the
-$p$-series schedule is within $0.1$ points throughout and is in the artifact), pristine seeds
-501--530. \emph{Gain} is balanced-accuracy points over never-adapting on CICIDS-PortScan at
-full drift, where always-deploying gains $+7.22$; \emph{\% naive} is the fraction of
-that benefit recovered; \emph{labels} are probe labels per proposal (candidate \emph{training}
-already costs 1{,}024); \emph{abst.} is the fraction of proposals resolved as neither commit
-nor futility; \emph{delay} is deferral windows to a decision; the last column is commits under
-\emph{zero drift} across 91 proposals. The pre-declared non-vacuity target (commits,
-$\ge$50\% of naive, zero zero-drift commits, $<$1{,}024 labels) is met by twelve
-configurations across both alpha-spending schedules (the seven Bonferroni rows shown here plus
-five $p$-series) --- the deployment-long guarantee is a matter of budget, not of the rule. For
-reference, the no-additional-label strict gate (same probe as the point gate, no extra labels) scores $+7.57$ here and $-0.01$
-under zero drift (vs the point gate's $-0.17$).}
+Lifetime-budgeted risk gates ($\alpha_{\mathrm{life}}{=}0.10$, Bonferroni spending;
+$p$-series is within $0.1$ points and in the artifact), seeds 501--530, balanced probes.
+\emph{Gain} is balanced-accuracy points over never-adapting on CICIDS-PortScan at full
+drift (always-deploying gains $+7.22$); \emph{\% naive} the fraction recovered;
+\emph{labels} probe labels per proposal (candidate training costs 1{,}024, its
+inspected-flow acquisition unpriced); \emph{abst.} the fraction of proposals resolved as
+neither commit nor futility; \emph{delay} deferral windows; last column commits under zero
+drift (91 proposals). The pre-declared non-vacuity target is met by twelve configurations
+across both schedules --- within the evaluated balanced-probe adjudication budget the
+guarantee is a matter of budget, not of the rule. Cohort-sim resamples the proposal-time
+target distribution in the simulator; it does not model a retained production cohort. For
+reference, the no-additional-label strict gate scores $+7.57$ here and
+$-0.01$ under zero drift (point gate: $-0.17$).}
 \label{tab:budget_frontier}
 \small
 \begin{tabular}{l r r r r r r r}
@@ -26,11 +26,11 @@ Pooled EB-CS + defer & 256 & $+5.88$ & 82\% & 324 & 0.82 & 4.2 & 0 \\
 Pooled EB-CS + defer & 512 & $+6.73$ & 93\% & 578 & 0.78 & 4.0 & 0 \\
 Pooled EB-CS + defer & 1024 & $+7.30$ & 101\% & 1082 & 0.69 & 3.6 & 0 \\
 \addlinespace
-VBC-SG-Cohort & 64 & $+0.69$ & 10\% & 140 & 0.89 & 4.7 & 0 \\
-VBC-SG-Cohort & 128 & $+2.27$ & 32\% & 201 & 0.85 & 4.5 & 0 \\
-VBC-SG-Cohort & 256 & $+4.39$ & 61\% & 327 & 0.82 & 4.4 & 0 \\
-VBC-SG-Cohort & 512 & $+5.83$ & 81\% & 580 & 0.82 & 4.2 & 0 \\
-VBC-SG-Cohort & 1024 & $+6.56$ & 91\% & 1090 & 0.80 & 4.0 & 0 \\
+VBC-SG-Cohort-sim & 64 & $+0.69$ & 10\% & 140 & 0.89 & 4.7 & 0 \\
+VBC-SG-Cohort-sim & 128 & $+2.27$ & 32\% & 201 & 0.85 & 4.5 & 0 \\
+VBC-SG-Cohort-sim & 256 & $+4.39$ & 61\% & 327 & 0.82 & 4.4 & 0 \\
+VBC-SG-Cohort-sim & 512 & $+5.83$ & 81\% & 580 & 0.82 & 4.2 & 0 \\
+VBC-SG-Cohort-sim & 1024 & $+6.56$ & 91\% & 1090 & 0.80 & 4.0 & 0 \\
 \addlinespace
 VBC-SG-Refresh & 64 & $+0.00$ &  & 141 & 0.93 & 4.7 & 0 \\
 VBC-SG-Refresh & 128 & $+0.00$ &  & 204 & 0.92 & 4.6 & 0 \\

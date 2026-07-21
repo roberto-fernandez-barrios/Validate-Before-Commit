@@ -1,29 +1,36 @@
 """final-q1 Fase F: the paper's one multiplicity table.
 
-Two families, treated differently and labelled as such:
+Three families, fixed IN ADVANCE and independent of any observed outcome (q1-final-patch
+v1.20.1, Block B — the earlier commits-positive frontier filter was outcome-dependent
+selection and is removed):
 
-  * CONFIRMATORY CORE -- the registered gate-vs-naive contrasts of the hardened replication
-    (the primary gate, both detectors, three regimes). This is a genuine inferential family
-    of 6 pre-declared tests, so it gets HOLM step-down control of the family-wise error.
-  * REGISTERED FOLLOW-UPS -- BENJAMINI-HOCHBERG within each block that makes several
-    inferential statements at once. This script corrects exactly two such families: the
-    selected budget-frontier configurations (PortScan full, Bonferroni, committing arms) and
-    the strict-gate-versus-no-adaptation family across the seven chronological replays. Other
-    point/VBC-SG/naive comparisons are descriptive and are not automatically corrected here.
+  * F1 CONFIRMATORY CORE — exactly 6 contrasts (2 detectors x 3 regimes, primary b=32 gate
+    vs naive), the registered superiority family. HOLM step-down FWER control.
+  * F2 BUDGET FRONTIER — exactly 15 contrasts (3 policies x 5 caps, PortScan full drift,
+    Bonferroni schedule), INCLUDING cells that never commit (their per-seed gain is still a
+    well-defined paired difference vs no-adaptation). BENJAMINI-HOCHBERG within the block.
+  * F3 CHRONOLOGICAL MATRIX — exactly 7 strict-gate-vs-no-adaptation replays.
+    BENJAMINI-HOCHBERG within the block.
 
 Everything else in the paper is descriptive and is not corrected -- and, per the protocol,
 must not carry confirmatory language. The audit cross-checks that the manuscript's stated
 policy matches what this script actually applied.
 
-p-values (q1-final-patch, Block E). Wherever the per-seed files are on disk, the paired
-contrast is bootstrapped DIRECTLY: a deterministic seed-level paired bootstrap with
-N_BOOT = 20000 resamples, two-sided p = 2*min(P(mean<=0), P(mean>=0)), floored at 1/N_BOOT,
-with a per-contrast RNG derived from the contrast label (order-independent, exactly
-reproducible; see tests/test_q1_temporal_semantics.py's sibling reproducibility test).
-Where a family's per-seed data are NOT available, the p is a NORMAL-APPROXIMATION INVERSION
-OF THE PUBLISHED INTERVAL and is labelled as such in the `p_method` column -- it is never
-called an exact bootstrap p-value. No conclusion in the manuscript depends on the
-approximate branch: it exists only as a fallback for re-runs on partial checkouts.
+p-values (q1-final-patch v1.20.1). The primary analysis is a DETERMINISTIC CENTERED PAIRED
+BOOTSTRAP TEST computed directly from the seed-level paired differences d (n = 30 seeds is
+the unit of inference; windows are never treated as units):
+
+    observed = mean(d);  d0 = d - mean(d)            # impose H0: mean zero
+    resample d0 with replacement, B = 100,000
+    p = (#{ |mean(d0*)| >= |observed| } + 1) / (B + 1)   # two-sided, Monte-Carlo corrected
+
+The per-contrast RNG is derived from the contrast label (CRC32), so results are bit
+reproducible and independent of computation order. This is a bootstrap approximation of the
+null distribution of the mean -- it is never described as an exact test. Two pre-declared
+sensitivities are reported alongside (never substituted for the primary): a one-sample
+paired t-test on d and a Wilcoxon signed-rank test on d (NaN when d is identically zero).
+A normal-approximation inversion of the published interval exists only as a labelled
+fallback for partial checkouts; the shipped CSV must contain zero fallback rows.
 
 Output: results/tables/paper2_final_q1/multiplicity.csv
 """
@@ -38,26 +45,51 @@ import pandas as pd
 T = "results/tables"
 RAW = "results/raw"
 OUT = f"{T}/paper2_final_q1"
-N_BOOT = 20000
+N_BOOT = 100_000
 BOOT_SEED = 20260721
-EXACT = f"exact paired bootstrap ({N_BOOT} resamples, deterministic seed {BOOT_SEED})"
-APPROX = "normal-approximation inversion of the published interval"
+PRIMARY = (f"deterministic centered paired bootstrap test ({N_BOOT} resamples, "
+           f"Monte-Carlo corrected, per-contrast seed base {BOOT_SEED})")
+APPROX = "normal-approximation inversion of the published interval (fallback; not used in the shipped artifact)"
+
+FRONTIER_POLICIES = ("ebcsdef", "vbccoh", "vbcref")
+FRONTIER_CAPS = (64, 128, 256, 512, 1024)
 
 
-def boot_p_exact(d: np.ndarray, label: str) -> float:
-    """Deterministic two-sided seed-level paired bootstrap p for mean(d) = 0."""
+def boot_p_centered(d: np.ndarray, label: str) -> float:
+    """Two-sided deterministic centered paired bootstrap p for H0: mean(d) = 0."""
     d = np.asarray(d, float)
     n = len(d)
+    observed = abs(d.mean())
+    d0 = d - d.mean()
     rng = np.random.default_rng(BOOT_SEED + zlib.crc32(label.encode()))
-    b = d[rng.integers(0, n, (N_BOOT, n))].mean(1)
-    p = 2.0 * min(float((b <= 0).mean()), float((b >= 0).mean()))
-    return max(p, 1.0 / N_BOOT)
+    b = np.abs(d0[rng.integers(0, n, (N_BOOT, n))].mean(1))
+    extreme = int((b >= observed - 1e-15).sum())
+    return (extreme + 1) / (N_BOOT + 1)
+
+
+def p_ttest(d: np.ndarray) -> float:
+    """Sensitivity: one-sample paired t-test on the seed-level differences."""
+    from scipy.stats import ttest_1samp
+    d = np.asarray(d, float)
+    if np.allclose(d.std(ddof=1), 0.0):
+        return 1.0 if np.allclose(d.mean(), 0.0) else 0.0
+    return float(ttest_1samp(d, 0.0).pvalue)
+
+
+def p_wilcoxon(d: np.ndarray) -> float:
+    """Sensitivity: Wilcoxon signed-rank on the seed-level differences (NaN if all zero)."""
+    from scipy.stats import wilcoxon
+    d = np.asarray(d, float)
+    if np.allclose(d, 0.0):
+        return float("nan")
+    try:
+        return float(wilcoxon(d).pvalue)
+    except ValueError:
+        return float("nan")
 
 
 def boot_p(diff: float, lo: float, hi: float) -> float:
-    """Fallback only: two-sided p implied by a symmetric-ish bootstrap interval, inverted
-    under a normal approximation. Labelled APPROX in the output; never used when the
-    per-seed files are present."""
+    """Fallback only (labelled APPROX): normal inversion of a published interval."""
     se = (hi - lo) / (2 * 1.959964)
     if se <= 0:
         return 1.0
@@ -120,84 +152,91 @@ def _core_diff_per_seed(det: str, reg: str) -> np.ndarray | None:
     return (out["lp32"][idx] - out["none"][idx]).values
 
 
+def _row(family, fam_size, method, test, effect, lo, hi, d, label, approx=None):
+    if d is not None:
+        p = boot_p_centered(d, label)
+        return dict(family=family, family_size=fam_size, method=method, test=test,
+                    effect=effect, ci_lo=lo, ci_hi=hi, p_raw=p, p_method=PRIMARY,
+                    p_ttest_sensitivity=round(p_ttest(d), 6),
+                    p_wilcoxon_sensitivity=round(p_wilcoxon(d), 6))
+    return dict(family=family, family_size=fam_size, method=method, test=test,
+                effect=effect, ci_lo=lo, ci_hi=hi, p_raw=approx, p_method=APPROX,
+                p_ttest_sensitivity=float("nan"), p_wilcoxon_sensitivity=float("nan"))
+
+
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     rows = []
 
-    # ---- family 1: confirmatory core, Holm ----
+    # ---- F1: confirmatory core (6 contrasts), Holm ----
     ci = pd.read_csv(f"{T}/paper2_v2_replication_001/paired_ci.csv")
     core = ci[ci.contrast == "lp32_vs_naive"].copy()
-    ps, methods = [], []
+    assert len(core) == 6, f"core family must have exactly 6 contrasts, found {len(core)}"
+    f1 = []
     for r in core.itertuples():
         label = f"core/{r.detector}/{r.regime}/lp32_vs_naive"
         d = _core_diff_per_seed(r.detector, r.regime)
-        if d is not None:
-            ps.append(boot_p_exact(d, label)); methods.append(EXACT)
-        else:
-            ps.append(boot_p(r.diff, r.ci_lo, r.ci_hi)); methods.append(APPROX)
-    core["p_raw"], core["p_method"] = ps, methods
-    core["p_adj"] = holm(ps)
-    for r in core.itertuples():
-        rows.append(dict(family="confirmatory core (gate vs naive)", method="Holm",
-                         test=f"{r.detector}/{r.regime} lp32 vs naive",
-                         effect=r.diff, ci_lo=r.ci_lo, ci_hi=r.ci_hi,
-                         p_raw=round(r.p_raw, 5), p_adj=round(r.p_adj, 5),
-                         p_method=r.p_method,
-                         significant_adj=bool(r.p_adj < 0.05)))
+        f1.append(_row("confirmatory core (gate vs naive)", 6, "Holm",
+                       f"{r.detector}/{r.regime} lp32 vs naive",
+                       r.diff, r.ci_lo, r.ci_hi, d, label,
+                       approx=boot_p(r.diff, r.ci_lo, r.ci_hi)))
+    adj = holm([r["p_raw"] for r in f1])
+    for r, a in zip(f1, adj):
+        r["p_adj"] = a
+    rows += f1
 
-    # ---- family 2: registered follow-up blocks, BH within block ----
+    # ---- F2: budget frontier (15 pre-declared cells, zero-commit cells INCLUDED), BH ----
     bf = f"{OUT}/budget_frontier.csv"
-    if os.path.exists(bf):
-        B = pd.read_csv(bf)
-        b = B[(B.scenario == "ps_full") & (B.schedule == "bonf") & (B.commits_total > 0)].copy()
-        if len(b):
-            ps2, m2 = [], []
-            for r in b.itertuples():
-                sch = "bonf" if r.schedule == "bonf" else r.schedule
-                d = _arm_gain_per_seed(f"q1fc_{r.scenario}_{r.policy}_c{r.cap}_{sch}")
-                label = f"frontier/{r.scenario}/{r.policy}/c{r.cap}/{sch}"
-                if d is not None:
-                    ps2.append(boot_p_exact(d, label)); m2.append(EXACT)
-                else:
-                    ps2.append(boot_p(r.gain, r.lo, r.hi)); m2.append(APPROX)
-            b["p_raw"], b["p_method"] = ps2, m2
-            b["p_adj"] = bh(ps2)
-            for r in b.itertuples():
-                rows.append(dict(family="registered follow-up: budget frontier (PortScan full)",
-                                 method="Benjamini-Hochberg",
-                                 test=f"{r.policy}/cap{r.cap} gain vs no-adaptation",
-                                 effect=r.gain, ci_lo=r.lo, ci_hi=r.hi,
-                                 p_raw=round(r.p_raw, 5), p_adj=round(r.p_adj, 5),
-                                 p_method=r.p_method,
-                                 significant_adj=bool(r.p_adj < 0.05)))
+    B = pd.read_csv(bf)
+    f2 = []
+    for pol in FRONTIER_POLICIES:
+        for cap in FRONTIER_CAPS:
+            cell = B[(B.scenario == "ps_full") & (B.policy == pol)
+                     & (B.cap == cap) & (B.schedule == "bonf")]
+            tag = f"q1fc_ps_full_{pol}_c{cap}_bonf"
+            d = _arm_gain_per_seed(tag)
+            eff = float(cell.iloc[0].gain) if len(cell) else float("nan")
+            lo = float(cell.iloc[0].lo) if len(cell) else float("nan")
+            hi = float(cell.iloc[0].hi) if len(cell) else float("nan")
+            f2.append(_row("registered follow-up: budget frontier (PortScan full, Bonferroni)",
+                           15, "Benjamini-Hochberg",
+                           f"{pol}/cap{cap} gain vs no-adaptation",
+                           eff, lo, hi, d, f"frontier/ps_full/{pol}/c{cap}/bonf",
+                           approx=boot_p(eff, lo, hi) if lo == lo else 1.0))
+    assert len(f2) == 15, f"frontier family must have exactly 15 cells, found {len(f2)}"
+    adj = bh([r["p_raw"] for r in f2])
+    for r, a in zip(f2, adj):
+        r["p_adj"] = a
+    rows += f2
 
+    # ---- F3: chronological matrix (7 strict replays), BH ----
     ch = f"{OUT}/chronological_replays.csv"
-    if os.path.exists(ch):
-        C = pd.read_csv(ch)
-        c = C[C.policy == "strict"].copy()
-        if len(c):
-            ps3, m3 = [], []
-            for r in c.itertuples():
-                d = _arm_gain_per_seed(f"q1fd_{r.stream}_strict")
-                label = f"chrono/{r.stream}/strict"
-                if d is not None:
-                    ps3.append(boot_p_exact(d, label)); m3.append(EXACT)
-                else:
-                    ps3.append(boot_p(r.gain_ba * 100, r.ba_lo * 100, r.ba_hi * 100))
-                    m3.append(APPROX)
-            c["p_raw"], c["p_method"] = ps3, m3
-            c["p_adj"] = bh(ps3)
-            for r in c.itertuples():
-                rows.append(dict(family="registered follow-up: chronological matrix (strict)",
-                                 method="Benjamini-Hochberg",
-                                 test=f"{r.stream} strict gain vs no-adaptation",
-                                 effect=round(r.gain_ba * 100, 3),
-                                 ci_lo=round(r.ba_lo * 100, 3), ci_hi=round(r.ba_hi * 100, 3),
-                                 p_raw=round(r.p_raw, 5), p_adj=round(r.p_adj, 5),
-                                 p_method=r.p_method,
-                                 significant_adj=bool(r.p_adj < 0.05)))
+    C = pd.read_csv(ch)
+    c = C[C.policy == "strict"].copy()
+    assert len(c) == 7, f"chronological family must have exactly 7 replays, found {len(c)}"
+    f3 = []
+    for r in c.itertuples():
+        d = _arm_gain_per_seed(f"q1fd_{r.stream}_strict")
+        f3.append(_row("registered follow-up: chronological matrix (strict)", 7,
+                       "Benjamini-Hochberg",
+                       f"{r.stream} strict gain vs no-adaptation",
+                       round(r.gain_ba * 100, 3), round(r.ba_lo * 100, 3),
+                       round(r.ba_hi * 100, 3), d, f"chrono/{r.stream}/strict",
+                       approx=boot_p(r.gain_ba * 100, r.ba_lo * 100, r.ba_hi * 100)))
+    adj = bh([r["p_raw"] for r in f3])
+    for r, a in zip(f3, adj):
+        r["p_adj"] = a
+    rows += f3
 
-    M = pd.DataFrame(rows)
+    for r in rows:
+        r["p_raw"] = round(r["p_raw"], 6)
+        r["p_adj"] = round(r["p_adj"], 6)
+        r["significant_adj"] = bool(r["p_adj"] < 0.05)
+    M = pd.DataFrame(rows)[["family", "family_size", "method", "test", "effect",
+                            "ci_lo", "ci_hi", "p_raw", "p_adj", "p_method",
+                            "p_ttest_sensitivity", "p_wilcoxon_sensitivity",
+                            "significant_adj"]]
+    assert len(M) == 28, f"expected 28 total contrasts, found {len(M)}"
     M.to_csv(f"{OUT}/multiplicity.csv", index=False)
     print(M.to_string(index=False))
     print("\n== survival under adjustment, per family ==")
@@ -205,8 +244,10 @@ def main() -> None:
         n_raw = int((g.p_raw < 0.05).sum()); n_adj = int(g.significant_adj.sum())
         print(f"  {fam}: {n_adj}/{len(g)} survive ({n_raw} were nominally significant)")
     n_ap = int((M.p_method == APPROX).sum())
-    print(f"\np-value provenance: {len(M) - n_ap}/{len(M)} exact paired bootstrap, "
+    print(f"\np-value provenance: {len(M) - n_ap}/{len(M)} centered paired bootstrap, "
           f"{n_ap} normal-approximation fallback")
+    if n_ap:
+        print("WARNING: fallback rows present -- the shipped artifact must have zero")
 
 
 if __name__ == "__main__":

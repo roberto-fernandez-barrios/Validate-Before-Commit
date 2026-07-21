@@ -14,7 +14,9 @@ import pandas as pd
 Q1 = "results/tables/paper2_final_q1"
 FK = "results/tables/paper2_final_kbs"
 OUTS = ["manuscript/tables", "manuscript/tables_ieee"]
-POL_NAME = {"ebcsdef": "Pooled EB-CS + defer", "vbccoh": "VBC-SG-Cohort",
+# q1-final-patch v1.20.1 (Block D1): "Cohort" is a proposal-target resampling simulation
+# (Cohort-sim), not a retained-and-later-adjudicated physical cohort -- named accordingly.
+POL_NAME = {"ebcsdef": "Pooled EB-CS + defer", "vbccoh": "VBC-SG-Cohort-sim",
             "vbcref": "VBC-SG-Refresh"}
 STAR = "*"
 
@@ -54,19 +56,19 @@ def budget_frontier() -> None:
     tex = f"""\\begin{{table}}[t]
 \\centering
 \\caption{{\\textbf{{The registered budget frontier for the deployment-long guarantee (final-q1).}}
-Lifetime-budgeted risk gates ($\\alpha_{{\\mathrm{{life}}}}{{=}}0.10$, Bonferroni spending; the
-$p$-series schedule is within $0.1$ points throughout and is in the artifact), pristine seeds
-501--530. \\emph{{Gain}} is balanced-accuracy points over never-adapting on CICIDS-PortScan at
-full drift, where always-deploying gains ${naive:+.2f}$; \\emph{{\\% naive}} is the fraction of
-that benefit recovered; \\emph{{labels}} are probe labels per proposal (candidate \\emph{{training}}
-already costs 1{{,}}024); \\emph{{abst.}} is the fraction of proposals resolved as neither commit
-nor futility; \\emph{{delay}} is deferral windows to a decision; the last column is commits under
-\\emph{{zero drift}} across 91 proposals. The pre-declared non-vacuity target (commits,
-$\\ge$50\\% of naive, zero zero-drift commits, $<$1{{,}}024 labels) is met by twelve
-configurations across both alpha-spending schedules (the seven Bonferroni rows shown here plus
-five $p$-series) --- the deployment-long guarantee is a matter of budget, not of the rule. For
-reference, the no-additional-label strict gate (same probe as the point gate, no extra labels) scores ${strict.gain:+.2f}$ here and ${strict_z.gain:+.2f}$
-under zero drift (vs the point gate's ${point_z.gain:+.2f}$).}}
+Lifetime-budgeted risk gates ($\\alpha_{{\\mathrm{{life}}}}{{=}}0.10$, Bonferroni spending;
+$p$-series is within $0.1$ points and in the artifact), seeds 501--530, balanced probes.
+\\emph{{Gain}} is balanced-accuracy points over never-adapting on CICIDS-PortScan at full
+drift (always-deploying gains ${naive:+.2f}$); \\emph{{\\% naive}} the fraction recovered;
+\\emph{{labels}} probe labels per proposal (candidate training costs 1{{,}}024, its
+inspected-flow acquisition unpriced); \\emph{{abst.}} the fraction of proposals resolved as
+neither commit nor futility; \\emph{{delay}} deferral windows; last column commits under zero
+drift (91 proposals). The pre-declared non-vacuity target is met by twelve configurations
+across both schedules --- within the evaluated balanced-probe adjudication budget the
+guarantee is a matter of budget, not of the rule. Cohort-sim resamples the proposal-time
+target distribution in the simulator; it does not model a retained production cohort. For
+reference, the no-additional-label strict gate scores ${strict.gain:+.2f}$ here and
+${strict_z.gain:+.2f}$ under zero drift (point gate: ${point_z.gain:+.2f}$).}}
 \\label{{tab:budget_frontier}}
 \\small
 \\begin{{tabular}}{{l r r r r r r r}}
@@ -175,16 +177,15 @@ def chronological() -> None:
     tex = f"""\\begin{{table}}[t]
 \\centering
 \\caption{{\\textbf{{The registered chronological matrix (final-q1).}} Seven pre-enumerated
-replays on genuinely time-ordered captures --- every train$\\to$future day pair of CICIDS2017
-with an attack-bearing training day, two intra-day splits, and the UNSW-NB15 timeline at two
-training fractions --- each processed as 200 windows of 256 flows in capture order, seeds
-601--630. Columns are balanced-accuracy points over never-adapting (two-class windows only);
-\\emph{{no-adapt}} is the frozen incumbent's absolute BA, the health indicator that governs
-which regime a stream is in. \\textbf{{No stream shows net harm}}, consistent with the six
-earlier replays. Where the incumbent collapses (CICIDS), updating helps a lot and the gates
-cost almost nothing; where it stays healthy (both UNSW timelines), the point and strict gates are
-\\emph{{above}} always-deploying (VBC-SG on the 20\\% split but not the 40\\% split), and the
-no-additional-label strict rule is the best of the three.}}
+time-ordered replays (CICIDS2017 train$\\to$future day pairs, two intra-day splits, UNSW-NB15
+at two training fractions), 200 windows of 256 flows in capture order, seeds 601--630.
+Columns: balanced-accuracy points over never-adapting (two-class windows only);
+\\emph{{no-adapt}} is the frozen incumbent's absolute BA --- the health indicator.
+\\textbf{{No stream shows net harm}}, consistent with the six earlier replays. Where the
+incumbent collapses (CICIDS), updating helps a lot and the gates cost little; where it stays
+healthy (both UNSW timelines), the point and strict gates are \\emph{{above}} always-deploying
+(VBC-SG on the 20\\% split but not the 40\\%), with the healthy Wednesday intra-day replay the
+unresolved counterexample.}}
 \\label{{tab:chronological_q1}}
 \\small
 \\begin{{tabular}}{{l r r r r r}}
@@ -221,26 +222,20 @@ def operational() -> None:
 \\centering
 \\caption{{\\textbf{{Attack-label acquisition yield under operational prevalence (final-q1).}}
 Inspected flows per adjudicated \\emph{{attack}} label found in the auxiliary
-\\emph{{discovery}} queue of a pool-based operational acquisition-yield simulation (seeds
-801--830; the earlier 701--730 window is a pilot). Adjudication candidates are drawn at
-operating prevalence $\\pi$ and every probe label arrives five windows late; the evaluation
-stream and detector calibration remain balanced, and the candidate training batch remains
-balanced per class with its acquisition cost \\emph{{not}} modeled --- so this arm measures
-label-acquisition yield, not the end-to-end cost of the commit decision. The adjudication
-budget is split in two: the enriched discovery half measures attack-\\emph{{finding}} yield
-only, while an independent \\emph{{uniform}} validation half at operating prevalence is the
-only sample the commit rule is shown (32 adjudications per decision, compared by plain
-accuracy; at extreme prevalence it may contain no attacks) --- so an enriched sample is never
-used as an estimate of deployed performance, and enrichment neither reduces the validation
-adjudications nor cheapens the commit decision itself. Acquisition policies rank candidate
-flows by model \\emph{{predictions}} only, never by ground truth, so they are implementable:
-an analyst inspects the queue the deployed detector already produces. Alert-enriched
-inspection \\emph{{finds an attack}} 5--8$\\times$ more cheaply than random inspection at
-every prevalence, and hybrid 3--6$\\times$; ranking by candidate/incumbent
-\\emph{{disagreement}} barely helps, because the two models differ near the decision boundary
-rather than on the minority class. The honest headline: the decision still requires its 32
-uniform validation adjudications; what enrichment changes is the cost of \\emph{{finding
-attack labels}} in the discovery queue, at the yields tabulated here.}}
+\\emph{{discovery}} queue (seeds 801--830; 701--730 is a pilot). Adjudication candidates are
+drawn at operating prevalence $\\pi$, labels arrive five windows late; the evaluation stream,
+detector calibration and candidate training batch remain balanced per class, with the
+candidate batch's acquisition cost \\emph{{not}} modeled --- the arm measures acquisition
+yield and delay; it does not price the commit pipeline end to end. Discovery never decides:
+the commit rule sees only an independent \\emph{{uniform}} validation half at operating
+prevalence (32 adjudications per decision, plain accuracy; at extreme prevalence it may
+consist mostly or entirely of benign flows, so no balanced-accuracy guarantee is claimed),
+and enrichment reduces neither those 32 adjudications nor the decision's own cost.
+Acquisition policies rank flows by model \\emph{{predictions}} only, so an analyst can work
+the queue the detector already produces. Alert-enriched inspection \\emph{{finds an attack}}
+5--8$\\times$ more cheaply than random inspection, hybrid 3--6$\\times$; candidate/incumbent
+\\emph{{disagreement}} barely helps (the models differ near the boundary, not on the minority
+class).}}
 \\label{{tab:operational_e2e}}
 \\small
 \\begin{{tabular}}{{l l r r r r}}

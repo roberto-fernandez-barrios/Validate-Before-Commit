@@ -113,13 +113,19 @@ def harm_summary() -> dict:
     if not all(c in B.columns for c in cols):
         return {"status": "stale (rerun make_paper2_q1_frontier)"}
     ev = int(B.e6_n_evaluable.sum()); k = int(B.e6_harmful_h5.sum())
+    # q1-final-patch v1.20.1 (Block A): the H5-evaluable commits are clustered within shared
+    # seeds, scenarios and policy/cap/schedule cells, so the 0/506 count is reported as a
+    # factual observation only -- no binomial population-rate bound is inferred from it.
     return dict(commits_total=int(B.commits_total.sum()),
                 immediate=int(B.n_commits_immediate.sum()),
                 deferred=int(B.n_commits_deferred.sum()),
                 evaluable_h5=ev, censored_h5=int(B.e6_n_censored.sum()),
                 harmful_h5=k, harmful_immediate=int(B.e6_harmful_immediate.sum()),
                 harmful_deferred=int(B.e6_harmful_deferred.sum()),
-                harmful_rate_h5=(round(k / ev, 4) if ev else None))
+                observed_harmful_proportion_h5=(round(k / ev, 4) if ev else None),
+                binomial_upper_bound_reported=False,
+                reason=("commit outcomes are clustered within shared seeds, scenarios and "
+                        "policy configurations; they are not independent Bernoulli trials"))
 
 
 def q1_final_patch_summary() -> dict:
@@ -154,6 +160,35 @@ def q1_final_patch_summary() -> dict:
         recovery_report="notes/frontier_driver_recovery_report.md",
         max_served_ba_change_points=0.14,
     )
+
+
+def statistical_inference_summary() -> dict:
+    """v1.20.1: multiplicity + claim-scope facts, computed from the shipped CSVs."""
+    out = dict(status="missing")
+    mf = REPO / "results" / "tables" / "paper2_final_q1" / "multiplicity.csv"
+    cf = REPO / "results" / "tables" / "paper2_final_q1" / "claim_scope_audit.csv"
+    if not mf.exists():
+        return out
+    m = pd.read_csv(mf)
+    fam = {f: int(n) for f, n in m.groupby("family").size().items()}
+    surv = {f: int(g.significant_adj.sum()) for f, g in m.groupby("family")}
+    out = dict(
+        multiplicity_method=("deterministic centered paired bootstrap test "
+                             "(H0-centered resampling, Monte-Carlo corrected)"),
+        bootstrap_resamples=100_000,
+        multiplicity_total=int(len(m)),
+        family_sizes=fam,
+        family_survivors_adj=surv,
+        normal_approximation_fallbacks=int(
+            (~m.p_method.str.contains("centered paired bootstrap")).sum()),
+        sensitivities=["paired t-test", "Wilcoxon signed-rank"],
+        harm_population_rate_bound_removed=True,
+    )
+    if cf.exists():
+        a = pd.read_csv(cf)
+        out["claim_scope_audit_claims"] = int(len(a))
+        out["claim_scope_audit_failures"] = int(a.status.str.startswith("FAIL").sum())
+    return out
 
 
 def run_audit() -> dict:
@@ -234,6 +269,25 @@ def main() -> None:
         harmful_commits=harm_summary(),
         # q1-final-patch (v1.20.0): the deferred-commit temporal fix and its frontier rerun.
         q1_final_patch=q1_final_patch_summary(),
+        # q1-final-patch (v1.20.1): the statistical-inference contract, read from the shipped
+        # analysis tables themselves so the manifest can never drift from them.
+        statistical_inference=statistical_inference_summary(),
+        # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
+        # stated field by field so no claim can outrun what the simulation measures.
+        operational_arm_scope=dict(
+            evaluation_stream_prevalence="balanced",
+            detector_calibration_prevalence="balanced",
+            candidate_training_sampling="balanced_per_class",
+            candidate_training_inspection_cost_modeled=False,
+            adjudication_pool_prevalence="operating",
+            discovery_sampling_policy=["random", "alert_enriched", "disagreement", "hybrid"],
+            discovery_used_for_commit=False,
+            validation_sampling_policy="uniform_at_operating_prevalence",
+            validation_labels=32,
+            decision_metric="plain_accuracy",
+            operational_scope="acquisition_yield_and_delay_only",
+            end_to_end_pipeline_cost_modeled=False,
+        ),
         outputs=dict(
             tables_manifest_sha256=sha256(manifest_file) if manifest_file.exists() else "missing",
             n_table_csvs=len(list(tables.rglob("*.csv"))),
