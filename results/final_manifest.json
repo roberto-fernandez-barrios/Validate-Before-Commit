@@ -1,6 +1,9 @@
 {
-  "commit_sha": "e7aae3023c139caa573b8fdd2f974b92de2d8c29",
-  "artifact_version": "1.17.0",
+  "manifest_schema_version": "1.1.0",
+  "generated_at_utc": "2026-07-21T09:10:10Z",
+  "source_commit_sha": "6f38524abb0bb52c9a7fc6292decc551a122de17",
+  "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
+  "artifact_version": "1.19.0",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -18,7 +21,7 @@
     "cicids_tuesday_chronological": "401-430",
     "q1_budget_frontier": "501-530",
     "q1_chronological_matrix": "601-630",
-    "q1_operational_e2e": "701-730",
+    "q1_operational_e2e": "801-830 (pilot 701-730)",
     "q1_ab_confirmatory": "2001-2100 (pilot 104-133)"
   },
   "acquisition_policies": [
@@ -45,6 +48,7 @@
   "prevalences": {
     "balanced": 0.5,
     "operational": [
+      0.005,
       0.01,
       0.05,
       0.1
@@ -115,7 +119,10 @@
     ],
     "accumulate_mode_guarantee": "weak conditional null (Proposition 1; supplement S4)"
   },
-  "training_delay_windows": 0,
+  "training_delay_windows": [
+    0,
+    5
+  ],
   "evidence_tiers": [
     "registered confirmatory core",
     "registered follow-ups",
@@ -292,9 +299,28 @@
     "total_cand_future_collisions": 0,
     "total_commit_no_probe": 0
   },
+  "experiment_ledger": {
+    "path": "results/final_experiment_ledger.csv",
+    "n_blocks": 10,
+    "n_arm_dirs": 499,
+    "missing_blocks": [],
+    "n_orphan_dirs": 0,
+    "orphan_dirs": []
+  },
+  "harmful_commits": {
+    "commits_total": 520,
+    "immediate": 340,
+    "deferred": 180,
+    "evaluable_h5": 506,
+    "censored_h5": 14,
+    "harmful_h5": 0,
+    "harmful_immediate": 0,
+    "harmful_deferred": 0,
+    "harmful_rate_h5": 0.0
+  },
   "outputs": {
-    "tables_manifest_sha256": "e21102863049ad3d765bcf298c5c5ec393e90ec27c945062a3c92574db0913a5",
-    "n_table_csvs": 157,
+    "tables_manifest_sha256": "51d6c88345552c589e3fbe57726864d3d8d75ede7545a43a89477b6ca42785c1",
+    "n_table_csvs": 163,
     "pdfs": [
       "manuscript/main.pdf",
       "manuscript/supplement.pdf",
@@ -303,7 +329,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 459,
-    "checks_total": 459
+    "checks_passed": 465,
+    "checks_total": 465
   }
 }
