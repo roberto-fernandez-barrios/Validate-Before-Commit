@@ -4,8 +4,9 @@
 decomposition (final-q1).} Role-randomized challenger$-$incumbent gap (balanced-accuracy
 points) on globally value-deduplicated, disjoint blocks, SVC-RBF, on 100 \emph{fresh}
 confirmatory seeds (2001--2100); the original 30 seeds are re-labelled a pilot and excluded
-here. Equivalence is a bootstrap TOST at the pre-registered $\pm1.0$-point materiality
-margin (90\% interval inside the margin); ``not established'' means the gap is unresolved
+here. Equivalence is a bootstrap CI-based assessment at the pre-registered $\pm1.0$-point
+materiality margin --- declared iff the 90\% seed-level bootstrap interval lies inside the
+margin, the interval-inclusion form of TOST; ``not established'' means the gap is unresolved
 \emph{and} too imprecise to declare practically zero --- not that an effect was shown. The
 middle block decomposes transformer ownership: giving the incumbent only the
 \emph{standardizer} reproduces essentially the whole ownership advantage, while giving it
@@ -17,7 +18,7 @@ generated the hypothesis: whichever model's data fits the transformer gains the 
 \small
 \begin{tabular}{l l r l l}
 \toprule
-Condition & Benchmark & gap & CI90 & TOST ($\pm1.0$) \\
+Condition & Benchmark & gap & CI90 & equivalence ($\pm1.0$) \\
 \midrule
 Independent transformer & CICIDS-PortScan & $-0.30$ & [$-3.80$, $+3.34$] & not established \\
 Independent transformer & UNSW-Recon & $+0.00$ & [$-0.05$, $+0.06$] & \textbf{equivalent} \\

@@ -1,10 +1,26 @@
-"""final-q1 D5 (P1.4): operational end-to-end evaluation with realistic label acquisition.
+"""final-q1 D5 (P1.4): pool-based operational label-ACQUISITION simulation.
 
-Pipeline: stream (at operating prevalence) -> KS-max trigger -> label acquisition -> candidate
-training -> probe -> commit, with an explicit training-completion delay. Reuses the v2
-harness's environment (bit-identical stream construction, disjoint role partitions) via
-`build_environment`, so the trigger/candidate machinery is exactly the tested one; this
-script adds only what P1.4 is actually about: WHICH flows get labeled.
+Scope (q1-final-patch, Block C -- stated precisely so no claim can outrun the design):
+this arm measures ATTACK-LABEL ACQUISITION YIELD under operational prevalence, not the
+end-to-end cost of the commit decision. Concretely:
+  * the EVALUATION stream is balanced (--stream-prevalence, default 0.5) and the detector is
+    calibrated on balanced references; only the ADJUDICATION POOL is drawn at the operating
+    prevalence (--probe-prevalence);
+  * the CANDIDATE TRAINING batch is sampled balanced per class (2 x adapt-size-per-class
+    labels per trigger) and its acquisition cost is NOT modeled or counted in labels_used;
+  * under --dual-sample, the enriched DISCOVERY half only measures attack-finding yield
+    (`inspected_flows_per_attack`); the commit decision is made EXCLUSIVELY on the uniform
+    VALIDATION half at operating prevalence, by plain accuracy comparison (at extreme
+    prevalence that sample may contain no attacks -- balanced accuracy is not available);
+  * alert enrichment therefore improves attack DISCOVERY yield; it neither converts the
+    validation sample into an enriched one nor reduces the validation adjudications.
+
+Pipeline: balanced stream -> KS-max trigger -> label acquisition at operating prevalence ->
+balanced candidate training -> dual-sample probe -> commit, with an explicit
+training-completion delay. Reuses the v2 harness's environment (bit-identical stream
+construction, disjoint role partitions) via `build_environment`, so the trigger/candidate
+machinery is exactly the tested one; this script adds only what P1.4 is actually about:
+WHICH flows get labeled.
 
 Acquisition policies (registered, notes/q1_max_protocol.md D5), all honest -- they never read
 true labels to decide what to inspect, only model PREDICTIONS (legitimate: a deployed
@@ -207,12 +223,14 @@ def main():
                     n_labels = args.probe_size
                 Xp = transform_X(Xp_raw, env.scaler, env.pca)
                 labels_used += n_labels; attacks_found_total += n_att
-                if len(np.unique(yp)) == 2:
-                    f = lambda mm: float((mm.predict(Xp) == yp).mean())
-                    commit = f(pending["cand"]) >= f(model) + args.gate_margin
-                else:
-                    commit = float((pending["cand"].predict(Xp) == yp).mean()) >= \
-                             float((model.predict(Xp) == yp).mean()) + args.gate_margin
+                # q1-final-patch Block C: the decision metric is PLAIN ACCURACY on the
+                # (uniform, operating-prevalence) validation sample -- both class-composition
+                # branches always computed the same pooled accuracy, so this is now stated
+                # once. At extreme prevalence the sample may contain zero attacks; a
+                # prevalence-valid balanced accuracy would need stratified sampling with
+                # known inclusion probabilities (future work), which this arm does not claim.
+                commit = float((pending["cand"].predict(Xp) == yp).mean()) >= \
+                         float((model.predict(Xp) == yp).mean()) + args.gate_margin
                 if commit:
                     model = pending["cand"]; n_adapt += 1
                     detector, threshold = calibrate(detector, env, sev, args,
@@ -227,7 +245,24 @@ def main():
                                         if attacks_found_total else np.nan),
             dual_sample=bool(args.dual_sample),
             discovery_attacks=discovery_attacks, validation_attacks=validation_attacks,
-            mean_balanced_accuracy=float(np.mean(ba_hist))))
+            mean_balanced_accuracy=float(np.mean(ba_hist)),
+            # q1-final-patch Block C: explicit scope instrumentation, so every derived
+            # artifact (and any future claim) can be checked against what was measured.
+            stream_prevalence=float(args.stream_prevalence),
+            detector_calibration_prevalence=0.5,
+            probe_pool_prevalence=float(args.probe_prevalence),
+            candidate_training_sampling="balanced_per_class",
+            candidate_training_labels_per_trigger=2 * args.adapt_size_per_class,
+            candidate_training_inspection_cost_modeled=False,
+            discovery_sampling_policy=str(args.acquisition_policy),
+            discovery_labels_per_decision=(max(1, args.probe_size // 2)
+                                           if args.dual_sample else args.probe_size),
+            discovery_metric="inspected_flows_per_attack_found",
+            validation_sampling_policy=("uniform_at_operating_prevalence"
+                                        if args.dual_sample else "acquisition_policy_direct"),
+            validation_labels_per_decision=(max(1, args.probe_size // 2)
+                                            if args.dual_sample else args.probe_size),
+            decision_metric="plain_accuracy_on_validation_sample"))
         print(f"[seed {seed}] triggers={n_trig} adapt={n_adapt} "
               f"attacks_found={attacks_found_total}/{labels_used}", flush=True)
 

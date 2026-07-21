@@ -1,4 +1,4 @@
-"""final-q1 P0.3 / D2: TOST equivalence analysis for the symmetric A/B control.
+"""final-q1 P0.3 / D2: bootstrap CI-based equivalence assessment for the symmetric A/B control.
 
 Question: are the {independent, own_transformer} conditions' role-randomized gaps
 PRACTICALLY EQUIVALENT to zero, at pre-registered margins -- not merely unresolved?
@@ -8,9 +8,14 @@ Registered design (notes/q1_max_protocol.md, D2):
     hypothesis and is excluded from the confirmatory verdict).
   * SECONDARY analysis: pooled pilot+confirmatory (labeled as such, precision only).
   * Margins: primary +/-1.0 BA (the P1.7 materiality threshold); sensitivity +/-0.5, +/-2.0.
-  * TOST via paired per-seed bootstrap: equivalence at margin m is declared iff the
-    two one-sided bootstrap p-values (P[mean <= -m], P[mean >= +m]) are both < 0.05 --
-    equivalently the bootstrap 90% CI of the mean lies inside (-m, +m).
+  * Decision rule (q1-final-patch, Block E -- named for exactly what it is): a BOOTSTRAP
+    CI-BASED EQUIVALENCE ASSESSMENT using the pre-registered margin. Equivalence at margin m
+    is declared iff the 90% seed-level bootstrap CI of the mean gap lies inside (-m, +m) --
+    the interval-inclusion form of TOST. The `boot_frac_*` columns report the fraction of
+    bootstrap resamples whose mean falls at or beyond each margin; they are DESCRIPTIVE
+    diagnostics of the bootstrap distribution, not p-values of boundary-null hypothesis
+    tests, and are not presented as such anywhere. (Earlier output named them p_low/p_high;
+    that naming overstated them and is retired.)
   * MANDATORY fallback wording if equivalence is not established (protocol D2).
 
 Input : results/tables/paper2_final_kbs/symmetric_ab_perseed*.csv
@@ -43,16 +48,19 @@ CONFIRMATORY = set(range(2001, 2101))
 CONDITIONS = ("independent", "own_transformer", "inc_scaler_indep_pca", "indep_scaler_inc_pca")
 
 
-def tost(gaps: np.ndarray, margin: float, n_boot: int = 20000, seed: int = 0):
-    """Bootstrap TOST: equivalent iff the 90% bootstrap CI of the mean is inside (-m, m)."""
+def equivalence_ci(gaps: np.ndarray, margin: float, n_boot: int = 20000, seed: int = 0):
+    """Bootstrap CI-based equivalence assessment: equivalent iff the 90% bootstrap CI of the
+    mean lies inside (-m, m) (interval-inclusion form of TOST). The boot_frac_* outputs are
+    descriptive bootstrap-distribution tail fractions, not boundary-null p-values."""
     rng = np.random.default_rng(seed)
     bs = rng.choice(gaps, size=(n_boot, len(gaps)), replace=True).mean(1)
     lo90, hi90 = float(np.percentile(bs, 5)), float(np.percentile(bs, 95))
-    p_low = float(np.mean(bs <= -margin))    # one-sided: mean at or below -m
-    p_high = float(np.mean(bs >= margin))    # one-sided: mean at or above +m
+    frac_low = float(np.mean(bs <= -margin))    # descriptive: resample means at/below -m
+    frac_high = float(np.mean(bs >= margin))    # descriptive: resample means at/above +m
     return dict(ci90_lo=round(lo90, 3), ci90_hi=round(hi90, 3),
                 equivalent=bool(-margin < lo90 and hi90 < margin),
-                p_low=round(p_low, 5), p_high=round(p_high, 5))
+                boot_frac_below_neg_margin=round(frac_low, 5),
+                boot_frac_above_pos_margin=round(frac_high, 5))
 
 
 def main() -> None:
@@ -73,7 +81,7 @@ def main() -> None:
             gaps = gg.gap_rand.to_numpy(float)
             for m in MARGINS:
                 sd = stable_seed(ds, mt, cond, label, m)
-                r = tost(gaps, m, seed=sd)
+                r = equivalence_ci(gaps, m, seed=sd)
                 rows.append(dict(dataset=ds, model=mt, condition=cond, analysis=label,
                                  n_seeds=len(gg), margin=m, mean_gap=round(gaps.mean(), 3),
                                  **r, bootstrap_seed=sd,

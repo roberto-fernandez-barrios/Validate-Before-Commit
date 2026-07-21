@@ -837,9 +837,13 @@ def main():
         check("q1 anchor ToN-zero strict -0.01", -0.01, anc("ton_zero", "strict"), 0.02)
         check("q1 anchor ToN-zero point -0.17", -0.175, anc("ton_zero", "point"), 0.02)
         check("q1 anchor ToN-zero strict commits 0.13", 0.13, anc("ton_zero", "strict", "commits"), 0.02)
-        check("q1 frontier ebcsdef c64 +3.84 (53%)", 3.84, bf("ebcsdef", 64, "gain"), 0.02)
-        check("q1 frontier ebcsdef c64 frac 0.53", 0.53, bf("ebcsdef", 64, "e2_frac_naive"), 0.01)
-        check("q1 frontier ebcsdef c512 +6.74", 6.74, bf("ebcsdef", 512, "gain"), 0.02)
+        # q1-final-patch: gains re-pinned after the deferred-commit temporal fix (a deferred
+        # commit no longer retroactively serves its own resolution window). Commit counts,
+        # deferral counts, harm accounting, abstention, delay and labels were bit-identical
+        # before and after; only the served-BA gains moved (<= 0.14 pts, PortScan arms).
+        check("q1 frontier ebcsdef c64 +3.73 (52%)", 3.73, bf("ebcsdef", 64, "gain"), 0.02)
+        check("q1 frontier ebcsdef c64 frac 0.52", 0.52, bf("ebcsdef", 64, "e2_frac_naive"), 0.01)
+        check("q1 frontier ebcsdef c512 +6.73", 6.73, bf("ebcsdef", 512, "gain"), 0.02)
         check("q1 frontier ebcsdef c512 frac 0.93", 0.93, bf("ebcsdef", 512, "e2_frac_naive"), 0.01)
         check("q1 frontier ebcsdef c512 labels 578", 578, bf("ebcsdef", 512, "labels_probe_per_proposal"), 2.0)
         check("q1 frontier vbccoh c512 frac 0.81", 0.81, bf("vbccoh", 512, "e2_frac_naive"), 0.01)
@@ -946,10 +950,14 @@ def main():
     # the IEEE port so a reworded false claim cannot slip through one of them.
     import re as _re
     _texts = {}
-    for _d in ("main.tex", "main_ieee.tex", "supplement.tex"):
-        _p = f"manuscript/{_d}"
+    # q1-final-patch (Block G): README.md and highlights.md are claim surfaces too -- the
+    # published "every gate beats always-deploy" README overclaim slipped past these guards
+    # precisely because only the .tex sources were scanned.
+    for _p in ("manuscript/main.tex", "manuscript/main_ieee.tex", "manuscript/supplement.tex",
+               "README.md", "manuscript/highlights.md"):
         if os.path.exists(_p):
-            _texts[_d] = _re.sub(r"\s+", " ", open(_p, encoding="utf-8").read().lower())
+            _texts[os.path.basename(_p)] = _re.sub(
+                r"\s+", " ", open(_p, encoding="utf-8").read().lower())
 
     def _hits(pat):
         return sum(len(_re.findall(pat, t)) for t in _texts.values())
@@ -984,6 +992,67 @@ def main():
           float(_prox_hits(r"match(?:es)?[ -]or[ -]beat", ("always-deploying", "always deploying"),
                            span=45, ahead=True)), 0.5)
     check("no-overclaim: 'every gate beats' (B3)", 0.0, float(_hits(r"every gate beats")), 0.5)
+
+    # --- q1-final-patch guards (Blocks C, D, G) ------------------------------------------
+    # C1: the operational arm is an ACQUISITION-YIELD simulation; no surface may call it the
+    # cost of the commit decision or claim all labels sit at operating prevalence.
+    check("q1fp C1: no 'what the commit decision costs'", 0.0,
+          float(_hits(r"what the commit decision costs")), 0.5)
+    check("q1fp C1: no 'all labels (sit )?at operating' claim", 0.0,
+          float(_hits(r"all labels\W+(?:sit at|at) operating")
+                + _hits(r"and all labels\W+at operating")), 0.5)
+    check("q1fp C1: no 'prices the decision in inspected flows'", 0.0,
+          float(_hits(r"prices the decision in inspected flows")), 0.5)
+    check("q1fp C1: no 'end-to-end cost of (the )?commit'", 0.0,
+          float(_hits(r"end[- ]to[- ]end cost of (?:the )?commit")), 0.5)
+    check("q1fp C1: no 'cost of obtaining the 32'", 0.0,
+          float(_hits(r"cost of obtaining the 32")), 0.5)
+    # C2: the Table 11 caption (both editions) must carry the acquisition-yield title and the
+    # balanced-candidate disclosure, and must not carry the commit-cost title.
+    _cap_ok = _cap_bad = 0
+    for _tp in ("manuscript/tables/table_operational_e2e.tex",
+                "manuscript/tables_ieee/table_operational_e2e.tex"):
+        if os.path.exists(_tp):
+            _c = _re.sub(r"\s+", " ", open(_tp, encoding="utf-8").read().lower())
+            _cap_ok += int("acquisition yield" in _c and "balanced per class" in _c)
+            _cap_bad += int("commit decision costs" in _c)
+    check("q1fp C2: Table 11 captions say acquisition yield + balanced candidate (2 files)",
+          2.0, float(_cap_ok), 0.5)
+    check("q1fp C2: Table 11 captions do not say 'commit decision costs'", 0.0,
+          float(_cap_bad), 0.5)
+    # C3: the operational runner must declare its scope fields (structural, not phrasing).
+    _oe_src = ""
+    if os.path.exists("src/experiments/run_paper2_operational_e2e.py"):
+        _oe_src = open("src/experiments/run_paper2_operational_e2e.py", encoding="utf-8").read()
+    for _field in ("candidate_training_sampling", "balanced_per_class",
+                   "candidate_training_inspection_cost_modeled",
+                   "validation_sampling_policy", "decision_metric",
+                   "inspected_flows_per_attack"):
+        check(f"q1fp C3: operational runner declares {_field}", 1.0,
+              float(_field in _oe_src), 0.5)
+    # D1: no universal healthy-timeline claim, in any phrasing scanned here. The precise form
+    # is: point+strict win both UNSW timelines, VBC-SG one, Wednesday intra-day unresolved.
+    check("q1fp D1: no 'the gates beat always-deploying where/when ... healthy' universal", 0.0,
+          float(_prox_hits(r"gates beat always-deploying", ("where the incumbent", "when the incumbent",
+                                                           "on healthy", "healthy timelines"),
+                           span=60, ahead=True)), 0.5)
+    check("q1fp D1: no 'every|all gate(s) (beat|outperform|above) always'", 0.0,
+          float(_hits(r"(?:every|all) gates? (?:beats?|outperforms?|(?:sit |are )?above) always")), 0.5)
+    check("q1fp D1: Wednesday counterexample stated wherever UNSW win is claimed (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n in ("main.tex", "main_ieee.tex")
+                    and "unresolved counterexample" in _t)), 0.5)
+    # G1: temporal serving semantics -- the v2 runner must evaluate/score the window BEFORE
+    # the pending-resolution block can swap the model or rebuild the detector (Block A).
+    _v2 = open("src/experiments/run_paper2_readaptation_v2.py", encoding="utf-8").read()
+    _loop = _v2[_v2.index("for t, (Xw, yw, sev) in enumerate(env.stream):"):]
+    _i_eval = _loop.index("m = evaluate_model(model, Xw, yw)")
+    _i_score = _loop.index("score = float(detector.score(Xw))")
+    _i_pend = _loop.index("if pending is not None:")
+    check("q1fp G1: v2 loop serves the window before resolving pending (eval<pending)", 1.0,
+          float(_i_eval < _i_pend and _i_score < _i_pend), 0.5)
+    check("q1fp G1: v2 loop logs served_model_version", 1.0,
+          float("served_model_version" in _v2), 0.5)
     # B1: every 93% benefit claim must be marked as the approximate pooled analysis
     _bad93 = 0
     for _t in _texts.values():

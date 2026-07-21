@@ -44,21 +44,27 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   downstream models, and by a **causal arm** (candidate, probe and detector recalibration from observed traffic only).
 - **A named policy with a guarantee you can afford:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
-  vacuous: at a 512-flow probe cap a lifetime-budgeted gate recovers **93% of always-deploying's benefit** (81% for
-  the fully stratified VBC-SG) while committing **nothing at all** under zero drift. The mechanism behind the harm is named too — a role-randomized A/B
+  vacuous: at a 512-flow probe cap a lifetime-budgeted pooled gate recovers **93% of always-deploying's benefit**
+  under an approximate pooled analysis (81% for the fully stratified VBC-SG variant carrying the formal per-class
+  guarantee) while committing **nothing at all** under zero drift. The mechanism behind the harm is named too — a role-randomized A/B
   control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**
   (per-model scaling removes it; equivalence-tested on 100 fresh seeds).
 - **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the
   paper's principal limit on external validity, stated as such. Where the incumbent collapses, always-deploy is
-  excellent and the gate pays a real premium. But on the timelines that keep the incumbent healthy — the condition
-  under which the account says the decision is genuinely hard — **every gate beats always-deploy**, the zero-cost
-  strict rule by up to +2.8 points while committing 2.5 times per stream against naive's 13.
-- **Priced end to end, and measured on the right sample:** at operating prevalence the honest unit is *inspected
-  flows*, not adjudicated labels. Alert-guided inspection finds an attack **5–8× more cheaply** than random
-  inspection; ranking by candidate/incumbent disagreement barely helps (a negative we report as it came out).
-  The label budget is split so that cost and validity are never measured on the same sample: an enriched
-  **discovery** half prices the search, an independent uniform **validation** half is the only sample the commit
-  rule ever sees.
+  excellent and the gate pays a real premium. On the healthy-incumbent timelines the picture is favorable but not
+  universal: **point and strict gates outperform always-deploying on the two healthy UNSW timelines** (the
+  no-additional-label strict rule by up to +2.8 points while committing 2.5 times per stream against naive's 13),
+  VBC-SG does so on one of the two, and the healthy Wednesday intra-day replay remains an unresolved
+  counterexample where the gates sit slightly below naive.
+- **Attack-label acquisition yield, measured on the right sample:** at operating prevalence the honest unit for
+  *finding attack labels* is inspected flows, not adjudicated labels. Alert-guided inspection finds an attack
+  **5–8× more cheaply** than random inspection; ranking by candidate/incumbent disagreement barely helps (a
+  negative we report as it came out). The adjudication budget is split so that discovery yield and decision
+  validity are never measured on the same sample: an auxiliary enriched **discovery** half prices the search,
+  while an independent uniform **validation** half at operating prevalence is the only sample the commit rule
+  ever sees (32 adjudications per decision — enrichment does not reduce or cheapen them). The candidate training
+  batch remains balanced per class and its acquisition cost is not modeled, so this arm is an acquisition-yield
+  simulation, not a fully end-to-end operational evaluation.
 - **Every commit is scored, including the deferred ones:** each risk gate logs the *real* resolution window of
   every proposal, so harmful-commit rates cover commits that took effect several windows after they were raised,
   with end-of-stream cases declared censored rather than counted as harmless.

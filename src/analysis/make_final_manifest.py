@@ -122,6 +122,40 @@ def harm_summary() -> dict:
                 harmful_rate_h5=(round(k / ev, 4) if ev else None))
 
 
+def q1_final_patch_summary() -> dict:
+    """v1.20.0 (q1-final-patch): temporal-semantics fix + targeted frontier rerun, computed
+    from the per-arm run_config.json provenance the committed driver writes -- never typed in.
+    """
+    raw = REPO / "results" / "raw"
+    fresh = reused = 0
+    for rc in sorted(raw.glob("q1fc_*/run_config.json")):
+        try:
+            payload = json.loads(rc.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if payload.get("reused_from_v1_19_1"):
+            reused += 1
+        else:
+            fresh += 1
+    return dict(
+        temporal_semantics="commit resolved at t serves from t+1 (immediate and deferred alike)",
+        frontier_driver="src/experiments/run_q1_budget_frontier.py",
+        frontier_config="configs/q1_budget_frontier_v2.json",
+        frontier_expected_arms=99,
+        frontier_arm_breakdown=("90 risk-controlled cells (3 scenarios x 3 policies x 5 caps "
+                                "x 2 schedules) + 9 anchors (3 scenarios x {none, point, "
+                                "strict})"),
+        frontier_rerun_arms=fresh,
+        frontier_reused_verified_arms=reused,
+        reuse_criterion=("zero deferred commits in the resolution log; provably bit-identical "
+                         "under the reorder, validated on three full 30-seed control arms"),
+        recovered_driver_sha256=(
+            "655309bfec1c01924fd8708b6bde4c2ee055021ba6461959aea5502df11737c7"),
+        recovery_report="notes/frontier_driver_recovery_report.md",
+        max_served_ba_change_points=0.14,
+    )
+
+
 def run_audit() -> dict:
     r = subprocess.run([sys.executable, "-m", "src.analysis.audit_paper2_claims"],
                        cwd=REPO, capture_output=True, text=True)
@@ -198,6 +232,8 @@ def main() -> None:
         collision_counts=causal_matrix_counters(),
         experiment_ledger=ledger_summary(),
         harmful_commits=harm_summary(),
+        # q1-final-patch (v1.20.0): the deferred-commit temporal fix and its frontier rerun.
+        q1_final_patch=q1_final_patch_summary(),
         outputs=dict(
             tables_manifest_sha256=sha256(manifest_file) if manifest_file.exists() else "missing",
             n_table_csvs=len(list(tables.rglob("*.csv"))),

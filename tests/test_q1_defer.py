@@ -151,11 +151,13 @@ def test_candidate_latency_semantics(synth, tmp_path_factory):
 
 
 def test_ab_equivalence_margin():
-    from src.analysis.paper2_ab_equivalence import tost
+    # q1-final-patch Block E: renamed from tost() -- the rule is a bootstrap CI-based
+    # equivalence assessment (90% CI inside the margin, the interval-inclusion form of TOST)
+    from src.analysis.paper2_ab_equivalence import equivalence_ci
     rng = np.random.default_rng(5)
     tight = rng.normal(0.02, 0.4, size=100)      # near-zero, tight -> equivalent at 1.0
-    assert tost(tight, 1.0)["equivalent"]
+    assert equivalence_ci(tight, 1.0)["equivalent"]
     wide = rng.normal(0.0, 15.0, size=100)       # zero mean, huge SD -> NOT equivalent
-    assert not tost(wide, 1.0)["equivalent"]
+    assert not equivalence_ci(wide, 1.0)["equivalent"]
     shifted = rng.normal(2.5, 0.4, size=100)     # materially nonzero -> NOT equivalent
-    assert not tost(shifted, 1.0)["equivalent"]
+    assert not equivalence_ci(shifted, 1.0)["equivalent"]

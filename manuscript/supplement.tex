@@ -354,10 +354,14 @@ auxiliary negative results are reported without correction and without confirmat
 \emph{The point of the table is what it does not change.} Every nominally significant contrast
 in this paper survives its adjustment, so no conclusion rests on an uncorrected comparison;
 the correction is reported because a reader is entitled to check that, not because it rescues
-anything. $p$-values are normal-approximation inversions of the per-seed paired bootstrap
-intervals (each contrast is a mean over 30 seeds), which we state as the approximation it is.
-The full machine-readable table is \texttt{results/tables/paper2\_final\_q1/multiplicity.csv}
-in the artifact.
+anything. $p$-values are computed directly from the per-seed paired differences by a
+deterministic seed-level paired bootstrap (20{,}000 resamples, fixed per-contrast seeds,
+two-sided $p = 2\min\{\Pr(\bar d \le 0), \Pr(\bar d \ge 0)\}$ floored at $1/20{,}000$; each
+contrast is a mean over 30 seeds). Where a re-run lacks the per-seed files, the generating
+script falls back to a normal-approximation inversion of the published interval and labels
+each row's provenance in a \texttt{p\_method} column; in the shipped artifact all 26 rows use
+the exact paired bootstrap. The full machine-readable table is
+\texttt{results/tables/paper2\_final\_q1/multiplicity.csv} in the artifact.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}

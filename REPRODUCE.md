@@ -92,10 +92,15 @@ The final-q1 protocol (`notes/q1_max_protocol.md`, frozen with registered deltas
 `PLAN_Q1_CLAUDE_CODE.md`) adds `--vbc-defer-mode {accumulate,cohort,refresh}` (defer-continuation
 semantics; the accumulate mode's weak-conditional-null guarantee is Proposition 1 / supplement §S4),
 the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--seed-start/--seed-end`,
-`--out-suffix` on `paper2_symmetric_ab_final`), and the TOST equivalence analysis
+`--out-suffix` on `paper2_symmetric_ab_final`), and the bootstrap CI-based equivalence analysis
 (`python -m src.analysis.paper2_ab_equivalence`). Its four experiment blocks:
 
-- **Budget frontier (D3)**, seeds 501–530: `run_paper2_readaptation_v2` with
+- **Budget frontier (D3)**, seeds 501–530: driven end to end by the committed driver
+  `python -m src.experiments.run_q1_budget_frontier --run` — the 99-arm grid and every fixed
+  parameter live in `configs/q1_budget_frontier_v2.json`, and each arm records its exact
+  command, resolved configuration, environment and completion marker
+  (`--list-arms`/`--dry-run`/`--only-arm`/`--range`/`--resume`/`--force`/`--validate-complete`).
+  Equivalent per-arm invocation: `run_paper2_readaptation_v2` with
   `--adaptation-gate {labeled_probe_ebcs_defer,vbc_sg}`, `--probe-size {64,128,256,512,1024}`,
   `--seq-block 16 --defer-windows 5 --lifetime-alpha 0.10 --alpha-spending {bonferroni,pseries}`,
   on {PortScan full, ToN full, ToN zero-drift}; anchors `none` / `labeled_probe` /
@@ -111,15 +116,19 @@ the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--
   and UNSW at `prepare_paper2_unsw_chronological --train-frac {0.20,0.40}`), each under
   `--adaptation-gate {none,labeled_probe,labeled_probe + --gate-margin 0.001,vbc_sg}`
   (`--vbc-defer-mode cohort`). Aggregate: `make_paper2_q1_chronological`.
-- **Operational label-acquisition and delay simulation (D5)**, seeds **801–830** (the earlier
+- **Operational acquisition-yield and delay simulation (D5)**, seeds **801–830** (the earlier
   701–730 window is a pilot: it was inspected before the dual-sample redesign):
   `run_paper2_operational_e2e` with `--probe-prevalence {0.005,0.01,0.05,0.10}`,
   `--acquisition-policy {random,alert_enriched,disagreement,hybrid}`,
   `--candidate-latency/--probe-latency {5,20}`, `--training-delay {0,5}`, `--probe-size 64`
   and **`--dual-sample`**. The last flag is what makes the arm statistically valid: it splits
-  the budget into an enriched *discovery* half (measures acquisition cost only) and an
-  independent uniform *validation* half at operating prevalence (the only sample the commit
-  rule sees). This arm runs inside the pool-based harness and is **not** the causal arm.
+  the adjudication budget into an enriched *discovery* half (measures attack-finding yield
+  only) and an independent uniform *validation* half at operating prevalence (the only sample
+  the commit rule sees, compared by plain accuracy). Scope: the evaluation stream and detector
+  calibration remain balanced, and the candidate training batch remains balanced per class
+  with its acquisition cost not modeled — the arm measures label-acquisition yield, not the
+  end-to-end cost of the commit pipeline. It runs inside the pool-based harness and is
+  **not** the causal arm.
   Aggregate: `make_paper2_q1_e2e`. Tables for all four: `make_paper2_q1_tables`.
 
 Three cross-cutting artifacts complete the final phase:

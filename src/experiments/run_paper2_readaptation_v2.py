@@ -359,6 +359,12 @@ def run_arm(method: str, env: Environment, args, seed: int):
     # --lifetime-max-proposals M, every risk gate runs at A/M (Bonferroni over the stream's
     # proposals), so the lifetime false-commit probability is bounded by A.
     proposal_ctr = 0          # final-kbs: proposal index for lifetime alpha spending
+    # q1-final-patch (temporal semantics): monotone counter of DEPLOYED models. It increments
+    # only when a commit takes effect; the version SERVING a window is captured at the window's
+    # start, so a commit resolved in window t is never reflected in t's served log -- it enters
+    # service at t+1 (identical rule for immediate and deferred commits). See
+    # notes/q1_final_acceptance_patch_protocol.md (Block A).
+    model_version = 0
 
     def eff_alpha(j: int) -> float:
         if getattr(args, "lifetime_alpha", 0.0) > 0:
@@ -534,6 +540,54 @@ def run_arm(method: str, env: Environment, args, seed: int):
         perf_thr = float(np.mean(errs) + 3.0 * (np.std(errs) if np.std(errs) > 0 else 0.02))
 
     for t, (Xw, yw, sev) in enumerate(env.stream):
+        # q1-final-patch (Block A) -- production temporal semantics. A window is SERVED by the
+        # model/detector deployed at its START. Only after W_t is served and logged do we absorb
+        # the evidence arriving in t and resolve any (immediate or deferred) decision; a COMMIT
+        # resolved in t enters service at W_{t+1} and can never rewrite W_t's served performance,
+        # predictions, detector score, or logs. Immediate and deferred commits obey one rule.
+        # STEP 1-2: serve & evaluate W_t with the model/detector in force at the window start.
+        served_model_version = model_version   # q1-final-patch: model that SERVES this window
+        m = evaluate_model(model, Xw, yw)
+        pred = model.predict(Xw)
+        fp = int(((pred == 1) & (yw == 0)).sum()); tn = int(((pred == 0) & (yw == 0)).sum())
+        m["fpr"] = fp / max(1, fp + tn)
+        m["recall"] = float(((pred == 1) & (yw == 1)).sum() / max(1, (yw == 1).sum()))
+        m["alerts"] = int((pred == 1).sum())
+        ba_hist.append(m["balanced_accuracy"])
+        score = float(detector.score(Xw))       # serving detector's score for W_t (pre-commit)
+        if args.trigger_mode in ("performance", "ddm", "adwin", "ddm_river", "adwin_river"):
+            mon_rng = np.random.default_rng(seed * 400_009 + t)
+            Xm_raw, ym = sample_balanced_from_distribution(
+                env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=sev, rng=mon_rng)
+            Xm = transform_X(Xm_raw, env.scaler, env.pca)
+            err = 1.0 - float((model.predict(Xm) == ym).mean())
+            labels_used += args.monitor_labels
+            labels_monitor += args.monitor_labels
+            if args.trigger_mode == "ddm":
+                alarms.append(ddm.update(err, args.monitor_labels))
+            elif args.trigger_mode == "adwin":
+                alarms.append(adwin.update(err))
+            elif args.trigger_mode in ("ddm_river", "adwin_river"):
+                # reference implementations receive the SAME monitoring labels as
+                # INDIVIDUAL Bernoulli outcomes (their canonical input granularity)
+                fired = False
+                for e in (model.predict(Xm) != ym):
+                    riv.update(bool(e) if args.trigger_mode == "ddm_river" else int(e))
+                    fired = fired or bool(riv.drift_detected)
+                alarms.append(fired)
+            else:
+                err_hist.append(err)
+                alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
+        elif args.trigger_mode == "random":
+            # amendment 007 control: triggers fired at a fixed rate, independent of any drift
+            # signal (isolates "harm from replacing a model" from "harm from drift")
+            alarms.append(bool(np.random.default_rng(seed * 700_001 + t).random() < args.trigger_prob))
+        else:
+            alarms.append(score > threshold)
+
+        # STEP 3-4: absorb the evidence that arrives in t and resolve any DEFERRED decision. A
+        # commit resolved here swaps the model/detector for W_{t+1} ONLY -- W_t above is already
+        # served and logged, so this cannot act retroactively.
         # amendment 014 (ebcs_defer): continue a deferred decision with fresh labels.
         # final-q1 D1 (--vbc-defer-mode): what the continuation estimates.
         #   accumulate: same e-process, labels at the CURRENT mixture (weak conditional null);
@@ -575,7 +629,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     ubs.append(-cs_lower_bound_eb(-dc, a_p / 4.0))
                 if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
                     n_adapt += 1; adapt_windows.append(t)
-                    model = pending["cand"]
+                    model = pending["cand"]; model_version += 1   # takes effect at W_{t+1}
                     detector = build_detector(method, args, seed + t + 1)
                     if args.recal_source == "observed":
                         detector, _nt = calibrate_observed(detector, seen, args)
@@ -604,7 +658,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     pending["left"] -= 1
             elif cs_lower_bound_eb(da, pending["alpha"] / 2.0) > 0.0:
                 n_adapt += 1; adapt_windows.append(t)
-                model = pending["cand"]
+                model = pending["cand"]; model_version += 1       # takes effect at W_{t+1}
                 detector = build_detector(method, args, seed + t + 1)
                 if args.recal_source == "observed":
                     detector, _nt = calibrate_observed(detector, seen, args)
@@ -631,45 +685,11 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 pending = None
             else:
                 pending["left"] -= 1
-        m = evaluate_model(model, Xw, yw)
-        pred = model.predict(Xw)
-        fp = int(((pred == 1) & (yw == 0)).sum()); tn = int(((pred == 0) & (yw == 0)).sum())
-        m["fpr"] = fp / max(1, fp + tn)
-        m["recall"] = float(((pred == 1) & (yw == 1)).sum() / max(1, (yw == 1).sum()))
-        m["alerts"] = int((pred == 1).sum())
-        ba_hist.append(m["balanced_accuracy"])
-        score = float(detector.score(Xw))
-        if args.trigger_mode in ("performance", "ddm", "adwin", "ddm_river", "adwin_river"):
-            mon_rng = np.random.default_rng(seed * 400_009 + t)
-            Xm_raw, ym = sample_balanced_from_distribution(
-                env.probe_pools, n_per_class=max(1, args.monitor_labels // 2), severity=sev, rng=mon_rng)
-            Xm = transform_X(Xm_raw, env.scaler, env.pca)
-            err = 1.0 - float((model.predict(Xm) == ym).mean())
-            labels_used += args.monitor_labels
-            labels_monitor += args.monitor_labels
-            if args.trigger_mode == "ddm":
-                alarms.append(ddm.update(err, args.monitor_labels))
-            elif args.trigger_mode == "adwin":
-                alarms.append(adwin.update(err))
-            elif args.trigger_mode in ("ddm_river", "adwin_river"):
-                # reference implementations receive the SAME monitoring labels as
-                # INDIVIDUAL Bernoulli outcomes (their canonical input granularity)
-                fired = False
-                for e in (model.predict(Xm) != ym):
-                    riv.update(bool(e) if args.trigger_mode == "ddm_river" else int(e))
-                    fired = fired or bool(riv.drift_detected)
-                alarms.append(fired)
-            else:
-                err_hist.append(err)
-                alarms.append(len(err_hist) >= 1 and float(np.mean(err_hist[-3:])) > perf_thr)
-        elif args.trigger_mode == "random":
-            # amendment 007 control: triggers fired at a fixed rate, independent of any drift
-            # signal (isolates "harm from replacing a model" from "harm from drift")
-            alarms.append(bool(np.random.default_rng(seed * 700_001 + t).random() < args.trigger_prob))
-        else:
-            alarms.append(score > threshold)
+
+        # STEP 4: trigger decision (reads the POST-resolution `pending` state) + immediate
+        # proposal. `alarms` may have been reset to [] by a commit just above -- guard the index.
         if args.trigger_mode in ("ddm", "adwin", "ddm_river", "adwin_river", "random"):
-            trigger = bool(alarms[-1]) and cooldown <= 0 and pending is None
+            trigger = bool(alarms and alarms[-1]) and cooldown <= 0 and pending is None
         else:
             recent = alarms[-args.consecutive_k:]
             trigger = (len(recent) == args.consecutive_k and all(recent) and cooldown <= 0
@@ -1136,6 +1156,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     model = EnsembleModelCal(model, candidate)
                 else:
                     model = candidate
+                model_version += 1
                 if ddm is not None:
                     ddm.reset()
                 if adwin is not None:
@@ -1172,7 +1193,8 @@ def run_arm(method: str, env: Environment, args, seed: int):
                          balanced_accuracy=m["balanced_accuracy"], f1=m["f1"],
                          fpr=m["fpr"], recall=m["recall"], alerts=m["alerts"],
                          score=score, threshold=threshold, alarm=bool(alarms[-1]) if alarms else False,
-                         trigger=bool(trigger), adapted_now=bool(adapted)))
+                         trigger=bool(trigger), adapted_now=bool(adapted),
+                         served_model_version=int(served_model_version)))
 
     summary = dict(seed=seed, method=method, n_windows=args.post_windows, n_adaptations=n_adapt,
                    vbc_defer_mode=getattr(args, "vbc_defer_mode", "accumulate"),
@@ -1352,7 +1374,8 @@ def main():
         na = [dict(seed=seed, method="no_adaptation", window_idx=t, severity_t=sev,
                    balanced_accuracy=evaluate_model(env.initial_model, Xw, yw)["balanced_accuracy"],
                    f1=evaluate_model(env.initial_model, Xw, yw)["f1"], score=np.nan,
-                   threshold=np.nan, alarm=False, trigger=False, adapted_now=False)
+                   threshold=np.nan, alarm=False, trigger=False, adapted_now=False,
+                   served_model_version=0)
               for t, (Xw, yw, sev) in enumerate(env.stream)]
         win_rows.extend(na)
         sum_rows.append(dict(seed=seed, method="no_adaptation", n_windows=args.post_windows,

@@ -1,7 +1,7 @@
 """final-q1: emit the LaTeX tables for the Fase C/D results into manuscript/tables{,_ieee}/.
 
   tab:budget_frontier  -- the registered lifetime budget frontier (D3 endpoints e1-e6)
-  tab:ab_equivalence   -- the confirmatory A/B with TOST verdicts + scaler/PCA decomposition
+  tab:ab_equivalence   -- the confirmatory A/B with CI-based equivalence verdicts + scaler/PCA decomposition
 Reads only the frozen CSVs under results/tables/paper2_final_q1 and paper2_final_kbs, so
 every number in the manuscript traces to an artifact file.
 """
@@ -129,8 +129,9 @@ def ab_equivalence() -> None:
 decomposition (final-q1).}} Role-randomized challenger$-$incumbent gap (balanced-accuracy
 points) on globally value-deduplicated, disjoint blocks, SVC-RBF, on 100 \\emph{{fresh}}
 confirmatory seeds (2001--2100); the original 30 seeds are re-labelled a pilot and excluded
-here. Equivalence is a bootstrap TOST at the pre-registered $\\pm1.0$-point materiality
-margin (90\\% interval inside the margin); ``not established'' means the gap is unresolved
+here. Equivalence is a bootstrap CI-based assessment at the pre-registered $\\pm1.0$-point
+materiality margin --- declared iff the 90\\% seed-level bootstrap interval lies inside the
+margin, the interval-inclusion form of TOST; ``not established'' means the gap is unresolved
 \\emph{{and}} too imprecise to declare practically zero --- not that an effect was shown. The
 middle block decomposes transformer ownership: giving the incumbent only the
 \\emph{{standardizer}} reproduces essentially the whole ownership advantage, while giving it
@@ -142,7 +143,7 @@ generated the hypothesis: whichever model's data fits the transformer gains the 
 \\small
 \\begin{{tabular}}{{l l r l l}}
 \\toprule
-Condition & Benchmark & gap & CI90 & TOST ($\\pm1.0$) \\\\
+Condition & Benchmark & gap & CI90 & equivalence ($\\pm1.0$) \\\\
 \\midrule
 {body}
 \\bottomrule
@@ -218,22 +219,28 @@ def operational() -> None:
     body = "\n".join(rows[:-1])
     tex = f"""\\begin{{table}}[t]
 \\centering
-\\caption{{\\textbf{{What the commit decision costs in inspected flows (final-q1).}}
-Inspected flows per adjudicated \\emph{{attack}} label in the \\emph{{discovery}} half of the
-budget, under an operational label-acquisition and delay simulation in which the stream, the
-probe and \\emph{{all}} labels sit at operating prevalence $\\pi$ and every label arrives five
-windows late (seeds 801--830; the earlier 701--730 window is a pilot). The budget is split in
-two: this enriched half measures \\emph{{cost}}, while an independent uniform
-\\emph{{validation}} half at operating prevalence is the only sample the commit rule is shown
---- so an enriched sample is never used as an estimate of deployed performance. Acquisition
-policies rank candidate flows by model \\emph{{predictions}} only, never by ground truth, so
-they are implementable: an analyst inspects the queue the deployed detector already produces.
-Alert-enriched inspection finds an attack 5--8$\\times$ more cheaply than random inspection at
+\\caption{{\\textbf{{Attack-label acquisition yield under operational prevalence (final-q1).}}
+Inspected flows per adjudicated \\emph{{attack}} label found in the auxiliary
+\\emph{{discovery}} queue of a pool-based operational acquisition-yield simulation (seeds
+801--830; the earlier 701--730 window is a pilot). Adjudication candidates are drawn at
+operating prevalence $\\pi$ and every probe label arrives five windows late; the evaluation
+stream and detector calibration remain balanced, and the candidate training batch remains
+balanced per class with its acquisition cost \\emph{{not}} modeled --- so this arm measures
+label-acquisition yield, not the end-to-end cost of the commit decision. The adjudication
+budget is split in two: the enriched discovery half measures attack-\\emph{{finding}} yield
+only, while an independent \\emph{{uniform}} validation half at operating prevalence is the
+only sample the commit rule is shown (32 adjudications per decision, compared by plain
+accuracy; at extreme prevalence it may contain no attacks) --- so an enriched sample is never
+used as an estimate of deployed performance, and enrichment neither reduces the validation
+adjudications nor cheapens the commit decision itself. Acquisition policies rank candidate
+flows by model \\emph{{predictions}} only, never by ground truth, so they are implementable:
+an analyst inspects the queue the deployed detector already produces. Alert-enriched
+inspection \\emph{{finds an attack}} 5--8$\\times$ more cheaply than random inspection at
 every prevalence, and hybrid 3--6$\\times$; ranking by candidate/incumbent
 \\emph{{disagreement}} barely helps, because the two models differ near the decision boundary
-rather than on the minority class. The honest headline is therefore not ``32 labels suffice''
-but: 32 adjudicated \\emph{{validation}} labels for the decision, costing this many inspected
-flows to obtain under this policy at this prevalence.}}
+rather than on the minority class. The honest headline: the decision still requires its 32
+uniform validation adjudications; what enrichment changes is the cost of \\emph{{finding
+attack labels}} in the discovery queue, at the yields tabulated here.}}
 \\label{{tab:operational_e2e}}
 \\small
 \\begin{{tabular}}{{l l r r r r}}

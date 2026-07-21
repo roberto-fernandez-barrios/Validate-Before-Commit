@@ -1,0 +1,77 @@
+{
+  "config_version": "2.0.0",
+  "description": "Canonical registered budget-frontier grid (notes/q1_max_protocol.md D3). 99 arms = 3 scenarios x [3 anchors + 3 policies x 5 caps x 2 schedules], seeds 501-530. Provenance: the original driver run_q1_faseC.py (SHA256 655309bfec1c01924fd8708b6bde4c2ee055021ba6461959aea5502df11737c7, recovered 2026-07-21, see notes/frontier_driver_recovery_report.md) relied on runner argparse defaults for every fixed stream parameter; this config makes each of them explicit. Values below are byte-for-byte the argparse defaults of src/experiments/run_paper2_readaptation_v2.py at the time of recovery, verified bit-identical against the published v1.19.1 arms on deferred-commit-free arms.",
+  "runner_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "seeds": {"start": 501, "end": 530},
+  "expected_arms": 99,
+  "fixed_flags": {
+    "--label-col": "Label",
+    "--dim": "8",
+    "--window-size": "128",
+    "--train-size-per-class": "2000",
+    "--adapt-size-per-class": "512",
+    "--detector-ref-size-per-class": "256",
+    "--post-windows": "100",
+    "--ramp-windows": "80",
+    "--max-severity": "1.0",
+    "--calibration-windows": "30",
+    "--threshold-quantile": "0.95",
+    "--consecutive-k": "3",
+    "--cooldown-windows": "10",
+    "--downstream-model": "svc_rbf",
+    "--ks-reduction": "max",
+    "--adapt-strategy": "full_replace",
+    "--trigger-mode": "detector",
+    "--recal-source": "pools",
+    "--probe-source": "pools",
+    "--stream-prevalence": "0.5",
+    "--gate-margin": "0.0",
+    "--probe-latency": "0",
+    "--probe-flip-frac": "0.0",
+    "--candidate-latency": "0",
+    "--min-calib-windows": "0",
+    "--no-probe-policy": "commit",
+    "--lifetime-max-proposals": "10",
+    "--adaptation-policy": "consecutive"
+  },
+  "data": {
+    "portscan": {
+      "ref": "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
+      "cur": "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    },
+    "ton_scanning": {
+      "ref": "data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv",
+      "cur": "data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv"
+    }
+  },
+  "scenarios": {
+    "ps_full": {"data": "portscan", "override_flags": {}},
+    "ton_full": {"data": "ton_scanning", "override_flags": {}},
+    "ton_zero": {"data": "ton_scanning",
+                 "override_flags": {"--trigger-mode": "random",
+                                    "--trigger-prob": "0.05",
+                                    "--max-severity": "0"}}
+  },
+  "anchors": {
+    "none": {"--adaptation-gate": "none"},
+    "point": {"--adaptation-gate": "labeled_probe", "--probe-size": "32"},
+    "strict": {"--adaptation-gate": "labeled_probe", "--probe-size": "32",
+               "--gate-margin": "0.001"}
+  },
+  "policies": {
+    "ebcsdef": {"--adaptation-gate": "labeled_probe_ebcs_defer"},
+    "vbccoh": {"--adaptation-gate": "vbc_sg", "--vbc-defer-mode": "cohort"},
+    "vbcref": {"--adaptation-gate": "vbc_sg", "--vbc-defer-mode": "refresh"}
+  },
+  "policy_common_flags": {
+    "--seq-block": "16",
+    "--defer-windows": "5",
+    "--seqav-alpha": "0.10",
+    "--lifetime-alpha": "0.10"
+  },
+  "caps": [64, 128, 256, 512, 1024],
+  "schedules": ["bonferroni", "pseries"],
+  "tag_pattern": "q1fc_{scenario}_{policy}_c{cap}_{schedule4}",
+  "anchor_tag_pattern": "q1fc_{scenario}_{anchor}"
+}
