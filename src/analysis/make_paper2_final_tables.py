@@ -39,8 +39,8 @@ def causal_table():
         return fmt(r.gain, r.lo, r.hi)
 
     L = [r"\begin{table}", r"\centering"]
-    L.append(r"\caption{\textbf{Final observed-data (causal) arm --- unified leakage-free "
-             r"matrix (final-kbs protocol).} All three datasets at 64-flow windows (the largest "
+    L.append(r"\caption{\textbf{Final leakage-free observed-data policy-evaluation arm --- "
+             r"unified matrix (final-kbs protocol).} All three datasets at 64-flow windows (the largest "
              r"size UNSW's attack pool supports without replacement; a 128-flow sensitivity for "
              r"PortScan/ToN-IoT appears in the amendment notes with the same conclusions). Stream "
              r"drawn without replacement from globally value-deduplicated pools --- "

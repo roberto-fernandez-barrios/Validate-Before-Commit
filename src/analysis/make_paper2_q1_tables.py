@@ -57,18 +57,16 @@ def budget_frontier() -> None:
 \\centering
 \\caption{{\\textbf{{The registered budget frontier for the deployment-long guarantee (final-q1).}}
 Lifetime-budgeted risk gates ($\\alpha_{{\\mathrm{{life}}}}{{=}}0.10$, Bonferroni spending;
-$p$-series is within $0.1$ points and in the artifact), seeds 501--530, balanced probes.
-\\emph{{Gain}} is balanced-accuracy points over never-adapting on CICIDS-PortScan at full
-drift (always-deploying gains ${naive:+.2f}$); \\emph{{\\% naive}} the fraction recovered;
-\\emph{{labels}} probe labels per proposal (candidate training costs 1{{,}}024, its
-inspected-flow acquisition unpriced); \\emph{{abst.}} the fraction of proposals resolved as
-neither commit nor futility; \\emph{{delay}} deferral windows; last column commits under zero
-drift (91 proposals). The pre-declared non-vacuity target is met by twelve configurations
-across both schedules --- within the evaluated balanced-probe adjudication budget the
-guarantee is a matter of budget, not of the rule. Cohort-sim resamples the proposal-time
-target distribution in the simulator; it does not model a retained production cohort. For
-reference, the no-additional-label strict gate scores ${strict.gain:+.2f}$ here and
-${strict_z.gain:+.2f}$ under zero drift (point gate: ${point_z.gain:+.2f}$).}}
+$p$-series within $0.1$ points, in the artifact), seeds 501--530, balanced probes.
+\\emph{{Gain}}: balanced-accuracy points over never-adapting on CICIDS-PortScan at full
+drift (always-deploying gains ${naive:+.2f}$); \\emph{{\\% naive}}: fraction recovered;
+\\emph{{labels}}: realized probe labels per proposal after deferral continuations (candidate
+training costs 1{{,}}024, its inspected-flow acquisition unpriced); \\emph{{abst.}}:
+proposals resolved as neither commit nor futility; \\emph{{delay}}: deferral windows; last
+column: commits under zero drift (91 proposals). Twelve configurations meet the pre-declared
+non-vacuity target. Cohort-sim resamples the proposal-time target in the simulator, not a
+retained production cohort. Strict-gate reference: ${strict.gain:+.2f}$ here,
+${strict_z.gain:+.2f}$ under zero drift (point gate ${point_z.gain:+.2f}$).}}
 \\label{{tab:budget_frontier}}
 \\small
 \\begin{{tabular}}{{l r r r r r r r}}
@@ -179,13 +177,12 @@ def chronological() -> None:
 \\caption{{\\textbf{{The registered chronological matrix (final-q1).}} Seven pre-enumerated
 time-ordered replays (CICIDS2017 train$\\to$future day pairs, two intra-day splits, UNSW-NB15
 at two training fractions), 200 windows of 256 flows in capture order, seeds 601--630.
-Columns: balanced-accuracy points over never-adapting (two-class windows only);
-\\emph{{no-adapt}} is the frozen incumbent's absolute BA --- the health indicator.
-\\textbf{{No stream shows net harm}}, consistent with the six earlier replays. Where the
-incumbent collapses (CICIDS), updating helps a lot and the gates cost little; where it stays
-healthy (both UNSW timelines), the point and strict gates are \\emph{{above}} always-deploying
-(VBC-SG on the 20\\% split but not the 40\\%), with the healthy Wednesday intra-day replay the
-unresolved counterexample.}}
+Columns: balanced-accuracy points over never-adapting; \\emph{{no-adapt}} is the frozen
+incumbent's absolute BA (the health indicator). \\textbf{{No stream shows net harm.}} Where
+the incumbent collapses (CICIDS), updating helps a lot and the gates cost little; where it
+stays healthy, point and strict gates are \\emph{{above}} always-deploying on both UNSW
+timelines (VBC-SG on the 20\\% split but not the 40\\%), with the healthy Wednesday intra-day
+replay the unresolved counterexample.}}
 \\label{{tab:chronological_q1}}
 \\small
 \\begin{{tabular}}{{l r r r r r}}
@@ -222,20 +219,16 @@ def operational() -> None:
 \\centering
 \\caption{{\\textbf{{Attack-label acquisition yield under operational prevalence (final-q1).}}
 Inspected flows per adjudicated \\emph{{attack}} label found in the auxiliary
-\\emph{{discovery}} queue (seeds 801--830; 701--730 is a pilot). Adjudication candidates are
-drawn at operating prevalence $\\pi$, labels arrive five windows late; the evaluation stream,
-detector calibration and candidate training batch remain balanced per class, with the
-candidate batch's acquisition cost \\emph{{not}} modeled --- the arm measures acquisition
-yield and delay; it does not price the commit pipeline end to end. Discovery never decides:
-the commit rule sees only an independent \\emph{{uniform}} validation half at operating
-prevalence (32 adjudications per decision, plain accuracy; at extreme prevalence it may
-consist mostly or entirely of benign flows, so no balanced-accuracy guarantee is claimed),
-and enrichment reduces neither those 32 adjudications nor the decision's own cost.
-Acquisition policies rank flows by model \\emph{{predictions}} only, so an analyst can work
-the queue the detector already produces. Alert-enriched inspection \\emph{{finds an attack}}
-5--8$\\times$ more cheaply than random inspection, hybrid 3--6$\\times$; candidate/incumbent
-\\emph{{disagreement}} barely helps (the models differ near the boundary, not on the minority
-class).}}
+\\emph{{discovery}} queue (seeds 801--830; 701--730 a pilot). Adjudication candidates are
+drawn at operating prevalence $\\pi$ with five-window label latency; the evaluation stream,
+detector calibration and candidate training batch remain balanced per class (candidate
+acquisition cost not modeled), so the arm measures acquisition yield and delay, not
+end-to-end pipeline cost. Discovery never decides: the commit rule sees only the independent
+\\emph{{uniform}} validation half (32 adjudications, plain accuracy; at extreme prevalence it
+may be mostly or entirely benign, so no balanced-accuracy guarantee is claimed), and
+enrichment reduces neither those adjudications nor the decision's own cost. Alert-enriched
+inspection \\emph{{finds an attack}} 5--8$\\times$ more cheaply than random inspection,
+hybrid 3--6$\\times$; candidate/incumbent \\emph{{disagreement}} barely helps.}}
 \\label{{tab:operational_e2e}}
 \\small
 \\begin{{tabular}}{{l l r r r r}}

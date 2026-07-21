@@ -1128,6 +1128,65 @@ def main():
                     and "controlled balanced-probe" in _t)), 0.5)
     check("v121 E: no 'zero probability of harm' / 'eliminates harmful commits'", 0.0,
           float(_hits(r"zero probability of harm") + _hits(r"eliminates harmful commits")), 0.5)
+    # --- v1.20.2 guards (editorial compression + final claim scope) ----------------------
+    # E1 negative: no causal-inference language on claim surfaces (the LaTeX label
+    # tab:causal_probe, the negation 'not as a causal proof', and the temporal
+    # 'causal-information availability' sense are the only permitted survivals).
+    check("v122 E1: no 'causal arm/experiment/result' or 'genuinely causal'", 0.0,
+          float(_hits(r"causal arm") + _hits(r"genuinely causal") + _hits(r"causal result")
+                + _hits(r"causal experiment")), 0.5)
+    check("v122 E1: no 'realistic cost'", 0.0, float(_hits(r"realistic cost")), 0.5)
+    check("v122 E1: no 'reliable safeguard'", 0.0, float(_hits(r"reliable safeguard")), 0.5)
+    check("v122 E1: no unconditional 'identity is secondary'", 0.0,
+          float(_hits(r"identity is secondary")), 0.5)
+    check("v122 E1: no 'risk guarantee at tens of labels' (pooled/stratified undistinguished)",
+          0.0, float(_hits(r"risk guarantee at tens of labels")), 0.5)
+    check("v122 E1: no '512-flow probe cap' without deferral clarification", 0.0,
+          float(_hits(r"512-flow probe cap")), 0.5)
+    check("v122 E1: no 'operating point we recommend'", 0.0,
+          float(_hits(r"operating point we recommend")), 0.5)
+    check("v122 E1: no 'independent confirmation' for the hierarchical model", 0.0,
+          float(_hits(r"independent confirmation")), 0.5)
+    # E2 positive: the corrected formulations are present.
+    check("v122 E2: 'leakage-free observed-data' present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "leakage-free observed-data" in _t)), 0.5)
+    check("v122 E2: 'free of simulator-oracle information' present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "free of simulator-oracle information" in _t)), 0.5)
+    check("v122 E2: pooled-empirical vs stratified-formal distinction present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "pooled sequential gate provides useful empirical risk control" in _t
+                    and "formally aligned stratified guarantee" in _t)), 0.5)
+    check("v122 E2: 578-labels-after-deferrals clarification present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "578" in _t and "deferral" in _t)), 0.5)
+    check("v122 E2: 'adjudication count' framing present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "adjudication count" in _t)), 0.5)
+    check("v122 E2: conditional-on-proposal detector wording present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "conditional on a comparable proposal" in _t)), 0.5)
+    check("v122 E2: 'direct safeguard is candidate' + stratified formal control present", 1.0,
+          float(any("direct safeguard is candidate" in _t
+                    and "formal false-superiority control" in _t
+                    for _t in _texts.values())), 0.5)
+    check("v122 E2: chronological net-harm boundary retained (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and ("net harm never appeared" in _t or "net harm remains unobserved" in _t
+                         or "net harm is unobserved" in _t))), 0.5)
+    check("v122 E2: inspected-flow acquisition cost declared unmeasured (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "inspected-flow acquisition cost" in _t
+                    and ("not measured" in _t or "not modeled" in _t or "unpriced" in _t))), 0.5)
     # v2E: claim-scope audit table generated and fully verified.
     _csa = f"{Q1}/claim_scope_audit.csv"
     if os.path.exists(_csa):

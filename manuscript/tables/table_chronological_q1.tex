@@ -3,13 +3,12 @@
 \caption{\textbf{The registered chronological matrix (final-q1).} Seven pre-enumerated
 time-ordered replays (CICIDS2017 train$\to$future day pairs, two intra-day splits, UNSW-NB15
 at two training fractions), 200 windows of 256 flows in capture order, seeds 601--630.
-Columns: balanced-accuracy points over never-adapting (two-class windows only);
-\emph{no-adapt} is the frozen incumbent's absolute BA --- the health indicator.
-\textbf{No stream shows net harm}, consistent with the six earlier replays. Where the
-incumbent collapses (CICIDS), updating helps a lot and the gates cost little; where it stays
-healthy (both UNSW timelines), the point and strict gates are \emph{above} always-deploying
-(VBC-SG on the 20\% split but not the 40\%), with the healthy Wednesday intra-day replay the
-unresolved counterexample.}
+Columns: balanced-accuracy points over never-adapting; \emph{no-adapt} is the frozen
+incumbent's absolute BA (the health indicator). \textbf{No stream shows net harm.} Where
+the incumbent collapses (CICIDS), updating helps a lot and the gates cost little; where it
+stays healthy, point and strict gates are \emph{above} always-deploying on both UNSW
+timelines (VBC-SG on the 20\% split but not the 40\%), with the healthy Wednesday intra-day
+replay the unresolved counterexample.}
 \label{tab:chronological_q1}
 \small
 \begin{tabular}{l r r r r r}

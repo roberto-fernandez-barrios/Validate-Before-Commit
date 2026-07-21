@@ -90,6 +90,25 @@ def test_cohort_and_affordable_and_labels_scoped():
     assert "eliminates harmful commits" not in t
 
 
+def test_v1202_claim_scope_hardening():
+    """v1.20.2: causal-inference language removed; scope qualifications present."""
+    t = _text()
+    for phrase in ("causal arm", "genuinely causal", "causal result", "causal experiment",
+                   "realistic cost", "reliable safeguard", "identity is secondary",
+                   "risk guarantee at tens of labels", "512-flow probe cap",
+                   "operating point we recommend", "independent confirmation"):
+        assert phrase not in t, f"forbidden phrase survives: {phrase!r}"
+    for f in ("manuscript/main.tex", "manuscript/main_ieee.tex"):
+        tt = re.sub(r"\s+", " ", (REPO / f).read_text(encoding="utf-8").lower())
+        assert "leakage-free observed-data" in tt, f
+        assert "free of simulator-oracle information" in tt, f
+        assert "pooled sequential gate provides useful empirical risk control" in tt, f
+        assert "formally aligned stratified guarantee" in tt, f
+        assert "578" in tt and "deferral" in tt, f"{f}: cap-vs-total clarification missing"
+        assert "conditional on a comparable proposal" in tt, f
+        assert "adjudication count" in tt, f
+
+
 def test_paper1_reference_untouched():
     bib = (REPO / "manuscript" / "references.bib").read_text(encoding="utf-8")
     i = bib.find("Authors' own prior work (Paper 1)")

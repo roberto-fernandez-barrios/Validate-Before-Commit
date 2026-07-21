@@ -162,6 +162,26 @@ def q1_final_patch_summary() -> dict:
     )
 
 
+def editorial_v1202_summary() -> dict:
+    """v1.20.2: editorial-compression facts. The 'before' word count is the frozen v1.20.1
+    baseline (measured identically); 'after' is computed live from main.tex."""
+    t = (REPO / "manuscript" / "main.tex").read_text(encoding="utf-8")
+    body = t[t.find(r"\begin{abstract}"):]
+    after = len(re.findall(r"\b[\w'-]+\b", body))
+    before = 19413
+    return dict(
+        editorial_compression=True,
+        claim_scope_hardening=True,
+        causal_language_removed=True,
+        scientific_experiments_rerun=False,
+        primary_results_changed=False,
+        scientific_csvs_changed=False,
+        article_word_count_before=before,
+        article_word_count_after=after,
+        article_word_reduction_pct=round(100.0 * (before - after) / before, 1),
+    )
+
+
 def statistical_inference_summary() -> dict:
     """v1.20.1: multiplicity + claim-scope facts, computed from the shipped CSVs."""
     out = dict(status="missing")
@@ -272,6 +292,8 @@ def main() -> None:
         # q1-final-patch (v1.20.1): the statistical-inference contract, read from the shipped
         # analysis tables themselves so the manifest can never drift from them.
         statistical_inference=statistical_inference_summary(),
+        # v1.20.2: editorial compression + final claim-scope hardening (no science changed).
+        editorial_v1_20_2=editorial_v1202_summary(),
         # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
         # stated field by field so no claim can outrun what the simulation measures.
         operational_arm_scope=dict(

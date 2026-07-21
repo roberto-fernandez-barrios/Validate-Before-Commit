@@ -41,10 +41,11 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   before it replaces the incumbent. A **zero-drift control** makes the point: forcing updates on a healthy model
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
-  downstream models, and by a **causal arm** (candidate, probe and detector recalibration from observed traffic only).
+  downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
 - **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
-  vacuous: at a 512-flow probe cap a lifetime-budgeted pooled gate recovers **93% of always-deploying's benefit**
+  vacuous: at a configured probe cap of 512 (about 578 adjudicated probe labels per proposal after deferrals) a
+  lifetime-budgeted pooled gate recovers **93% of always-deploying's benefit**
   under an approximate pooled analysis (81% for the fully stratified VBC-SG variant carrying the formal per-class
   guarantee) while committing **nothing at all** under zero drift (the inspected-flow acquisition cost of these balanced probes under operational class imbalance is not measured; the Cohort continuation is a proposal-target resampling simulation, Cohort-sim, not a retained production cohort). The mechanism behind the harm is named too — a role-randomized A/B
   control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**

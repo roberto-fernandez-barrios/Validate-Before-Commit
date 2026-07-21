@@ -17,7 +17,7 @@ def test_evidence_tier_labels():
     text = MAIN.read_text(encoding="utf-8")
     assert "Five tiers of evidence" in text
     for marker in ("Registered confirmatory core", "Registered follow-ups",
-                   "Feasibility, of two distinct kinds", "External boundary", "Exploratory"):
+                   "Feasibility, of two kinds", "External boundary", "Exploratory"):
         assert marker in text, f"evidence tier missing: {marker}"
     # the confirmatory replication must be labeled internal; "external replication" may only
     # appear negated ("not an external replication")

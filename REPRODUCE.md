@@ -77,7 +77,7 @@ that note. The CICIDS Tuesday chronological stream is staged by
 and run with `run_paper2_temporal_stream` on seeds 401--430.
 Amendment 011 (`notes/paper2_harness_v2_amendment_011.md`) adds `--stream-disjoint-windows`
 (without-replacement, value-deduplicated stream: removes candidate-train/future-eval overlap in the
-causal arm) and `--cumulative-mode {initial_plus_observed,dedup,cn}` (cumulative-generator controls);
+observed-data arm) and `--cumulative-mode {initial_plus_observed,dedup,cn}` (cumulative-generator controls);
 its `paper2_v12_*` arms plus the standalone CS coverage simulation are enumerated in that note.
 Amendment 012 (`notes/paper2_harness_v2_amendment_012.md`) fixes three code bugs and adds
 `--no-probe-policy {commit,reject}` (early-trigger behaviour when the observed probe is unavailable),
@@ -128,7 +128,7 @@ the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--
   calibration remain balanced, and the candidate training batch remains balanced per class
   with its acquisition cost not modeled — the arm measures label-acquisition yield; it does not
   price the commit pipeline end to end. It runs inside the pool-based harness and is
-  **not** the causal arm.
+  **not** the leakage-free observed-data arm.
   Aggregate: `make_paper2_q1_e2e`. Tables for all four: `make_paper2_q1_tables`.
 
 Three cross-cutting artifacts complete the final phase:
@@ -198,7 +198,7 @@ python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: le
 python -m src.analysis.paper2_cs_coverage_011               # amendment 011: CS empirical coverage (iid/no-replace/autocorr)
 python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn fix, McNemar a=0.10, causal reject-policy,
                                                            #   size-matched RF/LogReg/MLP zero-drift, strict-> baseline
-python -m src.analysis.aggregate_paper2_amendment_013        # amendment 013: FINAL leakage-free causal arm, stratified gate,
+python -m src.analysis.aggregate_paper2_amendment_013        # amendment 013: FINAL leakage-free observed-data arm, stratified gate,
                                                            #   strict outside zero drift, calib-min sweep
 python -m src.analysis.paper2_symmetric_ab_013               # amendment 013: symmetric-A/B mechanism control (superseded)
 python -m src.analysis.make_paper2_causal_final_table        # Table 8 emitter (superseded by final-kbs)
