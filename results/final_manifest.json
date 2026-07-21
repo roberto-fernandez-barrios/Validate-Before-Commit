@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-21T21:57:04Z",
-  "source_commit_sha": "1befbf557bbf187f9ba6bfd48967bb71eb41bafe",
+  "generated_at_utc": "2026-07-21T23:07:18Z",
+  "source_commit_sha": "031f86f3eb094f9569f3e5f0b3c420954ef9a9bb",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.20.1",
+  "artifact_version": "1.20.2",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -356,6 +356,17 @@
     "claim_scope_audit_claims": 14,
     "claim_scope_audit_failures": 0
   },
+  "editorial_v1_20_2": {
+    "editorial_compression": true,
+    "claim_scope_hardening": true,
+    "causal_language_removed": true,
+    "scientific_experiments_rerun": false,
+    "primary_results_changed": false,
+    "scientific_csvs_changed": false,
+    "article_word_count_before": 19413,
+    "article_word_count_after": 17827,
+    "article_word_reduction_pct": 8.2
+  },
   "operational_arm_scope": {
     "evaluation_stream_prevalence": "balanced",
     "detector_calibration_prevalence": "balanced",
@@ -386,7 +397,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 521,
-    "checks_total": 521
+    "checks_passed": 538,
+    "checks_total": 538
   }
 }
