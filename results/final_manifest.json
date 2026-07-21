@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-21T18:48:31Z",
-  "source_commit_sha": "f27bdedcd8e059acdb6ecce825e787d2f8702d39",
+  "generated_at_utc": "2026-07-21T21:57:04Z",
+  "source_commit_sha": "1befbf557bbf187f9ba6bfd48967bb71eb41bafe",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.20.0",
+  "artifact_version": "1.20.1",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -316,7 +316,9 @@
     "harmful_h5": 0,
     "harmful_immediate": 0,
     "harmful_deferred": 0,
-    "harmful_rate_h5": 0.0
+    "observed_harmful_proportion_h5": 0.0,
+    "binomial_upper_bound_reported": false,
+    "reason": "commit outcomes are clustered within shared seeds, scenarios and policy configurations; they are not independent Bernoulli trials"
   },
   "q1_final_patch": {
     "temporal_semantics": "commit resolved at t serves from t+1 (immediate and deferred alike)",
@@ -331,9 +333,51 @@
     "recovery_report": "notes/frontier_driver_recovery_report.md",
     "max_served_ba_change_points": 0.14
   },
+  "statistical_inference": {
+    "multiplicity_method": "deterministic centered paired bootstrap test (H0-centered resampling, Monte-Carlo corrected)",
+    "bootstrap_resamples": 100000,
+    "multiplicity_total": 28,
+    "family_sizes": {
+      "confirmatory core (gate vs naive)": 6,
+      "registered follow-up: budget frontier (PortScan full, Bonferroni)": 15,
+      "registered follow-up: chronological matrix (strict)": 7
+    },
+    "family_survivors_adj": {
+      "confirmatory core (gate vs naive)": 3,
+      "registered follow-up: budget frontier (PortScan full, Bonferroni)": 13,
+      "registered follow-up: chronological matrix (strict)": 7
+    },
+    "normal_approximation_fallbacks": 0,
+    "sensitivities": [
+      "paired t-test",
+      "Wilcoxon signed-rank"
+    ],
+    "harm_population_rate_bound_removed": true,
+    "claim_scope_audit_claims": 14,
+    "claim_scope_audit_failures": 0
+  },
+  "operational_arm_scope": {
+    "evaluation_stream_prevalence": "balanced",
+    "detector_calibration_prevalence": "balanced",
+    "candidate_training_sampling": "balanced_per_class",
+    "candidate_training_inspection_cost_modeled": false,
+    "adjudication_pool_prevalence": "operating",
+    "discovery_sampling_policy": [
+      "random",
+      "alert_enriched",
+      "disagreement",
+      "hybrid"
+    ],
+    "discovery_used_for_commit": false,
+    "validation_sampling_policy": "uniform_at_operating_prevalence",
+    "validation_labels": 32,
+    "decision_metric": "plain_accuracy",
+    "operational_scope": "acquisition_yield_and_delay_only",
+    "end_to_end_pipeline_cost_modeled": false
+  },
   "outputs": {
-    "tables_manifest_sha256": "e16049f71d22502d4b0a3016f3f61bd7fba5d6cf964d09d5a4fbaf13c69df28c",
-    "n_table_csvs": 163,
+    "tables_manifest_sha256": "dcf322681f5863d120ebda03a76abd0d17825f9f93fdd3aa96f491d0e4420c36",
+    "n_table_csvs": 164,
     "pdfs": [
       "manuscript/main.pdf",
       "manuscript/supplement.pdf",
@@ -342,7 +386,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 495,
-    "checks_total": 495
+    "checks_passed": 521,
+    "checks_total": 521
   }
 }
