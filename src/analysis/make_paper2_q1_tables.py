@@ -65,7 +65,7 @@ nor futility; \\emph{{delay}} is deferral windows to a decision; the last column
 $\\ge$50\\% of naive, zero zero-drift commits, $<$1{{,}}024 labels) is met by twelve
 configurations across both alpha-spending schedules (the seven Bonferroni rows shown here plus
 five $p$-series) --- the deployment-long guarantee is a matter of budget, not of the rule. For
-reference, the zero-cost strict gate scores ${strict.gain:+.2f}$ here and ${strict_z.gain:+.2f}$
+reference, the no-additional-label strict gate (same probe as the point gate, no extra labels) scores ${strict.gain:+.2f}$ here and ${strict_z.gain:+.2f}$
 under zero drift (vs the point gate's ${point_z.gain:+.2f}$).}}
 \\label{{tab:budget_frontier}}
 \\small
@@ -181,8 +181,9 @@ training fractions --- each processed as 200 windows of 256 flows in capture ord
 \\emph{{no-adapt}} is the frozen incumbent's absolute BA, the health indicator that governs
 which regime a stream is in. \\textbf{{No stream shows net harm}}, consistent with the six
 earlier replays. Where the incumbent collapses (CICIDS), updating helps a lot and the gates
-cost almost nothing; where it stays healthy (both UNSW timelines), all three gates are
-\\emph{{above}} always-deploying, and the zero-cost strict rule is the best of them.}}
+cost almost nothing; where it stays healthy (both UNSW timelines), the point and strict gates are
+\\emph{{above}} always-deploying (VBC-SG on the 20\\% split but not the 40\\% split), and the
+no-additional-label strict rule is the best of the three.}}
 \\label{{tab:chronological_q1}}
 \\small
 \\begin{{tabular}}{{l r r r r r}}

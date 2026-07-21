@@ -5,9 +5,11 @@ Two families, treated differently and labelled as such:
   * CONFIRMATORY CORE -- the registered gate-vs-naive contrasts of the hardened replication
     (the primary gate, both detectors, three regimes). This is a genuine inferential family
     of 6 pre-declared tests, so it gets HOLM step-down control of the family-wise error.
-  * REGISTERED FOLLOW-UPS -- each block (zero drift, budget frontier, chronological matrix)
-    is a family only where several inferential statements are made together; those get
-    BENJAMINI-HOCHBERG within the block.
+  * REGISTERED FOLLOW-UPS -- BENJAMINI-HOCHBERG within each block that makes several
+    inferential statements at once. This script corrects exactly two such families: the
+    selected budget-frontier configurations (PortScan full, Bonferroni, committing arms) and
+    the strict-gate-versus-no-adaptation family across the seven chronological replays. Other
+    point/VBC-SG/naive comparisons are descriptive and are not automatically corrected here.
 
 Everything else in the paper is descriptive and is not corrected -- and, per the protocol,
 must not carry confirmatory language. The audit cross-checks that the manuscript's stated

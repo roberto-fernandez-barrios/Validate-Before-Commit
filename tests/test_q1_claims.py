@@ -262,3 +262,56 @@ def test_manifest_completeness_final_q1():
         f"operational seed window stale: {m['seeds']['q1_operational_e2e']}"
     # the sealing field must be the non-circular source_commit_sha, never commit_sha
     assert "source_commit_sha" in m and "commit_sha" not in m
+
+
+def test_final_editorial_no_overclaims():
+    """Final editorial guard (Blocks 1-8): fail on any claim stronger than the evidence,
+    matched by MEANING (banned phrases plus windowed proximity) rather than one exact string,
+    so a reworded false claim is still caught. Scans the CAS source, the IEEE port and the
+    supplement. Each pattern is checked against the specific false variant it must reject."""
+    docs = {}
+    for d in ("main.tex", "main_ieee.tex", "supplement.tex"):
+        p = REPO / "manuscript" / d
+        if p.exists():
+            docs[d] = re.sub(r"\s+", " ", p.read_text(encoding="utf-8").lower())
+
+    banned = [
+        (r"full protection", "B6: 'full protection' overclaims formal control"),
+        (r"costs no labels at all", "B2: strict is no-ADDITIONAL-label, not label-free"),
+        (r"zero-cost strict", "B2: use 'no-additional-label strict'"),
+        (r"reproduces every conclusion", "B5: causal arm does not reproduce every conclusion"),
+        (r"assumed zero throughout", "B4: operational arm evaluates a 5-window training delay"),
+        (r"instantaneous in every arm", "B4: operational arm evaluates a 5-window training delay"),
+        (r"scoring all 520 commits", "B8: the H5 endpoint scores 506 evaluable, not all 520"),
+        (r"significantly outperforms both naive", "B7: significance is harm-regime only"),
+        (r"every gate beats", "B3: not every gate beats always-deploying on healthy timelines"),
+    ]
+    v = []
+    for name, t in docs.items():
+        for pat, why in banned:
+            if re.search(pat, t):
+                v.append(f"{name}: {why}")
+        # B5: 'statistically indistinguishable' must not describe causal-vs-oracle
+        for m in re.finditer(r"statistically indistinguishable", t):
+            w = t[max(0, m.start() - 120): m.end() + 120]
+            if "oracle" in w or "causal gate" in w:
+                v.append(f"{name}: B5 causal-vs-oracle 'statistically indistinguishable'")
+        # B3: 'all three gates' must not be claimed above/beating always-deploying
+        for m in re.finditer(r"all three gates", t):
+            w = t[m.start(): m.end() + 90]
+            if ("above" in w or "beat" in w) and "always" in w:
+                v.append(f"{name}: B3 'all three gates ... above/beat always-deploying'")
+        # B3: 'match(es)-or-beat(s) always-deploying' (false joint UNSW+Wednesday claim)
+        for m in re.finditer(r"match(?:es)?[ -]or[ -]beat", t):
+            w = t[m.start(): m.end() + 45]
+            if "always-deploying" in w or "always deploying" in w:
+                v.append(f"{name}: B3 'match or beat always-deploying'")
+        # B1: every '93%' benefit claim must be marked as the APPROXIMATE POOLED analysis and
+        # thereby distinguished from the fully stratified variant
+        for m in re.finditer(r"93\s*\?%", t):
+            w = t[max(0, m.start() - 40): m.end() + 240]
+            if ("benefit" in w or "always-deploying" in w) and not \
+               ("approximate" in w or "pooled" in w):
+                v.append(f"{name}: B1 '93%' benefit claim not marked approximate/pooled")
+
+    assert not v, "editorial overclaim(s) detected:\n  " + "\n  ".join(sorted(set(v)))

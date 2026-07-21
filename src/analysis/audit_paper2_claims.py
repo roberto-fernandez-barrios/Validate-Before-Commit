@@ -941,6 +941,59 @@ def main():
               float(pd.read_csv(f"{Q1}/chronological_replays.csv")
                     .query("stream=='thu_fri' and policy=='none'").iloc[0].gain_ba) * 100, 0.02)
 
+    # --- final editorial overclaim guards (Blocks 1-8): claim strength vs evidence ---
+    # Meaning-based, not a single exact string, and checked against both the CAS source and
+    # the IEEE port so a reworded false claim cannot slip through one of them.
+    import re as _re
+    _texts = {}
+    for _d in ("main.tex", "main_ieee.tex", "supplement.tex"):
+        _p = f"manuscript/{_d}"
+        if os.path.exists(_p):
+            _texts[_d] = _re.sub(r"\s+", " ", open(_p, encoding="utf-8").read().lower())
+
+    def _hits(pat):
+        return sum(len(_re.findall(pat, t)) for t in _texts.values())
+
+    def _prox_hits(anchor, needles, span=120, ahead=False):
+        n = 0
+        for t in _texts.values():
+            for m in _re.finditer(anchor, t):
+                w = t[m.start(): m.end() + span] if ahead else \
+                    t[max(0, m.start() - span): m.end() + span]
+                if any(x in w for x in needles):
+                    n += 1
+        return n
+
+    check("no-overclaim: 'full protection' (B6)", 0.0, float(_hits(r"full protection")), 0.5)
+    check("no-overclaim: strict 'costs no labels at all' (B2)", 0.0,
+          float(_hits(r"costs no labels at all")), 0.5)
+    check("no-overclaim: 'zero-cost strict' (B2)", 0.0, float(_hits(r"zero-cost strict")), 0.5)
+    check("no-overclaim: 'reproduces every conclusion' (B5)", 0.0,
+          float(_hits(r"reproduces every conclusion")), 0.5)
+    check("no-overclaim: causal-vs-oracle 'statistically indistinguishable' (B5)", 0.0,
+          float(_prox_hits(r"statistically indistinguishable", ("oracle", "causal gate"))), 0.5)
+    check("no-overclaim: 'assumed zero throughout' / 'instantaneous in every arm' (B4)", 0.0,
+          float(_hits(r"assumed zero throughout") + _hits(r"instantaneous in every arm")), 0.5)
+    check("no-overclaim: 'scoring all 520 commits' at H5 (B8)", 0.0,
+          float(_hits(r"scoring all 520 commits")), 0.5)
+    check("no-overclaim: joint 'significantly outperforms both naive' (B7)", 0.0,
+          float(_hits(r"significantly outperforms both naive")), 0.5)
+    check("no-overclaim: 'all three gates ... above/beat always-deploying' (B3)", 0.0,
+          float(_prox_hits(r"all three gates", ("above always", "beat always"), span=90, ahead=True)), 0.5)
+    check("no-overclaim: 'match or beat always-deploying' (B3)", 0.0,
+          float(_prox_hits(r"match(?:es)?[ -]or[ -]beat", ("always-deploying", "always deploying"),
+                           span=45, ahead=True)), 0.5)
+    check("no-overclaim: 'every gate beats' (B3)", 0.0, float(_hits(r"every gate beats")), 0.5)
+    # B1: every 93% benefit claim must be marked as the approximate pooled analysis
+    _bad93 = 0
+    for _t in _texts.values():
+        for _m in _re.finditer(r"93\s*\\?%", _t):
+            _w = _t[max(0, _m.start() - 40): _m.end() + 240]
+            if ("benefit" in _w or "always-deploying" in _w) and not \
+               ("approximate" in _w or "pooled" in _w):
+                _bad93 += 1
+    check("no-overclaim: 93% pooled marked 'approximate/pooled' (B1)", 0.0, float(_bad93), 0.5)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")
