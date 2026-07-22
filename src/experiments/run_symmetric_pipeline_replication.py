@@ -47,9 +47,12 @@ SMOKE_MARKER = "SMOKE_ONLY_DO_NOT_ANALYZE"
 POLICY_SHORT = {"frozen_initial_transformer": "froz", "own_transformer_per_model": "own"}
 
 
-def load_config() -> dict:
-    with open(CONFIG_PATH, encoding="utf-8") as f:
-        return json.load(f)
+def load_config(path: Path | None = None) -> dict:
+    path = Path(path) if path is not None else CONFIG_PATH
+    with open(path, encoding="utf-8") as f:
+        cfg = json.load(f)
+    cfg["_config_path"] = str(path.resolve().relative_to(ROOT)).replace(os.sep, "/")
+    return cfg
 
 
 def reserved_seeds(cfg: dict) -> set[int]:
@@ -68,8 +71,41 @@ def _merge(*flag_dicts: dict) -> dict:
     return merged
 
 
+def size_matched_arms(cfg: dict) -> list[dict]:
+    """The registered 21-arm size-matched matrix (protocol
+    paper2_size_matched_own_transformer_001): per zero-drift scenario, 1 never-adapt +
+    3 policies x 2 candidate sizes, own_transformer_per_model only. The ONLY flag that
+    varies between the size conditions is --candidate-size-per-class (nested canonical
+    draw in the science module)."""
+    arms = []
+    for sc, sdef in cfg["scenarios"].items():
+        base = _merge(cfg["fixed_flags"], sdef["override_flags"])
+        arms.append(dict(tag=f"sm_{sc}_never", scenario=sc, policy="never",
+                         transformer_policy="frozen_initial_transformer",
+                         candidate_size=None,
+                         data=cfg["data"][sdef["data"]],
+                         flags=dict(base, **{"--adaptation-gate": "none"})))
+        for pol in ("naive", "point", "strict"):
+            pflags = cfg["policies"][pol]
+            for size in cfg["candidate_sizes_per_class"]:
+                arms.append(dict(tag=f"sm_{sc}_{pol}_{size}", scenario=sc,
+                                 policy=pol, transformer_policy="own_transformer_per_model",
+                                 candidate_size=int(size),
+                                 data=cfg["data"][sdef["data"]],
+                                 flags=_merge(base, pflags,
+                                              {"--candidate-size-per-class": str(size)})))
+    if len(arms) != cfg["expected_arms"]:
+        raise SystemExit(f"grid enumerates {len(arms)} arms, expected {cfg['expected_arms']}")
+    tags = [a["tag"] for a in arms]
+    if len(set(tags)) != len(tags):
+        raise SystemExit("duplicate arm tags in grid")
+    return arms
+
+
 def confirmatory_arms(cfg: dict) -> list[dict]:
-    """The registered 42-arm matrix: per scenario, 1 never-adapt + 3 policies x 2 tpolicies."""
+    """The registered confirmatory matrix for the loaded config."""
+    if cfg.get("matrix_kind") == "size_matched":
+        return size_matched_arms(cfg)
     arms = []
     for sc, sdef in cfg["scenarios"].items():
         base = _merge(cfg["fixed_flags"], sdef["override_flags"])
@@ -99,7 +135,8 @@ def parity_arms(cfg: dict) -> list[dict]:
         base = _merge(cfg["fixed_flags"], sdef["override_flags"])
         pflags = pa.get("policy_flags") or cfg["policies"][pa["policy"]]
         arms.append(dict(tag=pa["tag"], scenario=pa["scenario"], policy=pa["policy"],
-                         transformer_policy="frozen_initial_transformer",
+                         transformer_policy=pa.get("transformer_policy",
+                                                   "frozen_initial_transformer"),
                          data=cfg["data"][sdef["data"]], flags=_merge(base, pflags),
                          published_dir=pa["published_dir"]))
     return arms
@@ -132,9 +169,10 @@ def firewall(cfg: dict, seeds: list[int], *, mode: str, authorized: bool) -> Non
     hit = sorted(set(seeds) & reserved_seeds(cfg))
     if not hit:
         return
+    block = f"{cfg['confirmatory_seeds']['start']}-{cfg['confirmatory_seeds']['end']}"
     if mode in ("smoke", "parity", "dry-run", "development"):
         raise SystemExit(f"CONFIRMATORY SEED FIREWALL: seeds {hit} are reserved "
-                         f"(3001-3030) and can NEVER run in --{mode} mode.")
+                         f"({block}) and can NEVER run in --{mode} mode.")
     if not authorized:
         raise SystemExit(f"CONFIRMATORY SEED FIREWALL: seeds {hit} are reserved for the "
                          f"registered confirmatory matrix; pass --confirmatory-authorized "
@@ -177,6 +215,31 @@ def load_pools(arm: dict):
     return _POOLS_CACHE[key]
 
 
+def _recording_candidate_factory(inner, seed: int, base_per_class: int, records: list):
+    """Provenance capture for the size-matched control (protocol section 2.4): wraps the
+    environment's candidate_factory, recording per candidate the size, the full
+    training-batch row hash, the row hash of the nested initial `base_per_class` subset
+    (the first 2*base rows ARE the base batch, by the canonical-draw construction), and
+    the complete preprocessing/classifier provenance already computed by
+    build_candidate_pipeline. Pure logging: the returned pipeline is untouched."""
+    from src.experiments.symmetric_pipeline import rows_hash
+
+    def factory(X_raw, y, cseed, C, proba):
+        pipe = inner(X_raw, y, cseed, C, proba)
+        n = len(y)
+        rec = dict(seed=int(seed),
+                   candidate_size_per_class=int(n // 2),
+                   n_rows=int(n),
+                   nested_base_per_class=int(base_per_class),
+                   nested_prefix_row_hash=rows_hash(X_raw[: 2 * base_per_class],
+                                                    y[: 2 * base_per_class]),
+                   **{k: v for k, v in pipe.metadata.items()})
+        records.append(rec)
+        return pipe
+
+    return factory
+
+
 def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
                 mode: str, smoke: bool = False) -> None:
     from src.experiments import run_paper2_readaptation_v2 as v2
@@ -192,13 +255,22 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
     (outdir / "environment.json").write_text(
         json.dumps(environment_info(), indent=2), encoding="utf-8")
 
+    size_matched = "--candidate-size-per-class" in arm["flags"]
+    prov_records: list[dict] = []
     win_rows, trig_rows, sum_rows, res_all, shashes = [], [], [], [], []
     for seed in seeds:
         print(f"[{arm['tag']} SEED={seed}]", flush=True)
         env = build_raw_environment(pools, args, seed, arm["transformer_policy"])
+        if size_matched:
+            env.candidate_factory = _recording_candidate_factory(
+                env.candidate_factory, seed, int(args.adapt_size_per_class), prov_records)
         shashes.append((seed, stream_raw_hash(env.stream_raw)))
         w_, t_, s_, r_ = v2.run_seed(env, args, seed, methods)
         win_rows.extend(w_); trig_rows.extend(t_); sum_rows.extend(s_); res_all.extend(r_)
+    if size_matched:
+        with open(outdir / "candidate_provenance.jsonl", "w", encoding="utf-8") as fh:
+            for rec in prov_records:
+                fh.write(json.dumps(rec, sort_keys=True) + "\n")
 
     agg = v2.write_outputs(outdir, win_rows, trig_rows, sum_rows, res_all)
     print(agg.to_string(index=False))
@@ -207,7 +279,9 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
         "".join(f"{s},{h}\n" for s, h in shashes), encoding="utf-8")
     (outdir / "run_config.json").write_text(json.dumps(dict(
         tag=arm["tag"], mode=mode, config_version=cfg["config_version"],
-        config_file=str(CONFIG_PATH.relative_to(ROOT)),
+        config_file=cfg.get("_config_path", str(CONFIG_PATH.relative_to(ROOT))),
+        config_sha256=sha256_file(ROOT / cfg.get("_config_path",
+                                                 str(CONFIG_PATH.relative_to(ROOT)))),
         runner_module=cfg["runner_module"], science_module=cfg["science_module"],
         methods=cfg["methods"], seeds=[int(s) for s in seeds],
         scenario=arm["scenario"], policy=arm["policy"],
@@ -330,7 +404,8 @@ def validate_complete(cfg: dict, *, parity: bool) -> None:
         for t in missing:
             print(" ", t)
         raise SystemExit(1)
-    print("COMPLETE: all registered confirmatory arms present")
+    print(f"{cfg['expected_arms']}/{cfg['expected_arms']} COMPLETE: all registered "
+          f"confirmatory arms present")
 
 
 def main() -> None:
@@ -351,8 +426,12 @@ def main() -> None:
     p.add_argument("--confirmatory-authorized", action="store_true",
                    help="REQUIRED for confirmatory seeds; must NOT be used in the "
                         "preparation phase")
+    p.add_argument("--config", type=Path, default=None,
+                   help="registered config JSON (default: the symmetric-pipeline dynamic "
+                        "config; pass configs/size_matched_own_transformer_v1.json for the "
+                        "size-matched control matrix)")
     a = p.parse_args()
-    cfg = load_config()
+    cfg = load_config(a.config)
 
     if a.confirmatory_authorized and (a.smoke or a.parity or a.dry_run):
         raise SystemExit("--confirmatory-authorized cannot be combined with "

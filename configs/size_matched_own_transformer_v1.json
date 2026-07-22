@@ -1,0 +1,118 @@
+{
+  "config_version": "1.0.0",
+  "matrix_kind": "size_matched",
+  "description": "Registered size-matched self-contained challenger control (notes/paper2_size_matched_own_transformer_protocol_001.md). 21 confirmatory arms = 3 zero-drift scenarios x (1 never-adapt + 3 policies x 2 candidate sizes), own_transformer_per_model only, confirmatory seeds 4001-4030 (RESERVED, firewalled). Fixed flags are byte-for-byte the v1.21.0 symmetric-pipeline values; the ONLY new variable is --candidate-size-per-class in {512, 2000} via the nested canonical draw (protocol section 2.2). Smoke seeds 4401-4402; parity vs stored v1.21.0-code smoke outputs on seeds 4242-4243.",
+  "source_baseline": {
+    "tag": "v1.21.0",
+    "manifest_commit": "7f9ea405f6bd30e457f714c1a5ebc6b463e74c50",
+    "scientific_commit": "588c89e90b823813043a559e7ebd307cf57baf2a",
+    "version_doi": "10.5281/zenodo.21495829"
+  },
+  "protocol": {
+    "file": "notes/paper2_size_matched_own_transformer_protocol_001.md",
+    "protocol_commit": "114513f8613d0b76b206d03dc74aeefe1ea7200e"
+  },
+  "runner_module": "src.experiments.run_symmetric_pipeline_replication",
+  "science_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "confirmatory_seeds": {"start": 4001, "end": 4030, "status": "RESERVED - virgin block, verified 2026-07-22 (protocol 1.4)"},
+  "smoke_seeds": [4401, 4402],
+  "parity_seeds": {"start": 4242, "end": 4243, "note": "previous phase's smoke seeds; parity verification of the new 512 path vs stored v1.21.0-code outputs ONLY, never new evidence"},
+  "expected_arms": 21,
+  "transformer_policies": ["own_transformer_per_model"],
+  "candidate_sizes_per_class": [512, 2000],
+  "incumbent_train_size_per_class": 2000,
+  "detector_transform_policy": "frozen_initial",
+  "fixed_flags": {
+    "--label-col": "Label",
+    "--dim": "8",
+    "--window-size": "128",
+    "--train-size-per-class": "2000",
+    "--adapt-size-per-class": "512",
+    "--detector-ref-size-per-class": "256",
+    "--post-windows": "100",
+    "--ramp-windows": "80",
+    "--max-severity": "1.0",
+    "--calibration-windows": "30",
+    "--threshold-quantile": "0.95",
+    "--consecutive-k": "3",
+    "--cooldown-windows": "10",
+    "--downstream-model": "svc_rbf",
+    "--ks-reduction": "max",
+    "--adapt-strategy": "full_replace",
+    "--trigger-mode": "detector",
+    "--recal-source": "pools",
+    "--probe-source": "pools",
+    "--stream-prevalence": "0.5",
+    "--gate-margin": "0.0",
+    "--probe-latency": "0",
+    "--probe-flip-frac": "0.0",
+    "--candidate-latency": "0",
+    "--min-calib-windows": "0",
+    "--no-probe-policy": "commit",
+    "--lifetime-max-proposals": "10",
+    "--adaptation-policy": "consecutive"
+  },
+  "data": {
+    "portscan": {
+      "ref": "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
+      "cur": "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    },
+    "unsw_recon": {
+      "ref": "data/processed/unsw_nb15/unsw_ref_no_reconnaissance_binary.csv",
+      "cur": "data/processed/unsw_nb15/unsw_cur_reconnaissance_binary.csv"
+    },
+    "ton_scanning": {
+      "ref": "data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv",
+      "cur": "data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv"
+    }
+  },
+  "scenarios": {
+    "ps_zero": {"data": "portscan",
+                "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                   "--max-severity": "0"}},
+    "unsw_zero": {"data": "unsw_recon",
+                  "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                     "--max-severity": "0"}},
+    "ton_zero": {"data": "ton_scanning",
+                 "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                    "--max-severity": "0"}}
+  },
+  "policies": {
+    "never": {"note": "no-adaptation baseline only; size/transformer independent, run once per scenario/seed"},
+    "naive": {"--adaptation-gate": "none"},
+    "point": {"--adaptation-gate": "labeled_probe", "--probe-size": "32"},
+    "strict": {"--adaptation-gate": "labeled_probe", "--probe-size": "32",
+               "--gate-margin": "0.001"}
+  },
+  "parity_arms": [
+    {"tag": "parity_ton_zero_naive_512", "scenario": "ton_zero", "policy": "naive",
+     "transformer_policy": "own_transformer_per_model",
+     "policy_flags": {"--adaptation-gate": "none", "--candidate-size-per-class": "512"},
+     "published_dir": "results/smoke/symmetric_pipeline/sp_ton_zero_naive_own",
+     "note": "T1(b): the new nested 512 path must reproduce the stored v1.21.0-code smoke outputs bit-for-bit (seeds 4242-4243)"}
+  ],
+  "smoke_arms": ["sm_ps_zero_naive_512", "sm_ps_zero_naive_2000", "sm_ps_zero_strict_2000"],
+  "margins": {
+    "ba_equivalence_primary_pp": 0.5,
+    "ba_equivalence_sensitivities_pp": [0.2, 1.0],
+    "attack_recall_noninferiority_pp": 1.0,
+    "attack_recall_sensitivities_pp": [0.5, 2.0],
+    "fpr_noninferiority_pp": 0.5,
+    "fpr_sensitivities_pp": [0.25, 1.0],
+    "status": "reused frozen v1.21.0 margins (protocol section 4)"
+  },
+  "statistical_families": {
+    "F1_size_matched_damage": {"contrasts": 3, "contrast": "naive_2000 vs never", "regimes": "zero x3", "correction": "Holm FWER"},
+    "F2_candidate_size_effect": {"contrasts": 3, "contrast": "naive_2000 vs naive_512", "regimes": "zero x3", "correction": "Holm FWER"},
+    "F3_gate_value_size_2000": {"contrasts": 6, "contrast": "point_2000/strict_2000 vs naive_2000", "regimes": "zero x3", "correction": "Holm FWER"},
+    "F4_gate_size_interaction_secondary": {"contrasts": 6, "contrast": "(gate - naive)_2000 - (gate - naive)_512, gate in {point, strict}", "regimes": "zero x3", "correction": "Holm FWER"}
+  },
+  "output_paths": {
+    "confirmatory_outroot": "results/raw/size_matched_own_transformer",
+    "smoke_outroot": "results/smoke/size_matched_own_transformer",
+    "parity_outroot": "results/smoke/size_matched_own_transformer/parity",
+    "tables_outdir": "results/tables/size_matched_own_transformer_001"
+  },
+  "tag_pattern": "sm_{scenario}_{policy}_{512|2000}; never arms: sm_{scenario}_never"
+}

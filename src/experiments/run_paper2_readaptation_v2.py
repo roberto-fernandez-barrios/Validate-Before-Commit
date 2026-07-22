@@ -363,6 +363,38 @@ def calibrate_observed(detector, seen: list[tuple[np.ndarray, np.ndarray]], args
     return detector, float(np.quantile(scores, args.threshold_quantile))
 
 
+def nested_candidate_draw(pools, args, csize, sev_c, cand_rng):
+    """Size-matched control (registered protocol paper2_size_matched_own_transformer_001,
+    section 2.2): canonical nested candidate draw.
+
+    B_base is the UNCHANGED historical draw (bit-identical to the v1.21.0 own-transformer
+    arms at --adapt-size-per-class); the extension continues the SAME per-trigger RNG
+    stream through the SAME sampler (same pools, with replacement, balanced). The full
+    batch is concat(B_base, E_ext), so its first `base` samples per class ARE B_base --
+    same rows, labels, order and row hash; the extra samples are the only additional
+    information of the larger condition. Training uses the prefix selected by
+    --candidate-size-per-class. Both conditions execute this identical draw, so nesting
+    holds at every proposal. Only defined at severity 0 under full_replace (the entire
+    scope of the registered experiment)."""
+    base = int(args.adapt_size_per_class)
+    full = int(args.train_size_per_class)
+    if args.adapt_strategy != "full_replace":
+        raise SystemExit("--candidate-size-per-class requires --adapt-strategy full_replace")
+    if float(sev_c) != 0.0:
+        raise SystemExit("--candidate-size-per-class is only defined at severity 0 "
+                         f"(got severity {sev_c!r})")
+    if int(csize) not in (base, full):
+        raise SystemExit(f"--candidate-size-per-class must be {base} (adapt size) or "
+                         f"{full} (train size), got {csize}")
+    Xb, yb = sample_balanced_from_distribution(
+        pools, n_per_class=base, severity=0.0, rng=cand_rng)
+    Xe, ye = sample_balanced_from_distribution(
+        pools, n_per_class=full - base, severity=0.0, rng=cand_rng)
+    if int(csize) == base:
+        return Xb, yb
+    return np.vstack([Xb, Xe]), np.concatenate([yb, ye])
+
+
 def run_arm(method: str, env: Environment, args, seed: int):
     """One (detector, gate) arm over the shared pre-generated stream."""
     # symmetric-pipeline hooks: with the default (None) factories these lambdas call the exact
@@ -812,8 +844,12 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     sev_c = env.stream[max(0, t - cl)][2] if cl > 0 else sev
                     cand_sev_used = sev_c                  # final-q1 latency instrumentation
                     cand_newest_win = max(0, t - cl)
-                    Xa_raw, ya = sample_balanced_from_distribution(
-                        env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev_c, rng=cand_rng)
+                    if getattr(args, "candidate_size_per_class", None) is None:
+                        Xa_raw, ya = sample_balanced_from_distribution(
+                            env.train_pools, n_per_class=args.adapt_size_per_class, severity=sev_c, rng=cand_rng)
+                    else:
+                        Xa_raw, ya = nested_candidate_draw(
+                            env.train_pools, args, args.candidate_size_per_class, sev_c, cand_rng)
                     Xa = transform_X(Xa_raw, env.scaler, env.pca)
 
                 if gate == "labeled_probe_holdout":
@@ -1258,6 +1294,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--window-size", type=int, default=128)
     p.add_argument("--train-size-per-class", type=int, default=2000)
     p.add_argument("--adapt-size-per-class", type=int, default=512)
+    p.add_argument("--candidate-size-per-class", type=int, default=None,
+                   help="size-matched control (protocol paper2_size_matched_own_transformer_001): "
+                        "activates the nested canonical candidate draw (B512 + extension from the "
+                        "same per-trigger RNG stream) and trains on the first N per class. Only "
+                        "valid with --adapt-strategy full_replace at severity 0; None = historical "
+                        "behavior, byte-identical.")
     p.add_argument("--detector-ref-size-per-class", type=int, default=256)
     p.add_argument("--post-windows", type=int, default=100)
     p.add_argument("--ramp-windows", type=int, default=80)
