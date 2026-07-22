@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-21T23:07:18Z",
-  "source_commit_sha": "031f86f3eb094f9569f3e5f0b3c420954ef9a9bb",
+  "generated_at_utc": "2026-07-22T14:25:25Z",
+  "source_commit_sha": "588c89e90b823813043a559e7ebd307cf57baf2a",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.20.2",
+  "artifact_version": "1.21.0",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -301,8 +301,8 @@
   },
   "experiment_ledger": {
     "path": "results/final_experiment_ledger.csv",
-    "n_blocks": 10,
-    "n_arm_dirs": 499,
+    "n_blocks": 11,
+    "n_arm_dirs": 541,
     "missing_blocks": [],
     "n_orphan_dirs": 0,
     "orphan_dirs": []
@@ -364,8 +364,139 @@
     "primary_results_changed": false,
     "scientific_csvs_changed": false,
     "article_word_count_before": 19413,
-    "article_word_count_after": 17827,
-    "article_word_reduction_pct": 8.2
+    "article_word_count_after": 19835,
+    "article_word_reduction_pct": -2.2
+  },
+  "symmetric_replication_v1_21": {
+    "title": "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection",
+    "scenario": "A",
+    "decision_rules": "protocol Appendix A (frozen pre-run; BA classifies, recall/FPR restrict language)",
+    "transformer_policies": [
+      "frozen_initial_transformer",
+      "own_transformer_per_model"
+    ],
+    "detector_transform_policy": "frozen_initial (both policies)",
+    "protocol_commits": {
+      "protocol": "88385660edd8",
+      "appendix_a": "96576bb",
+      "rewrite_protocol": "3d1d9f6",
+      "sealing_protocol": "4658d66"
+    },
+    "config_sha256": "527947788e685e7f8cabf2989eb58aec8fbc8f948ea8e0d1f3640b52893d40e8",
+    "confirmatory_seeds": "3001-3030",
+    "expected_arms": 42,
+    "completed_arms": 42,
+    "frozen_mode_parity": "bit-identical vs published v1.20.2 arms (4 arms x 30 seeds; parity_report.json per arm)",
+    "full_drift_own_naive_vs_never": {
+      "ps_full": {
+        "effect_pp": 7.2122,
+        "ci95": [
+          4.8862,
+          9.5227
+        ]
+      },
+      "unsw_full": {
+        "effect_pp": 2.5461,
+        "ci95": [
+          2.3375,
+          2.7549
+        ]
+      },
+      "ton_full": {
+        "effect_pp": 1.0289,
+        "ci95": [
+          0.5544,
+          1.526
+        ]
+      }
+    },
+    "ownership_interaction_own_vs_frozen_naive": {
+      "ps_full": {
+        "effect_pp": 0.9026,
+        "ci95": [
+          0.2607,
+          1.7471
+        ]
+      },
+      "unsw_full": {
+        "effect_pp": 1.1518,
+        "ci95": [
+          0.9521,
+          1.3508
+        ]
+      },
+      "ton_full": {
+        "effect_pp": 5.9779,
+        "ci95": [
+          3.8229,
+          8.257
+        ]
+      }
+    },
+    "zero_drift_own_naive_vs_never": {
+      "ps_zero": {
+        "effect_pp": -1.7385,
+        "ci95": [
+          -2.35,
+          -0.9638
+        ]
+      },
+      "unsw_zero": {
+        "effect_pp": -0.6547,
+        "ci95": [
+          -0.7654,
+          -0.5484
+        ]
+      },
+      "ton_zero": {
+        "effect_pp": -0.381,
+        "ci95": [
+          -0.5286,
+          -0.2492
+        ]
+      }
+    },
+    "zero_drift_gate_contrasts_all_positive_holm_significant": true,
+    "statistical_families": {
+      "F1": 3,
+      "F2": 3,
+      "F3": 6,
+      "F4": 12,
+      "correction": "Holm within family",
+      "test": "deterministic centered paired bootstrap (100k)"
+    },
+    "margins": {
+      "ba_equivalence_pp": 0.5,
+      "ba_sensitivities": [
+        0.2,
+        1.0
+      ],
+      "recall_NI_pp": 1.0,
+      "fpr_NI_pp": 0.5
+    },
+    "security_guardrails": {
+      "unsw_zero_strict": {
+        "d_recall_pp": -0.9885,
+        "recall_onesided_lo95": -1.262,
+        "recall_NI_principal": false,
+        "recall_NI_lax": true,
+        "fpr_NI_principal": true,
+        "language": "trade-off only; no security-improvement language"
+      },
+      "all_other_winning_cells": "pass both preregistered NI margins"
+    },
+    "harmful_future_value_caveat": "descriptive fractions of future-negative committed proposals within the controlled trajectories; commits cluster within seeds; no independence assumed; no population prevalence or deployment probability inferred",
+    "qk_vbcsg_scope": "QK-ZZ, VBC-SG/budget frontier and mild drift remain evaluated under the historical frozen-transformer policy; no transfer to own-transformer pipelines is claimed",
+    "chronological_net_harm": "unobserved across 13 replays (unchanged; principal external-validity limit)",
+    "experiments_added": "symmetric-pipeline dynamic replication (42-arm registered matrix)",
+    "experiments_rerun_after_frozen_protocol": "exactly the registered 42-arm matrix, seeds 3001-3030",
+    "unregistered_experiments": "none",
+    "v1_20_2_raw_outputs": "unchanged (MANIFEST re-pin additive 164->173)",
+    "manuscript_pages": {
+      "main.pdf": 33,
+      "supplement.pdf": 27,
+      "main_ieee.pdf": 25
+    }
   },
   "operational_arm_scope": {
     "evaluation_stream_prevalence": "balanced",
@@ -387,8 +518,8 @@
     "end_to_end_pipeline_cost_modeled": false
   },
   "outputs": {
-    "tables_manifest_sha256": "dcf322681f5863d120ebda03a76abd0d17825f9f93fdd3aa96f491d0e4420c36",
-    "n_table_csvs": 164,
+    "tables_manifest_sha256": "8500c6e2e241a34bca1001f7f312e3e3ab663aab1d9bd537288469a7cd3cdc43",
+    "n_table_csvs": 173,
     "pdfs": [
       "manuscript/main.pdf",
       "manuscript/supplement.pdf",
@@ -397,7 +528,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 538,
-    "checks_total": 538
+    "checks_passed": 561,
+    "checks_total": 561
   }
 }
