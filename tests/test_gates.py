@@ -85,14 +85,19 @@ def test_lifetime_alpha_budget(vbc_trigger_log):
         assert per_prop.alpha_allocated.sum() <= a_life + 1e-9, f"seed {seed} overspent the budget"
 
 
-def test_effective_alpha_manifest(vbc_trigger_log):
+def test_effective_alpha_manifest(vbc_trigger_log, tmp_path):
     # (a) the run log records the effective alpha of every proposal
     assert {"proposal_idx", "alpha_allocated"} <= set(vbc_trigger_log.columns)
     assert vbc_trigger_log.alpha_allocated.between(0, 1).all()
-    # (b) the final manifest records the risk configuration of the final arms
+    # (b) the final manifest records the risk configuration of the final arms.
+    # Written to tmp_path: the test exercises the generator WITHOUT mutating the
+    # sealed results/final_manifest.json (see test_manifest_generator_does_not_mutate_sealed).
     from src.analysis import make_final_manifest
-    make_final_manifest.main()
-    m = json.loads((REPO / "results" / "final_manifest.json").read_text(encoding="utf-8"))
+    sealed = (REPO / "results" / "final_manifest.json").read_bytes()
+    make_final_manifest.main(out=tmp_path / "final_manifest.json")
+    assert (REPO / "results" / "final_manifest.json").read_bytes() == sealed, (
+        "running the manifest generator in tests must NOT touch the sealed manifest")
+    m = json.loads((tmp_path / "final_manifest.json").read_text(encoding="utf-8"))
     risk = m["risk_control"]
     assert risk["per_proposal_alpha_cs"] == 0.10
     assert risk["mcnemar_alpha"] == 0.05
@@ -105,3 +110,18 @@ def test_effective_alpha_manifest(vbc_trigger_log):
         assert key in m, f"final_manifest.json missing field {key}"
     # the legacy circular-reference field must not come back
     assert "commit_sha" not in m, "commit_sha renamed to source_commit_sha (no self-reference)"
+
+
+def test_manifest_generator_does_not_mutate_sealed(tmp_path):
+    """Symmetric-pipeline confirmatory phase fix: the sealed results/final_manifest.json is a
+    version-controlled artifact; exercising the generator (as this suite does) must leave the
+    working tree untouched -- git must report the file unmodified afterwards."""
+    import subprocess
+    from src.analysis import make_final_manifest
+    sealed = (REPO / "results" / "final_manifest.json").read_bytes()
+    make_final_manifest.main(out=tmp_path / "m.json")
+    assert (tmp_path / "m.json").exists()
+    assert (REPO / "results" / "final_manifest.json").read_bytes() == sealed
+    r = subprocess.run(["git", "status", "--porcelain", "results/final_manifest.json"],
+                       cwd=REPO, capture_output=True, text=True, timeout=60)
+    assert r.stdout.strip() == "", f"sealed manifest modified in working tree: {r.stdout}"

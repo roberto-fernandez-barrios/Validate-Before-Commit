@@ -220,7 +220,12 @@ def run_audit() -> dict:
                 checks_total=int(m.group(2)) if m else None)
 
 
-def main() -> None:
+def main(out: Path | None = None) -> None:
+    """Write the manifest to `out` (default: the sealed results/final_manifest.json).
+
+    `out` exists so tests can exercise this generator WITHOUT mutating the sealed,
+    version-controlled artifact (symmetric-pipeline confirmatory phase fix)."""
+    out = OUT if out is None else Path(out)
     tables = REPO / "results" / "tables"
     manifest_file = tables / "MANIFEST.sha256"
     payload = dict(
@@ -318,9 +323,9 @@ def main() -> None:
         ),
         audit=run_audit(),
     )
-    OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     cc = payload["collision_counts"]
-    print(f"wrote {OUT}")
+    print(f"wrote {out}")
     print(f"  source-commit {payload['source_commit_sha'][:12]}  version {payload['artifact_version']}  "
           f"audit {payload['audit']['checks_passed']}/{payload['audit']['checks_total']} "
           f"({payload['audit']['status']})")
