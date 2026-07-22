@@ -1,13 +1,11 @@
 \begin{table*}
 \centering
 \caption{\textbf{Security guardrails for the own-transformer gates (vs.\ own-naive).}
-Paired per-seed differences in attack recall and false-positive rate (percentage points);
-parentheses give the one-sided 95\% bootstrap bound the preregistered non-inferiority
-margins are tested against (recall lower bound vs.\ $-1.0$; FPR upper bound vs.\ $+0.5$).
-Every winning gate cell passes both margins except UNSW-Recon zero/strict, whose recall
-bound ($-1.26$) misses the principal margin (it passes the lax $-2.0$ sensitivity) while
-improving FPR by $2.0$ points --- a trade-off, not a security improvement. Guardrails
-restrict language only; BA determines the registered classification (protocol Appendix~A).}
+Paired per-seed $\Delta$recall and $\Delta$FPR (pp); parentheses: one-sided 95\% bound
+tested against the preregistered NI margins (recall $>-1.0$; FPR $<+0.5$). All winning cells
+pass both margins except UNSW-Recon zero/strict (recall bound $-1.26$; passes the lax $-2.0$)
+--- a trade-off, not a security improvement. Guardrails restrict language only; BA determines
+the registered classification (Appendix~A).}
 \label{tab:symmetric_security}
 \footnotesize
 \begin{tabular}{l l l l l l}

@@ -249,7 +249,7 @@ Adaptive intrusion detection, concept drift, safe model updating, label-efficien
 
 """
 
-TITLE = "Validate Before Commit: Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates in Network Intrusion Detection"
+TITLE = "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection"  # superseded v1 generator, kept title-consistent
 
 TAIL_ELS = r"""
 

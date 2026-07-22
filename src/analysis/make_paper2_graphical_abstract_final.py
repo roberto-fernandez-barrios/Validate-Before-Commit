@@ -52,8 +52,9 @@ box(77, 41, 21, 11, "DEFER\nbuy more labels later", "#ede7f6", "#4527a0", fs=FS_
 # crowded caveat strip; larger type, generous spacing) ----
 box(1.5, 7, 31.5, 27,
     "Controlled harm case\n\n"
-    "Healthy SVC-RBF incumbent,\n"
-    "frozen pipeline: swapping hurts",
+    "Healthy SVC-RBF incumbent:\n"
+    "swapping hurts, even with\n"
+    "self-contained pipelines",
     "#fff8e1", "#795548", fs=14)
 box(34, 7, 31.5, 27,
     "The trade-off\n\n"

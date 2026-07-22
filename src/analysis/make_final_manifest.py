@@ -56,6 +56,90 @@ def artifact_version() -> str:
     return m.group(1) if m else "unknown"
 
 
+def symmetric_replication_v1_21_summary() -> dict:
+    """v1.21.0: the preregistered symmetric-pipeline dynamic replication, read from the
+    frozen analysis outputs so the manifest can never drift from them."""
+    import json as _json
+    import pandas as pd
+    sp = REPO / "results" / "tables" / "symmetric_pipeline_dynamic_001"
+    con = pd.read_csv(sp / "paired_contrasts.csv")
+    sec = pd.read_csv(sp / "security_metrics.csv")
+    rc = pd.read_csv(sp / "run_completion.csv")
+    ci = _json.loads((sp / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+
+    def eff(name):
+        r = con[con.contrast == name].iloc[0]
+        return dict(effect_pp=float(r.effect_pp), ci95=[float(r.ci95_lo), float(r.ci95_hi)])
+
+    uzs = sec[(sec.scenario == "unsw_zero") & (sec.policy == "strict")
+              & (sec.transformer_policy == "own_transformer_per_model")].iloc[0]
+    cfg = (REPO / "configs" / "symmetric_pipeline_dynamic_v1.json").read_bytes()
+    pages = {}
+    try:
+        import pypdf
+        for p in ("main.pdf", "supplement.pdf", "main_ieee.pdf"):
+            pages[p] = len(pypdf.PdfReader(REPO / "manuscript" / p).pages)
+    except Exception:
+        pages = "pypdf unavailable"
+    return dict(
+        title=("Validate Before Commit: Candidate Governance for Drift-Triggered "
+               "Classifier Pipelines in Network Intrusion Detection"),
+        scenario=ci["scenario"],
+        decision_rules="protocol Appendix A (frozen pre-run; BA classifies, recall/FPR "
+                       "restrict language)",
+        transformer_policies=["frozen_initial_transformer", "own_transformer_per_model"],
+        detector_transform_policy="frozen_initial (both policies)",
+        protocol_commits=dict(protocol="88385660edd8", appendix_a="96576bb",
+                              rewrite_protocol="3d1d9f6", sealing_protocol="4658d66"),
+        config_sha256=hashlib.sha256(cfg).hexdigest(),
+        confirmatory_seeds="3001-3030",
+        expected_arms=42, completed_arms=int(rc.complete.sum()),
+        frozen_mode_parity="bit-identical vs published v1.20.2 arms (4 arms x 30 seeds; "
+                           "parity_report.json per arm)",
+        full_drift_own_naive_vs_never=dict(
+            ps_full=eff("ps_full: own-naive vs never"),
+            unsw_full=eff("unsw_full: own-naive vs never"),
+            ton_full=eff("ton_full: own-naive vs never")),
+        ownership_interaction_own_vs_frozen_naive=dict(
+            ps_full=eff("ps_full: own-naive vs frozen-naive"),
+            unsw_full=eff("unsw_full: own-naive vs frozen-naive"),
+            ton_full=eff("ton_full: own-naive vs frozen-naive")),
+        zero_drift_own_naive_vs_never=dict(
+            ps_zero=eff("ps_zero: own-naive vs never"),
+            unsw_zero=eff("unsw_zero: own-naive vs never"),
+            ton_zero=eff("ton_zero: own-naive vs never")),
+        zero_drift_gate_contrasts_all_positive_holm_significant=True,
+        statistical_families=dict(F1=3, F2=3, F3=6, F4=12, correction="Holm within family",
+                                  test="deterministic centered paired bootstrap (100k)"),
+        margins=dict(ba_equivalence_pp=0.5, ba_sensitivities=[0.2, 1.0],
+                     recall_NI_pp=1.0, fpr_NI_pp=0.5),
+        security_guardrails=dict(
+            unsw_zero_strict=dict(
+                d_recall_pp=float(uzs.d_recall_vs_naive_pp),
+                recall_onesided_lo95=float(uzs.recall_onesided_lo95),
+                recall_NI_principal=bool(uzs.recall_NI_principal),
+                recall_NI_lax=bool(uzs.recall_NI_lax),
+                fpr_NI_principal=bool(uzs.fpr_NI_principal),
+                language="trade-off only; no security-improvement language"),
+            all_other_winning_cells="pass both preregistered NI margins"),
+        harmful_future_value_caveat=(
+            "descriptive fractions of future-negative committed proposals within the "
+            "controlled trajectories; commits cluster within seeds; no independence "
+            "assumed; no population prevalence or deployment probability inferred"),
+        qk_vbcsg_scope=("QK-ZZ, VBC-SG/budget frontier and mild drift remain evaluated "
+                        "under the historical frozen-transformer policy; no transfer to "
+                        "own-transformer pipelines is claimed"),
+        chronological_net_harm="unobserved across 13 replays (unchanged; principal "
+                               "external-validity limit)",
+        experiments_added="symmetric-pipeline dynamic replication (42-arm registered matrix)",
+        experiments_rerun_after_frozen_protocol="exactly the registered 42-arm matrix, "
+                                                "seeds 3001-3030",
+        unregistered_experiments="none",
+        v1_20_2_raw_outputs="unchanged (MANIFEST re-pin additive 164->173)",
+        manuscript_pages=pages,
+    )
+
+
 def causal_matrix_counters() -> dict:
     """Sum the collision/label counters of the final-kbs causal-64 matrix arms."""
     rows = []
@@ -299,6 +383,8 @@ def main(out: Path | None = None) -> None:
         statistical_inference=statistical_inference_summary(),
         # v1.20.2: editorial compression + final claim-scope hardening (no science changed).
         editorial_v1_20_2=editorial_v1202_summary(),
+        # v1.21.0: the preregistered symmetric-pipeline dynamic replication (Scenario A).
+        symmetric_replication_v1_21=symmetric_replication_v1_21_summary(),
         # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
         # stated field by field so no claim can outrun what the simulation measures.
         operational_arm_scope=dict(

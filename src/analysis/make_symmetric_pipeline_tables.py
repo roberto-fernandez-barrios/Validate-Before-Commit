@@ -94,14 +94,12 @@ def main_table(df, con, mult):
     tex = f"""\\begin{{table}}
 \\centering
 \\caption{{\\textbf{{The symmetric-pipeline dynamic replication (registered; seeds 3001--3030).}}
-Each scenario is one shared raw stream per seed (hash-verified identical across all seven
-arms); \\emph{{frozen}} = the historical frozen-initial-transformer policy, \\emph{{own}} =
-self-contained pipelines in which each challenger fits its own scaler/PCA on its own raw
-candidate batch (bit-identical batches across policies) and a commit deploys the complete
-bundle. Balanced-accuracy points, paired within seed, 30 seeds, deterministic paired-bootstrap
-CI95. $\\dagger$: Holm-significant within its registered family (F1/F3/F4; own rows).
-Frozen-side contrasts are descriptive context (same machinery, uncorrected). Zero-drift
-scenarios use the registered random trigger ($p{{=}}0.05$) with no drift; the detector's
+Shared raw stream per seed (hash-verified across all seven arms); \\emph{{frozen}} = historical
+frozen-initial-transformer policy, \\emph{{own}} = self-contained pipelines (each challenger
+fits its own scaler/PCA on its own raw batch, bit-identical across policies; commits deploy
+the complete bundle). BA points, paired within seed, 30 seeds, deterministic paired-bootstrap
+CI95; $\\dagger$ = Holm-significant within its registered family (own rows); frozen rows are
+descriptive (uncorrected). Zero drift: random trigger $p{{=}}0.05$, no drift; the detector
 representation stays the initial transformer under both policies.}}
 \\label{{tab:symmetric_pipeline}}
 \\small
@@ -135,13 +133,11 @@ def security_table(sec):
     tex = f"""\\begin{{table}}
 \\centering
 \\caption{{\\textbf{{Security guardrails for the own-transformer gates (vs.\\ own-naive).}}
-Paired per-seed differences in attack recall and false-positive rate (percentage points);
-parentheses give the one-sided 95\\% bootstrap bound the preregistered non-inferiority
-margins are tested against (recall lower bound vs.\\ $-1.0$; FPR upper bound vs.\\ $+0.5$).
-Every winning gate cell passes both margins except UNSW-Recon zero/strict, whose recall
-bound ($-1.26$) misses the principal margin (it passes the lax $-2.0$ sensitivity) while
-improving FPR by $2.0$ points --- a trade-off, not a security improvement. Guardrails
-restrict language only; BA determines the registered classification (protocol Appendix~A).}}
+Paired per-seed $\\Delta$recall and $\\Delta$FPR (pp); parentheses: one-sided 95\\% bound
+tested against the preregistered NI margins (recall $>-1.0$; FPR $<+0.5$). All winning cells
+pass both margins except UNSW-Recon zero/strict (recall bound $-1.26$; passes the lax $-2.0$)
+--- a trade-off, not a security improvement. Guardrails restrict language only; BA determines
+the registered classification (Appendix~A).}}
 \\label{{tab:symmetric_security}}
 \\footnotesize
 \\begin{{tabular}}{{l l l l l l}}

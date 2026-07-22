@@ -35,6 +35,11 @@ def main() -> None:
     new_abs = re.search(r"\\begin\{abstract\}\n(.*?)\n\\end\{abstract\}", cas, re.S).group(1)
     head = re.sub(r"(\\begin\{abstract\}\n).*?(\n\\end\{abstract\})",
                   lambda m: m.group(1) + new_abs + m.group(2), head, flags=re.S)
+    # v1.21: sync the title from main.tex too -- the IEEE head kept its own \title and had
+    # silently retained the pre-rewrite title
+    new_title = re.search(r"\\title\[mode=title\]\{(.*?)\}\n", cas, re.S).group(1)
+    head = re.sub(r"\\title\{.*?\}\n", "\\\\title{" + new_title.replace("\\", "\\\\") + "}\n",
+                  head, count=1, flags=re.S)
 
     body = body.replace("\\input{tables/", "\\input{tables_ieee/")
     body = body.replace("\\begin{figure}", "\\begin{figure*}")

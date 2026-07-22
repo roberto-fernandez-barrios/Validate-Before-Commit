@@ -1,6 +1,6 @@
 # Validate Before Commit
 
-**Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates in Network Intrusion Detection**
+**Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection**
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -245,8 +245,8 @@ The paper is under review; cite it as below. To cite the **software artifact** i
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
-  title  = {Validate Before Commit: Label-Efficient Commit Decisions for
-            Drift-Triggered Classifier Updates in Network Intrusion Detection},
+  title  = {Validate Before Commit: Candidate Governance for
+            Drift-Triggered Classifier Pipelines in Network Intrusion Detection},
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},

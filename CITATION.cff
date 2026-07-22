@@ -20,13 +20,13 @@ authors:
     orcid: "https://orcid.org/0000-0003-3594-9534"
     affiliation: "Faculty of Engineering, University of Deusto"
 license: MIT
-version: "1.20.2"
+version: "1.21.0"
 date-released: "2026-07-21"
 doi: "10.5281/zenodo.21322256"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished
-  title: "Validate Before Commit: Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates in Network Intrusion Detection"
+  title: "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection"
   authors:
     - family-names: "Fernández-Barrios"
       given-names: "Roberto"

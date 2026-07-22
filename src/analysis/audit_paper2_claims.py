@@ -1274,6 +1274,79 @@ def main():
     check("v121sp SP9: 'scenario~a' named per protocol (main+ieee)", 2.0,
           float(sum(1 for _t in _mi.values() if "scenario~a" in _t or "scenario a" in _t)), 0.5)
 
+    # --- v1.21 sealing guards (title, scope phrasing, completeness, provenance) ---
+    import json as _json
+    _NEW_TITLE = ("validate before commit: candidate governance for drift-triggered "
+                  "classifier pipelines in network intrusion detection")
+    _OLD_TITLE = "label-efficient commit decisions for drift-triggered classifier updates"
+    _live = {n: t for n, t in _texts.items()
+             if n.endswith(("/main.tex", "/main_ieee.tex", "/supplement.tex",
+                            "README.md", "REPRODUCE.md", "highlights.md"))}
+    for _extra in ("CITATION.cff", ".zenodo.json"):
+        if os.path.exists(_extra):
+            _live[_extra] = _re.sub(r"\s+", " ",
+                                    open(_extra, encoding="utf-8").read().lower())
+    check("v121seal T1: definitive title on main+ieee+supp+README+CITATION", 5.0,
+          float(sum(1 for _n in ("manuscript/main.tex", "manuscript/main_ieee.tex",
+                                 "manuscript/supplement.tex", "README.md", "CITATION.cff")
+                    if _NEW_TITLE.split(": ")[1] in _live.get(_n, ""))), 0.5)
+    check("v121seal T2: old title absent from live surfaces", 0.0,
+          float(sum(1 for _t in _live.values() if _OLD_TITLE in _t)), 0.5)
+    # ("NOT the sole cause..." is the REQUIRED phrasing and is excluded by the lookbehind)
+    check("v121seal C1: no positive 'ownership explains all'/'sole cause' phrasing", 0.0,
+          float(_hits(r"ownership explains all|all (?:the )?harm is caused by preprocessing|"
+                      r"(?<!not the )sole cause of (?:the )?(?:full-drift )?harm")), 0.5)
+    check("v121seal C2: zero-drift gate claim carries the vs-naive scope", 2.0,
+          float(sum(1 for _n, _t in _live.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "improve over naive in all six zero-drift comparisons" in _t)), 0.5)
+    check("v121seal C2b: no unscoped 'recover the loss in all six' claim", 0.0,
+          float(_hits(r"recover(?:s|ing)? the (?:entire |full )?loss in all six")), 0.5)
+    _spm = "results/tables/symmetric_pipeline_dynamic_001"
+    if os.path.exists(f"{_spm}/paired_contrasts.csv"):
+        _C2 = pd.read_csv(f"{_spm}/paired_contrasts.csv")
+        _E2 = pd.read_csv(f"{_spm}/equivalence.csv")
+
+        def _eff2(name):
+            return float(_C2[_C2.contrast == name].effect_pp.iloc[0])
+
+        check("v121seal R1: full-drift own-naive vs never positive in all 3", 3.0,
+              float(sum(1 for s in ("ps_full", "unsw_full", "ton_full")
+                        if _eff2(f"{s}: own-naive vs never") > 0)), 0.5)
+        check("v121seal R2: zero-drift residual material in ps+unsw (<= -0.5)", 2.0,
+              float(sum(1 for s in ("ps_zero", "unsw_zero")
+                        if _eff2(f"{s}: own-naive vs never") <= -0.5)), 0.5)
+        _tz = _eff2("ton_zero: own-naive vs never")
+        _tz_eq = bool(_E2[(_E2.contrast == "ton_zero: own-naive vs never")
+                          & (_E2.margin_kind == "primary")].equivalent.iloc[0])
+        check("v121seal R3: ton_zero negative sub-material and NOT equivalent", 1.0,
+              float(-0.5 < _tz < 0.0 and not _tz_eq), 0.5)
+        _S2 = pd.read_csv(f"{_spm}/security_metrics.csv")
+        _uzs = _S2[(_S2.scenario == "unsw_zero") & (_S2.policy == "strict")
+                   & (_S2.transformer_policy == "own_transformer_per_model")].iloc[0]
+        check("v121seal R4: unsw_zero strict recall-NI failure recorded", 1.0,
+              float((not _uzs.recall_NI_principal) and _uzs.fpr_NI_principal), 0.5)
+        _ci_p = f"{_spm}/CLAIM_INTERPRETATION.json"
+        _ci = _json.loads(open(_ci_p, encoding="utf-8").read())
+        check("v121seal R5: Scenario A per frozen rules (no reinterpretation)", 1.0,
+              float(_ci.get("scenario") == "A"
+                    and _ci.get("rules_version") == "protocol Appendix A"), 0.5)
+        _RC = pd.read_csv(f"{_spm}/run_completion.csv")
+        check("v121seal R6: 42/42 confirmatory arms complete", 42.0,
+              float(int(_RC.complete.sum())), 0.5)
+        check("v121seal R7: every arm on seeds 3001-3030 (30 seeds)", 42.0,
+              float(int(((_RC.seeds == "3001-3030") & (_RC.n_seeds == 30)).sum())), 0.5)
+        import hashlib as _hl
+        _cfg_sha = _hl.sha256(open("configs/symmetric_pipeline_dynamic_v1.json",
+                                   "rb").read()).hexdigest()
+        check("v121seal R8: frozen config SHA-256 unchanged", 1.0,
+              float(_cfg_sha == "527947788e685e7f8cabf2989eb58aec"
+                               "8fbc8f948ea8e0d1f3640b52893d40e8"), 0.5)
+        check("v121seal R9: protocol commits recorded in run_completion", 42.0,
+              float(int((_RC.protocol_commit == "88385660edd8").sum())), 0.5)
+    else:
+        check("v121seal: symmetric analysis outputs missing", 1.0, None, 0.5)
+
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
     print(f"\n{'='*70}\nAUDIT: {npass}/{len(results)} checks pass\n{'='*70}")
