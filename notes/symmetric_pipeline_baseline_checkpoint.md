@@ -43,8 +43,19 @@ Python 3.11.15).
 
 | file | sha256 |
 |---|---|
-| `results/final_manifest.json` | `5f0fb6bf5c9edea8988dc79825a083762e23318cc186f7ed7b9394f3d13642c0` |
+| `results/final_manifest.json` (sealed checkout state) | `11474601eb7aef3b4494d7e6dd97609380625778f338a71e1d75e004052a5b12` |
 | `results/tables/MANIFEST.sha256` | `dcf322681f5863d120ebda03a76abd0d17825f9f93fdd3aa96f491d0e4420c36` |
+
+**Correction (2026-07-22, end of phase).** The hash originally recorded here for
+`final_manifest.json` (`5f0fb6bf...`) was taken AFTER the baseline gate run, and the
+sealed test suite itself has a pre-existing side effect: `tests/test_gates.py` calls
+`make_final_manifest.main()`, which regenerates `results/final_manifest.json` in
+place, restamping ONLY the two provenance lines `generated_at_utc` and
+`source_commit_sha` (all scientific content unchanged — verified by `git diff`,
+2-line diff). The value now recorded above (`11474601...`) is the sealed v1.20.2
+checkout state, restored with `git restore` after the final gate run. This side
+effect predates this phase and exists at tag v1.20.2; it is flagged as a blocker-
+review item in the final phase checkpoint.
 
 `results/tables/MANIFEST.sha256` itself pins the SHA-256 of every one of the
 164 scientific CSVs; `verify_results_manifest` PASSED against it at baseline,

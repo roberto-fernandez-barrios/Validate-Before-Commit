@@ -1,0 +1,125 @@
+{
+  "config_version": "1.0.0",
+  "description": "Registered symmetric-pipeline dynamic replication matrix (notes/paper2_symmetric_pipeline_dynamic_protocol_001.md). 42 confirmatory arms = 6 scenarios x (1 never-adapt + 3 policies x 2 transformer policies), confirmatory seeds 3001-3030 (RESERVED, firewalled). Fixed flags are byte-for-byte the v1.20.2 frontier values (configs/q1_budget_frontier_v2.json). This phase executes NO confirmatory seed: only --parity (historical seeds 501-530 vs published q1fc outputs), --smoke (seeds 4242-4243, SMOKE_ONLY) and --dry-run/--list-arms are authorized.",
+  "source_baseline": {
+    "tag": "v1.20.2",
+    "sealing_commit": "3b00cc406ed22e7e8fbbdd0f4f517f2d0353888c",
+    "source_commit": "031f86f3eb094f9569f3e5f0b3c420954ef9a9bb",
+    "version_doi": "10.5281/zenodo.21481392"
+  },
+  "protocol": {
+    "file": "notes/paper2_symmetric_pipeline_dynamic_protocol_001.md",
+    "protocol_commit": "88385660edd849f9ea54b2c6e8462d59119d2741"
+  },
+  "runner_module": "src.experiments.run_symmetric_pipeline_replication",
+  "science_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "confirmatory_seeds": {"start": 3001, "end": 3030, "status": "RESERVED - not executed in this phase"},
+  "smoke_seeds": [4242, 4243],
+  "parity_seeds": {"start": 501, "end": 530, "note": "historical frontier seeds, parity verification ONLY, never new evidence"},
+  "expected_arms": 42,
+  "transformer_policies": ["frozen_initial_transformer", "own_transformer_per_model"],
+  "detector_transform_policy": "frozen_initial",
+  "fixed_flags": {
+    "--label-col": "Label",
+    "--dim": "8",
+    "--window-size": "128",
+    "--train-size-per-class": "2000",
+    "--adapt-size-per-class": "512",
+    "--detector-ref-size-per-class": "256",
+    "--post-windows": "100",
+    "--ramp-windows": "80",
+    "--max-severity": "1.0",
+    "--calibration-windows": "30",
+    "--threshold-quantile": "0.95",
+    "--consecutive-k": "3",
+    "--cooldown-windows": "10",
+    "--downstream-model": "svc_rbf",
+    "--ks-reduction": "max",
+    "--adapt-strategy": "full_replace",
+    "--trigger-mode": "detector",
+    "--recal-source": "pools",
+    "--probe-source": "pools",
+    "--stream-prevalence": "0.5",
+    "--gate-margin": "0.0",
+    "--probe-latency": "0",
+    "--probe-flip-frac": "0.0",
+    "--candidate-latency": "0",
+    "--min-calib-windows": "0",
+    "--no-probe-policy": "commit",
+    "--lifetime-max-proposals": "10",
+    "--adaptation-policy": "consecutive"
+  },
+  "data": {
+    "portscan": {
+      "ref": "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
+      "cur": "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    },
+    "unsw_recon": {
+      "ref": "data/processed/unsw_nb15/unsw_ref_no_reconnaissance_binary.csv",
+      "cur": "data/processed/unsw_nb15/unsw_cur_reconnaissance_binary.csv"
+    },
+    "ton_scanning": {
+      "ref": "data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv",
+      "cur": "data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv"
+    }
+  },
+  "scenarios": {
+    "ps_full": {"data": "portscan", "override_flags": {}},
+    "unsw_full": {"data": "unsw_recon", "override_flags": {}},
+    "ton_full": {"data": "ton_scanning", "override_flags": {}},
+    "ps_zero": {"data": "portscan",
+                "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                   "--max-severity": "0"}},
+    "unsw_zero": {"data": "unsw_recon",
+                  "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                     "--max-severity": "0"}},
+    "ton_zero": {"data": "ton_scanning",
+                 "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                    "--max-severity": "0"}}
+  },
+  "policies": {
+    "never": {"note": "no-adaptation baseline only; transformer-policy independent, run once per scenario/seed"},
+    "naive": {"--adaptation-gate": "none"},
+    "point": {"--adaptation-gate": "labeled_probe", "--probe-size": "32"},
+    "strict": {"--adaptation-gate": "labeled_probe", "--probe-size": "32",
+               "--gate-margin": "0.001"}
+  },
+  "parity_arms": [
+    {"tag": "parity_ps_full_point", "scenario": "ps_full", "policy": "point",
+     "published_dir": "results/raw/q1fc_ps_full_point"},
+    {"tag": "parity_ton_full_naive", "scenario": "ton_full", "policy": "naive",
+     "published_dir": "results/raw/q1fc_ton_full_none"},
+    {"tag": "parity_ton_zero_point", "scenario": "ton_zero", "policy": "point",
+     "published_dir": "results/raw/q1fc_ton_zero_point"},
+    {"tag": "parity_ps_full_vbccoh_c64_bonf", "scenario": "ps_full", "policy": "_vbc_deferred",
+     "published_dir": "results/raw/q1fc_ps_full_vbccoh_c64_bonf",
+     "note": "deferred-commit case through the shared runner",
+     "policy_flags": {"--adaptation-gate": "vbc_sg", "--vbc-defer-mode": "cohort",
+                      "--seq-block": "16", "--defer-windows": "5", "--seqav-alpha": "0.10",
+                      "--lifetime-alpha": "0.10", "--probe-size": "64",
+                      "--alpha-spending": "bonferroni"}}
+  ],
+  "smoke_arms": ["sp_ps_full_point_own", "sp_ton_zero_naive_own"],
+  "margins_pending_human_approval": {
+    "ba_equivalence_primary_pp": 0.5,
+    "ba_equivalence_sensitivities_pp": [0.2, 1.0],
+    "attack_recall_noninferiority_pp": 1.0,
+    "attack_recall_sensitivities_pp": [0.5, 2.0],
+    "fpr_noninferiority_pp": 0.5,
+    "fpr_sensitivities_pp": [0.2, 1.0],
+    "status": "proposed in protocol 1.7; REQUIRE explicit human approval before any confirmatory seed"
+  },
+  "statistical_families": {
+    "F1_harm_own_full": {"contrasts": 3, "contrast": "own-naive vs never", "regimes": "full x3", "correction": "Holm FWER"},
+    "F2_transformer_interaction_full": {"contrasts": 3, "contrast": "own-naive vs frozen-naive", "regimes": "full x3", "correction": "Holm FWER"},
+    "F3_gate_value_own_full": {"contrasts": 6, "contrast": "own-point/own-strict vs own-naive", "regimes": "full x3", "correction": "Holm FWER"},
+    "F4_zero_drift_secondary": {"contrasts": 12, "contrast": "own-naive vs never; own-point vs own-naive; own-strict vs own-naive; own-naive vs frozen-naive", "regimes": "zero x3", "correction": "Holm FWER"}
+  },
+  "output_paths": {
+    "confirmatory_outroot": "results/raw/symmetric_pipeline",
+    "smoke_outroot": "results/smoke/symmetric_pipeline",
+    "parity_outroot": "results/smoke/symmetric_pipeline/parity"
+  },
+  "tag_pattern": "sp_{scenario}_{policy}_{froz|own}; never arms: sp_{scenario}_never"
+}
