@@ -31,7 +31,7 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   drift-detector scores do not measure (at individual triggered decisions a hierarchical model clustered
   on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
   MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
-- **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each.
+- **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each. (Mild-drift evidence is from the historical frozen-transformer configuration; the healthy-incumbent condition itself is re-confirmed under self-contained pipelines by the zero-drift cells of the symmetric replication below.)
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
 - **Candidate governance, not just drift detection:** a **validate-before-commit gate** — the loop retrains its
   candidate as usual, and the gate decides **deployment**: commit only if the candidate beats the incumbent on a
@@ -42,6 +42,21 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
+- **The symmetric-pipeline dynamic replication (the central v1.21 result — preregistered, fresh seeds 3001–3030,
+  margins and A/B/C decision rules frozen before execution):** rebuilding incumbent and challengers as
+  **self-contained pipelines** — each fitting its own scaler/PCA on its own raw candidate batch, on hash-verified
+  identical raw streams — **removes the mean full-drift harm entirely** (always-deploy turns beneficial in all
+  three benchmarks: +7.21 / +2.55 / +1.03 BA points; the ownership interaction reaches +5.98 on ToN-IoT). The
+  original ToN-IoT full-drift harm was, in its mean, an artifact of the frozen-initial-transformer update policy —
+  stated plainly. **But zero-drift promotion harm persists** under fully self-contained pipelines (PortScan −1.74,
+  UNSW −0.65, both material and Holm-significant; ToN −0.38 resolved but sub-material), most individual proposals
+  there carry negative future value (seed-clustered descriptive fractions), and **point/strict validation recovers
+  it** (all six zero-drift gate contrasts positive and Holm-significant; strict cuts commit exposure by an order of
+  magnitude) — within preregistered recall/FPR guardrails in every winning cell except UNSW-zero/strict, reported
+  as a recall↔FPR trade-off. The locus of average harm shifts from full-drift replacement under frozen
+  preprocessing to healthy-incumbent replacement under self-contained pipelines: correct construction and
+  validate-before-commit are complementary safeguards, not substitutes. (QK-ZZ, VBC-SG and the mild-drift matrix
+  remain evaluated under the historical frozen policy.)
 - **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
   vacuous: at a configured probe cap of 512 (about 578 adjudicated probe labels per proposal after deferrals) a
@@ -49,7 +64,8 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   under an approximate pooled analysis (81% for the fully stratified VBC-SG variant carrying the formal per-class
   guarantee) while committing **nothing at all** under zero drift (the inspected-flow acquisition cost of these balanced probes under operational class imbalance is not measured; the Cohort continuation is a proposal-target resampling simulation, Cohort-sim, not a retained production cohort). The mechanism behind the harm is named too — a role-randomized A/B
   control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**
-  (per-model scaling removes it; equivalence-tested on 100 fresh seeds).
+  (per-model scaling removes the static gap, equivalence-tested on 100 fresh seeds; the symmetric-pipeline dynamic
+  replication then confirms at trajectory scale that ownership amplifies but does not explain all of the risk).
 - **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the
   paper's principal limit on external validity, stated as such. Where the incumbent collapses, always-deploy is
   excellent and the gate pays a real premium. On the healthy-incumbent timelines the picture is favorable but not
@@ -187,6 +203,13 @@ python -m src.analysis.aggregate_paper2_v2_replication  # registered replication
 python -m src.analysis.aggregate_paper2_amendment_004   # robustness suite, cost table, temporal streams
 python -m src.analysis.paper2_decision_quality_004      # decision metrics + hierarchical model
 python -m src.analysis.validate_monitors_vs_river       # DDM/ADWIN vs reference implementations
+
+# symmetric-pipeline dynamic replication (v1.21; protocol + Appendix A frozen pre-run):
+python -m src.experiments.run_symmetric_pipeline_replication --list-arms   # 42 registered arms
+python -m src.experiments.run_symmetric_pipeline_replication --parity      # frozen-mode bit-parity vs published v1.20.2 arms
+python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized  # seeds 3001-3030
+python -m src.analysis.make_symmetric_pipeline_dynamic_001  # families F1-F4, guardrails, Scenario A/B/C rules
+python -m src.analysis.make_symmetric_pipeline_tables       # manuscript + supplement tables
 ```
 
 A `requirements-lock.txt` (pip freeze of the environment that produced the results) accompanies

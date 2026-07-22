@@ -297,17 +297,26 @@ def main() -> None:
                               note="secondary descriptive (protocol 1.4); not a primary estimand"))
     pd.DataFrame(irows).to_csv(OUT / "transformer_interaction.csv", index=False)
 
-    # ---- run_completion.csv
+    # ---- run_completion.csv (per-arm provenance ledger)
+    import hashlib
+    cfg = json.loads((REPO / "configs" / "symmetric_pipeline_dynamic_v1.json")
+                     .read_text(encoding="utf-8"))
+    protocol_commit = cfg["protocol"]["protocol_commit"][:12]
     rrows = []
     for d in sorted(RAW.iterdir()):
         if not d.is_dir():
             continue
         cm = json.loads((d / "completion_marker.json").read_text(encoding="utf-8"))
         rc = json.loads((d / "run_config.json").read_text(encoding="utf-8"))
+        sh = hashlib.sha256((d / "raw_stream_hash.txt").read_bytes()).hexdigest()
         rrows.append(dict(arm=d.name, complete=cm["complete"], duration_s=cm["duration_s"],
                           seeds=f"{min(rc['seeds'])}-{max(rc['seeds'])}",
                           n_seeds=len(rc["seeds"]),
-                          source_commit=rc["source_commit_sha"][:12], mode=rc["mode"]))
+                          source_commit=rc["source_commit_sha"][:12], mode=rc["mode"],
+                          transformer_policy=rc["transformer_policy"],
+                          detector_transform_policy=rc["detector_transform_policy"],
+                          protocol_commit=protocol_commit,
+                          raw_stream_hashes_sha256=sh))
     comp = pd.DataFrame(rrows)
     comp.to_csv(OUT / "run_completion.csv", index=False)
     assert len(comp) == 42 and comp.complete.all(), "42/42 completeness violated"

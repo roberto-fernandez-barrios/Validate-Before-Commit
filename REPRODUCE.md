@@ -157,6 +157,35 @@ exact stratified baseline (`labeled_probe_exact_strat`), `--candidate-latency` (
 unified window-64 causal matrix (`paper2_fk_*_c64_*`), the operational-prevalence sweep
 (`paper2_fk_*_e2e*`), and the 4-condition disjoint role-randomized symmetric A/B.
 
+**Symmetric-pipeline dynamic replication (v1.21 — the central new evidence block).**
+Registered protocol `notes/paper2_symmetric_pipeline_dynamic_protocol_001.md` (frozen commit
+`8838566`; margins + machine-evaluable A/B/C decision rules in Appendix A, commit `96576bb`);
+config `configs/symmetric_pipeline_dynamic_v1.json`. Incumbent and challengers are
+self-contained `ModelPipeline`s over a shared raw stream (`src/experiments/symmetric_pipeline.py`);
+the drift monitor keeps the initial-transformer representation under both policies
+(`DetectorPipeline`). 42 arms = 6 scenarios (PortScan/UNSW-Recon/ToN-IoT × full/zero drift)
+× (never + {naive, point, strict} × {frozen_initial_transformer, own_transformer_per_model}),
+KS-max, confirmatory seeds 3001–3030 (firewalled: the driver refuses them without
+`--confirmatory-authorized`, and always in smoke/parity modes):
+
+```bash
+python -m src.experiments.run_symmetric_pipeline_replication --list-arms
+python -m src.experiments.run_symmetric_pipeline_replication --parity           # frozen mode is
+#   bit-identical to the published v1.20.2 frontier arms (seeds 501-530, byte-level reports)
+python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized
+python -m src.analysis.make_symmetric_pipeline_dynamic_001   # F1-F4 (Holm), equivalence (CI90),
+#   recall/FPR NI guardrails, harmful-commit accounting, Scenario A/B/C rules applied literally
+python -m src.analysis.make_symmetric_pipeline_tables        # tab:symmetric_pipeline etc.
+```
+
+Outputs: `results/raw/symmetric_pipeline/sp_*` (per-arm run_config/command/environment/
+raw_stream_hash/completion marker) and `results/tables/symmetric_pipeline_dynamic_001/`
+(by_seed, paired_contrasts, multiplicity, equivalence, security_metrics,
+harmful_commit_summary, transformer_interaction, run_completion, CLAIM_INTERPRETATION.json —
+machine verdict: **Scenario A**). Invariants (frozen parity, batch/probe identity, leakage,
+role symmetry, temporal semantics, determinism, provenance, seed firewall):
+`tests/test_symmetric_pipeline.py`.
+
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
 
@@ -242,6 +271,8 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Calibrated soft ensemble: strongest label-free rule, harm-avoiding everywhere, beats gate in marginal regime, cannot decline updates | `paper2_v6_*_enscal_none/`, `paper2_amendment_004/robustness.csv` |
 | Chronological streams (corrected runner): deep-benefit recoveries on all CICIDS days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday or external UNSW | `paper2_amendment_004/temporal.csv`, temporal-streams table (§5.3), Supp §S2.6 |
 | Causal-64 matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
+| Symmetric-pipeline replication (Scenario A): mean full-drift harm does not persist under self-contained pipelines (+7.21/+2.55/+1.03); ownership interaction up to +5.98; zero-drift harm persists (−1.74/−0.65 material, −0.38 resolved) and gates recover it (6/6 Holm-sig.); unsw_zero strict = recall↔FPR trade-off | `symmetric_pipeline_dynamic_001/` (CLAIM_INTERPRETATION.json), tab:symmetric_pipeline, Supp §S7 |
+| Frozen-mode parity: the new self-contained harness reproduces published v1.20.2 arms bit-for-bit (4 arms × 30 seeds; deferred arm 5/5 files byte-identical) | `results/smoke/symmetric_pipeline/parity/*/parity_report.json` |
 | Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Supp §S1.3/S3; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Supp §S1.4 |

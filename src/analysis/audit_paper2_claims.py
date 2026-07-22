@@ -1073,7 +1073,9 @@ def main():
     # v2B: multiplicity naming and family structure.
     check("v121 B: no 'exact paired bootstrap' / 'exact bootstrap p'", 0.0,
           float(_hits(r"exact paired bootstrap") + _hits(r"exact bootstrap \$?p")), 0.5)
-    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp)", 3.0,
+    # v1.21: the symmetric-pipeline supplement contrast table also names the test in its
+    # caption (generated into tables/ and tables_ieee/), so the document count is 5.
+    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+2 tables)", 5.0,
           float(sum(1 for _t in _texts.values()
                     if "centered paired bootstrap" in _t)), 0.5)
     if os.path.exists(f"{Q1}/multiplicity.csv"):
@@ -1205,6 +1207,72 @@ def main():
                ("approximate" in _w or "pooled" in _w):
                 _bad93 += 1
     check("no-overclaim: 93% pooled marked 'approximate/pooled' (B1)", 0.0, float(_bad93), 0.5)
+
+    # --- v1.21 Scenario-A symmetric-pipeline guards (rewrite protocol, forbidden claims) ---
+    _mi = {n: t for n, t in _texts.items() if n.endswith(("/main.tex", "/main_ieee.tex"))}
+    # SP1: the full-drift non-persistence statement must be present (main+ieee) -- no text
+    # may quote the frozen-policy full-drift harm as if it survived own-transformer pipelines
+    check("v121sp SP1: 'mean full-drift harm does not persist' present (main+ieee)", 2.0,
+          float(sum(1 for _t in _mi.values()
+                    if "full-drift harm does not persist" in _t)), 0.5)
+    # SP2: the zero-drift residual harm must be stated (no omission of the residual risk)
+    check("v121sp SP2: zero-drift material residual harm stated (main+ieee)", 2.0,
+          float(sum(1 for _t in _mi.values()
+                    if "remains materially harmful" in _t or
+                       "zero-drift promotion harm persists" in _t)), 0.5)
+    # SP3: own-transformer must never be claimed to eliminate all risk (negated uses --
+    # "does not eliminate promotion risk" -- are the REQUIRED phrasing and are excluded)
+    check("v121sp SP3: no positive 'eliminates harmful/promotion risk' claim", 0.0,
+          float(_hits(r"(?<!not )eliminat\w+ (?:all )?(?:the )?(?:harmful|promotion risk)")),
+          0.5)
+    # SP4: no positive 'security improvement' language (the unsw_zero strict guardrail);
+    # explicit disclaimers ("not a security improvement", "not described as a security
+    # improvement") are the required phrasing and are excluded
+    check("v121sp SP4: no positive 'security improvement' language", 0.0,
+          float(_hits(r"(?<!not a )(?<!d as a )security improvement")), 0.5)
+    # SP5: QK/VBC-SG/mild scope: frozen-policy scoping sentence present (main+ieee)
+    check("v121sp SP5: frozen-policy scope for QK/VBC-SG present (main+ieee)", 2.0,
+          float(sum(1 for _t in _mi.values()
+                    if "under the historical frozen" in _t)), 0.5)
+    # SP6: harmful commits must be marked as clustered/non-independent (main+ieee+supp)
+    check("v121sp SP6: harmful commits marked non-independent (main+ieee+supp)", 3.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex", "/supplement.tex"))
+                    and ("not independent trials" in _t or "no independence is assumed" in _t))),
+          0.5)
+    # SP7: numeric consistency -- headline effects in the text must equal the frozen CSV
+    _spc = "results/tables/symmetric_pipeline_dynamic_001/paired_contrasts.csv"
+    if os.path.exists(_spc):
+        _C = pd.read_csv(_spc)
+
+        def _eff(name):
+            return float(_C[_C.contrast == name].effect_pp.iloc[0])
+
+        _expect = [("ps_full: own-naive vs never", "+7.21"),
+                   ("unsw_full: own-naive vs never", "+2.55"),
+                   ("ton_full: own-naive vs never", "+1.03"),
+                   ("ton_full: own-naive vs frozen-naive", "+5.98"),
+                   ("ps_zero: own-naive vs never", "-1.74"),
+                   ("unsw_zero: own-naive vs never", "-0.65"),
+                   ("ps_zero: own-strict vs own-naive", "+1.68")]
+        _bad = 0
+        for _name, _s in _expect:
+            if f"{_eff(_name):+.2f}" != _s:
+                _bad += 1          # CSV moved away from the quoted value
+            elif not any(_s.replace("-", "$-") in _t.replace("$-$", "$-") or _s in _t
+                         for _t in _mi.values()):
+                _bad += 1          # value absent from the manuscript
+        check("v121sp SP7: headline symmetric effects match frozen CSV (7 cells)", 0.0,
+              float(_bad), 0.5)
+        check("v121sp SP8: F4 zero-drift gate contrasts all positive in CSV", 6.0,
+              float(sum(1 for _sc in ("ps_zero", "unsw_zero", "ton_zero")
+                        for _g in ("point", "strict")
+                        if _eff(f"{_sc}: own-{_g} vs own-naive") > 0)), 0.5)
+    else:
+        check("v121sp SP7: symmetric paired_contrasts.csv missing", 1.0, None, 0.5)
+    # SP9: the scenario name must follow the protocol's A/B/C vocabulary
+    check("v121sp SP9: 'scenario~a' named per protocol (main+ieee)", 2.0,
+          float(sum(1 for _t in _mi.values() if "scenario~a" in _t or "scenario a" in _t)), 0.5)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

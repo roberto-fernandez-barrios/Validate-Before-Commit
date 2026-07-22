@@ -24,6 +24,9 @@ FINAL_BODY_TABLES = {
     # chronological matrix respectively)
     "table_budget_frontier", "table_ab_equivalence",
     "table_chronological_q1", "table_operational_e2e",
+    # v1.21 Scenario-A rewrite: the symmetric-pipeline replication is the central new
+    # result (main matrix + security guardrail panel in the body; full matrices in S7)
+    "table_symmetric_pipeline", "table_symmetric_security",
 }
 V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",
@@ -31,6 +34,9 @@ V1_SUPPLEMENT_TABLES = {
     "table7_mechanism_law_robustness", "table_temporal_streams",
     # final-q1: moved out of the body to hold it at 27 pages; the text keeps the summary
     "table_label_cost",
+    # v1.21: full symmetric-pipeline matrices (S7)
+    "table_symmetric_supp_contrasts", "table_symmetric_supp_harm",
+    "table_symmetric_supp_interaction",
 }
 
 

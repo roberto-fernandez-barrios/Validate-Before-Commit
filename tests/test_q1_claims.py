@@ -15,12 +15,14 @@ SUPP = (REPO / "manuscript" / "supplement.tex")
 
 def test_evidence_tier_labels():
     text = MAIN.read_text(encoding="utf-8")
-    assert "Five tiers of evidence" in text
-    for marker in ("Registered confirmatory core", "Registered follow-ups",
+    # v1.21: the symmetric-pipeline replication joins the tier list as tier (i')
+    assert "Six tiers of evidence" in text
+    for marker in ("Registered confirmatory core", "Registered symmetric-pipeline replication",
+                   "Registered follow-ups",
                    "Feasibility, of two kinds", "External boundary", "Exploratory"):
         assert marker in text, f"evidence tier missing: {marker}"
-    # the confirmatory replication must be labeled internal; "external replication" may only
-    # appear negated ("not an external replication")
+    # the confirmatory replications must be labeled internal; "external replication" may only
+    # appear negated ("not an external replication"/"not external validations")
     assert re.search(r"\\emph\{internal\} replication", text)
     lowered = text.lower().replace("not an external replication", "")
     assert "external replication" not in lowered

@@ -61,6 +61,14 @@ def compute_orphans() -> list:
 
 # block_id -> (evidence tier, glob, script, seeds, protocol note, manuscript target)
 BLOCKS = [
+    ("symmetric_pipeline_dynamic", "registered confirmatory replication",
+     "symmetric_pipeline/sp_*",
+     "src.experiments.run_symmetric_pipeline_replication", "3001-3030",
+     "notes/paper2_symmetric_pipeline_dynamic_protocol_001.md (protocol 8838566 + "
+     "Appendix A 96576bb; per-arm source commit, transformer policy, raw-stream hash and "
+     "completion in results/tables/symmetric_pipeline_dynamic_001/run_completion.csv; "
+     "scaler/PCA/effective-gamma provenance in pipeline metadata, validated by "
+     "tests/test_symmetric_pipeline.py)", "tab:symmetric_pipeline"),
     ("confirmatory_v2", "registered confirmatory core", "paper2_v2_*",
      "src.experiments.run_paper2_readaptation_v2", "104-133",
      "notes/paper2_harness_v2_registered_replication_protocol_001.md", "tab:v2_confirmatory"),
