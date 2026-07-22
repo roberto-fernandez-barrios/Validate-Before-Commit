@@ -393,6 +393,68 @@ def test_T11_security_metrics(own_naive):
         assert m.loc[t].fpr == fp / max(1, fp + tn)
 
 
+# ----------------------------------------- provenance (confirmatory-phase requirement)
+
+PROVENANCE_KEYS = (
+    "transformer_policy", "training_row_hash",
+    "scaler_hash", "scaler_mean_hash", "scaler_scale_hash",
+    "pca_hash", "pca_components_hash", "pca_explained_variance_hash", "pca_dim",
+    "classifier_params", "svc_configured_gamma", "svc_effective_gamma",
+    "creation_window", "deployed_version",
+)
+
+
+def test_provenance_metadata_complete(froz_point, own_point):
+    """Every pipeline (initial incumbent and every candidate, both policies) records the full
+    preprocessing provenance so no gamma/PCA variation can hide inside 'own transformer'."""
+    for run in (froz_point, own_point):
+        for p in [run["env"].initial_model] + run["rec"]:
+            for k in PROVENANCE_KEYS:
+                assert k in p.metadata, f"missing provenance key {k}"
+            assert p.metadata["pca_dim"] == 4
+            assert p.metadata["classifier_params"], "classifier params not recorded"
+
+
+def test_provenance_effective_gamma_reproducible():
+    """For SVC-RBF pipelines the recorded fitted effective gamma equals sklearn's
+    gamma='scale' formula on the internally transformed training batch, and is
+    bit-reproducible across identical builds."""
+    rng = np.random.default_rng(99)
+    X = np.vstack([rng.normal(0, 1, (48, 5)), rng.normal(1.5, 1.2, (48, 5))])
+    y = np.r_[np.zeros(48, int), np.ones(48, int)]
+    p1 = build_candidate_pipeline(X, y, transformer_policy=OWN_POLICY,
+                                  initial_transformer=(None, None), incumbent_pipeline=None,
+                                  model_kind="svc_rbf", seed=5, dim=4)
+    p2 = build_candidate_pipeline(X, y, transformer_policy=OWN_POLICY,
+                                  initial_transformer=(None, None), incumbent_pipeline=None,
+                                  model_kind="svc_rbf", seed=5, dim=4)
+    g = p1.metadata["svc_effective_gamma"]
+    assert g is not None and g > 0
+    assert g == p2.metadata["svc_effective_gamma"]
+    Xt = p1.transform(X)
+    assert g == pytest.approx(1.0 / (Xt.shape[1] * Xt.var()), rel=1e-12)
+    assert p1.metadata["svc_configured_gamma"] == "'scale'"
+
+
+def test_provenance_frozen_vs_own_components(froz_point, own_point):
+    """Frozen candidates carry the INITIAL fitted components (hashes equal to the incumbent's);
+    own candidates fit NEW components on the SAME raw candidate batch (batch hash equal,
+    component hashes different)."""
+    init_meta = froz_point["env"].initial_model.metadata
+    bf = {p.metadata["creation_window"]: p for p in froz_point["rec"]}
+    bo = {p.metadata["creation_window"]: p for p in own_point["rec"]}
+    common = sorted(set(bf) & set(bo))
+    assert common
+    for t in common:
+        pf, po = bf[t], bo[t]
+        assert pf.metadata["training_row_hash"] == po.metadata["training_row_hash"]
+        for k in ("scaler_mean_hash", "scaler_scale_hash", "pca_components_hash",
+                  "pca_explained_variance_hash"):
+            assert pf.metadata[k] == init_meta[k], f"frozen {k} != initial at window {t}"
+            assert po.metadata[k] != init_meta[k], f"own {k} did not refit at window {t}"
+        assert pf.metadata["pca_dim"] == po.metadata["pca_dim"] == init_meta["pca_dim"]
+
+
 # ------------------------------------------------- T12: confirmatory seed firewall
 
 

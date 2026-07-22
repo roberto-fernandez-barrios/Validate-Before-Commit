@@ -61,6 +61,34 @@ def obj_hash(obj) -> str:
     return hashlib.sha256(pickle.dumps(obj)).hexdigest()
 
 
+def arr_hash(a) -> str:
+    """SHA-256 of a fitted-parameter array's exact bytes ('none' when absent)."""
+    if a is None:
+        return "none"
+    return hashlib.sha256(np.ascontiguousarray(np.asarray(a)).tobytes()).hexdigest()
+
+
+def preprocessing_provenance(scaler, reducer, classifier, model_kind: str) -> dict:
+    """Complete preprocessing/classifier provenance, so no gamma or PCA variation can hide
+    inside 'own transformer' (confirmatory-phase requirement, protocol Appendix A phase)."""
+    prov = dict(
+        scaler_hash=obj_hash(scaler),
+        scaler_mean_hash=arr_hash(getattr(scaler, "mean_", None)),
+        scaler_scale_hash=arr_hash(getattr(scaler, "scale_", None)),
+        pca_hash=obj_hash(reducer),
+        pca_components_hash=arr_hash(getattr(reducer, "components_", None)),
+        pca_explained_variance_hash=arr_hash(getattr(reducer, "explained_variance_", None)),
+        pca_dim=(int(reducer.n_components_) if reducer is not None else None),
+        classifier_params={k: repr(v) for k, v in sorted(classifier.get_params().items())},
+        svc_configured_gamma=(repr(classifier.get_params().get("gamma"))
+                              if model_kind == "svc_rbf" else None),
+        svc_effective_gamma=(float(classifier._gamma)
+                             if model_kind == "svc_rbf" and hasattr(classifier, "_gamma")
+                             else None),
+    )
+    return prov
+
+
 def stream_raw_hash(stream_raw: list[tuple[np.ndarray, np.ndarray, float]]) -> str:
     """Hash of the whole raw stream: every window's features, labels and severity."""
     h = hashlib.sha256()
@@ -156,11 +184,10 @@ def build_candidate_pipeline(
         training_seed=int(seed),
         creation_window=(int(seed - arm_seed - 1) if arm_seed is not None else None),
         training_row_hash=rows_hash(X_train_raw, y_train),
-        scaler_hash=obj_hash(scaler),
-        pca_hash=obj_hash(reducer),
         classifier_config=dict(model_kind=model_kind, C=float(svc_C),
                                probability=bool(probability), dim=int(dim)),
         deployed_version=None,   # assigned by the runner's serving log on commit
+        **preprocessing_provenance(scaler, reducer, clf, model_kind),
     )
     return ModelPipeline(scaler, reducer, clf, meta)
 
@@ -183,10 +210,11 @@ def build_raw_environment(pools, args, seed: int, transformer_policy: str) -> En
         metadata=dict(transformer_policy=FROZEN_POLICY, training_seed=int(seed),
                       creation_window=None, role="initial_incumbent",
                       training_row_hash=rows_hash(*hist.init_train_raw),
-                      scaler_hash=obj_hash(scaler0), pca_hash=obj_hash(pca0),
                       classifier_config=dict(model_kind=args.downstream_model, C=1.0,
                                              dim=int(args.dim)),
-                      deployed_version=0))
+                      deployed_version=0,
+                      **preprocessing_provenance(scaler0, pca0, hist.initial_model,
+                                                 args.downstream_model)))
 
     def detector_factory(method, dargs, dseed):
         return DetectorPipeline(
