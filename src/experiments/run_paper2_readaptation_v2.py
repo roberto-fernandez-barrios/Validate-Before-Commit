@@ -218,6 +218,12 @@ class Environment:
     train_pools: Pools
     probe_pools: Pools
     init_train: tuple = None                               # (X_tr, y_tr) of the incumbent (amend 011)
+    # symmetric-pipeline harness (src/experiments/symmetric_pipeline.py). All default to None /
+    # unset, in which case every code path below is bit-identical to the historical runner.
+    stream_raw: list = None                                # raw-feature mirror of `stream`
+    init_train_raw: tuple = None                           # (X_tr_raw, y_tr) before any transform
+    detector_factory: object = None                        # (method, args, seed) -> detector
+    candidate_factory: object = None                       # (X, y, seed, C, proba) -> model
 
 
 def build_environment(pools: Pools, args, seed: int) -> Environment:
@@ -236,6 +242,7 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
 
     env_rng = np.random.default_rng(seed)  # environment: depends on seed ONLY
     stream = []
+    stream_raw = []   # raw-feature mirror; same draws, same order, no extra RNG consumption
     if getattr(args, "stream_disjoint_windows", False):
         # amendment 011: draw every stream window WITHOUT replacement within the window pool, so
         # no original row appears in more than one window. Because the candidate (sliding_window)
@@ -283,8 +290,12 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
                            take("ref_attack", n_ref), take("cur_attack", n_cur)])
             y = np.array([0] * npc + [1] * npc)
             perm = env_rng.permutation(len(y))
-            stream.append((transform_X(X[perm], scaler, pca), y[perm], sev))
-        return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"], (X_tr, y_tr))
+            Xw_raw_p, yw_p = X[perm], y[perm]
+            stream.append((transform_X(Xw_raw_p, scaler, pca), yw_p, sev))
+            stream_raw.append((Xw_raw_p, yw_p, sev))
+        return Environment(scaler, pca, initial_model, stream, role["window"], role["train"],
+                           role["probe"], (X_tr, y_tr),
+                           stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr))
     for t in range(args.post_windows):
         sev = progressive_severity(t, args)
         if args.stream_prevalence != 0.5:
@@ -295,7 +306,10 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
             Xw_raw, yw = sample_balanced_from_distribution(
                 role["window"], n_per_class=args.window_size // 2, severity=sev, rng=env_rng)
         stream.append((transform_X(Xw_raw, scaler, pca), yw, sev))
-    return Environment(scaler, pca, initial_model, stream, role["window"], role["train"], role["probe"], (X_tr, y_tr))
+        stream_raw.append((Xw_raw, yw, sev))
+    return Environment(scaler, pca, initial_model, stream, role["window"], role["train"],
+                       role["probe"], (X_tr, y_tr),
+                       stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr))
 
 
 def calibrate(detector, env: Environment, severity: float, args, rng) -> tuple[object, float]:
@@ -351,7 +365,12 @@ def calibrate_observed(detector, seen: list[tuple[np.ndarray, np.ndarray]], args
 
 def run_arm(method: str, env: Environment, args, seed: int):
     """One (detector, gate) arm over the shared pre-generated stream."""
-    detector = build_detector(method, args, seed)
+    # symmetric-pipeline hooks: with the default (None) factories these lambdas call the exact
+    # historical constructors with the exact historical arguments -- bit-identical behaviour.
+    _make_detector = env.detector_factory or (lambda m, a, s: build_detector(m, a, s))
+    _make_candidate = env.candidate_factory or (
+        lambda X, y, s, C, proba: train_svc(X, y, s, args.downstream_model, proba=proba, C=C))
+    detector = _make_detector(method, args, seed)
     detector, threshold = calibrate(detector, env, 0.0, args,
                                     np.random.default_rng(seed + 888))
     model = env.initial_model
@@ -630,7 +649,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                 if lbs is not None and 0.5 * (lbs[0] + lbs[1]) > 0.0:
                     n_adapt += 1; adapt_windows.append(t)
                     model = pending["cand"]; model_version += 1   # takes effect at W_{t+1}
-                    detector = build_detector(method, args, seed + t + 1)
+                    detector = _make_detector(method, args, seed + t + 1)
                     if args.recal_source == "observed":
                         detector, _nt = calibrate_observed(detector, seen, args)
                         if _nt is not None:
@@ -659,7 +678,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
             elif cs_lower_bound_eb(da, pending["alpha"] / 2.0) > 0.0:
                 n_adapt += 1; adapt_windows.append(t)
                 model = pending["cand"]; model_version += 1       # takes effect at W_{t+1}
-                detector = build_detector(method, args, seed + t + 1)
+                detector = _make_detector(method, args, seed + t + 1)
                 if args.recal_source == "observed":
                     detector, _nt = calibrate_observed(detector, seen, args)
                     if _nt is not None:
@@ -812,8 +831,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     mask = np.ones(len(ya), bool); mask[hold] = False
                     probe = (Xa[hold], ya[hold])
                     Xa, ya = Xa[mask], ya[mask]
-                candidate = train_svc(Xa, ya, seed + t + 1, args.downstream_model,
-                                      proba=wants_proba, C=svc_C)
+                candidate = _make_candidate(Xa, ya, seed + t + 1, svc_C, wants_proba)
                 n_cand_trained += 1
                 labels_candidate += int(len(ya))
                 if args.adapt_strategy == "cumulative":   # amendment 011: unique-row accounting
@@ -1173,7 +1191,7 @@ def run_arm(method: str, env: Environment, args, seed: int):
                     # from the incumbent after the first commit.
                     if len(probe[1]):
                         health_ref = float((model.predict(probe[0]) == probe[1]).mean())
-                detector = build_detector(method, args, seed + t + 1)
+                detector = _make_detector(method, args, seed + t + 1)
                 if args.recal_source == "observed":
                     # amendment 007: recalibrate from observed traffic only (no sev, no pools)
                     detector, new_thr = calibrate_observed(detector, seen, args)
@@ -1226,7 +1244,9 @@ def run_arm(method: str, env: Environment, args, seed: int):
     return rows, trig_rows, summary, res_rows
 
 
-def main():
+def build_parser() -> argparse.ArgumentParser:
+    """The full v2 flag surface. Exposed so config-driven drivers (symmetric-pipeline
+    replication) resolve flags through the SAME parser/defaults as the historical CLI."""
     p = argparse.ArgumentParser()
     p.add_argument("--data-ref", type=Path, required=True)
     p.add_argument("--data-cur", type=Path, required=True)
@@ -1355,7 +1375,11 @@ def main():
                    help="amendment 011 cumulative controls: observed = all observed windows (a009 "
                         "default); initial_plus_observed = incumbent training set + all observed; "
                         "dedup = row-identity dedup before fit; cn = C = 2*train_size/n_unique (~1/n).")
-    args = p.parse_args()
+    return p
+
+
+def main():
+    args = build_parser().parse_args()
 
     seeds = [int(s) for s in str(args.seeds).split(",") if s.strip()]
     methods = [m.strip() for m in args.methods.split(",") if m.strip()]
@@ -1370,41 +1394,59 @@ def main():
     for seed in seeds:
         print(f"[v2 SEED={seed}]", flush=True)
         env = build_environment(pools, args, seed)
-        # no-adaptation on the SAME shared stream
-        na = [dict(seed=seed, method="no_adaptation", window_idx=t, severity_t=sev,
-                   balanced_accuracy=evaluate_model(env.initial_model, Xw, yw)["balanced_accuracy"],
-                   f1=evaluate_model(env.initial_model, Xw, yw)["f1"], score=np.nan,
-                   threshold=np.nan, alarm=False, trigger=False, adapted_now=False,
-                   served_model_version=0)
-              for t, (Xw, yw, sev) in enumerate(env.stream)]
-        win_rows.extend(na)
-        sum_rows.append(dict(seed=seed, method="no_adaptation", n_windows=args.post_windows,
-                             n_adaptations=0, n_triggers=0, n_gate_rejections=0,
-                             labels_used_total=0, labels_probe=0, labels_monitor=0,
-                             labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
-                             n_probes=0, n_probes_zero_attack=0, probe_row_collisions=0,
-                             cand_future_collisions=0, seq_labels_mean=np.nan,
-                             adaptation_gate="none", harness="v2",
-                             first_adaptation_window=np.nan,
-                             mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
-                             mean_f1=float(np.mean([r["f1"] for r in na]))))
-        for method in methods:
-            rows, trows, summary, rres = run_arm(method, env, args, seed)
-            res_all.extend(rres)
-            win_rows.extend(rows); trig_rows.extend(trows); sum_rows.append(summary)
+        w_, t_, s_, r_ = run_seed(env, args, seed, methods)
+        win_rows.extend(w_); trig_rows.extend(t_); sum_rows.extend(s_); res_all.extend(r_)
 
-    pd.DataFrame(win_rows).to_csv(args.outdir / "paper2_progressive_readaptation_window_results.csv", index=False)
-    pd.DataFrame(sum_rows).to_csv(args.outdir / "paper2_progressive_readaptation_by_seed.csv", index=False)
+    agg = write_outputs(args.outdir, win_rows, trig_rows, sum_rows, res_all)
+    print(agg.to_string(index=False))
+
+
+def run_seed(env, args, seed: int, methods: list[str]):
+    """Every arm of one seed over an ALREADY-BUILT environment.
+
+    Extracted verbatim from main() so config-driven drivers (symmetric-pipeline replication)
+    reuse the exact no-adaptation baseline and per-method loop instead of duplicating them.
+    """
+    win_rows, trig_rows, sum_rows, res_all = [], [], [], []
+    # no-adaptation on the SAME shared stream
+    na = [dict(seed=seed, method="no_adaptation", window_idx=t, severity_t=sev,
+               balanced_accuracy=evaluate_model(env.initial_model, Xw, yw)["balanced_accuracy"],
+               f1=evaluate_model(env.initial_model, Xw, yw)["f1"], score=np.nan,
+               threshold=np.nan, alarm=False, trigger=False, adapted_now=False,
+               served_model_version=0)
+          for t, (Xw, yw, sev) in enumerate(env.stream)]
+    win_rows.extend(na)
+    sum_rows.append(dict(seed=seed, method="no_adaptation", n_windows=args.post_windows,
+                         n_adaptations=0, n_triggers=0, n_gate_rejections=0,
+                         labels_used_total=0, labels_probe=0, labels_monitor=0,
+                         labels_candidate=0, n_candidates_trained=0, n_train_skipped=0,
+                         n_probes=0, n_probes_zero_attack=0, probe_row_collisions=0,
+                         cand_future_collisions=0, seq_labels_mean=np.nan,
+                         adaptation_gate="none", harness="v2",
+                         first_adaptation_window=np.nan,
+                         mean_balanced_accuracy=float(np.mean([r["balanced_accuracy"] for r in na])),
+                         mean_f1=float(np.mean([r["f1"] for r in na]))))
+    for method in methods:
+        rows, trows, summary, rres = run_arm(method, env, args, seed)
+        res_all.extend(rres)
+        win_rows.extend(rows); trig_rows.extend(trows); sum_rows.append(summary)
+    return win_rows, trig_rows, sum_rows, res_all
+
+
+def write_outputs(outdir: Path, win_rows, trig_rows, sum_rows, res_all):
+    """The exact historical CSV emission (formats, filenames, column orders)."""
+    pd.DataFrame(win_rows).to_csv(outdir / "paper2_progressive_readaptation_window_results.csv", index=False)
+    pd.DataFrame(sum_rows).to_csv(outdir / "paper2_progressive_readaptation_by_seed.csv", index=False)
     if trig_rows:
-        pd.DataFrame(trig_rows).to_csv(args.outdir / "paper2_v2_trigger_log.csv", index=False)
+        pd.DataFrame(trig_rows).to_csv(outdir / "paper2_v2_trigger_log.csv", index=False)
     if res_all:
-        pd.DataFrame(res_all).to_csv(args.outdir / "paper2_v2_resolution_log.csv", index=False)
+        pd.DataFrame(res_all).to_csv(outdir / "paper2_v2_resolution_log.csv", index=False)
     s = pd.DataFrame(sum_rows)
     agg = s.groupby("method").agg(n_seeds=("seed", "nunique"),
                                   mean_balanced_accuracy=("mean_balanced_accuracy", "mean"),
                                   n_adaptations_mean=("n_adaptations", "mean")).reset_index()
-    s.to_csv(args.outdir / "paper2_progressive_readaptation_summary.csv", index=False)
-    print(agg.to_string(index=False))
+    s.to_csv(outdir / "paper2_progressive_readaptation_summary.csv", index=False)
+    return agg
 
 
 if __name__ == "__main__":

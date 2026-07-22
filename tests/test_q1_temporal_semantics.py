@@ -101,7 +101,9 @@ def test_T3_detector_score_precedes_resolution():
     body = src[src.index("for t, (Xw, yw, sev) in enumerate(env.stream):"):]
     i_score = body.index("score = float(detector.score(Xw))")
     i_pending = body.index("if pending is not None:")
-    i_rebuild = body.index("detector = build_detector(method, args, seed + t + 1)")
+    # `_make_detector` is the symmetric-pipeline hook that defaults to the historical
+    # build_detector; the structural ordering invariant is unchanged.
+    i_rebuild = body.index("detector = _make_detector(method, args, seed + t + 1)")
     assert i_score < i_pending < i_rebuild, (
         "the window's detector score must be computed BEFORE the pending-resolution block "
         "rebuilds the detector (found score@%d, pending@%d, rebuild@%d)"
