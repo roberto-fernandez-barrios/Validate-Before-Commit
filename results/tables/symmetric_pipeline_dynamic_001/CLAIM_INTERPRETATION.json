@@ -1,0 +1,151 @@
+{
+  "scenario": "A",
+  "rules_version": "protocol Appendix A",
+  "rules_passed": {
+    "A1_material_harm_in_critical_cell": true,
+    "A2_gate_win_ge_0p5_holm": true,
+    "A3_guardrails_not_contradicted": true,
+    "A3_note": "frozen text (Appendix A.1): guardrails restrict safety language only; the conclusion rests on winning cells that pass both NI margins",
+    "A3_stricter_nonfrozen_reading_all_wins_pass": false,
+    "clean_gate_wins": [
+      "ton_full: own-point vs own-naive",
+      "ps_zero: own-point vs own-naive",
+      "ps_zero: own-strict vs own-naive"
+    ],
+    "guardrail_restricted_wins": [
+      "unsw_zero: own-strict vs own-naive"
+    ],
+    "C1_all_critical_cells_equiv_pm0p5": false,
+    "C2_gates_equiv_naive_in_critical": false,
+    "critical_cells": {
+      "ton_full": {
+        "effect": 1.0289,
+        "ci95": [
+          0.5544,
+          1.526
+        ],
+        "ci90": [
+          0.6289,
+          1.4393
+        ],
+        "p_holm": 4.999950000499995e-05,
+        "harm_material": false,
+        "equiv_pm05": false
+      },
+      "ps_zero": {
+        "effect": -1.7385,
+        "ci95": [
+          -2.35,
+          -0.9638
+        ],
+        "ci90": [
+          -2.2708,
+          -1.1078
+        ],
+        "p_holm": 0.0005599944000559995,
+        "harm_material": true,
+        "equiv_pm05": false
+      },
+      "unsw_zero": {
+        "effect": -0.6547,
+        "ci95": [
+          -0.7654,
+          -0.5484
+        ],
+        "ci90": [
+          -0.7469,
+          -0.5648
+        ],
+        "p_holm": 0.00011999880001199988,
+        "harm_material": true,
+        "equiv_pm05": false
+      },
+      "ton_zero": {
+        "effect": -0.381,
+        "ci95": [
+          -0.5286,
+          -0.2492
+        ],
+        "ci90": [
+          -0.5039,
+          -0.269
+        ],
+        "p_holm": 0.00011999880001199988,
+        "harm_material": false,
+        "equiv_pm05": false
+      }
+    },
+    "gate_wins": {
+      "ton_full: own-point vs own-naive": {
+        "effect": 0.6411,
+        "p_holm": 0.014699853001469984,
+        "win": true
+      },
+      "ps_zero: own-point vs own-naive": {
+        "effect": 0.7534,
+        "p_holm": 0.0022199778002219978,
+        "win": true
+      },
+      "ps_zero: own-strict vs own-naive": {
+        "effect": 1.6768,
+        "p_holm": 0.00011999880001199988,
+        "win": true
+      },
+      "unsw_zero: own-strict vs own-naive": {
+        "effect": 0.5065,
+        "p_holm": 0.00011999880001199988,
+        "win": true
+      }
+    },
+    "gate_equivalence_critical": {
+      "ton_full: own-point vs own-naive": false,
+      "ton_full: own-strict vs own-naive": false,
+      "ps_zero: own-point vs own-naive": false,
+      "ps_zero: own-strict vs own-naive": false,
+      "unsw_zero: own-point vs own-naive": true,
+      "unsw_zero: own-strict vs own-naive": false,
+      "ton_zero: own-point vs own-naive": true,
+      "ton_zero: own-strict vs own-naive": true
+    },
+    "harmful_future_value_critical": {
+      "ton_full": {
+        "own_h5": 0.4198,
+        "frozen_h5": 0.4938,
+        "own_commits": 81,
+        "frozen_commits": 81
+      },
+      "ps_zero": {
+        "own_h5": 0.65,
+        "frozen_h5": 0.61,
+        "own_commits": 104,
+        "frozen_commits": 104
+      },
+      "unsw_zero": {
+        "own_h5": 0.61,
+        "frozen_h5": 0.53,
+        "own_commits": 104,
+        "frozen_commits": 104
+      },
+      "ton_zero": {
+        "own_h5": 0.46,
+        "frozen_h5": 0.51,
+        "own_commits": 104,
+        "frozen_commits": 104
+      }
+    }
+  },
+  "primary_conclusion": "Preprocessing asymmetry amplified harmful promotion, but candidate governance remains materially useful with self-contained predictive pipelines.",
+  "allowed_claims": [
+    "Preprocessing asymmetry amplified harmful promotion, but candidate governance remains materially useful with self-contained predictive pipelines.",
+    "Under self-contained pipelines, full-drift naive adaptation is beneficial in all three regimes (F1 positive, Holm-significant); the published full-drift naive harm does not persist under own-transformer pipelines.",
+    "Zero-drift harmful updating persists materially under self-contained pipelines (ps_zero, unsw_zero <= -0.5 pp, Holm-significant), and point/strict gates recover it (all six F4 gate contrasts positive and Holm-significant).",
+    "Preprocessing ownership is a large amplifier of the frozen-transformer harm (F2: ToN full +5.98 pp; ton_zero +5.49 pp; ps_zero +2.36 pp)."
+  ],
+  "forbidden_claims": [
+    "Preprocessing ownership is a major amplifier, while candidate promotion retains residual decision risk.",
+    "The principal harmful-promotion effect was driven by representation incompatibility under the frozen-initial-transformer update policy.",
+    "Any 'security improvement' language for cells failing an NI guardrail (currently: ['unsw_zero: own-strict vs own-naive']); their recall/FPR trade-off must be described explicitly.",
+    "Any claim that full-drift harmful promotion persists under self-contained pipelines (it does not: F1 is positive in all three full-drift regimes).",
+    "Any equivalence claim for own-naive vs never in the critical cells (C1 fails: no critical cell has CI90 inside +-0.5 pp)."
+  ]
+}

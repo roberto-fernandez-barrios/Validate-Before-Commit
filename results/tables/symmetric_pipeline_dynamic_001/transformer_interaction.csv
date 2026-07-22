@@ -1,0 +1,13 @@
+scenario,gate,interaction_pp,ci95_lo,ci95_hi,note
+ps_full,point,-0.1406,-0.882,0.349,secondary descriptive (protocol 1.4); not a primary estimand
+ps_full,strict,-0.307,-1.0537,0.2888,secondary descriptive (protocol 1.4); not a primary estimand
+unsw_full,point,-0.2031,-0.375,-0.037,secondary descriptive (protocol 1.4); not a primary estimand
+unsw_full,strict,-0.1115,-0.3333,0.1094,secondary descriptive (protocol 1.4); not a primary estimand
+ton_full,point,-4.9141,-7.2099,-2.7568,secondary descriptive (protocol 1.4); not a primary estimand
+ton_full,strict,-5.2057,-7.4011,-3.1299,secondary descriptive (protocol 1.4); not a primary estimand
+ps_zero,point,-2.1766,-4.0227,-0.6721,secondary descriptive (protocol 1.4); not a primary estimand
+ps_zero,strict,-2.3495,-4.156,-0.8818,secondary descriptive (protocol 1.4); not a primary estimand
+unsw_zero,point,-0.0247,-0.1245,0.0714,secondary descriptive (protocol 1.4); not a primary estimand
+unsw_zero,strict,0.0695,-0.0344,0.2018,secondary descriptive (protocol 1.4); not a primary estimand
+ton_zero,point,-5.3568,-8.7706,-2.688,secondary descriptive (protocol 1.4); not a primary estimand
+ton_zero,strict,-5.5359,-8.8456,-2.9755,secondary descriptive (protocol 1.4); not a primary estimand

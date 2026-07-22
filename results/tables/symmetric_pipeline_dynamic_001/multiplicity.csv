@@ -1,0 +1,25 @@
+family,family_size,contrast,effect_pp,ci95_lo,ci95_hi,p_raw,p_holm,significant_holm,correction
+F1 harm under own-transformer (full),3,ps_full: own-naive vs never,7.2122,4.8862,9.5227,9.99990000099999e-06,2.999970000299997e-05,True,Holm FWER
+F1 harm under own-transformer (full),3,unsw_full: own-naive vs never,2.5461,2.3375,2.7549,9.99990000099999e-06,2.999970000299997e-05,True,Holm FWER
+F1 harm under own-transformer (full),3,ton_full: own-naive vs never,1.0289,0.5544,1.526,4.999950000499995e-05,4.999950000499995e-05,True,Holm FWER
+F2 transformer interaction on naive (full),3,ps_full: own-naive vs frozen-naive,0.9026,0.2607,1.7471,0.019479805201947982,0.019479805201947982,True,Holm FWER
+F2 transformer interaction on naive (full),3,unsw_full: own-naive vs frozen-naive,1.1518,0.9521,1.3508,9.99990000099999e-06,2.999970000299997e-05,True,Holm FWER
+F2 transformer interaction on naive (full),3,ton_full: own-naive vs frozen-naive,5.9779,3.8229,8.257,9.99990000099999e-06,2.999970000299997e-05,True,Holm FWER
+F3 gate value under own-transformer (full),6,ps_full: own-point vs own-naive,0.1922,-0.057,0.4091,0.10176898231017689,0.40707592924070757,False,Holm FWER
+F3 gate value under own-transformer (full),6,ps_full: own-strict vs own-naive,0.0492,-0.3266,0.4107,0.7928720712792872,0.964590354096459,False,Holm FWER
+F3 gate value under own-transformer (full),6,unsw_full: own-point vs own-naive,-0.2078,-0.3638,-0.0612,0.007589924100758993,0.03794962050379497,True,Holm FWER
+F3 gate value under own-transformer (full),6,unsw_full: own-strict vs own-naive,-0.1464,-0.3471,0.0484,0.14676853231467685,0.44030559694403054,False,Holm FWER
+F3 gate value under own-transformer (full),6,ton_full: own-point vs own-naive,0.6411,0.257,1.0596,0.0024499755002449974,0.014699853001469984,True,Holm FWER
+F3 gate value under own-transformer (full),6,ton_full: own-strict vs own-naive,0.1768,-0.3112,0.6732,0.4822951770482295,0.964590354096459,False,Holm FWER
+F4 zero-drift secondary,12,ps_zero: own-naive vs never,-1.7385,-2.35,-0.9638,7.999920000799993e-05,0.0005599944000559995,True,Holm FWER
+F4 zero-drift secondary,12,unsw_zero: own-naive vs never,-0.6547,-0.7654,-0.5484,9.99990000099999e-06,0.00011999880001199988,True,Holm FWER
+F4 zero-drift secondary,12,ton_zero: own-naive vs never,-0.381,-0.5286,-0.2492,9.99990000099999e-06,0.00011999880001199988,True,Holm FWER
+F4 zero-drift secondary,12,ps_zero: own-point vs own-naive,0.7534,0.4055,1.1591,0.0003699963000369996,0.0022199778002219978,True,Holm FWER
+F4 zero-drift secondary,12,unsw_zero: own-point vs own-naive,0.188,0.0875,0.3073,0.0017799822001779981,0.0071199288007119926,True,Holm FWER
+F4 zero-drift secondary,12,ton_zero: own-point vs own-naive,0.1089,0.0299,0.1958,0.01050989490105099,0.022679773202267977,True,Holm FWER
+F4 zero-drift secondary,12,ps_zero: own-strict vs own-naive,1.6768,1.2299,2.1331,9.99990000099999e-06,0.00011999880001199988,True,Holm FWER
+F4 zero-drift secondary,12,unsw_zero: own-strict vs own-naive,0.5065,0.3768,0.6438,9.99990000099999e-06,0.00011999880001199988,True,Holm FWER
+F4 zero-drift secondary,12,ton_zero: own-strict vs own-naive,0.3362,0.1961,0.493,2.999970000299997e-05,0.00023999760002399976,True,Holm FWER
+F4 zero-drift secondary,12,ps_zero: own-naive vs frozen-naive,2.3563,0.8117,4.199,0.007559924400755993,0.022679773202267977,True,Holm FWER
+F4 zero-drift secondary,12,unsw_zero: own-naive vs frozen-naive,0.0276,-0.0406,0.1021,0.4509254907450925,0.4509254907450925,False,Holm FWER
+F4 zero-drift secondary,12,ton_zero: own-naive vs frozen-naive,5.4935,2.9406,8.7625,0.0008699913000869992,0.004349956500434996,True,Holm FWER
