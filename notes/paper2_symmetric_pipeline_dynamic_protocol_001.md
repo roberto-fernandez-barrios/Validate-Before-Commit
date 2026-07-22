@@ -243,3 +243,94 @@ The preparation phase does NOT execute this protocol. It ends when:
 The confirmatory matrix may only start after human review of: this protocol,
 the margins in 1.7, the frozen parity evidence, the own-transformer
 architecture, the leakage/symmetry tests, and the expected compute cost.
+
+---
+
+# Appendix A — Human-approved margins and machine-evaluable decision rules
+
+Date frozen: **2026-07-22**, BEFORE any confirmatory seed (3001-3030) is
+executed. Human approval received in the confirmatory-phase authorization.
+These rules are literal and machine-evaluable; they may not be modified after
+execution.
+
+## A.1 Margins (absolute percentage points)
+
+**Balanced accuracy (primary; determines the A/B/C classification)**
+- Primary equivalence margin: **±0.5 pp**; sensitivities: ±0.2 and ±1.0 pp.
+- Equivalence is established iff the FULL paired CI90 lies inside the margin.
+
+**Attack recall (non-inferiority guardrail)**
+- Principal NI margin: **−1.0 pp**; sensitivities: −0.5 and −2.0 pp.
+- Passes NI iff the one-sided 95% LOWER bound of the paired difference is
+  greater than −1.0 pp.
+
+**False-positive rate (non-inferiority guardrail)**
+- Principal NI margin: **+0.5 pp**; sensitivities: +0.25 and +1.0 pp.
+- Passes NI iff the one-sided 95% UPPER bound of the paired difference is
+  less than +0.5 pp.
+
+BA determines the scientific classification. Recall and FPR are secondary
+guardrails that restrict the permitted safety language only.
+
+## A.2 Critical cells
+
+```
+HARM_OR_HEALTHY_CELLS =
+    ToN-IoT full drift
+    CICIDS2017 zero drift
+    UNSW-NB15 zero drift
+    ToN-IoT zero drift
+```
+
+PortScan full and UNSW full are primarily benefit-preservation cells.
+
+## A.3 Scenario A — persistence
+
+Classify as A iff ALL of:
+1. at least one critical cell has `own-naive − never <= −0.5 pp` AND its CI95
+   excludes zero after the registered (Holm, within-family) correction;
+2. point-own or strict-own improves over naive-own by `>= +0.5 pp` in at
+   least one critical or benefit cell, with the Holm-adjusted contrast
+   significant;
+3. the conclusion does not contradict the recall/FPR guardrails.
+
+Authorized interpretation:
+> Preprocessing asymmetry amplified harmful promotion, but candidate
+> governance remains materially useful with self-contained predictive
+> pipelines.
+
+## A.4 Scenario C — practical elimination
+
+Classify as C ONLY iff ALL of:
+1. in EVERY critical cell, the CI90 of `own-naive − never` lies entirely
+   inside ±0.5 pp;
+2. in those same cells, point-own and strict-own vs naive-own are equivalent
+   within ±0.5 pp (full CI90 inside);
+3. no material reduction of harmful future value contradicts that
+   equivalence;
+4. recall and FPR reveal no relevant hidden effect.
+
+Authorized interpretation:
+> The principal harmful-promotion effect was driven by representation
+> incompatibility under the frozen-initial-transformer update policy.
+
+## A.5 Scenario B — attenuation
+
+Any result that does not fully satisfy A or C is classified as B, including:
+attenuated-but-not-equivalent mean harm; persistent individual bad proposals;
+gate useful in some cells but not uniformly; large transformer interaction
+without complete risk elimination.
+
+Authorized interpretation:
+> Preprocessing ownership is a major amplifier, while candidate promotion
+> retains residual decision risk.
+
+## A.6 Evaluation conventions
+
+- Inferential unit: the seed (paired within seed/scenario via the shared raw
+  stream). Windows, triggers and commits are never treated as independent
+  units.
+- Superiority/harm: deterministic centered paired bootstrap CI95 + Holm
+  within the frozen family; sensitivities: paired t-test and Wilcoxon.
+- Equivalence: paired bootstrap CI90 fully inside the margin.
+- NI guardrails: one-sided 95% bounds as defined in A.1.
