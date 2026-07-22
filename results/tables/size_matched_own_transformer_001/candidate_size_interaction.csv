@@ -1,0 +1,7 @@
+scenario,gate,interaction_pp,ci95_lo,ci95_hi,p_holm,significant_holm,note
+ps_zero,point,-0.9174,-1.2508,-0.6094,5.999940000599994e-05,True,secondary (protocol E5/F4); never substitutes the primary estimands
+ps_zero,strict,-1.5427,-1.8862,-1.2013,5.999940000599994e-05,True,secondary (protocol E5/F4); never substitutes the primary estimands
+unsw_zero,point,-0.1813,-0.2872,-0.0888,0.0024899751002489976,True,secondary (protocol E5/F4); never substitutes the primary estimands
+unsw_zero,strict,-0.4062,-0.525,-0.2859,5.999940000599994e-05,True,secondary (protocol E5/F4); never substitutes the primary estimands
+ton_zero,point,-0.1003,-0.212,-0.0193,0.04005959940400596,True,secondary (protocol E5/F4); never substitutes the primary estimands
+ton_zero,strict,-0.2042,-0.3422,-0.0878,0.005499945000549994,True,secondary (protocol E5/F4); never substitutes the primary estimands

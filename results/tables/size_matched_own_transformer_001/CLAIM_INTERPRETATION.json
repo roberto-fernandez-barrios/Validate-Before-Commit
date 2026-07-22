@@ -1,0 +1,101 @@
+{
+  "outcome": "ATTENUATION",
+  "protocol_commit": "114513f8613d0b76b206d03dc74aeefe1ea7200e",
+  "config_sha256": "6873cc1a3ed0048238104ff907da1675384f353302770918219a2cff03e2df60",
+  "confirmatory_seeds": "4001-4030",
+  "rules_passed": {
+    "P1_material_size_matched_harm": false,
+    "P2_gate_win_ge_0p5_holm_at_2000": false,
+    "P3_conclusion_rests_on_guardrail_clean_cell": false,
+    "E1_all_naive2000_vs_never_equiv_pm0p5": true,
+    "E2_gates_equiv_naive_at_2000_all_datasets": true,
+    "E3_no_harmful_future_value_contradiction": false,
+    "f1_cells": {
+      "ps_zero": {
+        "effect": 0.1854,
+        "ci95": [
+          -0.1513,
+          0.5547
+        ],
+        "ci90": [
+          -0.0995,
+          0.494
+        ],
+        "p_holm": 0.9064409355906442,
+        "harm_material": false,
+        "equiv_pm05": true
+      },
+      "unsw_zero": {
+        "effect": -0.0206,
+        "ci95": [
+          -0.1042,
+          0.0609
+        ],
+        "ci90": [
+          -0.0904,
+          0.0474
+        ],
+        "p_holm": 1.0,
+        "harm_material": false,
+        "equiv_pm05": true
+      },
+      "ton_zero": {
+        "effect": -0.0094,
+        "ci95": [
+          -0.0544,
+          0.0367
+        ],
+        "ci90": [
+          -0.0471,
+          0.0289
+        ],
+        "p_holm": 1.0,
+        "harm_material": false,
+        "equiv_pm05": true
+      }
+    },
+    "gate_wins": {},
+    "clean_gate_wins": [],
+    "guardrail_restricted_wins": [],
+    "gate_equivalence_at_2000": {
+      "ps_zero: point-2000 vs naive-2000": true,
+      "ps_zero: strict-2000 vs naive-2000": true,
+      "unsw_zero: point-2000 vs naive-2000": true,
+      "unsw_zero: strict-2000 vs naive-2000": true,
+      "ton_zero: point-2000 vs naive-2000": true,
+      "ton_zero: strict-2000 vs naive-2000": true
+    },
+    "harmful_future_value_naive_2000": {
+      "ps_zero": {
+        "commits_logged": 111,
+        "evaluable_h5": 98,
+        "harmful_rate_h5": 0.4796,
+        "material_contradiction": true
+      },
+      "unsw_zero": {
+        "commits_logged": 111,
+        "evaluable_h5": 98,
+        "harmful_rate_h5": 0.5204,
+        "material_contradiction": true
+      },
+      "ton_zero": {
+        "commits_logged": 111,
+        "evaluable_h5": 98,
+        "harmful_rate_h5": 0.3571,
+        "material_contradiction": false
+      }
+    },
+    "nesting_pairs_verified": 999
+  },
+  "primary_conclusion": "Candidate size is an important amplifier, while the remaining promotion risk is dataset- and policy-dependent.",
+  "allowed_claims": [
+    "Candidate size is an important amplifier, while the remaining promotion risk is dataset- and policy-dependent."
+  ],
+  "forbidden_claims": [
+    "Candidate-size asymmetry amplifies the effect, but harmful promotion persists even for self-contained challengers trained with the same per-class sample size as the incumbent.",
+    "The residual zero-drift harm was primarily attributable to promoting challengers trained with substantially less data than the incumbent.",
+    "Any binomial bound, population probability or production-prevalence estimate derived from harmful committed proposals (descriptive only; commits cluster within seed).",
+    "Any presentation of this control as observed-data or operational evidence."
+  ],
+  "follow_up_authorized": false
+}
