@@ -378,6 +378,40 @@ configurations, whose paired gain is identically zero); all 7 chronological repl
 BH. The full machine-readable table is
 \texttt{results/tables/paper2\_final\_q1/multiplicity.csv} in the artifact.
 
+\section{Symmetric-pipeline confirmatory replication: full matrices}
+\label{sec:supp_symmetric}
+
+This section carries the complete machine-generated evidence behind the main text's
+symmetric-pipeline section (the registered symmetric-pipeline dynamic replication;
+protocol and Appendix~A frozen before any confirmatory seed ran; seeds 3001--3030;
+42 arms, KS-max, six scenarios). Every number traces to
+\texttt{results/tables/symmetric\_pipeline\_dynamic\_001/} in the artifact; raw per-arm
+outputs (window logs, trigger logs, resolution logs, raw-stream hashes, pipeline
+provenance including scaler/PCA parameter hashes and fitted SVC $\gamma$) are under
+\texttt{results/raw/symmetric\_pipeline/}.
+
+Table~\ref{tab:symmetric_supp_contrasts} lists all 24 contrasts of the four frozen
+families with raw and Holm-adjusted $p$-values and the $\pm0.5$-point CI90 equivalence
+verdicts (paired $t$ and Wilcoxon sensitivities in the artifact CSV; they agree with the
+primary bootstrap analysis in every cell). Table~\ref{tab:symmetric_supp_harm} gives the
+complete harmful-commit accounting at horizons 1/3/5/10 with right-censoring made
+explicit; the counts are descriptive (commits cluster within seeds; no independence is
+assumed and no population rate is inferred). Table~\ref{tab:symmetric_supp_interaction}
+reports the secondary gate$\times$transformer interactions: strongly negative values on
+ToN-IoT and the zero-drift streams quantify how much of the gate's frozen-policy marginal
+value was compensation for the construction defect that self-contained pipelines remove
+--- a secondary descriptive reading, registered as such, never the primary estimand.
+
+Guardrail detail for the one restricted cell: on zero-drift UNSW-Recon the strict gate's
+paired attack-recall difference vs.\ own-naive is $-0.99$ points with one-sided 95\% lower
+bound $-1.26$, missing the preregistered principal margin of $-1.0$ (passing the $-2.0$
+sensitivity) while improving FPR by $-2.00$ points (upper bound $-1.63$); the main text
+reports this cell as a recall/FPR trade-off and uses no safety-improvement language for it.
+
+\input{tables/table_symmetric_supp_contrasts.tex}
+\input{tables/table_symmetric_supp_harm.tex}
+\input{tables/table_symmetric_supp_interaction.tex}
+
 \bibliographystyle{unsrtnat}
 \bibliography{references}
 \end{document}

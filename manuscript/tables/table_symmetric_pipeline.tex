@@ -1,0 +1,39 @@
+\begin{table}
+\centering
+\caption{\textbf{The symmetric-pipeline dynamic replication (registered; seeds 3001--3030).}
+Each scenario is one shared raw stream per seed (hash-verified identical across all seven
+arms); \emph{frozen} = the historical frozen-initial-transformer policy, \emph{own} =
+self-contained pipelines in which each challenger fits its own scaler/PCA on its own raw
+candidate batch (bit-identical batches across policies) and a commit deploys the complete
+bundle. Balanced-accuracy points, paired within seed, 30 seeds, deterministic paired-bootstrap
+CI95. $\dagger$: Holm-significant within its registered family (F1/F3/F4; own rows).
+Frozen-side contrasts are descriptive context (same machinery, uncorrected). Zero-drift
+scenarios use the registered random trigger ($p{=}0.05$) with no drift; the detector's
+representation stays the initial transformer under both policies.}
+\label{tab:symmetric_pipeline}
+\small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{l l r l l l}
+\toprule
+Regime & Transf. & Never BA & Naive $-$ never & Point $-$ naive & Strict $-$ naive \\
+\midrule
+PortScan full & frozen & 87.44 & $+6.31$ [4.11, 8.53] & $+0.33$ [-0.05, 1.00] & $+0.36$ [-0.12, 1.07] \\
+ & own & 87.44 & $+7.21$ [4.89, 9.52]$^{\dagger}$ & $+0.19$ [-0.06, 0.41] & $+0.05$ [-0.33, 0.41] \\
+\addlinespace
+UNSW-Recon full & frozen & 83.03 & $+1.39$ [1.17, 1.62] & $-0.00$ [-0.11, 0.10] & $-0.03$ [-0.24, 0.16] \\
+ & own & 83.03 & $+2.55$ [2.34, 2.75]$^{\dagger}$ & $-0.21$ [-0.36, -0.06]$^{\dagger}$ & $-0.15$ [-0.35, 0.05] \\
+\addlinespace
+ToN-IoT full & frozen & 92.40 & $-4.95$ [-7.15, -2.86] & $+5.56$ [3.50, 7.75] & $+5.38$ [3.34, 7.56] \\
+ & own & 92.40 & $+1.03$ [0.55, 1.53]$^{\dagger}$ & $+0.64$ [0.26, 1.06]$^{\dagger}$ & $+0.18$ [-0.31, 0.67] \\
+\addlinespace
+PortScan zero & frozen & 95.44 & $-4.09$ [-6.01, -2.56] & $+2.93$ [1.34, 4.84] & $+4.03$ [2.49, 5.95] \\
+ & own & 95.44 & $-1.74$ [-2.35, -0.96]$^{\dagger}$ & $+0.75$ [0.41, 1.16]$^{\dagger}$ & $+1.68$ [1.23, 2.13]$^{\dagger}$ \\
+\addlinespace
+UNSW-Recon zero & frozen & 89.09 & $-0.68$ [-0.80, -0.57] & $+0.21$ [0.12, 0.32] & $+0.44$ [0.31, 0.57] \\
+ & own & 89.09 & $-0.65$ [-0.77, -0.55]$^{\dagger}$ & $+0.19$ [0.09, 0.31]$^{\dagger}$ & $+0.51$ [0.38, 0.64]$^{\dagger}$ \\
+\addlinespace
+ToN-IoT zero & frozen & 92.58 & $-5.87$ [-9.20, -3.29] & $+5.47$ [2.79, 8.86] & $+5.87$ [3.29, 9.21] \\
+ & own & 92.58 & $-0.38$ [-0.53, -0.25]$^{\dagger}$ & $+0.11$ [0.03, 0.20]$^{\dagger}$ & $+0.34$ [0.20, 0.49]$^{\dagger}$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

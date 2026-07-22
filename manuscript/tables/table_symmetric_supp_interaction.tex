@@ -1,0 +1,23 @@
+\begin{table}
+\centering
+\caption{Secondary descriptive gate$\times$transformer interactions:
+$(\mathrm{gate}-\mathrm{naive})_{\mathrm{own}} -
+(\mathrm{gate}-\mathrm{naive})_{\mathrm{frozen}}$, balanced-accuracy points,
+CI95. Large negative ToN/zero-drift values say the gate's \emph{marginal} value shrinks
+where own-transformer construction already removed most of the frozen-policy harm --- the
+registered secondary reading, not a primary estimand.}
+\label{tab:symmetric_supp_interaction}
+\small
+\begin{tabular}{l r r}
+\toprule
+Regime & point & strict \\
+\midrule
+PortScan full & $-0.14$ [-0.88, 0.35] & $-0.31$ [-1.05, 0.29] \\
+UNSW-Recon full & $-0.20$ [-0.38, -0.04] & $-0.11$ [-0.33, 0.11] \\
+ToN-IoT full & $-4.91$ [-7.21, -2.76] & $-5.21$ [-7.40, -3.13] \\
+PortScan zero & $-2.18$ [-4.02, -0.67] & $-2.35$ [-4.16, -0.88] \\
+UNSW-Recon zero & $-0.02$ [-0.12, 0.07] & $+0.07$ [-0.03, 0.20] \\
+ToN-IoT zero & $-5.36$ [-8.77, -2.69] & $-5.54$ [-8.85, -2.98] \\
+\bottomrule
+\end{tabular}
+\end{table}

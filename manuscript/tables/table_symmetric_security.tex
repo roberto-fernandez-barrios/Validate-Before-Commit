@@ -1,0 +1,36 @@
+\begin{table}
+\centering
+\caption{\textbf{Security guardrails for the own-transformer gates (vs.\ own-naive).}
+Paired per-seed differences in attack recall and false-positive rate (percentage points);
+parentheses give the one-sided 95\% bootstrap bound the preregistered non-inferiority
+margins are tested against (recall lower bound vs.\ $-1.0$; FPR upper bound vs.\ $+0.5$).
+Every winning gate cell passes both margins except UNSW-Recon zero/strict, whose recall
+bound ($-1.26$) misses the principal margin (it passes the lax $-2.0$ sensitivity) while
+improving FPR by $2.0$ points --- a trade-off, not a security improvement. Guardrails
+restrict language only; BA determines the registered classification (protocol Appendix~A).}
+\label{tab:symmetric_security}
+\footnotesize
+\begin{tabular}{l l l l l l}
+\toprule
+Regime & Gate & $\Delta$recall (lb$_{95}$) & NI & $\Delta$FPR (ub$_{95}$) & NI \\
+\midrule
+PortScan full & point & $+0.33$ ($+0.07$) & pass & $-0.06$ ($+0.42$) & pass \\
+PortScan full & strict & $+0.22$ ($-0.14$) & pass & $+0.12$ ($+0.71$) & \textbf{fail} \\
+\addlinespace
+UNSW-Recon full & point & $+0.31$ ($+0.19$) & pass & $+0.73$ ($+1.07$) & \textbf{fail} \\
+UNSW-Recon full & strict & $+0.33$ ($+0.11$) & pass & $+0.62$ ($+1.08$) & \textbf{fail} \\
+\addlinespace
+ToN-IoT full & point & $-0.43$ ($-0.71$) & pass & $-1.71$ ($-0.93$) & pass \\
+ToN-IoT full & strict & $-1.12$ ($-1.50$) & \textbf{fail} & $-1.47$ ($-0.52$) & pass \\
+\addlinespace
+PortScan zero & point & $-0.02$ ($-0.07$) & pass & $-1.53$ ($-0.93$) & pass \\
+PortScan zero & strict & $+0.02$ ($-0.02$) & pass & $-3.33$ ($-2.60$) & pass \\
+\addlinespace
+UNSW-Recon zero & point & $-0.63$ ($-0.92$) & pass & $-1.00$ ($-0.62$) & pass \\
+UNSW-Recon zero & strict & $-0.99$ ($-1.26$) & \textbf{fail} & $-2.00$ ($-1.63$) & pass \\
+\addlinespace
+ToN-IoT zero & point & $-0.13$ ($-0.20$) & pass & $-0.35$ ($-0.18$) & pass \\
+ToN-IoT zero & strict & $+0.10$ ($-0.07$) & pass & $-0.57$ ($-0.27$) & pass \\
+\bottomrule
+\end{tabular}
+\end{table}

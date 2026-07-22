@@ -4,8 +4,8 @@ Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
 - Drift alarms propose candidates; they do not establish deployment benefit  [73]
-- Healthy-incumbent updates turn negative in three benchmarks, resolved in two  [76]
-- Candidate-incumbent validation reduces harmful SVC-RBF replacement  [66]
+- Self-contained pipelines remove mean full-drift harm: ownership amplifies it  [78]
+- Zero-drift promotion harm persists in two benchmarks; validation recovers it  [78]
 - Point, strict and risk-controlled gates define a labels-benefit-risk frontier  [77]
 - Chronological net harm remains unobserved: the main external-validity boundary  [78]
 

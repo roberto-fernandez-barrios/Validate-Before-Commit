@@ -1,0 +1,57 @@
+\begin{table*}
+\centering
+\caption{Symmetric-pipeline replication: harmful commits (negative candidate-minus-incumbent
+balanced accuracy over the H windows after the commit's resolution) out of the commits
+evaluable at each horizon; the denominator excludes right-censored commits whose horizon runs
+past the stream end. Descriptive only: commits cluster within seeds, are not independent
+trials, and no population rate is inferred.}
+\label{tab:symmetric_supp_harm}
+\scriptsize
+\begin{tabular}{l l l r r r r r}
+\toprule
+Regime & Transf. & Policy & Commits & H1 & H3 & H5 & H10 \\
+\midrule
+PortScan full & frozen & naive & 102 & 32/102 & 33/101 & 36/100 & 33/99 \\
+PortScan full & frozen & point & 91 & 26/91 & 26/91 & 28/90 & 27/87 \\
+PortScan full & frozen & strict & 61 & 9/61 & 10/60 & 11/59 & 11/57 \\
+PortScan full & own & naive & 102 & 38/102 & 42/101 & 37/100 & 33/99 \\
+PortScan full & own & point & 79 & 19/79 & 23/79 & 20/78 & 18/78 \\
+PortScan full & own & strict & 62 & 13/62 & 13/62 & 12/60 & 10/59 \\
+\addlinespace
+UNSW-Recon full & frozen & naive & 84 & 19/84 & 26/83 & 24/83 & 27/82 \\
+UNSW-Recon full & frozen & point & 76 & 17/76 & 20/75 & 18/75 & 21/73 \\
+UNSW-Recon full & frozen & strict & 57 & 9/57 & 8/56 & 7/56 & 7/54 \\
+UNSW-Recon full & own & naive & 84 & 19/84 & 23/83 & 21/83 & 20/82 \\
+UNSW-Recon full & own & point & 69 & 15/69 & 15/68 & 14/68 & 13/67 \\
+UNSW-Recon full & own & strict & 58 & 6/58 & 6/56 & 5/56 & 5/54 \\
+\addlinespace
+ToN-IoT full & frozen & naive & 81 & 42/81 & 41/81 & 40/81 & 41/79 \\
+ToN-IoT full & frozen & point & 60 & 20/59 & 21/57 & 19/57 & 17/54 \\
+ToN-IoT full & frozen & strict & 31 & 8/31 & 10/31 & 9/31 & 7/30 \\
+ToN-IoT full & own & naive & 81 & 27/81 & 29/81 & 34/81 & 30/79 \\
+ToN-IoT full & own & point & 66 & 17/66 & 14/66 & 17/66 & 14/64 \\
+ToN-IoT full & own & strict & 42 & 6/42 & 5/42 & 5/41 & 4/38 \\
+\addlinespace
+PortScan zero & frozen & naive & 104 & 55/104 & 60/102 & 61/100 & 58/93 \\
+PortScan zero & frozen & point & 56 & 28/56 & 32/55 & 36/55 & 33/49 \\
+PortScan zero & frozen & strict & 4 & 1/4 & 3/4 & 4/4 & 4/4 \\
+PortScan zero & own & naive & 104 & 59/104 & 63/102 & 65/100 & 59/93 \\
+PortScan zero & own & point & 69 & 38/69 & 39/67 & 40/65 & 34/58 \\
+PortScan zero & own & strict & 14 & 6/14 & 9/14 & 8/14 & 8/14 \\
+\addlinespace
+UNSW-Recon zero & frozen & naive & 104 & 43/104 & 49/102 & 53/100 & 57/93 \\
+UNSW-Recon zero & frozen & point & 63 & 31/63 & 33/61 & 35/60 & 37/55 \\
+UNSW-Recon zero & frozen & strict & 19 & 13/19 & 14/19 & 15/18 & 15/17 \\
+UNSW-Recon zero & own & naive & 104 & 56/104 & 54/102 & 61/100 & 57/93 \\
+UNSW-Recon zero & own & point & 64 & 37/64 & 35/62 & 38/60 & 38/56 \\
+UNSW-Recon zero & own & strict & 20 & 10/20 & 11/20 & 13/19 & 13/18 \\
+\addlinespace
+ToN-IoT zero & frozen & naive & 104 & 43/104 & 50/102 & 51/100 & 52/93 \\
+ToN-IoT zero & frozen & point & 52 & 14/52 & 21/50 & 23/49 & 25/45 \\
+ToN-IoT zero & frozen & strict & 4 & 2/4 & 2/4 & 2/4 & 2/4 \\
+ToN-IoT zero & own & naive & 104 & 23/104 & 43/102 & 46/100 & 50/93 \\
+ToN-IoT zero & own & point & 83 & 18/83 & 33/81 & 35/79 & 38/74 \\
+ToN-IoT zero & own & strict & 5 & 2/5 & 2/5 & 3/5 & 3/5 \\
+\bottomrule
+\end{tabular}
+\end{table*}

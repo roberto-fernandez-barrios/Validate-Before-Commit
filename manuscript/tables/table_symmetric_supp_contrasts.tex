@@ -1,0 +1,47 @@
+\begin{table}
+\centering
+\caption{Symmetric-pipeline replication: every contrast of the four frozen families
+(F1--F4), deterministic centered paired bootstrap (100k resamples), Holm within family.
+\emph{equiv}: CI90 fully inside the preregistered $\pm0.5$-point equivalence margin.
+Sensitivity $p$-values (paired $t$, Wilcoxon) are in the artifact
+(\texttt{paired\_contrasts.csv}).}
+\label{tab:symmetric_supp_contrasts}
+\scriptsize
+\begin{tabular}{l r r r c}
+\toprule
+Contrast & effect [CI95] & $p$ & $p_{\mathrm{Holm}}$ & equiv $\pm0.5$ \\
+\midrule
+\multicolumn{5}{l}{\emph{F1 harm under own-transformer (full)}} \\
+ps\_full: own-naive vs never & $+7.21$ [4.89, 9.52] & 0.00001 & 0.00003 & no \\
+unsw\_full: own-naive vs never & $+2.55$ [2.34, 2.75] & 0.00001 & 0.00003 & no \\
+ton\_full: own-naive vs never & $+1.03$ [0.55, 1.53] & 0.00005 & 0.00005 & no \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F2 transformer interaction on naive (full)}} \\
+ps\_full: own-naive vs frozen-naive & $+0.90$ [0.26, 1.75] & 0.01948 & 0.01948 & no \\
+unsw\_full: own-naive vs frozen-naive & $+1.15$ [0.95, 1.35] & 0.00001 & 0.00003 & no \\
+ton\_full: own-naive vs frozen-naive & $+5.98$ [3.82, 8.26] & 0.00001 & 0.00003 & no \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F3 gate value under own-transformer (full)}} \\
+ps\_full: own-point vs own-naive & $+0.19$ [-0.06, 0.41] & 0.10177 & 0.40708 & yes \\
+ps\_full: own-strict vs own-naive & $+0.05$ [-0.33, 0.41] & 0.79287 & 0.96459 & yes \\
+unsw\_full: own-point vs own-naive & $-0.21$ [-0.36, -0.06] & 0.00759 & 0.03795 & yes \\
+unsw\_full: own-strict vs own-naive & $-0.15$ [-0.35, 0.05] & 0.14677 & 0.44031 & yes \\
+ton\_full: own-point vs own-naive & $+0.64$ [0.26, 1.06] & 0.00245 & 0.01470 & no \\
+ton\_full: own-strict vs own-naive & $+0.18$ [-0.31, 0.67] & 0.48230 & 0.96459 & no \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F4 zero-drift secondary}} \\
+ps\_zero: own-naive vs never & $-1.74$ [-2.35, -0.96] & 0.00008 & 0.00056 & no \\
+unsw\_zero: own-naive vs never & $-0.65$ [-0.77, -0.55] & 0.00001 & 0.00012 & no \\
+ton\_zero: own-naive vs never & $-0.38$ [-0.53, -0.25] & 0.00001 & 0.00012 & no \\
+ps\_zero: own-point vs own-naive & $+0.75$ [0.41, 1.16] & 0.00037 & 0.00222 & no \\
+unsw\_zero: own-point vs own-naive & $+0.19$ [0.09, 0.31] & 0.00178 & 0.00712 & yes \\
+ton\_zero: own-point vs own-naive & $+0.11$ [0.03, 0.20] & 0.01051 & 0.02268 & yes \\
+ps\_zero: own-strict vs own-naive & $+1.68$ [1.23, 2.13] & 0.00001 & 0.00012 & no \\
+unsw\_zero: own-strict vs own-naive & $+0.51$ [0.38, 0.64] & 0.00001 & 0.00012 & no \\
+ton\_zero: own-strict vs own-naive & $+0.34$ [0.20, 0.49] & 0.00003 & 0.00024 & yes \\
+ps\_zero: own-naive vs frozen-naive & $+2.36$ [0.81, 4.20] & 0.00756 & 0.02268 & no \\
+unsw\_zero: own-naive vs frozen-naive & $+0.03$ [-0.04, 0.10] & 0.45093 & 0.45093 & yes \\
+ton\_zero: own-naive vs frozen-naive & $+5.49$ [2.94, 8.76] & 0.00087 & 0.00435 & no \\
+\bottomrule
+\end{tabular}
+\end{table}
