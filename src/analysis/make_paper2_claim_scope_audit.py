@@ -113,7 +113,10 @@ CLAIMS = [
          multiplicity_family="none (descriptive count; no binomial bound)",
          operational_scope="registered frontier sweep only",
          allowed=["not treated as 506 independent bernoulli trials"],
-         forbidden=["0.73", "0.726", "clopper", "eliminates harmful commits",
+         # v1.22: "0.73" anchored to the percent sign (as in the main audit) -- the retired
+         # binomial bound was "0.73%"; the bare substring collides with the size-matched
+         # UNSW CI bound "[0.53, 0.73]".
+         forbidden=["0.73%", "0.726", "clopper", "eliminates harmful commits",
                     "zero probability of harm"]),
     dict(claim_id="chronological_boundary",
          claim_text_short="13 replays: no net harm; UNSW healthy: point/strict win; Wed unresolved",

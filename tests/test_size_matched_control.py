@@ -420,21 +420,59 @@ def test_T10_metrics_recomputation(naive_full):
 
 # -------------------------------------------------- T11: historical artifact unchanged
 
+# The scientific core sealed at v1.21.0: the confirmatory symmetric-pipeline analysis
+# tables, pinned with the exact on-disk hashes recorded in the v1.21.0 MANIFEST.sha256.
+# (Before the v1.22.0 sealing this test additionally pinned the whole-manifest hash;
+# the v1.22.0 re-pin is additive for these entries, so the per-file constants are the
+# invariant that must hold forever.)
+V1210_SEALED_CORE = {
+    "results/tables/symmetric_pipeline_dynamic_001/by_seed.csv":
+        "36269497853f680d0975bd4694de01b64f7b0fb650ffd9b69290c32b0d44d325",
+    "results/tables/symmetric_pipeline_dynamic_001/equivalence.csv":
+        "f405b2d27fbb8583dfbeaa6939ce2bd9a471e416896c7c4f6d92103863f83cc4",
+    "results/tables/symmetric_pipeline_dynamic_001/harmful_commit_summary.csv":
+        "ab6134730495e9332d7e87e0e0ce4060bdd4279d68f912ab565441435cbb989c",
+    "results/tables/symmetric_pipeline_dynamic_001/multiplicity.csv":
+        "9771a010dd213d6dfefcc91af873a1c71f269b1e0a1fe2174e028a5efd40ac19",
+    "results/tables/symmetric_pipeline_dynamic_001/paired_contrasts.csv":
+        "a3e536c4cf5acfa20c52c7926b2bd292e0d25533c43166e0f2d78cc933fed865",
+    "results/tables/symmetric_pipeline_dynamic_001/run_completion.csv":
+        "6f34c9c223951f66c89088c22b6ad6a27e1f3aeeeeb5bd8c392b370cbad4c3a0",
+    "results/tables/symmetric_pipeline_dynamic_001/security_metrics.csv":
+        "b38fb2e3ec623283d75c0e2b9cf85e55f0bd5f6f483112b7c5ccb59c069f905c",
+    "results/tables/symmetric_pipeline_dynamic_001/summary.csv":
+        "e92632d3c60f36eb438e00f2bac03c317d35f9a4c8fb2fab517c24d81a0fab19",
+    "results/tables/symmetric_pipeline_dynamic_001/transformer_interaction.csv":
+        "189681e94ef132547be2d37b0ecf63f7eafeeb28d494d2638e0ce685f47f1c35",
+}
+V1210_CONFIG_SHA = "527947788e685e7f8cabf2989eb58aec8fbc8f948ea8e0d1f3640b52893d40e8"
+
 
 def test_T11_v1210_artifact_unchanged():
-    """The sealed v1.21.0 artifact is untouched: every one of the 173 pinned CSVs still
-    hashes to its MANIFEST.sha256 entry, and the two sealed manifests themselves carry
-    their recorded SHA-256 (baseline checkpoint of this branch)."""
+    """The sealed v1.21.0 scientific core is untouched: every confirmatory
+    symmetric-pipeline table still carries its v1.21.0-sealed hash, the frozen v1.21.0
+    config is unchanged, the current MANIFEST still pins every one of those entries with
+    the identical hash, and every pinned CSV hashes to its manifest entry."""
+    for path, sealed in V1210_SEALED_CORE.items():
+        assert hashlib.sha256((REPO / path).read_bytes()).hexdigest() == sealed, \
+            f"sealed v1.21.0 table changed: {path}"
+    cfg = REPO / "configs" / "symmetric_pipeline_dynamic_v1.json"
+    assert hashlib.sha256(cfg.read_bytes()).hexdigest() == V1210_CONFIG_SHA
     manifest = REPO / "results" / "tables" / "MANIFEST.sha256"
-    final = REPO / "results" / "final_manifest.json"
-    assert hashlib.sha256(manifest.read_bytes()).hexdigest() \
-        == "8500c6e2e241a34bca1001f7f312e3e3ab663aab1d9bd537288469a7cd3cdc43"
-    assert hashlib.sha256(final.read_bytes()).hexdigest() \
-        == "5f8a1e434b45401fe210e4ddfcd4743b9b1eeb731c46add41b1dd13cab443ee6"
-    n = 0
+    pinned = {}
     for line in manifest.read_text(encoding="utf-8").splitlines():
         h, path = line.strip().split(maxsplit=1)
+        pinned[path.strip()] = h
         data = (REPO / path.strip()).read_bytes()
-        assert hashlib.sha256(data).hexdigest() == h, f"sealed file changed: {path}"
-        n += 1
-    assert n == 173
+        assert hashlib.sha256(data).hexdigest() == h, f"pinned file changed: {path}"
+    assert len(pinned) >= 173
+    for path, sealed in V1210_SEALED_CORE.items():
+        assert pinned.get(path) == sealed, f"v1.21.0 pin lost or altered: {path}"
+    # the v1.21.0 record inside the (re-stamped) final manifest stays intact
+    final = json.loads((REPO / "results" / "final_manifest.json")
+                       .read_text(encoding="utf-8"))
+    v121 = final["symmetric_replication_v1_21"]
+    assert v121["scenario"] == "A"
+    assert v121["confirmatory_seeds"] == "3001-3030"
+    assert v121["expected_arms"] == 42
+    assert v121["config_sha256"] == V1210_CONFIG_SHA

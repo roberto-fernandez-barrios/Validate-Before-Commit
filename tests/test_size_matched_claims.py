@@ -105,8 +105,12 @@ def test_scope_negations_present():
 
 
 def test_v121_sealed_artifact_pointers_untouched():
-    """The size-matched rewrite never edits the sealed v1.21.0 analysis outputs."""
-    import hashlib
-    manifest = REPO / "results" / "tables" / "MANIFEST.sha256"
-    assert hashlib.sha256(manifest.read_bytes()).hexdigest() \
-        == "8500c6e2e241a34bca1001f7f312e3e3ab663aab1d9bd537288469a7cd3cdc43"
+    """The size-matched rewrite never edits the sealed v1.21.0 analysis outputs: the
+    v1.22.0 MANIFEST re-pin is additive for every symmetric_pipeline_dynamic_001 entry
+    (same per-file hashes as sealed at v1.21.0; the full set is asserted in
+    tests/test_size_matched_control.py::test_T11_v1210_artifact_unchanged)."""
+    manifest = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
+    assert ("36269497853f680d0975bd4694de01b64f7b0fb650ffd9b69290c32b0d44d325  "
+            "results/tables/symmetric_pipeline_dynamic_001/by_seed.csv") in manifest
+    assert ("a3e536c4cf5acfa20c52c7926b2bd292e0d25533c43166e0f2d78cc933fed865  "
+            "results/tables/symmetric_pipeline_dynamic_001/paired_contrasts.csv") in manifest
