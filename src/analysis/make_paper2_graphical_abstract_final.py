@@ -1,8 +1,10 @@
-"""final-kbs P9: graphical abstract, redesigned from scratch per the frozen protocol.
+"""Graphical abstract, redesigned for the final size-matched framing (registered rewrite
+protocol notes/size_matched_final_rewrite_protocol.md).
 
-Spec: show Alarm -> Challenger -> Validation -> Commit / Reject / Defer; two policy lines
-(point/strict = power; risk gate = control + labels); an explicit "Controlled SVC-RBF harm case"
-badge; large typography; no universal claims. Output above Elsevier's 1328x531 minimum.
+Spec: Trigger != superiority -> check candidate comparability (preprocessing ownership +
+training evidence) -> comparable? yes -> direct promotion may be adequate; uncertain or
+asymmetric -> validate before commit. Three evidence badges, no universal claims.
+Output above Elsevier's 1328x531 minimum.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -13,8 +15,7 @@ W, H = 13.28, 5.31  # inches at 100 dpi -> 1328x531; render at 200 dpi
 fig, ax = plt.subplots(figsize=(W, H))
 ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
 
-BOX = dict(boxstyle="round,pad=0.6", lw=2)
-FS_BIG, FS_MED, FS_SM = 21, 15, 12.5
+FS_BIG, FS_MED, FS_SM = 20, 14.5, 12.5
 
 
 def box(x, y, w, h, text, fc, ec, fs=FS_MED, tc="black", bold=False):
@@ -30,42 +31,50 @@ def arrow(x0, y0, x1, y1, color="0.25", lw=2.6, style="-|>"):
 
 
 # ---- title strip ----
-ax.text(50, 94, "A drift alarm proposes a challenger — it does not justify deployment",
+ax.text(50, 94, "A drift alarm proposes a challenger — it does not establish superiority",
         ha="center", fontsize=FS_BIG, fontweight="bold")
 
-# ---- pipeline: Alarm -> Challenger -> Validation -> three actions ----
-y0, h0 = 58, 17
-box(2, y0, 16, h0, "Drift alarm\n(or schedule,\nor false alarm)", "#fff3e0", "#e65100")
-arrow(19.5, y0 + h0 / 2, 24.5, y0 + h0 / 2)
-box(25, y0, 16, h0, "Challenger\ntrained\n(a proposal)", "#e3f2fd", "#1565c0")
-arrow(42.5, y0 + h0 / 2, 47.5, y0 + h0 / 2)
-box(48, y0, 21, h0, "VALIDATE\nsmall labeled probe,\ncandidate vs incumbent", "#e8f5e9", "#1b5e20", bold=True)
+# ---- flow: trigger -> comparability check -> two branches ----
+y0, h0 = 52, 24
+box(2, y0 + 4, 15, h0 - 8, "Drift alarm\n(or schedule,\nor false alarm)", "#fff3e0", "#e65100", fs=FS_SM)
+arrow(18.5, y0 + h0 / 2, 23.5, y0 + h0 / 2)
+box(24, y0, 25, h0,
+    "CHECK CANDIDATE\nCOMPARABILITY\n"
+    "— preprocessing ownership\n— training evidence (size)",
+    "#e3f2fd", "#1565c0", fs=FS_SM, bold=True)
 
-arrow(70.5, y0 + h0 * 0.83, 76.5, 78)
-arrow(70.5, y0 + h0 / 2, 76.5, y0 + h0 / 2)
-arrow(70.5, y0 + h0 * 0.17, 76.5, 46)
-box(77, 73, 21, 11, "COMMIT\nevidence of improvement", "#e8f5e9", "#1b5e20", fs=FS_SM)
-box(77, y0 + 2.0, 21, 11, "REJECT\nkeep the incumbent", "#ffebee", "#b71c1c", fs=FS_SM)
-box(77, 41, 21, 11, "DEFER\nbuy more labels later", "#ede7f6", "#4527a0", fs=FS_SM)
+arrow(50.5, y0 + h0 * 0.72, 57.5, 74)
+arrow(50.5, y0 + h0 * 0.28, 57.5, 40)
+ax.text(54, 70, "comparable", fontsize=11, ha="center", rotation=18, color="#1b5e20")
+ax.text(54, 48, "uncertain /\nasymmetric", fontsize=11, ha="center", rotation=-18, color="#4527a0")
 
-# ---- three messages (final-q1: simplified per external review -- one sentence each, no
-# crowded caveat strip; larger type, generous spacing) ----
-box(1.5, 7, 31.5, 27,
-    "Controlled harm case\n\n"
-    "Healthy SVC-RBF incumbent:\n"
-    "swapping hurts, even with\n"
-    "self-contained pipelines",
-    "#fff8e1", "#795548", fs=14)
-box(34, 7, 31.5, 27,
-    "The trade-off\n\n"
-    "Point / strict: most benefit\n"
-    "Risk gates: control, more labels",
-    "#f5f5f5", "#455a64", fs=14)
-box(66.5, 7, 32, 27,
-    "The boundary\n\n"
-    "On real chronological streams\n"
-    "net harm was not observed",
-    "#eceff1", "#37474f", fs=14)
+box(58, 64, 40, 20,
+    "Direct promotion may be adequate\n"
+    "size-matched self-contained challengers:\n"
+    "always-deploy ≡ never-adapt (3/3 benchmarks)",
+    "#e8f5e9", "#1b5e20", fs=FS_SM)
+box(58, 30, 40, 20,
+    "VALIDATE BEFORE COMMIT\n"
+    "gates recover the loss where evidence\n"
+    "is limited, noisy or uncertain",
+    "#ede7f6", "#4527a0", fs=FS_SM, bold=True)
+
+# ---- three evidence badges ----
+box(1.5, 4, 31.5, 21,
+    "Frozen incumbent-owned\n"
+    "preprocessing manufactured the\n"
+    "full-drift harm (scaling, not projection)",
+    "#fff8e1", "#795548", fs=12)
+box(34, 4, 31.5, 21,
+    "A 4× candidate-size disadvantage\n"
+    "explains the residual zero-drift loss\n"
+    "(+1.89 / +0.63 / +0.23 pp, Holm-sig.)",
+    "#f5f5f5", "#455a64", fs=12)
+box(66.5, 4, 32, 21,
+    "At matched size, gates add no\n"
+    "measurable value; chronological\n"
+    "net harm remains unobserved",
+    "#eceff1", "#37474f", fs=12)
 
 fig.savefig("docs/img/graphical_abstract.png", dpi=200, bbox_inches="tight",
             facecolor="white")

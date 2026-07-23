@@ -61,6 +61,17 @@ def compute_orphans() -> list:
 
 # block_id -> (evidence tier, glob, script, seeds, protocol note, manuscript target)
 BLOCKS = [
+    ("size_matched_own_transformer", "registered confirmatory control",
+     "size_matched_own_transformer/sm_*",
+     "src.experiments.run_symmetric_pipeline_replication", "4001-4030",
+     "notes/paper2_size_matched_own_transformer_protocol_001.md (protocol 114513f frozen "
+     "BEFORE implementation; config configs/size_matched_own_transformer_v1.json, SHA-256 "
+     "6873cc1a in every run_config.json; nested 512-in-2000 candidate batches, 999 pairs "
+     "verified; per-arm source commit, candidate size, raw-stream hash and completion in "
+     "results/tables/size_matched_own_transformer_001/run_completion.csv; per-candidate "
+     "provenance in candidate_provenance.jsonl, validated by "
+     "tests/test_size_matched_control.py; registered outcome ATTENUATION)",
+     "tab:size_matched"),
     ("symmetric_pipeline_dynamic", "registered confirmatory replication",
      "symmetric_pipeline/sp_*",
      "src.experiments.run_symmetric_pipeline_replication", "3001-3030",

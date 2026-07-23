@@ -105,21 +105,24 @@ def test_zero_drift_gate_contrasts_positive_and_significant():
     assert gates.significant_holm.all()
 
 
-NEW_TITLE = ("Candidate Governance for Drift-Triggered Classifier Pipelines "
-             "in Network Intrusion Detection")
+NEW_TITLE = ("A Controlled Study of Pipeline Construction, Evidence Asymmetry, "
+             "and Candidate Promotion in Network Intrusion Detection")
 OLD_TITLE_FRAGMENT = "Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates"
+V121_TITLE_FRAGMENT = ("Candidate Governance for Drift-Triggered Classifier Pipelines "
+                       "in Network Intrusion Detection")
 
 
 def test_definitive_title_everywhere():
-    """v1.21 sealing: the definitive title is on every live surface and the old title is
-    gone from them (historical notes may keep it for literal v1.20.2 identification)."""
+    """v1.22 rewrite: the definitive title is on every live surface and both retired
+    titles are gone from them (historical notes may keep them for release identification)."""
     live = ["manuscript/main.tex", "manuscript/main_ieee.tex", "manuscript/supplement.tex",
             "README.md", "CITATION.cff", ".zenodo.json"]
     for p in live:
         t = re.sub(r"\s+", " ", (REPO / p).read_text(encoding="utf-8"))
         if p != ".zenodo.json":   # zenodo carries the artifact title + description
-            assert NEW_TITLE in t or NEW_TITLE.replace(" in Network", " in Network") in t, p
-        assert OLD_TITLE_FRAGMENT not in t, f"{p}: old title still present"
+            assert NEW_TITLE in t, p
+        assert OLD_TITLE_FRAGMENT not in t, f"{p}: pre-v1.21 title still present"
+        assert V121_TITLE_FRAGMENT not in t, f"{p}: v1.21 title still present"
 
 
 def test_unsw_zero_strict_guardrail_recorded():

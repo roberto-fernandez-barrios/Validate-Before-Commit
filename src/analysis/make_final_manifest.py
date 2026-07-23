@@ -140,6 +140,83 @@ def symmetric_replication_v1_21_summary() -> dict:
     )
 
 
+def size_matched_control_v1_22_summary() -> dict:
+    """v1.22.0 candidate: the preregistered size-matched self-contained challenger control,
+    read from the frozen analysis outputs so the manifest can never drift from them."""
+    import json as _json
+    import pandas as pd
+    sm = REPO / "results" / "tables" / "size_matched_own_transformer_001"
+    con = pd.read_csv(sm / "paired_contrasts.csv")
+    eqv = pd.read_csv(sm / "equivalence.csv")
+    desc = pd.read_csv(sm / "descriptive_contrasts.csv")
+    rc = pd.read_csv(sm / "run_completion.csv")
+    ci = _json.loads((sm / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    cfg = (REPO / "configs" / "size_matched_own_transformer_v1.json").read_bytes()
+
+    def eff(name):
+        r = con[con.contrast == name].iloc[0]
+        return dict(effect_pp=float(r.effect_pp), ci95=[float(r.ci95_lo), float(r.ci95_hi)])
+
+    def deff(name):
+        r = desc[desc.contrast == name].iloc[0]
+        return dict(effect_pp=float(r.effect_pp), ci95=[float(r.ci95_lo), float(r.ci95_hi)])
+
+    def eq(name):
+        e = eqv[(eqv.contrast == name) & (eqv.margin_kind == "primary")].iloc[0]
+        return bool(e.equivalent)
+
+    return dict(
+        title=("Validate Before Commit: A Controlled Study of Pipeline Construction, "
+               "Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection"),
+        registered_outcome=ci["outcome"],
+        outcome_note=("ATTENUATION under the frozen P/A/E rules: E1+E2 equivalence pass; "
+                      "the preregistered sign-based H5 future-value criterion (E3) blocks "
+                      "formal ELIMINATION; substantively, size matching neutralizes the "
+                      "mean zero-drift harm (mean H5 future value ~0 at the matched size); "
+                      "never retro-classified"),
+        protocol_commits=dict(protocol="114513f8613d", freeze="c4df062",
+                              rewrite_protocol="c7fca9d"),
+        config_sha256=hashlib.sha256(cfg).hexdigest(),
+        confirmatory_seeds="4001-4030",
+        smoke_seeds="4401-4402",
+        expected_arms=21, completed_arms=int(rc.complete.sum()),
+        nesting=("batch_512 == first 512 rows/class of batch_2000 at every proposal; "
+                 "999 (seed, window) pairs verified; 512 path bit-identical to v1.21.0 "
+                 "(5/5 CSVs BIT_IDENTICAL in the parity run, seeds 4242-4243)"),
+        zero_drift_naive512_vs_never=dict(
+            ps_zero=deff("ps_zero: naive-512 vs never"),
+            unsw_zero=deff("unsw_zero: naive-512 vs never"),
+            ton_zero=deff("ton_zero: naive-512 vs never")),
+        zero_drift_naive2000_vs_never=dict(
+            ps_zero=dict(**eff("ps_zero: naive-2000 vs never"),
+                         equivalent_pm0p5=eq("ps_zero: naive-2000 vs never")),
+            unsw_zero=dict(**eff("unsw_zero: naive-2000 vs never"),
+                           equivalent_pm0p5=eq("unsw_zero: naive-2000 vs never")),
+            ton_zero=dict(**eff("ton_zero: naive-2000 vs never"),
+                          equivalent_pm0p5=eq("ton_zero: naive-2000 vs never"))),
+        candidate_size_effect_naive2000_vs_naive512=dict(
+            ps_zero=eff("ps_zero: naive-2000 vs naive-512"),
+            unsw_zero=eff("unsw_zero: naive-2000 vs naive-512"),
+            ton_zero=eff("ton_zero: naive-2000 vs naive-512")),
+        gate_value_at_2000="0/6 Holm-significant; all effects < 0.14 pp; all six "
+                           "CI90-equivalent to naive within +-0.5 pp",
+        guardrails="all six matched-size gate cells pass recall/FPR NI; unsw strict_512 "
+                   "recall-NI failure replicates (trade-off language only)",
+        statistical_families=dict(F1=3, F2=3, F3=6, F4=6, correction="Holm within family",
+                                  test="deterministic centered paired bootstrap (100k)"),
+        future_negative_signs_caveat=(
+            "descriptive within-trajectory sign fractions over seed-clustered commits; "
+            "near-50% rates at the matched size around a ~0 mean; no population "
+            "prevalence, deployment probability or binomial bound inferred"),
+        scope=("zero drift only; random proposal trigger; balanced pools; own-transformer "
+               "only; full-drift size-matched, observed-data size-matched and VBC-SG under "
+               "size-matched own pipelines NOT evaluated"),
+        v1_21_0_artifact="unchanged (sealed manifests byte-identical; 173/173 pinned)",
+        experiments_added="size-matched own-transformer control (21-arm registered matrix)",
+        unregistered_experiments="none",
+    )
+
+
 def causal_matrix_counters() -> dict:
     """Sum the collision/label counters of the final-kbs causal-64 matrix arms."""
     rows = []
@@ -385,6 +462,8 @@ def main(out: Path | None = None) -> None:
         editorial_v1_20_2=editorial_v1202_summary(),
         # v1.21.0: the preregistered symmetric-pipeline dynamic replication (Scenario A).
         symmetric_replication_v1_21=symmetric_replication_v1_21_summary(),
+        # v1.22.0 candidate: the preregistered size-matched control (ATTENUATION).
+        size_matched_control_v1_22=size_matched_control_v1_22_summary(),
         # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
         # stated field by field so no claim can outrun what the simulation measures.
         operational_arm_scope=dict(

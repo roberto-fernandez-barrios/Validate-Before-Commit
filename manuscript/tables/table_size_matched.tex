@@ -1,0 +1,24 @@
+\begin{table}
+\centering
+\caption{\textbf{The size-matched self-contained challenger control (registered; seeds
+4001--4030).} Zero drift, random proposal trigger, own-transformer only; the sole new
+variable is the challenger's per-class training size (512 vs.\ the incumbent's 2{,}000),
+with nested candidate batches (\S\ref{sec:sizematched_method}). BA points, paired within
+seed, 30 fresh seeds, paired-bootstrap CI95; $\dagger$ = Holm-significant within its
+registered family; the 512-vs-never column is descriptive (uncorrected). \emph{eq}: CI90
+fully inside the preregistered $\pm0.5$-point equivalence margin.}
+\label{tab:size_matched}
+\small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{l r l l c l l l}
+\toprule
+Regime & Never BA & Naive$_{512}-$never & Naive$_{2000}-$never & eq &
+Naive$_{2000}-$naive$_{512}$ & Point$_{2000}-$naive$_{2000}$ &
+Strict$_{2000}-$naive$_{2000}$ \\
+\midrule
+PortScan zero & 95.66 & $-1.70$ [-2.05, -1.36] & $+0.19$ [-0.15, 0.55] & yes & $+1.89$ [1.54, 2.23]$^{\dagger}$ & $+0.05$ [-0.00, 0.12] & $+0.13$ [-0.07, 0.34] \\
+UNSW-Recon zero & 89.08 & $-0.65$ [-0.77, -0.55] & $-0.02$ [-0.10, 0.06] & yes & $+0.63$ [0.53, 0.73]$^{\dagger}$ & $+0.01$ [-0.02, 0.04] & $+0.06$ [-0.01, 0.12] \\
+ToN-IoT zero & 92.56 & $-0.24$ [-0.39, -0.10] & $-0.01$ [-0.05, 0.04] & yes & $+0.23$ [0.10, 0.38]$^{\dagger}$ & $+0.02$ [0.00, 0.04] & $+0.03$ [-0.01, 0.08] \\
+\bottomrule
+\end{tabular}}
+\end{table}

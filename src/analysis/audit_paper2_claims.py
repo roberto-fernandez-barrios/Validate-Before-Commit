@@ -1074,8 +1074,9 @@ def main():
     check("v121 B: no 'exact paired bootstrap' / 'exact bootstrap p'", 0.0,
           float(_hits(r"exact paired bootstrap") + _hits(r"exact bootstrap \$?p")), 0.5)
     # v1.21: the symmetric-pipeline supplement contrast table also names the test in its
-    # caption (generated into tables/ and tables_ieee/), so the document count is 5.
-    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+2 tables)", 5.0,
+    # caption (generated into tables/ and tables_ieee/); v1.22 adds the size-matched
+    # supplement contrast table (both dirs), so the document count is 7.
+    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+4 tables)", 7.0,
           float(sum(1 for _t in _texts.values()
                     if "centered paired bootstrap" in _t)), 0.5)
     if os.path.exists(f"{Q1}/multiplicity.csv"):
@@ -1175,10 +1176,13 @@ def main():
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
                     and "conditional on a comparable proposal" in _t)), 0.5)
-    check("v122 E2: 'direct safeguard is candidate' + stratified formal control present", 1.0,
-          float(any("direct safeguard is candidate" in _t
-                    and "formal false-superiority control" in _t
-                    for _t in _texts.values())), 0.5)
+    # v1.22 rewrite: the conclusion's universal-safeguard sentence was replaced by the
+    # registered conditional formulation (rewrite protocol); the guard now protects that.
+    check("v122 E2: conditional-validation conclusion present (main+ieee)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                    and "validation is valuable when comparability cannot be guaranteed" in _t
+                    and "not as a universal substitute" in _t)), 0.5)
     check("v122 E2: chronological net-harm boundary retained (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
@@ -1275,10 +1279,14 @@ def main():
           float(sum(1 for _t in _mi.values() if "scenario~a" in _t or "scenario a" in _t)), 0.5)
 
     # --- v1.21 sealing guards (title, scope phrasing, completeness, provenance) ---
+    # v1.22: the definitive title changed with the size-matched rewrite (registered in
+    # notes/size_matched_final_rewrite_protocol.md); the v1.21 title joins the retired list.
     import json as _json
-    _NEW_TITLE = ("validate before commit: candidate governance for drift-triggered "
-                  "classifier pipelines in network intrusion detection")
+    _NEW_TITLE = ("validate before commit: a controlled study of pipeline construction, "
+                  "evidence asymmetry, and candidate promotion in network intrusion detection")
     _OLD_TITLE = "label-efficient commit decisions for drift-triggered classifier updates"
+    _V121_TITLE = ("candidate governance for drift-triggered classifier pipelines "
+                   "in network intrusion detection")
     _live = {n: t for n, t in _texts.items()
              if n.endswith(("/main.tex", "/main_ieee.tex", "/supplement.tex",
                             "README.md", "REPRODUCE.md", "highlights.md"))}
@@ -1292,6 +1300,8 @@ def main():
                     if _NEW_TITLE.split(": ")[1] in _live.get(_n, ""))), 0.5)
     check("v121seal T2: old title absent from live surfaces", 0.0,
           float(sum(1 for _t in _live.values() if _OLD_TITLE in _t)), 0.5)
+    check("v122seal T3: v1.21 title absent from live surfaces", 0.0,
+          float(sum(1 for _t in _live.values() if _V121_TITLE in _t)), 0.5)
     # ("NOT the sole cause..." is the REQUIRED phrasing and is excluded by the lookbehind)
     check("v121seal C1: no positive 'ownership explains all'/'sole cause' phrasing", 0.0,
           float(_hits(r"ownership explains all|all (?:the )?harm is caused by preprocessing|"
@@ -1346,6 +1356,98 @@ def main():
               float(int((_RC.protocol_commit == "88385660edd8").sum())), 0.5)
     else:
         check("v121seal: symmetric analysis outputs missing", 1.0, None, 0.5)
+
+    # --- v1.22 size-matched control guards (registered rewrite protocol,
+    #     notes/size_matched_final_rewrite_protocol.md) --------------------------------------
+    # Negative guards: forbidden claims can never reappear on a claim surface.
+    check("v122sm N1: no 'harm persists ... size-matched' claim", 0.0,
+          float(_hits(r"harm persists[^.]{0,80}size-matched")
+                + _hits(r"persists even for self-contained challengers trained with the same")),
+          0.5)
+    check("v122sm N1b: every 'size-robust' mention is frozen-scoped", 0.0,
+          float(_hits(r"size-robust") - _prox_hits(r"size-robust", ("frozen",), span=160)), 0.5)
+    check("v122sm N2: no 'gates remain/still useful at the matched size/2000'", 0.0,
+          float(_hits(r"(?:remain|still) useful at (?:the matched size|(?:size )?2,?000)")
+                + _hits(r"gates? (?:are|remain) useful at 2")), 0.5)
+    check("v122sm N3: no 'universally required' governance claim", 0.0,
+          float(_hits(r"universally required") + _hits(r"universally necessary")
+                + _hits(r"(?<!not a )universal requirement")
+                + _hits(r"(?<!not\} ``)(?<!not ``)gate every adaptation")), 0.5)
+    check("v122sm N4: ATTENUATION never glossed as residual mean harm", 0.0,
+          float(_prox_hits(r"attenuation", ("mean harm remains", "harm remains material",
+                                            "residual mean harm remains"), span=200)), 0.5)
+    check("v122sm N5: no H5 sign rate dressed as deployment/harm probability", 0.0,
+          float(_prox_hits(r"(?:48|50|52)\\?%|near-50\\?%|sign rate",
+                           ("probability of harm", "deployment risk", "risk of harm",
+                            "chance of harm"), span=120)), 0.5)
+    check("v122sm N6: no 'no individual candidate can be worse' guarantee", 0.0,
+          float(_hits(r"proves? that no individual")
+                + _hits(r"guarantees? that no (?:individual )?(?:committed )?candidate")), 0.5)
+    check("v122sm N7: no 'VBC-SG validated under size-matched'", 0.0,
+          float(_hits(r"vbc-sg[^.]{0,60}validated under size-matched")
+                + _hits(r"vbc-sg[^.]{0,60}re-?evaluated under size-matched(?! )")), 0.5)
+    check("v122sm N8: no 'transfers automatically' for observed-data evidence", 0.0,
+          float(_hits(r"transfers automatically")), 0.5)
+    check("v122sm N9: no claim that full-drift size-matched was evaluated", 0.0,
+          float(_hits(r"full-drift size-matched[^.]{0,60}(?:was|were) (?:run|evaluated)")), 0.5)
+    check("v122sm N10: outcome never stated as formal ELIMINATION", 0.0,
+          float(_hits(r"formally elimination") + _hits(r"outcome is elimination")
+                + _hits(r"classified as elimination(?! classification)")), 0.5)
+    check("v122sm N11: no 'intrinsically dangerous' as a positive claim", 0.0,
+          float(_hits(r"deploying drift-triggered candidates is intrinsically dangerous")), 0.5)
+    # Positive guards: the frozen size-matched results and their honest presentation.
+    _smp = "results/tables/size_matched_own_transformer_001"
+    if os.path.exists(f"{_smp}/paired_contrasts.csv"):
+        _SC = pd.read_csv(f"{_smp}/paired_contrasts.csv")
+        _SM = pd.read_csv(f"{_smp}/multiplicity.csv")
+        _SE = pd.read_csv(f"{_smp}/equivalence.csv")
+        _SRC = pd.read_csv(f"{_smp}/run_completion.csv")
+        _sci = _json.loads(open(f"{_smp}/CLAIM_INTERPRETATION.json", encoding="utf-8").read())
+        check("v122sm P1: 3/3 BA equivalence at 2000 (CI90 in +-0.5)", 3.0,
+              float(sum(1 for s in ("ps_zero", "unsw_zero", "ton_zero")
+                        if bool(_SE[(_SE.contrast == f"{s}: naive-2000 vs never")
+                                    & (_SE.margin_kind == "primary")].equivalent.iloc[0]))), 0.5)
+        check("v122sm P2: 3/3 size effects Holm-significant and positive", 3.0,
+              float(sum(1 for s in ("ps_zero", "unsw_zero", "ton_zero")
+                        if bool(_SM[_SM.contrast == f"{s}: naive-2000 vs naive-512"]
+                                .significant_holm.iloc[0])
+                        and float(_SC[_SC.contrast == f"{s}: naive-2000 vs naive-512"]
+                                  .effect_pp.iloc[0]) > 0)), 0.5)
+        _f3 = _SM[_SM.family.str.startswith("F3")]
+        check("v122sm P3: 0/6 significant gate gains at 2000", 0.0,
+              float(int(_f3.significant_holm.sum())), 0.5)
+        check("v122sm P3b: all six gate contrasts < 0.5 pp", 6.0,
+              float(int((_f3.effect_pp.abs() < 0.5).sum())), 0.5)
+        check("v122sm P4: registered outcome is ATTENUATION (never re-classified)", 1.0,
+              float(_sci.get("outcome") == "ATTENUATION"), 0.5)
+        check("v122sm P5: no follow-up experiment authorized", 1.0,
+              float(_sci.get("follow_up_authorized") is False), 0.5)
+        check("v122sm P6: nesting 999 pairs verified in the frozen analysis", 999.0,
+              float(_sci.get("rules_passed", {}).get("nesting_pairs_verified", 0)), 0.5)
+        check("v122sm P7: 21/21 arms complete on seeds 4001-4030", 21.0,
+              float(int(((_SRC.seeds == "4001-4030") & (_SRC.n_seeds == 30)
+                         & _SRC.complete).sum())), 0.5)
+        import hashlib as _hl2
+        _sm_sha = _hl2.sha256(open("configs/size_matched_own_transformer_v1.json",
+                                   "rb").read()).hexdigest()
+        check("v122sm P8: frozen size-matched config SHA-256 unchanged", 1.0,
+              float(_sm_sha == "6873cc1a3ed0048238104ff907da1675"
+                               "384f353302770918219a2cff03e2df60"), 0.5)
+        check("v122sm P9: formal-vs-substantive distinction present (main+ieee)", 2.0,
+              float(sum(1 for _n, _t in _texts.items()
+                        if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                        and "prevents a formal elimination classification" in _t
+                        and "attenuation" in _t)), 0.5)
+        check("v122sm P10: sign-rate read as proposal-level variability (main+ieee)", 2.0,
+              float(sum(1 for _n, _t in _texts.items()
+                        if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                        and "proposal-level variability" in _t)), 0.5)
+        check("v122sm P11: 512-vs-never column declared descriptive (main+ieee tables)", 2.0,
+              float(sum(1 for _n, _t in _texts.items()
+                        if _n.endswith("table_size_matched.tex")
+                        and "descriptive (uncorrected)" in _t)), 0.5)
+    else:
+        check("v122sm: size-matched analysis outputs missing", 1.0, None, 0.5)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

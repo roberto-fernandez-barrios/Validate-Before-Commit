@@ -1,0 +1,38 @@
+\begin{table}
+\centering
+\caption{Size-matched control: future-negative signs (negative candidate-minus-incumbent
+balanced accuracy over the H windows after the commit's resolution) out of the commits
+evaluable at each horizon; denominators exclude right-censored commits. At the matched size
+the mean five-window future value is $\approx 0$ in every benchmark, so the near-50\%
+H5 sign rates are proposal-level variability around a null mean, not directional loss.
+Descriptive only: commits cluster within seeds, are not independent trials, and no
+population rate or deployment probability is inferred.}
+\label{tab:size_matched_supp_harm}
+\scriptsize
+\begin{tabular}{l l l r r r r r}
+\toprule
+Regime & Size & Policy & Commits & H1 & H3 & H5 & H10 \\
+\midrule
+PortScan zero & 512 & naive & 111 & 56/106 & 61/101 & 61/98 & 61/90 \\
+PortScan zero & 512 & point & 56 & 33/55 & 36/52 & 30/49 & 33/46 \\
+PortScan zero & 512 & strict & 7 & 2/7 & 3/7 & 2/7 & 3/6 \\
+PortScan zero & 2000 & naive & 111 & 39/106 & 43/101 & 47/98 & 43/90 \\
+PortScan zero & 2000 & point & 92 & 30/88 & 34/84 & 37/81 & 33/73 \\
+PortScan zero & 2000 & strict & 15 & 2/14 & 2/14 & 2/14 & 3/14 \\
+\addlinespace
+UNSW-Recon zero & 512 & naive & 111 & 48/106 & 54/101 & 58/98 & 53/90 \\
+UNSW-Recon zero & 512 & point & 68 & 31/65 & 27/61 & 34/59 & 39/55 \\
+UNSW-Recon zero & 512 & strict & 20 & 8/20 & 13/18 & 14/16 & 13/14 \\
+UNSW-Recon zero & 2000 & naive & 111 & 46/106 & 46/101 & 51/98 & 42/90 \\
+UNSW-Recon zero & 2000 & point & 86 & 33/82 & 36/78 & 40/76 & 31/69 \\
+UNSW-Recon zero & 2000 & strict & 21 & 8/21 & 2/20 & 4/18 & 5/16 \\
+\addlinespace
+ToN-IoT zero & 512 & naive & 111 & 34/106 & 40/101 & 45/98 & 48/90 \\
+ToN-IoT zero & 512 & point & 94 & 23/89 & 31/86 & 38/83 & 41/78 \\
+ToN-IoT zero & 512 & strict & 8 & 4/7 & 3/6 & 3/6 & 2/6 \\
+ToN-IoT zero & 2000 & naive & 111 & 20/106 & 32/101 & 35/98 & 36/90 \\
+ToN-IoT zero & 2000 & point & 105 & 18/100 & 29/96 & 33/94 & 34/86 \\
+ToN-IoT zero & 2000 & strict & 2 & 0/1 & 0/1 & 0/1 & 0/1 \\
+\bottomrule
+\end{tabular}
+\end{table}

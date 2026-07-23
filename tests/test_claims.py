@@ -27,6 +27,9 @@ FINAL_BODY_TABLES = {
     # v1.21 Scenario-A rewrite: the symmetric-pipeline replication is the central new
     # result (main matrix + security guardrail panel in the body; full matrices in S7)
     "table_symmetric_pipeline", "table_symmetric_security",
+    # v1.22 size-matched rewrite: the decisive-control matrix (guardrail panel and full
+    # matrices in S8)
+    "table_size_matched",
 }
 V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",
@@ -37,6 +40,9 @@ V1_SUPPLEMENT_TABLES = {
     # v1.21: full symmetric-pipeline matrices (S7)
     "table_symmetric_supp_contrasts", "table_symmetric_supp_harm",
     "table_symmetric_supp_interaction",
+    # v1.22: full size-matched matrices + guardrail panel (S8)
+    "table_size_matched_security", "table_size_matched_supp_contrasts",
+    "table_size_matched_supp_harm", "table_size_matched_supp_interaction",
 }
 
 

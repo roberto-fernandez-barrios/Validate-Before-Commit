@@ -1,0 +1,27 @@
+\begin{table}
+\centering
+\caption{\textbf{Security guardrails at the matched size (gates vs.\ naive, both at
+2{,}000/class).} Paired per-seed $\Delta$recall and $\Delta$FPR (pp); parentheses:
+one-sided 95\% bound tested against the preregistered NI margins (recall $>-1.0$;
+FPR $<+0.5$). All six matched-size cells pass both margins; at 512 the zero-drift
+UNSW-Recon strict cell again fails recall non-inferiority
+(bound $-1.14$), replicating the prior trade-off. Absence of a
+security trade-off is not evidence of gate utility: the same cells show no significant BA
+gain (main text, size-matched table).}
+\label{tab:size_matched_security}
+\footnotesize
+\begin{tabular}{l l l l l l}
+\toprule
+Regime & Gate & $\Delta$recall (lb$_{95}$) & NI & $\Delta$FPR (ub$_{95}$) & NI \\
+\midrule
+PortScan zero & point & $-0.00$ ($-0.01$) & pass & $-0.11$ ($-0.02$) & pass \\
+PortScan zero & strict & $+0.02$ ($+0.00$) & pass & $-0.24$ ($+0.10$) & pass \\
+\addlinespace
+UNSW-Recon zero & point & $-0.07$ ($-0.19$) & pass & $-0.08$ ($+0.04$) & pass \\
+UNSW-Recon zero & strict & $-0.27$ ($-0.47$) & pass & $-0.39$ ($-0.13$) & pass \\
+\addlinespace
+ToN-IoT zero & point & $+0.03$ ($+0.00$) & pass & $+0.00$ ($+0.00$) & pass \\
+ToN-IoT zero & strict & $+0.08$ ($+0.01$) & pass & $+0.02$ ($+0.04$) & pass \\
+\bottomrule
+\end{tabular}
+\end{table}

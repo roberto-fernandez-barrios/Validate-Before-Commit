@@ -1,6 +1,6 @@
 # Validate Before Commit
 
-**Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection**
+**A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection**
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -12,12 +12,16 @@
 
 Machine-learning intrusion detectors degrade under network **concept drift**, so adaptive systems retrain their
 classifiers. The field treats model updating as a **drift-detection** problem: fire a monitor, retrain on the
-alarm, deploy. This repository shows that the ungoverned step is the *deployment*: always deploying the
-retrained candidate is incomplete and sometimes harmful — and a small commit-time check fixes it.
+alarm, deploy. This repository decomposes what actually happens after the alarm: a trigger *proposes* a
+challenger, and whether promoting it helps depends on **how the challenger is constructed and evidenced**. Two
+preregistered controls trace the observed mean promotion harm to two construction asymmetries — frozen
+incumbent-owned preprocessing (full drift) and a 4× candidate-training-size disadvantage (zero drift). With
+both matched, always-deploy is mean-equivalent to never-adapt, and validation gates add no measurable value;
+where construction or evidence is asymmetric, a small commit-time check recovers the loss.
 
-> **Drift detectors answer "did the distribution change?". An adaptive IDS needs "will deploying this retrained
-> candidate improve the classifier?". These are different questions — and the gap between them is where harmful
-> updates live.**
+> **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
+> Candidate construction, evidence comparability and promotion testing are sequential controls: validate when
+> comparability cannot be guaranteed, not as a substitute for building a fair challenger.**
 
 ---
 
@@ -42,21 +46,29 @@ retrained candidate is incomplete and sometimes harmful — and a small commit-t
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
-- **The symmetric-pipeline dynamic replication (the central v1.21 result — preregistered, fresh seeds 3001–3030,
-  margins and A/B/C decision rules frozen before execution):** rebuilding incumbent and challengers as
-  **self-contained pipelines** — each fitting its own scaler/PCA on its own raw candidate batch, on hash-verified
-  identical raw streams — **removes the mean full-drift harm entirely** (always-deploy turns beneficial in all
-  three benchmarks: +7.21 / +2.55 / +1.03 BA points; the ownership interaction reaches +5.98 on ToN-IoT). The
-  original ToN-IoT full-drift harm was, in its mean, an artifact of the frozen-initial-transformer update policy —
-  stated plainly. **But zero-drift promotion harm persists** under fully self-contained pipelines (PortScan −1.74,
-  UNSW −0.65, both material and Holm-significant; ToN −0.38 resolved but sub-material), most individual proposals
-  there carry negative future value (seed-clustered descriptive fractions), and **point/strict validation recovers
-  it** (all six zero-drift gate contrasts positive and Holm-significant; strict cuts commit exposure by an order of
-  magnitude) — within preregistered recall/FPR guardrails in every winning cell except UNSW-zero/strict, reported
-  as a recall↔FPR trade-off. The locus of average harm shifts from full-drift replacement under frozen
-  preprocessing to healthy-incumbent replacement under self-contained pipelines: correct construction and
-  validate-before-commit are complementary safeguards, not substitutes. (QK-ZZ, VBC-SG and the mild-drift matrix
-  remain evaluated under the historical frozen policy.)
+- **The symmetric-pipeline dynamic replication (preregistered, fresh seeds 3001–3030, margins and A/B/C decision
+  rules frozen before execution):** rebuilding incumbent and challengers as **self-contained pipelines** — each
+  fitting its own scaler/PCA on its own raw candidate batch, on hash-verified identical raw streams —
+  **removes the mean full-drift harm entirely** (always-deploy turns beneficial in all three benchmarks:
+  +7.21 / +2.55 / +1.03 BA points; the ownership interaction reaches +5.98 on ToN-IoT). The original ToN-IoT
+  full-drift harm was, in its mean, an artifact of the frozen-initial-transformer update policy — stated plainly.
+  A residual zero-drift harm survived for its 512-per-class challengers (PortScan −1.74, UNSW −0.65, Holm-sig.;
+  ToN −0.38 resolved but sub-material), where point/strict validation recovered the loss (all six contrasts
+  positive and Holm-significant) — within preregistered recall/FPR guardrails in every winning cell except
+  UNSW-zero/strict, reported as a recall↔FPR trade-off. (QK-ZZ, VBC-SG and the mild-drift matrix remain
+  evaluated under the historical frozen policy.)
+- **The size-matched control (the decisive final result — preregistered, fresh seeds 4001–4030, nested candidate
+  batches, P/A/E outcome rules frozen before execution):** those residual-harm challengers were also trained on
+  **one quarter of the incumbent's per-class evidence** (512 vs 2,000). Giving the identical nested candidates
+  the incumbent's 2,000/class **removes the mean zero-drift harm in all three benchmarks** (naive − never:
+  +0.19 / −0.02 / −0.01, CI90 inside the ±0.5-pp equivalence margin in 3/3), the candidate-size effect is
+  Holm-significant everywhere (+1.89 / +0.63 / +0.23), and **point/strict gates add no measurable value at the
+  matched size** (all six effects <0.14 pp, none significant; the gate×size interactions are uniformly negative —
+  the gates' value at 512 was largely compensation for the evidence asymmetry). The **registered outcome is
+  ATTENUATION**: the preregistered sign-based H5 future-value criterion blocks a formal ELIMINATION
+  classification (near-50% negative-sign rates), while the mean five-window future value of committed
+  size-matched challengers is ≈0 — proposal-level variability around a null mean, not systematic net harm, and
+  not a deployment-risk probability. Formal outcome and substantive reading are both reported, and kept distinct.
 - **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
   vacuous: at a configured probe cap of 512 (about 578 adjudicated probe labels per proposal after deferrals) a
@@ -210,6 +222,14 @@ python -m src.experiments.run_symmetric_pipeline_replication --parity      # fro
 python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized  # seeds 3001-3030
 python -m src.analysis.make_symmetric_pipeline_dynamic_001  # families F1-F4, guardrails, Scenario A/B/C rules
 python -m src.analysis.make_symmetric_pipeline_tables       # manuscript + supplement tables
+
+# size-matched own-transformer control (v1.22 candidate; protocol + P/A/E rules frozen pre-run):
+SM_CFG=configs/size_matched_own_transformer_v1.json
+python -m src.experiments.run_symmetric_pipeline_replication --list-arms --config $SM_CFG  # 21 registered arms
+python -m src.experiments.run_symmetric_pipeline_replication --parity    --config $SM_CFG  # nested-512 bit-parity vs stored v1.21.0 outputs
+python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized --config $SM_CFG  # seeds 4001-4030
+python -m src.analysis.make_size_matched_own_transformer_001  # families F1-F4, nesting audit, P/A/E rules
+python -m src.analysis.make_size_matched_tables               # manuscript + supplement tables
 ```
 
 A `requirements-lock.txt` (pip freeze of the environment that produced the results) accompanies
@@ -235,7 +255,7 @@ The three public benchmarks are **not redistributed** here (place them under `da
 
 The working manuscript (§1–§8) and its bibliography are in [`manuscript/`](manuscript/). Every derived
 table, figure and numeric claim regenerates from this repository (`make reproduce`, or the full
-`make final-paper`, whose audit re-verifies all 439 pinned numbers); the experiment commands that
+`make final-paper`, whose audit re-verifies every pinned number); the experiment commands that
 populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.md`](REPRODUCE.md).
 
 ## Citation
@@ -245,8 +265,8 @@ The paper is under review; cite it as below. To cite the **software artifact** i
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
-  title  = {Validate Before Commit: Candidate Governance for
-            Drift-Triggered Classifier Pipelines in Network Intrusion Detection},
+  title  = {Validate Before Commit: A Controlled Study of Pipeline Construction,
+            Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection},
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},

@@ -3,15 +3,18 @@
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
-- Drift alarms propose candidates; they do not establish deployment benefit  [73]
-- Self-contained pipelines remove mean full-drift harm: ownership amplifies it  [78]
-- Zero-drift promotion harm persists in two benchmarks; validation recovers it  [78]
-- Point, strict and risk-controlled gates define a labels-benefit-risk frontier  [77]
-- Chronological net harm remains unobserved: the main external-validity boundary  [78]
+- Frozen preprocessing can manufacture apparent candidate-promotion harm  [70]
+- Fourfold candidate-size asymmetry explains the residual zero-drift loss  [72]
+- Size-matched self-contained challengers are mean-equivalent to never-adapt  [75]
+- Gates help under asymmetric evidence; no measurable value once sizes match  [75]
+- Candidate construction and validation are complementary, conditional controls  [78]
 
 ## Graphical abstract
 
 `docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
-2299×857, above Elsevier's 1328×531 minimum). Pipeline Alarm → Challenger → Validate → Commit/Reject/Defer,
-with the two policy lines (point/strict gate: more power; risk-controlled gate: formal control, more labels),
-an explicit "Controlled SVC-RBF harm case" badge, and an honest-scope strip (no universal claims).
+2247×857, above Elsevier's 1328×531 minimum). Flow: a drift alarm proposes a challenger →
+check candidate comparability (preprocessing ownership, training evidence) → comparable:
+direct promotion may be adequate (size-matched challengers mean-equivalent in 3/3
+benchmarks); uncertain/asymmetric: validate before commit — with three evidence badges
+(ownership mechanism, size effect, matched-size gate value plus the chronological
+boundary; no universal claims).

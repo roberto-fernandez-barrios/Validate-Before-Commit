@@ -1,0 +1,42 @@
+\begin{table}
+\centering
+\caption{Size-matched control: every contrast of the four frozen families (F1--F4),
+deterministic centered paired bootstrap (100k resamples), Holm within family.
+\emph{equiv}: CI90 fully inside the preregistered $\pm0.5$-point equivalence margin
+($\pm0.2$/$\pm1.0$ sensitivities in \texttt{equivalence.csv}). F4 interactions are
+secondary. Sensitivity $p$-values (paired $t$, Wilcoxon) are in the artifact
+(\texttt{paired\_contrasts.csv}).}
+\label{tab:size_matched_supp_contrasts}
+\scriptsize
+\begin{tabular}{l r r r c}
+\toprule
+Contrast & effect [CI95] & $p$ & $p_{\mathrm{Holm}}$ & equiv $\pm0.5$ \\
+\midrule
+\multicolumn{5}{l}{\emph{F1 size-matched damage}} \\
+ps\_zero: naive-2000 vs never & $+0.19$ [-0.15, 0.55] & 0.30215 & 0.90644 & yes \\
+unsw\_zero: naive-2000 vs never & $-0.02$ [-0.10, 0.06] & 0.62447 & 1.00000 & yes \\
+ton\_zero: naive-2000 vs never & $-0.01$ [-0.05, 0.04] & 0.68981 & 1.00000 & yes \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F2 candidate-size effect}} \\
+ps\_zero: naive-2000 vs naive-512 & $+1.89$ [1.54, 2.23] & 0.00001 & 0.00003 & no \\
+unsw\_zero: naive-2000 vs naive-512 & $+0.63$ [0.53, 0.73] & 0.00001 & 0.00003 & no \\
+ton\_zero: naive-2000 vs naive-512 & $+0.23$ [0.10, 0.38] & 0.00235 & 0.00235 & yes \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F3 gate value at size 2000}} \\
+ps\_zero: point-2000 vs naive-2000 & $+0.05$ [-0.00, 0.12] & 0.07259 & 0.43554 & yes \\
+ps\_zero: strict-2000 vs naive-2000 & $+0.13$ [-0.07, 0.34] & 0.21366 & 0.44142 & yes \\
+unsw\_zero: point-2000 vs naive-2000 & $+0.01$ [-0.02, 0.04] & 0.61116 & 0.61116 & yes \\
+unsw\_zero: strict-2000 vs naive-2000 & $+0.06$ [-0.01, 0.12] & 0.08417 & 0.43554 & yes \\
+ton\_zero: point-2000 vs naive-2000 & $+0.02$ [0.00, 0.04] & 0.10312 & 0.43554 & yes \\
+ton\_zero: strict-2000 vs naive-2000 & $+0.03$ [-0.01, 0.08] & 0.14714 & 0.44142 & yes \\
+\addlinespace
+\multicolumn{5}{l}{\emph{F4 gate x size interaction (secondary)}} \\
+ps\_zero: (point-naive)\,@\,2000 - (point-naive)\,@\,512 & $-0.92$ [-1.25, -0.61] & 0.00001 & 0.00006 & no \\
+ps\_zero: (strict-naive)\,@\,2000 - (strict-naive)\,@\,512 & $-1.54$ [-1.89, -1.20] & 0.00001 & 0.00006 & no \\
+unsw\_zero: (point-naive)\,@\,2000 - (point-naive)\,@\,512 & $-0.18$ [-0.29, -0.09] & 0.00083 & 0.00249 & yes \\
+unsw\_zero: (strict-naive)\,@\,2000 - (strict-naive)\,@\,512 & $-0.41$ [-0.53, -0.29] & 0.00001 & 0.00006 & no \\
+ton\_zero: (point-naive)\,@\,2000 - (point-naive)\,@\,512 & $-0.10$ [-0.21, -0.02] & 0.04006 & 0.04006 & yes \\
+ton\_zero: (strict-naive)\,@\,2000 - (strict-naive)\,@\,512 & $-0.20$ [-0.34, -0.09] & 0.00275 & 0.00550 & yes \\
+\bottomrule
+\end{tabular}
+\end{table}

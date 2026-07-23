@@ -51,9 +51,10 @@ def main():
              r"except the calibrated ensemble on PortScan ($+0.84$). \textbf{Size matters differently "
              r"by learner:} a size-matched control (amendment 012, \S\ref{sec:v2}) \emph{removes} the "
              r"harm for random forest, logistic regression and MLP (all within $\pm0.1$ of zero) but "
-             r"\emph{deepens} it for SVC-RBF, so the size-robust replacement harm is specific to the "
-             r"fragile SVC-RBF learner; the generator sweep is for SVC-RBF. The McNemar gate recovers "
-             r"essentially all of the loss ($+0.00$) where it is present.}")
+             r"\emph{deepens} it for SVC-RBF under this arm's frozen transformer --- a persistence the "
+             r"preregistered own-transformer size-matched control (\S\ref{sec:sizematched}) later shows "
+             r"is bound to the frozen representation; the generator sweep is for SVC-RBF. The McNemar "
+             r"gate recovers essentially all of the loss ($+0.00$) where it is present.}")
     L.append(r"\label{tab:amendment009}")
     L.append(r"__RESIZE_OPEN__")
     L.append(r"\begin{tabular}{l cc cc cc}")

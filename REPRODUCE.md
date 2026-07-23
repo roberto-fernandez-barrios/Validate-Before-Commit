@@ -186,6 +186,36 @@ machine verdict: **Scenario A**). Invariants (frozen parity, batch/probe identit
 role symmetry, temporal semantics, determinism, provenance, seed firewall):
 `tests/test_symmetric_pipeline.py`.
 
+**Size-matched self-contained challenger control (v1.22 candidate — the decisive final block).**
+Registered protocol `notes/paper2_size_matched_own_transformer_protocol_001.md` (frozen commit
+`114513f` BEFORE implementation; machine-evaluable P/A/E outcome rules in §6); config
+`configs/size_matched_own_transformer_v1.json` (SHA-256 recorded in every arm's `run_config.json`).
+21 arms = 3 zero-drift scenarios × (never + {naive, point, strict} × candidate size {512, 2000}/class),
+own-transformer only, confirmatory seeds 4001–4030 (firewalled), smoke 4401–4402. The
+`--candidate-size-per-class` flag activates the nested canonical draw (`nested_candidate_draw` in the
+v2 runner): the 512 batch is bit-identical both to the v1.21.0 draw (5/5 CSVs BIT_IDENTICAL in the
+parity run) and to the first 512 rows/class of the 2000 batch (999 proposal pairs verified):
+
+```bash
+SM_CFG=configs/size_matched_own_transformer_v1.json
+python -m src.experiments.run_symmetric_pipeline_replication --list-arms --config $SM_CFG
+python -m src.experiments.run_symmetric_pipeline_replication --parity    --config $SM_CFG
+python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized --config $SM_CFG
+python -m src.analysis.make_size_matched_own_transformer_001  # F1-F4 (Holm), CI90 equivalence,
+#   guardrails, future-negative-sign accounting, nesting audit, P/A/E rules applied literally
+python -m src.analysis.make_size_matched_tables               # tab:size_matched etc.
+```
+
+Outputs: `results/raw/size_matched_own_transformer/sm_*` (per-arm run_config/command/environment/
+raw_stream_hash/candidate_provenance.jsonl/completion marker) and
+`results/tables/size_matched_own_transformer_001/` (by_seed, paired_contrasts, multiplicity,
+equivalence, security_metrics, harmful_commit_summary, candidate_size_interaction,
+descriptive_contrasts, run_completion, CLAIM_INTERPRETATION.json — machine verdict:
+**ATTENUATION**, with the substantive near-elimination reading recorded alongside). Invariants
+(flag-off bit-parity, nesting, raw-stream pairing, probe identity, leakage, hyperparameter
+identity, complete-bundle commit, determinism, seed firewall, metric recomputation, sealed
+v1.21.0 artifact unchanged): `tests/test_size_matched_control.py`.
+
 **Real chronological streams** (corrected runner, amendment 004; Friday seeds 165–194, Wednesday 196–225,
 Thursday 227–256):
 
