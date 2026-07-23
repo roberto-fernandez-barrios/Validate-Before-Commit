@@ -30,6 +30,9 @@ FINAL_BODY_TABLES = {
     # v1.22 size-matched rewrite: the decisive-control matrix (guardrail panel and full
     # matrices in S8)
     "table_size_matched",
+    # v1.22.1 editorial phase: nominal evidence-vs-validation trade-off, derived
+    # exclusively from the sealed size-matched outputs (no new experiments)
+    "table_evidence_validation_tradeoff",
 }
 V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",

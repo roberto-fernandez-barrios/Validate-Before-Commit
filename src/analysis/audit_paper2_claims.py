@@ -1075,8 +1075,9 @@ def main():
           float(_hits(r"exact paired bootstrap") + _hits(r"exact bootstrap \$?p")), 0.5)
     # v1.21: the symmetric-pipeline supplement contrast table also names the test in its
     # caption (generated into tables/ and tables_ieee/); v1.22 adds the size-matched
-    # supplement contrast table (both dirs), so the document count is 7.
-    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+4 tables)", 7.0,
+    # supplement contrast table (both dirs), and v1.22.1 the evidence-validation
+    # trade-off table (both dirs), so the document count is 9.
+    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+6 tables)", 9.0,
           float(sum(1 for _t in _texts.values()
                     if "centered paired bootstrap" in _t)), 0.5)
     if os.path.exists(f"{Q1}/multiplicity.csv"):
@@ -1177,12 +1178,15 @@ def main():
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
                     and "conditional on a comparable proposal" in _t)), 0.5)
     # v1.22 rewrite: the conclusion's universal-safeguard sentence was replaced by the
-    # registered conditional formulation (rewrite protocol); the guard now protects that.
+    # registered conditional formulation; v1.22.1 sharpens it further (editorial scope
+    # protocol): validate when construction/evidence conditions are asymmetric or
+    # uncertain -- never "valuable when comparability cannot be guaranteed".
     check("v122 E2: conditional-validation conclusion present (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
-                    and "validation is valuable when comparability cannot be guaranteed" in _t
-                    and "not as a universal substitute" in _t)), 0.5)
+                    and "validate the challenger when its construction or evidence "
+                        "conditions remain asymmetric or uncertain" in _t
+                    and "substitute for building a fair challenger" in _t)), 0.5)
     check("v122 E2: chronological net-harm boundary retained (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
@@ -1433,11 +1437,13 @@ def main():
         check("v122sm P8: frozen size-matched config SHA-256 unchanged", 1.0,
               float(_sm_sha == "6873cc1a3ed0048238104ff907da1675"
                                "384f353302770918219a2cff03e2df60"), 0.5)
+        # v1.22.1: "formal ELIMINATION" phrasing retired (editorial scope protocol); the
+        # distinction is now anchored on the formal-classification/substantive-reading pair.
         check("v122sm P9: formal-vs-substantive distinction present (main+ieee)", 2.0,
               float(sum(1 for _n, _t in _texts.items()
                         if _n.endswith(("/main.tex", "/main_ieee.tex"))
-                        and "prevents a formal elimination classification" in _t
-                        and "attenuation" in _t)), 0.5)
+                        and "formal classification" in _t
+                        and "attenuation" in _t and "distinct" in _t)), 0.5)
         check("v122sm P10: sign-rate read as proposal-level variability (main+ieee)", 2.0,
               float(sum(1 for _n, _t in _texts.items()
                         if _n.endswith(("/main.tex", "/main_ieee.tex"))
@@ -1448,6 +1454,130 @@ def main():
                         and "descriptive (uncorrected)" in _t)), 0.5)
     else:
         check("v122sm: size-matched analysis outputs missing", 1.0, None, 0.5)
+
+    # --- v1.22.1 editorial scope correction guards (notes/v1_22_1_editorial_scope_protocol.md) ---
+    def _in_mains(*needles):
+        return float(sum(1 for _n, _t in _texts.items()
+                         if _n.endswith(("/main.tex", "/main_ieee.tex"))
+                         and all(nd in _t for nd in needles)))
+
+    # Data availability: exact v1.22.0 identity declared; stale v1.20.2 declaration gone.
+    check("v1221 DA: exact version DOI 10.5281/zenodo.21517899 (main+ieee)", 2.0,
+          _in_mains("10.5281/zenodo.21517899"), 0.5)
+    check("v1221 DA: concept DOI 10.5281/zenodo.21322256 (main+ieee)", 2.0,
+          _in_mains("10.5281/zenodo.21322256"), 0.5)
+    check("v1221 DA: sealing commit 43d9c25... declared (main+ieee)", 2.0,
+          _in_mains("43d9c255af48db9bcc3c6eb341a153381b18c8e8"), 0.5)
+    check("v1221 DA: artifact version v1.22.0 declared (main+ieee)", 2.0,
+          _in_mains("artifact version v1.22.0"), 0.5)
+    check("v1221 DA: no 'artifact version v1.20.2' declaration anywhere", 0.0,
+          float(_hits(r"artifact version\s*v?1\.20\.2")), 0.5)
+    # Scope: zero-drift qualifier on the size-matched claims, everywhere it is claimed.
+    check("v1221 S: highlights carry zero-drift scope (tex block + highlights.md)", 1.0,
+          float("under zero drift" in _texts.get("manuscript/main.tex", "")
+                and "zero-drift control" in _texts.get("manuscript/main.tex", "")
+                and "under zero drift" in _texts.get("manuscript/highlights.md", "")), 0.5)
+    check("v1221 S: graphical abstract names the ZERO-DRIFT CONTROL", 1.0,
+          float("zero-drift control" in open(
+              "src/analysis/make_paper2_graphical_abstract_final.py",
+              encoding="utf-8").read().lower()), 0.5)
+    check("v1221 S: no unscoped 'no measurable value once sizes match'", 0.0,
+          float(_hits(r"no measurable value once sizes match")), 0.5)
+    check("v1221 S: no 'when comparability is (already )?guaranteed' claim", 0.0,
+          float(_hits(r"comparability is (already )?guaranteed")), 0.5)
+    check("v1221 S: size-matched transfer limits retained (zero drift only)", 2.0,
+          _in_mains("only under zero drift"), 0.5)
+    # README: conditional recommendation, no universal gating.
+    check("v1221 R: README universal 'challenger should be validated before' gone", 0.0,
+          float(_hits(r"the challenger should be validated before it replaces")), 0.5)
+    check("v1221 R: README conditional recommendation present", 1.0,
+          float("asymmetric or uncertain, validate the challenger"
+                in _texts.get("README.md", "")), 0.5)
+    check("v1221 R: README states zero-drift no-gain result", 1.0,
+          float("point and strict validation provided no measurable gain"
+                in _texts.get("README.md", "")
+                and "nominal 2,000-per-class parity" in _texts.get("README.md", "")), 0.5)
+    # Terminology: nominal parity, and the nominal-vs-effective caveat.
+    check("v1221 T: 'nominal' sample-size parity terminology (main+ieee)", 2.0,
+          _in_mains("sample-size parity"), 0.5)
+    check("v1221 T: nominal-vs-effective evidence caveat present (main+ieee)", 2.0,
+          _in_mains("temporal coverage, diversity, subtype support, label quality"), 0.5)
+    check("v1221 T: row-counts-alone disclaimer present (main+ieee)", 2.0,
+          _in_mains("not a consequence of equal row counts alone"), 0.5)
+    # Equivalence margin sensitivity: pinned against the derived CSV.
+    _eqs = "results/tables/v1_22_1_editorial/equivalence_margin_sensitivity.csv"
+    if os.path.exists(_eqs):
+        _E = pd.read_csv(_eqs).set_index("contrast")
+        _ps = _E.loc["ps_zero: naive-2000 vs never"]
+        check("v1221 EQ: PortScan damage not equivalent at +-0.2", 0.0,
+              float(bool(_ps.equivalent_pm0p2)), 0.5)
+        check("v1221 EQ: PortScan damage equivalent at +-0.5 and +-1.0", 2.0,
+              float(bool(_ps.equivalent_pm0p5)) + float(bool(_ps.equivalent_pm1p0)), 0.5)
+        for _sc in ("unsw_zero", "ton_zero"):
+            _r = _E.loc[f"{_sc}: naive-2000 vs never"]
+            check(f"v1221 EQ: {_sc} damage equivalent at all margins", 3.0,
+                  float(bool(_r.equivalent_pm0p2)) + float(bool(_r.equivalent_pm0p5))
+                  + float(bool(_r.equivalent_pm1p0)), 0.5)
+        check("v1221 EQ: +-0.5 is the registered primary margin", 0.5,
+              float(_E.registered_primary_margin.iloc[0]), 0.01)
+        check("v1221 EQ: margin-dependence stated in text (main+ieee)", 2.0,
+              _in_mains("margin-dependent"), 0.5)
+        check("v1221 EQ: PortScan margin sensitivity stated (main+ieee)", 2.0,
+              _in_mains("margin-sensitive at"), 0.5)
+    else:
+        check("v1221 EQ: equivalence_margin_sensitivity.csv missing", 1.0, None, 0.5)
+    check("v1221 EQ: no bare 'identical performance'/'equal performance' claim", 0.0,
+          float(_hits(r"identical performance") + _hits(r"equal performance")), 0.5)
+    # Evidence-validation trade-off table: derived counts pinned against CSV + config.
+    _tro = "results/tables/v1_22_1_editorial/evidence_validation_tradeoff.csv"
+    if os.path.exists(_tro):
+        _T2 = pd.read_csv(_tro)
+        _main_rows = _T2[_T2.block == "main"]
+        check("v1221 CT: 12 main rows, no duplicates", 12.0,
+              float(len(_main_rows.drop_duplicates(["dataset", "policy"]))), 0.5)
+        check("v1221 CT: 2,976 additional candidate labels per proposal", 2976.0,
+              float(_T2.additional_candidate_labels_512_to_2000.iloc[0]), 0.5)
+        check("v1221 CT: candidate labels/proposal are 1024 and 4000", 1.0,
+              float(sorted(_T2.candidate_labels_per_proposal.unique().tolist())
+                    == [1024, 4000]), 0.5)
+        check("v1221 CT: probe labels/proposal are 0 (naive) and 32 (gates)", 1.0,
+              float(sorted(_T2.probe_labels_per_proposal.unique().tolist()) == [0, 32]), 0.5)
+        _f1 = pd.read_csv(
+            "results/tables/size_matched_own_transformer_001/paired_contrasts.csv"
+        ).set_index("contrast")
+        _ok = all(abs(float(_T2[(_T2.policy == "naive_2000")
+                               & (_T2.scenario == _sc)].ba_vs_never_pp.iloc[0])
+                      - float(_f1.loc[f"{_sc}: naive-2000 vs never"].effect_pp)) < 1e-9
+                  for _sc in ("ps_zero", "unsw_zero", "ton_zero"))
+        check("v1221 CT: naive-2000 BA-vs-never matches sealed F1", 1.0, float(_ok), 0.5)
+        check("v1221 CT: table input present in main (both formats)", 2.0,
+              float(sum(1 for _n in _texts
+                        if _n.endswith("table_evidence_validation_tradeoff.tex"))), 0.5)
+        check("v1221 CT: no-economic-dominance caveat present", 2.0,
+              float(_hits(r"economic dominance") >= 2), 1.5)
+    else:
+        check("v1221 CT: evidence_validation_tradeoff.csv missing", 1.0, None, 0.5)
+    # Historical evidence: frozen-policy table re-captioned as a diagnostic.
+    check("v1221 H: v2 table captioned 'Historical frozen-policy diagnostic' (2 dirs)", 2.0,
+          float(sum(1 for _n, _t in _texts.items()
+                    if _n.endswith("table_v2_confirmatory.tex")
+                    and "historical frozen-policy diagnostic" in _t)), 0.5)
+    check("v1221 H: no 'Main confirmatory result' caption/heading left", 0.0,
+          float(_hits(r"main confirmatory result")), 0.5)
+    # Detector-score claims: conditional on triggered decisions; absolutes gone.
+    check("v1221 D: 'within triggered decisions' scoping present (main+ieee)", 2.0,
+          _in_mains("within triggered decisions"), 0.5)
+    check("v1221 D: no 'is not the lever' absolute", 0.0,
+          float(_hits(r"is not the lever|not the lever in any regime")), 0.5)
+    check("v1221 D: no 'score is uninformative' absolute", 0.0,
+          float(_hits(r"score is uninformative|scores are uninformative")), 0.5)
+    # ATTENUATION presentation: registered outcome kept; banned glosses absent.
+    check("v1221 A: registered ATTENUATION outcome retained (main+ieee)", 2.0,
+          _in_mains("attenuation"), 0.5)
+    check("v1221 A: no 'near-elimination'/'effectively elimination'/'formal elimination'", 0.0,
+          float(_hits(r"near-elimination|effectively elimination|formal elimination")), 0.5)
+    check("v1221 A: no 'residual mean harm under attenuation'", 0.0,
+          float(_hits(r"residual mean harm under attenuation")), 0.5)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)
