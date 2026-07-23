@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-22T14:25:25Z",
-  "source_commit_sha": "588c89e90b823813043a559e7ebd307cf57baf2a",
+  "generated_at_utc": "2026-07-23T21:08:29Z",
+  "source_commit_sha": "cccc5e43c6769bc0b38f18370d45e44ef61c9f95",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.21.0",
+  "artifact_version": "1.22.0",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -301,8 +301,8 @@
   },
   "experiment_ledger": {
     "path": "results/final_experiment_ledger.csv",
-    "n_blocks": 11,
-    "n_arm_dirs": 541,
+    "n_blocks": 12,
+    "n_arm_dirs": 562,
     "missing_blocks": [],
     "n_orphan_dirs": 0,
     "orphan_dirs": []
@@ -353,7 +353,7 @@
       "Wilcoxon signed-rank"
     ],
     "harm_population_rate_bound_removed": true,
-    "claim_scope_audit_claims": 14,
+    "claim_scope_audit_claims": 18,
     "claim_scope_audit_failures": 0
   },
   "editorial_v1_20_2": {
@@ -364,8 +364,8 @@
     "primary_results_changed": false,
     "scientific_csvs_changed": false,
     "article_word_count_before": 19413,
-    "article_word_count_after": 19835,
-    "article_word_reduction_pct": -2.2
+    "article_word_count_after": 19507,
+    "article_word_reduction_pct": -0.5
   },
   "symmetric_replication_v1_21": {
     "title": "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection",
@@ -494,9 +494,112 @@
     "v1_20_2_raw_outputs": "unchanged (MANIFEST re-pin additive 164->173)",
     "manuscript_pages": {
       "main.pdf": 33,
-      "supplement.pdf": 27,
+      "supplement.pdf": 29,
       "main_ieee.pdf": 25
     }
+  },
+  "size_matched_control_v1_22": {
+    "title": "Validate Before Commit: A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection",
+    "registered_outcome": "ATTENUATION",
+    "outcome_note": "ATTENUATION under the frozen P/A/E rules: E1+E2 equivalence pass; the preregistered sign-based H5 future-value criterion (E3) blocks formal ELIMINATION; substantively, size matching neutralizes the mean zero-drift harm (mean H5 future value ~0 at the matched size); never retro-classified",
+    "protocol_commits": {
+      "protocol": "114513f8613d",
+      "freeze": "c4df062",
+      "rewrite_protocol": "c7fca9d"
+    },
+    "config_sha256": "6873cc1a3ed0048238104ff907da1675384f353302770918219a2cff03e2df60",
+    "confirmatory_seeds": "4001-4030",
+    "smoke_seeds": "4401-4402",
+    "expected_arms": 21,
+    "completed_arms": 21,
+    "nesting": "batch_512 == first 512 rows/class of batch_2000 at every proposal; 999 (seed, window) pairs verified; 512 path bit-identical to v1.21.0 (5/5 CSVs BIT_IDENTICAL in the parity run, seeds 4242-4243)",
+    "zero_drift_naive512_vs_never": {
+      "ps_zero": {
+        "effect_pp": -1.7029,
+        "ci95": [
+          -2.0451,
+          -1.362
+        ]
+      },
+      "unsw_zero": {
+        "effect_pp": -0.6536,
+        "ci95": [
+          -0.7664,
+          -0.5477
+        ]
+      },
+      "ton_zero": {
+        "effect_pp": -0.2372,
+        "ci95": [
+          -0.393,
+          -0.0997
+        ]
+      }
+    },
+    "zero_drift_naive2000_vs_never": {
+      "ps_zero": {
+        "effect_pp": 0.1854,
+        "ci95": [
+          -0.1513,
+          0.5547
+        ],
+        "equivalent_pm0p5": true
+      },
+      "unsw_zero": {
+        "effect_pp": -0.0206,
+        "ci95": [
+          -0.1042,
+          0.0609
+        ],
+        "equivalent_pm0p5": true
+      },
+      "ton_zero": {
+        "effect_pp": -0.0094,
+        "ci95": [
+          -0.0544,
+          0.0367
+        ],
+        "equivalent_pm0p5": true
+      }
+    },
+    "candidate_size_effect_naive2000_vs_naive512": {
+      "ps_zero": {
+        "effect_pp": 1.8883,
+        "ci95": [
+          1.5388,
+          2.226
+        ]
+      },
+      "unsw_zero": {
+        "effect_pp": 0.6331,
+        "ci95": [
+          0.5336,
+          0.7326
+        ]
+      },
+      "ton_zero": {
+        "effect_pp": 0.2279,
+        "ci95": [
+          0.1013,
+          0.3755
+        ]
+      }
+    },
+    "gate_value_at_2000": "0/6 Holm-significant; all effects < 0.14 pp; all six CI90-equivalent to naive within +-0.5 pp",
+    "guardrails": "all six matched-size gate cells pass recall/FPR NI; unsw strict_512 recall-NI failure replicates (trade-off language only)",
+    "statistical_families": {
+      "F1": 3,
+      "F2": 3,
+      "F3": 6,
+      "F4": 6,
+      "correction": "Holm within family",
+      "test": "deterministic centered paired bootstrap (100k)"
+    },
+    "future_negative_signs_caveat": "descriptive within-trajectory sign fractions over seed-clustered commits; near-50% rates at the matched size around a ~0 mean; no population prevalence, deployment probability or binomial bound inferred",
+    "scope": "zero drift only; random proposal trigger; balanced pools; own-transformer only; full-drift size-matched, observed-data size-matched and VBC-SG under size-matched own pipelines NOT evaluated",
+    "v1_21_0_artifact": "unchanged (sealed manifests byte-identical; 173/173 pinned)",
+    "experiments_added": "size-matched own-transformer control (21-arm registered matrix)",
+    "unregistered_experiments": "none"
   },
   "operational_arm_scope": {
     "evaluation_stream_prevalence": "balanced",
@@ -518,8 +621,8 @@
     "end_to_end_pipeline_cost_modeled": false
   },
   "outputs": {
-    "tables_manifest_sha256": "8500c6e2e241a34bca1001f7f312e3e3ab663aab1d9bd537288469a7cd3cdc43",
-    "n_table_csvs": 173,
+    "tables_manifest_sha256": "132643ad37e6b959775369043a58f862ceaea067364848f970f58212e738d87f",
+    "n_table_csvs": 183,
     "pdfs": [
       "manuscript/main.pdf",
       "manuscript/supplement.pdf",
@@ -528,7 +631,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 561,
-    "checks_total": 561
+    "checks_passed": 586,
+    "checks_total": 586
   }
 }
