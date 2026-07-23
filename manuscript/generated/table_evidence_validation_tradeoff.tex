@@ -1,9 +1,9 @@
 \begin{table}[t]
 \centering
-\caption{Nominal evidence--validation trade-off under the preregistered zero-drift size-matched control (own-transformer, random proposals, balanced pools, SVC-RBF, seeds 4001--4030). ``Cand.'' and ``Probe'' are nominal adjudicated labels per proposal (candidate training and gate probe); moving from 512 to 2{,}000 samples per class adds $2\times1{,}488 = 2{,}976$ nominal candidate-training labels per proposal, whereas the evaluated point/strict decision uses a 32-label probe. Nominal counts do not model inspected-flow or acquisition cost, so no economic dominance is claimed. BA contrasts are paired per seed (CI95, deterministic centered paired bootstrap); naive-2{,}000 vs never is the registered F1 contrast, gate gains at 2{,}000 are the registered F3 family (none Holm-significant), and gate-vs-never / 512-side cells are descriptive and uncorrected. The point-2{,}000 / strict-2{,}000 policies (supplementary block of the artifact CSV) differ from naive-2{,}000 by less than $0.14$ pp: all six registered gate contrasts at the matched size are non-significant and CI90-equivalent to naive within $\pm$0.5 pp.}
+\caption{Nominal evidence--validation trade-off under the preregistered zero-drift size-matched control (own-transformer, random proposals, balanced pools, SVC-RBF, seeds 4001--4030). ``Cand.''/``Probe'' are nominal adjudicated labels per proposal; moving from 512 to 2{,}000 per class adds $2\times1{,}488 = 2{,}976$ candidate-training labels per proposal versus the 32-label point/strict probe --- counts, not costs: inspected-flow acquisition is not modeled and no economic dominance is claimed. Paired per-seed BA contrasts (CI95, deterministic centered paired bootstrap): naive-2{,}000 vs never is registered F1, gate gains at 2{,}000 are registered F3 (none Holm-significant), 512-side and gate-vs-never cells are descriptive, uncorrected. The supplementary point/strict-2{,}000 policies differ from naive-2{,}000 by $<0.14$ pp (non-significant, CI90-equivalent within $\pm$0.5 pp). Guardrails: all matched-size gate cells pass recall/FPR non-inferiority; at 512 the UNSW strict cell fails recall non-inferiority (Supplementary~\S S8).}
 \label{tab:evidence_validation_tradeoff}
-\small
-\setlength{\tabcolsep}{4pt}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{l l r r l l r}
 \toprule
 Dataset & Policy & Cand. & Probe & BA vs never [CI95] & Gate gain vs naive [CI95] & Commits/seed \\
@@ -24,10 +24,4 @@ Dataset & Policy & Cand. & Probe & BA vs never [CI95] & Gate gain vs naive [CI95
  & naive 2{,}000 & 4,000 & 0 & $-0.01$ [-0.05, +0.04] & --- & 3.70 \\
 \bottomrule
 \end{tabular}
-
-\smallskip
-\raggedright\footnotesize \dag{} = Holm-significant within its registered family
-(none at the matched size). Guardrails: every matched-size gate cell passes both
-preregistered recall/FPR non-inferiority margins; at 512 the zero-drift UNSW strict
-cell fails recall non-inferiority (Supplementary~\S S8).
 \end{table}

@@ -16,7 +16,7 @@ import sys
 from tests.conftest import REPO
 
 FINAL_BODY_TABLES = {
-    "table_v2_confirmatory", "table_policy_frontier",
+    "table_policy_frontier",
     "table_causal_probe", "table_zero_drift", "table_amendment009",
     "table_harm_generality",
     # final-q1 additions (table_symmetric_ab and table_temporal_streams moved to the
@@ -46,6 +46,9 @@ V1_SUPPLEMENT_TABLES = {
     # v1.22: full size-matched matrices + guardrail panel (S8)
     "table_size_matched_security", "table_size_matched_supp_contrasts",
     "table_size_matched_supp_harm", "table_size_matched_supp_interaction",
+    # v1.22.1: the historical frozen-policy diagnostic table moved to S2.11 to make
+    # room for the evidence-validation trade-off table (compact summary stays in §5.1)
+    "table_v2_confirmatory",
 }
 
 
