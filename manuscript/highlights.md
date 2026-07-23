@@ -3,18 +3,17 @@
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
-- Frozen preprocessing can manufacture apparent candidate-promotion harm  [70]
-- Fourfold candidate-size asymmetry explains the residual zero-drift loss  [72]
-- Size-matched self-contained challengers are mean-equivalent to never-adapt  [75]
-- Gates help under asymmetric evidence; no measurable value once sizes match  [75]
-- Candidate construction and validation are complementary, conditional controls  [78]
+- Frozen incumbent-owned preprocessing can manufacture apparent promotion harm  [76]
+- A fourfold candidate-size disadvantage explains the residual zero-drift mean loss  [81]
+- Under zero drift, size-matched self-contained challengers meet the ±0.5-pp margin  [81]
+- Under that zero-drift control, point and strict gates provide no measurable gain  [80]
+- Construction, nominal evidence parity and validation are conditional controls  [77]
 
 ## Graphical abstract
 
 `docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
-2247×857, above Elsevier's 1328×531 minimum). Flow: a drift alarm proposes a challenger →
-check candidate comparability (preprocessing ownership, training evidence) → comparable:
-direct promotion may be adequate (size-matched challengers mean-equivalent in 3/3
-benchmarks); uncertain/asymmetric: validate before commit — with three evidence badges
-(ownership mechanism, size effect, matched-size gate value plus the chronological
-boundary; no universal claims).
+2247×857, above Elsevier's 1328×531 minimum). Flow: a trigger is not superiority →
+check candidate construction → check evidence conditions → nominal parity evaluated?
+No/uncertain: validation may be useful; yes, under the ZERO-DRIFT CONTROL (own
+preprocessing + 2,000/class nominal size parity): mean BA equivalent within ±0.5 pp,
+no measurable point/strict gain in this control — no universal deployment rule.

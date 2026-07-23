@@ -15,13 +15,16 @@ classifiers. The field treats model updating as a **drift-detection** problem: f
 alarm, deploy. This repository decomposes what actually happens after the alarm: a trigger *proposes* a
 challenger, and whether promoting it helps depends on **how the challenger is constructed and evidenced**. Two
 preregistered controls trace the observed mean promotion harm to two construction asymmetries — frozen
-incumbent-owned preprocessing (full drift) and a 4× candidate-training-size disadvantage (zero drift). With
-both matched, always-deploy is mean-equivalent to never-adapt, and validation gates add no measurable value;
-where construction or evidence is asymmetric, a small commit-time check recovers the loss.
+incumbent-owned preprocessing (full drift) and a 4× nominal candidate-training-size disadvantage (zero drift).
+In the preregistered zero-drift control, with both asymmetries removed (own preprocessing + nominal
+2,000-per-class sample-size parity), always-deploy is mean-equivalent to never-adapt within the ±0.5-pp margin
+and point/strict validation gates add no measurable value; where construction or evidence is asymmetric, a
+small commit-time check recovers the loss.
 
 > **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
-> Candidate construction, evidence comparability and promotion testing are sequential controls: validate when
-> comparability cannot be guaranteed, not as a substitute for building a fair challenger.**
+> Candidate construction, nominal evidence parity and promotion testing are sequential controls: validate the
+> challenger when its construction or evidence conditions remain asymmetric or uncertain, not as a substitute
+> for building a fair challenger.**
 
 ---
 
@@ -33,16 +36,21 @@ where construction or evidence is asymmetric, a small commit-time check recovers
 - Whether an update helps tracks **how degraded the deployed model already is**: retraining restores
   accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity
   drift-detector scores do not measure (at individual triggered decisions a hierarchical model clustered
-  on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). The detector — classical two-sample test or quantum-kernel
-  MMD — is **not the lever** in any regime we evaluated: improving the monitor did not improve the update decision.
+  on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). Within triggered decisions under the
+  evaluated detectors — classical two-sample tests or quantum-kernel MMD — score magnitude provided no
+  consistent incremental information about future candidate value beyond incumbent degradation: improving the
+  monitor did not improve the update decision in any regime we evaluated.
 - **Harm is a condition, not a dataset:** a *registered prediction test* (locked before running) confirms the account's sharpest consequence — under mild drift, where the incumbent stays healthy, always-deploy turns negative in **all three benchmarks** (CICIDS −0.46, UNSW −0.15, ToN −0.65; statistically resolved in UNSW and ToN), while the gate stays within its pre-registered tolerance and beats naive in each. (Mild-drift evidence is from the historical frozen-transformer configuration; the healthy-incumbent condition itself is re-confirmed under self-contained pipelines by the zero-drift cells of the symmetric replication below.)
 - Simple confirmation/cooldown policies and a 50/50 replay strategy do **not** fix it (pre-specified negatives).
 - **Candidate governance, not just drift detection:** a **validate-before-commit gate** — the loop retrains its
   candidate as usual, and the gate decides **deployment**: commit only if the candidate beats the incumbent on a
   small labeled probe (32 flows — the *decision's* incremental cost; candidates themselves consume ~1,024
   labels/trigger, fully accounted). A drift alarm is a *proposal generator*, not deployment evidence: whatever
-  produces a proposal — true drift, a false alarm, or a scheduled retrain — the challenger should be validated
-  before it replaces the incumbent. A **zero-drift control** makes the point: forcing updates on a healthy model
+  produces a proposal — true drift, a false alarm or a schedule — the trigger alone is not deployment evidence.
+  When candidate construction or evidence conditions remain asymmetric or uncertain, validate the challenger
+  before replacing the incumbent. (In the preregistered zero-drift size-matched control, point and strict
+  validation provided no measurable gain once self-contained challengers reached nominal 2,000-per-class
+  parity.) A **zero-drift control** makes the point: forcing updates on a healthy model
   is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
@@ -61,12 +69,15 @@ where construction or evidence is asymmetric, a small commit-time check recovers
   batches, P/A/E outcome rules frozen before execution):** those residual-harm challengers were also trained on
   **one quarter of the incumbent's per-class evidence** (512 vs 2,000). Giving the identical nested candidates
   the incumbent's 2,000/class **removes the mean zero-drift harm in all three benchmarks** (naive − never:
-  +0.19 / −0.02 / −0.01, CI90 inside the ±0.5-pp equivalence margin in 3/3), the candidate-size effect is
-  Holm-significant everywhere (+1.89 / +0.63 / +0.23), and **point/strict gates add no measurable value at the
-  matched size** (all six effects <0.14 pp, none significant; the gate×size interactions are uniformly negative —
-  the gates' value at 512 was largely compensation for the evidence asymmetry). The **registered outcome is
-  ATTENUATION**: the preregistered sign-based H5 future-value criterion blocks a formal ELIMINATION
-  classification (near-50% negative-sign rates), while the mean five-window future value of committed
+  +0.19 / −0.02 / −0.01, CI90 inside the ±0.5-pp equivalence margin in 3/3; PortScan is margin-sensitive at the
+  ±0.2-pp sensitivity), the candidate-size effect is Holm-significant everywhere (+1.89 / +0.63 / +0.23), and
+  **point/strict gates add no measurable value at the matched nominal size under this zero-drift control**
+  (all six effects <0.14 pp, none significant; the gate×size interactions are uniformly negative —
+  the gates' value at 512 was largely compensation for the nominal evidence asymmetry). Nominal per-class
+  sample-size parity isolates training-set size; it does not by itself establish equivalence in temporal
+  coverage, diversity, subtype support, label quality or effective sample size. The **registered outcome is
+  ATTENUATION**: the preregistered sign-based H5 future-value criterion remained inconclusive (near-50%
+  negative-sign rates), so ELIMINATION was not assigned, while the mean five-window future value of committed
   size-matched challengers is ≈0 — proposal-level variability around a null mean, not systematic net harm, and
   not a deployment-risk probability. Formal outcome and substantive reading are both reported, and kept distinct.
 - **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving

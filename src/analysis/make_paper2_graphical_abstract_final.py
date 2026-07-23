@@ -1,10 +1,11 @@
-"""Graphical abstract, redesigned for the final size-matched framing (registered rewrite
-protocol notes/size_matched_final_rewrite_protocol.md).
+"""Graphical abstract, v1.22.1 editorial-scope revision (protocol
+notes/v1_22_1_editorial_scope_protocol.md; supersedes the size-matched rewrite spec).
 
-Spec: Trigger != superiority -> check candidate comparability (preprocessing ownership +
-training evidence) -> comparable? yes -> direct promotion may be adequate; uncertain or
-asymmetric -> validate before commit. Three evidence badges, no universal claims.
-Output above Elsevier's 1328x531 minimum.
+Spec: Trigger != superiority -> check candidate construction -> check evidence
+conditions -> nominal parity evaluated?  No/uncertain -> validation may be useful;
+yes, under the ZERO-DRIFT CONTROL (own preprocessing + 2,000/class nominal size
+parity) -> mean BA equivalent within +-0.5 pp, no measurable point/strict gain in
+this control. No universal deployment rule. Output above Elsevier's 1328x531 minimum.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -31,50 +32,60 @@ def arrow(x0, y0, x1, y1, color="0.25", lw=2.6, style="-|>"):
 
 
 # ---- title strip ----
-ax.text(50, 94, "A drift alarm proposes a challenger — it does not establish superiority",
+ax.text(50, 94.5, "A trigger proposes a challenger — it does not establish superiority",
         ha="center", fontsize=FS_BIG, fontweight="bold")
 
-# ---- flow: trigger -> comparability check -> two branches ----
-y0, h0 = 52, 24
-box(2, y0 + 4, 15, h0 - 8, "Drift alarm\n(or schedule,\nor false alarm)", "#fff3e0", "#e65100", fs=FS_SM)
-arrow(18.5, y0 + h0 / 2, 23.5, y0 + h0 / 2)
-box(24, y0, 25, h0,
-    "CHECK CANDIDATE\nCOMPARABILITY\n"
-    "— preprocessing ownership\n— training evidence (size)",
-    "#e3f2fd", "#1565c0", fs=FS_SM, bold=True)
+# ---- top flow: trigger -> construction check -> evidence check -> parity question ----
+y0, h0 = 63, 22
+box(1.5, y0 + 2, 14.5, h0 - 4, "Drift alarm\n(or schedule,\nor false alarm)",
+    "#fff3e0", "#e65100", fs=11.5)
+arrow(17.5, y0 + h0 / 2, 20.5, y0 + h0 / 2)
+box(21, y0, 20, h0, "CHECK CANDIDATE\nCONSTRUCTION\nown preprocessing,\nnot the incumbent's",
+    "#e3f2fd", "#1565c0", fs=11.5, bold=True)
+arrow(42.5, y0 + h0 / 2, 45.5, y0 + h0 / 2)
+box(46, y0, 20, h0, "CHECK EVIDENCE\nCONDITIONS\nnominal per-class\ntraining size",
+    "#e3f2fd", "#1565c0", fs=11.5, bold=True)
+arrow(67.5, y0 + h0 / 2, 70.5, y0 + h0 / 2)
+box(71, y0, 27, h0, "NOMINAL PARITY\nEVALUATED?",
+    "#f3e5f5", "#6a1b9a", fs=13.5, bold=True)
 
-arrow(50.5, y0 + h0 * 0.72, 57.5, 74)
-arrow(50.5, y0 + h0 * 0.28, 57.5, 40)
-ax.text(54, 70, "comparable", fontsize=11, ha="center", rotation=18, color="#1b5e20")
-ax.text(54, 48, "uncertain /\nasymmetric", fontsize=11, ha="center", rotation=-18, color="#4527a0")
+# ---- branches ----
+arrow(74, y0 - 1.5, 28, 54, color="#4527a0")
+arrow(92, y0 - 1.5, 86, 55.5, color="#1b5e20")
+ax.text(49, 60.5, "no / uncertain", fontsize=11.5, ha="center", color="#4527a0",
+        bbox=dict(fc="white", ec="none", alpha=0.9, pad=1.5))
+ax.text(83, 58.5, "yes, under zero drift", fontsize=11.5, ha="right", color="#1b5e20",
+        bbox=dict(fc="white", ec="none", alpha=0.9, pad=1.5))
 
-box(58, 64, 40, 20,
-    "Direct promotion may be adequate\n"
-    "size-matched self-contained challengers:\n"
-    "always-deploy ≡ never-adapt (3/3 benchmarks)",
-    "#e8f5e9", "#1b5e20", fs=FS_SM)
-box(58, 30, 40, 20,
-    "VALIDATE BEFORE COMMIT\n"
-    "gates recover the loss where evidence\n"
-    "is limited, noisy or uncertain",
-    "#ede7f6", "#4527a0", fs=FS_SM, bold=True)
+box(2, 31, 44, 21,
+    "VALIDATION MAY BE USEFUL\n"
+    "validate before commit: gates recovered the\n"
+    "loss where construction or evidence\n"
+    "conditions were asymmetric",
+    "#ede7f6", "#4527a0", fs=11.5, bold=True)
+box(50, 27.5, 48.5, 26.5,
+    "ZERO-DRIFT CONTROL\n"
+    "own preprocessing + 2,000/class nominal size parity\n"
+    "$\\rightarrow$ mean BA equivalent within $\\pm$0.5 pp\n"
+    "$\\rightarrow$ no measurable point/strict gain in this control",
+    "#e8f5e9", "#1b5e20", fs=FS_SM, bold=True)
 
-# ---- three evidence badges ----
-box(1.5, 4, 31.5, 21,
+# ---- three evidence badges (scoped; no universal deployment rule) ----
+box(1.5, 3, 31.5, 19,
     "Frozen incumbent-owned\n"
     "preprocessing manufactured the\n"
     "full-drift harm (scaling, not projection)",
-    "#fff8e1", "#795548", fs=12)
-box(34, 4, 31.5, 21,
-    "A 4× candidate-size disadvantage\n"
+    "#fff8e1", "#795548", fs=11.5)
+box(34, 3, 31.5, 19,
+    "A 4× nominal candidate-size disadvantage\n"
     "explains the residual zero-drift loss\n"
     "(+1.89 / +0.63 / +0.23 pp, Holm-sig.)",
-    "#f5f5f5", "#455a64", fs=12)
-box(66.5, 4, 32, 21,
-    "At matched size, gates add no\n"
-    "measurable value; chronological\n"
-    "net harm remains unobserved",
-    "#eceff1", "#37474f", fs=12)
+    "#f5f5f5", "#455a64", fs=11.5)
+box(66.5, 3, 32, 19,
+    "Scope: zero drift, balanced pools,\n"
+    "SVC-RBF, random proposals;\n"
+    "chronological net harm unobserved",
+    "#eceff1", "#37474f", fs=11.5)
 
 fig.savefig("docs/img/graphical_abstract.png", dpi=200, bbox_inches="tight",
             facecolor="white")

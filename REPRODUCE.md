@@ -211,7 +211,8 @@ raw_stream_hash/candidate_provenance.jsonl/completion marker) and
 `results/tables/size_matched_own_transformer_001/` (by_seed, paired_contrasts, multiplicity,
 equivalence, security_metrics, harmful_commit_summary, candidate_size_interaction,
 descriptive_contrasts, run_completion, CLAIM_INTERPRETATION.json — machine verdict:
-**ATTENUATION**, with the substantive near-elimination reading recorded alongside). Invariants
+**ATTENUATION**, with the substantive reading — mean zero-drift harm equivalent to zero within the
+preregistered ±0.5-pp margin — recorded alongside). Invariants
 (flag-off bit-parity, nesting, raw-stream pairing, probe identity, leakage, hyperparameter
 identity, complete-bundle commit, determinism, seed firewall, metric recomputation, sealed
 v1.21.0 artifact unchanged): `tests/test_size_matched_control.py`.
@@ -303,7 +304,7 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Causal-64 matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
 | Symmetric-pipeline replication (Scenario A): mean full-drift harm does not persist under self-contained pipelines (+7.21/+2.55/+1.03); ownership interaction up to +5.98; zero-drift harm persists (−1.74/−0.65 material, −0.38 resolved) and gates recover it (6/6 Holm-sig.); unsw_zero strict = recall↔FPR trade-off | `symmetric_pipeline_dynamic_001/` (CLAIM_INTERPRETATION.json), tab:symmetric_pipeline, Supp §S7 |
 | Frozen-mode parity: the new self-contained harness reproduces published v1.20.2 arms bit-for-bit (4 arms × 30 seeds; deferred arm 5/5 files byte-identical) | `results/smoke/symmetric_pipeline/parity/*/parity_report.json` |
-| Detector is not the lever (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |
+| Detector score carries no consistent incremental signal within triggered decisions (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Supp §S1.3/S3; `notes/paper2_safe_readaptation_phase1_*` |
 | Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Supp §S1.4 |
 | ~how few labels suffice (label-efficiency frontier) | `paper2_phase2b_budget_curve_001/`, Supp §S1.5 |

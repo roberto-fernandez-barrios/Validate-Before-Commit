@@ -56,7 +56,7 @@ Because drift detectors are blind to model degradation, improving the detector c
 \subsection{Simple confirmation and cooldown policies do not prevent harm}
 
 
-If the decision is the lever, the natural fix is a smarter trigger policy. We pre-specified a grid of alarm-confirmation (k-of-n) and cooldown policies and evaluated them against fixed success criteria (preserve benefit in PortScan; avoid harm in ToN-IoT; do not degrade UNSW). None passed: in the harmful regime the tested policies remained far below no-adaptation and did not reduce adaptations relative to a conservative legacy baseline (Table~\ref{tab:table5_phase1_negative}). Confirmation and cooldown act on the \emph{persistence} of distributional change, which is exactly the signal that is uninformative about whether adaptation helps. This negative result motivates a policy that acts on the right quantity.
+If the decision is the lever, the natural fix is a smarter trigger policy. We pre-specified a grid of alarm-confirmation (k-of-n) and cooldown policies and evaluated them against fixed success criteria (preserve benefit in PortScan; avoid harm in ToN-IoT; do not degrade UNSW). None passed: in the harmful regime the tested policies remained far below no-adaptation and did not reduce adaptations relative to a conservative legacy baseline (Table~\ref{tab:table5_phase1_negative}). Confirmation and cooldown act on the \emph{persistence} of distributional change --- a signal that, within the evaluated triggered decisions, carried no consistent information about whether adaptation helps. This negative result motivates a policy that acts on the right quantity.
 
 
 \subsection{A label-efficient validate-before-commit gate resolves the problem}
@@ -229,6 +229,20 @@ also the rule that recovers essentially all of the zero-drift loss by refusing t
 without evidence. The confidence sequences of \S3.5 subsume it: they are valid at every sample
 size rather than at four pre-declared looks, and the empirical-Bernstein version is
 strictly tighter at the same $\alpha$.
+
+\subsection{Decision-quality of the lp32 gate on the logged triggers (relocated from main \S5.5)}
+
+Using the logged five-window lookahead as ground truth (never available to the policy), the
+lp32 gate's per-trigger operating point is: in the harm regime, rejection is almost always
+right (95\% of rejections blocked a non-beneficial update; recall of beneficial updates 0.95)
+and the gate cuts \emph{local per-decision regret} --- commit vs.\ reject on the gate policy's
+own trigger states, against an always-commit rule on those identical states --- from 0.0452
+to 0.0020, ${\sim}22\times$; in the benefit regime it still reduces this regret five-fold
+(0.0028 vs 0.0140). Pooled across 308 triggers: precision 0.74, recall 0.87, regret 0.0030
+vs 0.0212; horizon reruns at 1/3/5/10 leave the reductions essentially unchanged, and the
+marginal regime is honestly a wash at every horizon. The gate does commit some harmful
+updates (23\% of its commits have negative realized value, mostly small) --- it is a cheap
+statistical filter, not an oracle.
 
 \section{Additional figures and tables (initial study)}
 The floats below support the initial exploratory study of \S S1: the descriptive mechanism-law views, oracle-regret, label-latency, and the Phase-1 negative-policy table.
