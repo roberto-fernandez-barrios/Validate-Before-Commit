@@ -1,0 +1,33 @@
+\begin{table}[t]
+\centering
+\caption{Nominal evidence--validation trade-off under the preregistered zero-drift size-matched control (own-transformer, random proposals, balanced pools, SVC-RBF, seeds 4001--4030). ``Cand.'' and ``Probe'' are nominal adjudicated labels per proposal (candidate training and gate probe); moving from 512 to 2{,}000 samples per class adds $2\times1{,}488 = 2{,}976$ nominal candidate-training labels per proposal, whereas the evaluated point/strict decision uses a 32-label probe. Nominal counts do not model inspected-flow or acquisition cost, so no economic dominance is claimed. BA contrasts are paired per seed (CI95, deterministic centered paired bootstrap); naive-2{,}000 vs never is the registered F1 contrast, gate gains at 2{,}000 are the registered F3 family (none Holm-significant), and gate-vs-never / 512-side cells are descriptive and uncorrected. The point-2{,}000 / strict-2{,}000 policies (supplementary block of the artifact CSV) differ from naive-2{,}000 by less than $0.14$ pp: all six registered gate contrasts at the matched size are non-significant and CI90-equivalent to naive within $\pm$0.5 pp.}
+\label{tab:evidence_validation_tradeoff}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l l r r l l r}
+\toprule
+Dataset & Policy & Cand. & Probe & BA vs never [CI95] & Gate gain vs naive [CI95] & Commits/seed \\
+\midrule
+\multirow{4}{*}{CICIDS2017-PortScan} & naive 512 & 1,024 & 0 & $-1.70$ [-2.05, -1.36] & --- & 3.70 \\
+ & point 512 + 32-label probe & 1,024 & 32 & $-0.73$ [-1.10, -0.38] & $+0.97$ [+0.67, +1.31] & 1.87 \\
+ & strict 512 + 32-label probe & 1,024 & 32 & $-0.03$ [-0.24, +0.16] & $+1.67$ [+1.36, +2.00] & 0.23 \\
+ & naive 2{,}000 & 4,000 & 0 & $+0.19$ [-0.15, +0.55] & --- & 3.70 \\
+\midrule
+\multirow{4}{*}{UNSW-NB15} & naive 512 & 1,024 & 0 & $-0.65$ [-0.77, -0.55] & --- & 3.70 \\
+ & point 512 + 32-label probe & 1,024 & 32 & $-0.47$ [-0.61, -0.33] & $+0.19$ [+0.10, +0.30] & 2.27 \\
+ & strict 512 + 32-label probe & 1,024 & 32 & $-0.19$ [-0.30, -0.10] & $+0.46$ [+0.35, +0.58] & 0.67 \\
+ & naive 2{,}000 & 4,000 & 0 & $-0.02$ [-0.10, +0.06] & --- & 3.70 \\
+\midrule
+\multirow{4}{*}{ToN-IoT} & naive 512 & 1,024 & 0 & $-0.24$ [-0.39, -0.10] & --- & 3.70 \\
+ & point 512 + 32-label probe & 1,024 & 32 & $-0.12$ [-0.24, -0.01] & $+0.12$ [+0.04, +0.23] & 3.13 \\
+ & strict 512 + 32-label probe & 1,024 & 32 & $+0.00$ [-0.08, +0.06] & $+0.24$ [+0.12, +0.38] & 0.27 \\
+ & naive 2{,}000 & 4,000 & 0 & $-0.01$ [-0.05, +0.04] & --- & 3.70 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\raggedright\footnotesize \dag{} = Holm-significant within its registered family
+(none at the matched size). Guardrails: every matched-size gate cell passes both
+preregistered recall/FPR non-inferiority margins; at 512 the zero-drift UNSW strict
+cell fails recall non-inferiority (Supplementary~\S S8).
+\end{table}
