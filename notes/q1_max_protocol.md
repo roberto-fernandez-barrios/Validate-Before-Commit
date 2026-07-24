@@ -1,11 +1,10 @@
 # Q1-MAX PROTOCOL — frozen before execution (final-q1 branch)
 
 Registered: 2026-07-19, branch `final-q1`, base commit e7aae30 (v1.17.0 released,
-Zenodo 10.5281/zenodo.21440587). Source plan: `PLAN_Q1_CLAUDE_CODE.md` (Sol's Q1 plan,
-adopted with the registered deltas below). This protocol is FROZEN: hypotheses, configs,
-seeds, margins and stopping rules are fixed before any run. Supersedes the stopping rule of
-`notes/final_kbs_protocol.md` by explicit order of Roberto (2026-07-19: "vamos a por ese
-Q1"), and re-freezes: **this is the last scientific phase**. After it: hostile review,
+Zenodo 10.5281/zenodo.21440587). The registered deltas below define the design adopted for
+this final-q1 phase. This protocol is FROZEN: hypotheses, configs, seeds, margins and stopping
+rules are fixed before any run. Supersedes the stopping rule of `notes/final_kbs_protocol.md`,
+and re-freezes: **this is the last scientific phase**. After it: independent verification,
 verifiable-error fixes only, freeze, submit.
 
 Git rules: no commit/push/tag/release/Zenodo/merge without Roberto's explicit OK.
@@ -13,7 +12,7 @@ Local checkpoints per phase are allowed on `final-q1`.
 
 ---
 
-## Registered deltas vs PLAN_Q1_CLAUDE_CODE (with rationale, BEFORE running)
+## Registered deltas (with rationale, BEFORE running)
 
 **D1 — P0.1 gets a third, theory-first leg — under Roberto's precision (2026-07-19): the
 weak-null guarantee may be attributed to the current accumulate-across-windows variant ONLY
@@ -182,6 +181,6 @@ the `final-q1` branch with local checkpoints only.
 
 Fase B (code + text, no experiments beyond smokes/tests) → checkpoint → Fase C (budget
 frontier; STOP on the D3 clause) → Fase D (chronological + e2e; publish everything) →
-Fase E (manuscript restructure) → Fase F (make final-paper, independent hostile review,
+Fase E (manuscript restructure) → Fase F (make final-paper, independent verification,
 freeze). Any result that contradicts the story changes the story; nothing is re-run to
 rescue a hypothesis. No commits without explicit OK.
