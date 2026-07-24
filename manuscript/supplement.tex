@@ -4,6 +4,11 @@
 \graphicspath{{../}{./}}
 \usepackage[numbers]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+% Resolve the few main-paper section cross-references that appear in relocated table
+% captions (e.g. table_amendment009 cites main \S5.2/\S5.5). build_pdfs compiles main
+% first, so main.aux is available; a standalone supplement build degrades these to '??'.
+\usepackage{xr}
+\externaldocument{main}
 \newcommand{\bsection}[1]{\section{#1}}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thesubsection}{S\arabic{section}.\arabic{subsection}}
@@ -20,6 +25,38 @@ Conditional Validation in Adaptive Network Intrusion Detection''}
 The registered confirmatory evidence lives in the main paper; material here is context, and is
 superseded by the main paper's v2 numbers where noted. Bibliographic references are resolved
 against the same bibliography file as the main paper; numbering is local to this supplement.
+
+\setcounter{section}{-1}
+\section{Evidence hierarchy and provenance}
+\label{sec:S0}
+
+The paper labels the epistemic status of every block explicitly; the confirmatory replications are \emph{internal} replications (same datasets, corrected instrument, fresh seeds), not external validations. Six tiers of evidence are kept separate. (i) \emph{Registered confirmatory core (frozen policy):} criteria A/B/C/I on SVC-RBF, three regimes, two detectors, gate $b{=}32$ (full table in \S S2.11). (i$'$) \emph{Registered symmetric-pipeline replication:} the frozen-vs-own matrix on fresh seeds 3001--3030, margins and interpretation rules frozen in advance. (i$''$) \emph{Registered size-matched control:} the 512-vs-2{,}000 candidate-size matrix on fresh seeds 4001--4030 with nested candidate batches, outcome rules frozen in advance. (ii) \emph{Registered follow-ups:} analyses locked in public notes before their own runs --- registered evidence, not part of the original confirmation. (iii) \emph{Feasibility, of two kinds:} the leakage-free observed-data arm, which shows the decision is implementable without simulator privileges, and the operational acquisition-yield simulation, which prices attack-label discovery but still draws from the pools; only the former is free of simulator-oracle information. (iv) \emph{External boundary:} the thirteen chronological replays, the only tier on genuinely time-ordered traffic (no chronological net harm observed). (v) \emph{Exploratory:} the initial study of \S S1, which generated the hypotheses; where an exploratory number has a hardened-harness counterpart, the latter governs.
+
+\begin{table}[h]
+\centering
+\caption{Evidence blocks, their role, configuration, seeds, the primary claim each supports, and where the full result appears.}
+\label{tab:S0_provenance}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{0.155\linewidth} p{0.10\linewidth} p{0.165\linewidth} p{0.075\linewidth} p{0.225\linewidth} p{0.095\linewidth}}
+\toprule
+Evidence block & Role & Configuration & Seeds & Primary claim supported & Location \\
+\midrule
+Symmetric-pipeline replication & Primary & own vs frozen transformer & 3001--3030 & Preprocessing ownership amplified apparent harm & Main \S5.1; \S S7 \\
+Size-matched control & Primary & own transformer, 512 vs 2{,}000/class & 4001--4030 & Candidate size explains residual zero-drift harm; ATTENUATION & Main \S5.2; \S S8 \\
+Evidence--validation trade-off & Primary & derived from size-matched & 4001--4030 & Conditional value of validation & Main \S5.3 \\
+Chronological matrix & Boundary & real time-ordered streams & 601--630 & No net harm; incumbent health governs & Main \S5.4 \\
+Frozen-policy diagnostic & Historical & frozen transformer, 512/class & 104--133 & Reference gate-rescue behaviour & \S S2.11 \\
+Per-trigger mechanism & Support & frozen, 512/class & 104--133 & Degradation predicts update value & Main \S5.5; \S S1.1 \\
+Observed-data arm & Feasibility & leakage-free observed traffic & --- & Decision works without simulator privileges & \S S2.7 \\
+Classifier / generator controls & Robustness & 4 learners, 4 generators & --- & Sign general; magnitude SVC-specific & \S S1.5--S1.6 \\
+Ownership A/B & Support & role-randomized transformer & 2001--2100 & Feature scaling owns the effect & \S S6 \\
+Mild-drift matrix & Robustness & frozen, 512/class & --- & Harm tracks incumbent health & \S S2 \\
+VBC-SG budget frontier & Formal & frozen, 512/class & 501--530 & Price of formal guarantees & \S S2.8 \\
+Acquisition yield / prevalence & Operational & frozen, 512/class & --- & Attack-label discovery cost & \S S2.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \setcounter{section}{0}
 \section{The initial exploratory study (harness v1)}
@@ -252,6 +289,26 @@ main text carries the compact summary and reads it as a historical diagnostic, n
 final evidence on comparable challengers.
 
 \input{tables/table_v2_confirmatory.tex}
+
+\subsection{Relocated main-paper result tables (full matrices)}
+\label{sec:S2_relocated}
+
+The full result tables for the supporting evidence blocks summarized in main \S5.5 are collected
+here; the main text carries their load-bearing numbers and scope. Each is self-captioned and
+generated from the sealed outputs. The per-policy frontier (downstream models, monitors and update
+rules), the leakage-free observed-data arm, the mild-drift generality matrix, the frozen-transformer
+zero-drift control, the role-randomized ownership A/B decomposition, the four-classifier and
+update-generator controls, the VBC-SG budget frontier, and the operational acquisition-yield and
+delay simulation follow in order.
+
+\input{tables/table_policy_frontier.tex}
+\input{tables/table_causal_probe.tex}
+\input{tables/table_harm_generality.tex}
+\input{tables/table_zero_drift.tex}
+\input{tables/table_ab_equivalence.tex}
+\input{tables/table_amendment009.tex}
+\input{tables/table_budget_frontier.tex}
+\input{tables/table_operational_e2e.tex}
 
 \section{Additional figures and tables (initial study)}
 The floats below support the initial exploratory study of \S S1: the descriptive mechanism-law views, oracle-regret, label-latency, and the Phase-1 negative-policy table.

@@ -15,15 +15,9 @@ import sys
 
 from tests.conftest import REPO
 
+# KBS final focus cut: the main body keeps only the five primary/boundary result tables;
+# the eight secondary §5.5 tables move to the supplement (relocated main-paper result tables).
 FINAL_BODY_TABLES = {
-    "table_policy_frontier",
-    "table_causal_probe", "table_zero_drift", "table_amendment009",
-    "table_harm_generality",
-    # final-q1 additions (table_symmetric_ab and table_temporal_streams moved to the
-    # supplement: superseded in scope by the merged mechanism table and the pre-enumerated
-    # chronological matrix respectively)
-    "table_budget_frontier", "table_ab_equivalence",
-    "table_chronological_q1", "table_operational_e2e",
     # v1.21 Scenario-A rewrite: the symmetric-pipeline replication is the central new
     # result (main matrix + security guardrail panel in the body; full matrices in S7)
     "table_symmetric_pipeline", "table_symmetric_security",
@@ -33,6 +27,8 @@ FINAL_BODY_TABLES = {
     # v1.22.1 editorial phase: nominal evidence-vs-validation trade-off, derived
     # exclusively from the sealed size-matched outputs (no new experiments)
     "table_evidence_validation_tradeoff",
+    # the pre-enumerated chronological matrix is the external boundary
+    "table_chronological_q1",
 }
 V1_SUPPLEMENT_TABLES = {
     "table1_regime_taxonomy", "table2_phase2_gate_summary", "table3_phase2_paired_ci",
@@ -49,6 +45,11 @@ V1_SUPPLEMENT_TABLES = {
     # v1.22.1: the historical frozen-policy diagnostic table moved to S2.11 to make
     # room for the evidence-validation trade-off table (compact summary stays in §5.1)
     "table_v2_confirmatory",
+    # KBS final focus cut: the eight secondary §5.5 tables relocated to the supplement
+    # (S2 relocated main-paper result tables); the main body keeps their headline numbers
+    "table_policy_frontier", "table_causal_probe", "table_zero_drift",
+    "table_amendment009", "table_harm_generality", "table_budget_frontier",
+    "table_ab_equivalence", "table_operational_e2e",
 }
 
 

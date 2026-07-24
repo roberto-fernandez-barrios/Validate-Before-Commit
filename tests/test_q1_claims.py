@@ -14,8 +14,10 @@ SUPP = (REPO / "manuscript" / "supplement.tex")
 
 
 def test_evidence_tier_labels():
-    text = MAIN.read_text(encoding="utf-8")
-    # v1.21: the symmetric-pipeline replication joins the tier list as tier (i')
+    # KBS final focus cut: the full six-tier taxonomy moved to Supplement S0 (evidence
+    # hierarchy and provenance); the main body keeps a single "Evidence stages" paragraph
+    # pointing to it. The taxonomy and its markers are pinned in the supplement.
+    text = SUPP.read_text(encoding="utf-8")
     assert "Six tiers of evidence" in text
     for marker in ("Registered confirmatory core", "Registered symmetric-pipeline replication",
                    "Registered follow-ups",
@@ -26,6 +28,9 @@ def test_evidence_tier_labels():
     assert re.search(r"\\emph\{internal\} replication", text)
     lowered = text.lower().replace("not an external replication", "")
     assert "external replication" not in lowered
+    # the main body must carry the compact provenance pointer, not the full taxonomy
+    main = MAIN.read_text(encoding="utf-8")
+    assert "Evidence stages" in main and "Supplementary \\S S0" in main
 
 
 def test_strict_baseline_present():
