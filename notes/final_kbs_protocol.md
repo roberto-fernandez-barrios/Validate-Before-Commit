@@ -825,7 +825,7 @@ Campos:
 
 ---
 
-# 11. Priorización y orden exacto para Claude Code
+# 11. Priorización y orden exacto de ejecución
 
 ## Fase A — Congelar
 

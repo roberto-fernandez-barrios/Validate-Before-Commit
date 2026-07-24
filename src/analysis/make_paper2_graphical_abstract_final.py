@@ -1,4 +1,4 @@
-"""Graphical abstract, KBS final focus cut: a radically simplified three-step figure.
+"""Graphical abstract, KBS final scope reduction: a radically simplified three-step figure.
 
 Three steps down the centre --- DRIFT ALARM proposes a challenger; IS THE CHALLENGER
 COMPARABLE? (own preprocessing + adequate evidence); VALIDATE CONDITIONALLY (when

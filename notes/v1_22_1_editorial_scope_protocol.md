@@ -39,9 +39,9 @@ Frozen before any manuscript modification of this phase. Governs every change in
    "formal elimination", "residual mean harm under ATTENUATION".
 10. **VBC-SG compression**: compact main-text description as a scoped, secondary
     extension; details remain in the supplement; frozen-transformer scope retained.
-11. **Editorial compression** to hold page/word budgets (section 5).
+11. **Length reduction** to hold page/word budgets (section 5).
 12. **Tests and audits** guarding all of the above (plan section 16).
-13. **Notes**: baseline, this protocol, compression report, hostile review, checkpoint.
+13. **Notes**: baseline, this protocol, length-reduction report, independent verification, checkpoint.
 
 ## 2. Claims: permitted / prohibited
 
@@ -121,6 +121,6 @@ size.
 - **No new statistical inferences** beyond the two derived tables of section 3.
 - **Page/word budget**: main ≤ 33 pp (target 32–33); IEEE ≤ 25 pp; abstract 210–235
   words; body words ≤ v1.22.0's 18,088. Supplement may grow moderately.
-- **Stop rule**: after validation + hostile review + checkpoint, STOP. No merge, no tag,
+- **Stop rule**: after validation + independent verification + checkpoint, STOP. No merge, no tag,
   no release, no Zenodo, no DOI, no `results/final_manifest.json` update, no
   `MANIFEST.sha256` re-pin. Human checkpoint decides sealing.

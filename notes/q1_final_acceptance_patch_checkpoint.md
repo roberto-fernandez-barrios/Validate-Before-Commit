@@ -5,12 +5,12 @@ commitear. Ningún commit/push/tag/release/DOI ejecutado.
 
 ## A. Recuperación forense
 
-- Lugares inspeccionados (trail completo en `notes/frontier_driver_recovery_report.md`):
+- Lugares inspeccionados (trail completo en `docs/SCIENTIFIC_PROVENANCE.md`):
   git history/pickaxe, reflog, fsck (16 blobs no alcanzables + 1 commit colgante + 2 trees),
-  ficheros gitignorados en disco, transcripts de Claude Code, file-history, scratchpads de
-  sesiones antiguas, `__pycache__`, y fingerprinting de los 99 outputs publicados.
-- **Driver recuperado: SÍ** — `run_q1_faseC.py` intacto en el scratchpad de la sesión
-  `68de88a2-…` (SHA256 `655309bf…`; copia verbatim conservada localmente sin versionar, identificada por ese SHA256;
+  ficheros gitignorados en disco, file-history, el directorio de trabajo local recuperado,
+  `__pycache__`, y fingerprinting de los 99 outputs publicados.
+- **Driver recuperado: SÍ** — `run_q1_faseC.py` intacto en el directorio de trabajo local
+  recuperado (SHA256 `655309bf…`; copia verbatim conservada localmente sin versionar, identificada por ese SHA256;
   también `run_q1_faseD.py` y `run_q1_faseD5.py`).
 - **Configuración exacta recuperada: SÍ** — los parámetros fijos son los defaults del runner
   (window 128, dim 8, train 2000/clase, adapt 512/clase, detector-ref 256, calib 30, thr-q
@@ -34,7 +34,7 @@ re-ejecutados con el driver versionado. Backup pre-fix completo en
 Fuente canónica: `configs/q1_budget_frontier_v2.json` (todos los parámetros explícitos, con
 provenance y nota de que igualan byte a byte los defaults del argparse validados por
 bit-identidad). Driver: `src/experiments/run_q1_budget_frontier.py`. Tabla parámetro→
-fuente→confianza en `notes/frontier_driver_recovery_report.md` (todo "exact").
+fuente→confianza en `docs/SCIENTIFIC_PROVENANCE.md` (todo "exact").
 
 ## D. Ejecución
 

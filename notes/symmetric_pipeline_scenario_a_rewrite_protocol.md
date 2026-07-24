@@ -121,4 +121,4 @@ new CSVs only), PDFs.
 
 Deliver `notes/symmetric_pipeline_scenario_a_manuscript_checkpoint.md` and the
 console checkpoint; then stop. Recommendation is exactly one of
-READY FOR FINAL HOSTILE REVIEW AND v1.21.0 SEALING / NOT READY — BLOCKER.
+READY FOR FINAL INDEPENDENT VERIFICATION AND v1.21.0 SEALING / NOT READY — BLOCKER.

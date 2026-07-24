@@ -17,8 +17,7 @@ commit `88385660edd849f9ea54b2c6e8462d59119d2741`)
   `notes/symmetric_pipeline_baseline_checkpoint.md`: the sealed test suite
   itself restamps this file's two provenance lines on every pytest run;
   restored with `git restore`, scientific content unchanged).
-- Personal files excluded (pre-existing, untracked, untouched):
-  `PLAN_Q1_DEFINITIVO_VBC.md`, `notes/recovered_run_q1_faseC.py.txt`.
+- Local files excluded (pre-existing, untracked, untouched): known local untracked files.
 
 ## B. Protocol
 

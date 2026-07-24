@@ -215,7 +215,7 @@ tables/captions/README/REPRODUCE/audits/manifests.
 Git audit → this protocol → failing test → fix → unit tests → full suite → frontier
 rerun → regenerate derivatives → old-vs-new comparison → operational claims → chrono
 fix → multiplicity/equivalence → editorial polish → regenerate tables → IEEE port →
-compile 3 PDFs → full audit → hashes → ledger → manifest → tests again → hostile review
+compile 3 PDFs → full audit → hashes → ledger → manifest → tests again → independent verification
 → stop (no git/publication).
 
 ## Appendix — 2026-07-21 (dated): Block B unblocked via forensic driver recovery (Ruta A)
@@ -224,8 +224,8 @@ Written after Block A completed and before any frontier derivative was regenerat
 
 The frontier driver `run_q1_faseC.py` was not in the repository (a reproducibility defect in
 itself). Per the authorized continuation order, a bounded forensic search recovered it intact
-from the scratchpad of Claude Code session `68de88a2-…` (SHA256 `655309bf…`; full trail in
-`notes/frontier_driver_recovery_report.md`). Ruta A criteria were met before any rerun:
+from the recovered local working directory (SHA256 `655309bf…`; full trail in
+`docs/SCIENTIFIC_PROVENANCE.md`). Ruta A criteria were met before any rerun:
 
 - the recovered grid enumerates exactly the 99 published tags;
 - all fixed parameters resolved (they are the runner's argparse defaults);
@@ -250,5 +250,5 @@ Stop when, simultaneously: (1) temporal semantics correct and test-covered; (2) 
 frontier fully re-run; (3) all numbers regenerated from real outputs; (4) operational
 claims match what is measured; (5) chronological contradiction removed; (6) statistics
 and equivalence precisely described; (7) tests/audit/hashes/ledger/PDFs green;
-(8) hostile review shows no load-bearing blocker; (9) no new scientific line opened.
+(8) independent verification shows no load-bearing blocker; (9) no new scientific line opened.
 Then produce `CHECKPOINT FINAL — aceptación máxima KBS` and halt.

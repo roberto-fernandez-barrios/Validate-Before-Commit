@@ -18,7 +18,7 @@ Branch: `feature/size-matched-own-transformer` (created from `main` @ v1.21.0)
 | `git branch --show-current` (before branch) | `main` |
 | `git rev-parse HEAD` | `7f9ea405f6bd30e457f714c1a5ebc6b463e74c50` |
 | `git tag --points-at HEAD` | `v1.21.0` |
-| Working tree | clean except known personal untracked files `PLAN_Q1_DEFINITIVO_VBC.md`, `notes/recovered_run_q1_faseC.py.txt` |
+| Working tree | clean except known local untracked files |
 | `pytest tests -q` | 96 passed |
 | `src.analysis.audit_paper2_claims` | 561 PASS / 0 FAIL |
 | `src.analysis.verify_results_manifest` | 173/173 pinned CSVs match, 0 unpinned extras (orphans: 0) |
@@ -45,7 +45,7 @@ On first run, `verify_results_manifest` reported 9 hash mismatches, all in
   hash without changing content.
 
 Resolution (scripted, verify-before-write):
-`scratchpad/restore_crlf_sealed_tables.py` first verified read-only that the
+an offline read-only helper first verified that the
 CRLF variant of each current file matches its sealed hash exactly (9/9
 matched), and only then rewrote the 9 files with CRLF line endings, restoring
 the sealed disk representation. `git update-index --really-refresh` then

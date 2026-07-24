@@ -8,7 +8,7 @@ tag v1.20.0, version DOI 10.5281/zenodo.21479193. pytest 56/56, audit 495/495, h
 
 **Hard scope:** no experimental runners, no new data, no git/tag/release/DOI until
 authorized. Only re-analysis of existing outputs, table/manifest regeneration, tests,
-audits, PDFs. Paper 1 reference untouched. `PLAN_Q1_DEFINITIVO_VBC.md` untouched.
+audits, PDFs. Paper 1 reference untouched. Local planning files untouched.
 
 ---
 

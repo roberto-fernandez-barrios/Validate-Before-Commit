@@ -78,7 +78,7 @@ No cell may be added or removed after the run.
 ## 1.4 Seeds
 
 - **Confirmatory block: 4001–4030** (30 seeds, contiguous). Verified virgin
-  on 2026-07-22 by a structured scan (`scratchpad/scan_seed_usage.py`) over
+  on 2026-07-22 by a structured offline scan over
   5470 CSVs (every `seed`-like column) and 286 JSONs (every `seed`-like key)
   under `results/`, `configs/`, `notes/`, `src/`, `tests/`, `docs/`,
   `paper/`, plus regex extraction of literal seed ranges in all `.py/.md/

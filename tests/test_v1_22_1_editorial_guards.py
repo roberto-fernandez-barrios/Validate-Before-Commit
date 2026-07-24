@@ -211,7 +211,7 @@ def test_historical_table_recaptioned():
                    ).read_text(encoding="utf-8"))
         assert "historical frozen-policy diagnostic" in t
         assert "main confirmatory result" not in t
-    # KBS final focus cut: the frozen-policy diagnostic is subordinated into the §5.5
+    # KBS final scope reduction: the frozen-policy diagnostic is subordinated into the §5.5
     # supporting block (no longer its own headline subsection); the label survives in main.
     assert "historical frozen-policy diagnostic" in MAIN.lower()
 

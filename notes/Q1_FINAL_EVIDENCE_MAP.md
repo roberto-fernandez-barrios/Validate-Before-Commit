@@ -1,6 +1,6 @@
 # Q1 FINAL EVIDENCE MAP
 
-Audit of every evidence block against the locked thesis, before the narrative rebuild.
+Audit of every evidence block against the locked thesis, before the manuscript reorganization.
 No result is modified here; this note only fixes each block's function and placement.
 
 **Locked thesis.** Drift detection and candidate promotion are different decisions. Before

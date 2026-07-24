@@ -105,5 +105,5 @@ verified against the defect it exists to catch, not only against the corrected t
 `audit 465/465`, `tests 46/46`, body 27 pp, supplement 24 pp, IEEE 23 pp, 0 undefined
 references or citations in any of the three PDFs.
 
-Pending: hostile review of this phase, then Roberto's authorization for commit, release and
+Pending: independent verification of this phase, then authorization for commit, release and
 submission.

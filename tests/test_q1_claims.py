@@ -14,7 +14,7 @@ SUPP = (REPO / "manuscript" / "supplement.tex")
 
 
 def test_evidence_tier_labels():
-    # KBS final focus cut: the full six-tier taxonomy moved to Supplement S0 (evidence
+    # KBS final scope reduction: the full six-tier taxonomy moved to Supplement S0 (evidence
     # hierarchy and provenance); the main body keeps a single "Evidence stages" paragraph
     # pointing to it. The taxonomy and its markers are pinned in the supplement.
     text = SUPP.read_text(encoding="utf-8")

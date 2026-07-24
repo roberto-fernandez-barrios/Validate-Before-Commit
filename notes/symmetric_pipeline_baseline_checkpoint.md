@@ -19,7 +19,6 @@ nothing scientific changed.
 ## Working tree at audit time (`git status --short`)
 
 ```
-?? PLAN_Q1_DEFINITIVO_VBC.md
 ?? notes/recovered_run_q1_faseC.py.txt
 ```
 
