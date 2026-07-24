@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-24T15:46:12Z",
-  "source_commit_sha": "c7238c75d6961830a709db4dd82f79f4ffb0e4e2",
+  "generated_at_utc": "2026-07-24T16:44:54Z",
+  "source_commit_sha": "49372a663bdbc04ccadf3c7979be82dd8620e45e",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.22.4",
+  "artifact_version": "1.22.5",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
