@@ -318,7 +318,7 @@ def q1_final_patch_summary() -> dict:
                          "under the reorder, validated on three full 30-seed control arms"),
         recovered_driver_sha256=(
             "655309bfec1c01924fd8708b6bde4c2ee055021ba6461959aea5502df11737c7"),
-        recovery_report="docs/SCIENTIFIC_PROVENANCE.md",
+        recovery_report="notes/frontier_driver_recovery_report.md",
         max_served_ba_change_points=0.14,
     )
 

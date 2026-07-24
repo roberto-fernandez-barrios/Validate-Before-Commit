@@ -11,7 +11,7 @@ Sin commit/push/tag/release/DOI. Sin experimentos ejecutados. Paper 1 intacto.
   audit_paper2_claims.py, make_final_manifest.py, make_paper2_q1_frontier.py (docstring),
   make_paper2_q1_multiplicity.py, make_paper2_q1_tables.py, test_q1_statistics.py.
 - Nuevos (4 a versionar): este protocolo + checkpoint, make_paper2_claim_scope_audit.py,
-  tests/test_q1_claim_scope.py. (Excluidos como siempre: los ficheros de planificación locales,
+  tests/test_q1_claim_scope.py. (Excluidos como siempre: PLAN_Q1_DEFINITIVO_VBC.md,
   notes/recovered_run_q1_faseC.py.txt.)
 - Diffstat: 19 ficheros, +581/−334.
 
@@ -137,7 +137,7 @@ tocado.** Incidente reparado y documentado: 3 caracteres U+0007 introducidos por
 de backslashes del heredoc al editar `\approx`; detectados por pdflatex, reparados, PDFs
 verificados limpios (0 control chars).
 
-## I. Independent-verification verdict
+## I. Hostile-review verdict
 
 1. ¿Commits como réplicas independientes? **No** — caveat explícito, sin bound; ε=0
    descriptivo.

@@ -126,7 +126,7 @@ P/A/E result, equivalence, size effects, gate effects, guardrails, v1.21.0 uncha
 
 ## Stop rule
 
-After `notes/size_matched_final_manuscript_checkpoint.md` and the independent
-verification: STOP. No merge, no tag, no release, no
+After `notes/size_matched_final_manuscript_checkpoint.md` and
+`notes/size_matched_final_hostile_review.md`: STOP. No merge, no tag, no release, no
 Zenodo, no experiment. Verdict is exactly one of READY FOR FINAL v1.22.0 SEALING or
 NOT READY — TEXTUAL/TECHNICAL BLOCKER.
