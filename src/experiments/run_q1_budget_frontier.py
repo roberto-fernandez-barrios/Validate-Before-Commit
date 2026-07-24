@@ -1,13 +1,13 @@
 """Registered budget-frontier driver (q1_max_protocol.md D3) -- committed, reproducible form.
 
-History. The original Fase C driver (`run_q1_faseC.py`) produced the 99 published
-`results/raw/q1fc_*` arms but was never committed; it was recovered on 2026-07-21 from a
-Claude Code session scratchpad (SHA256 655309bf..., see
-notes/frontier_driver_recovery_report.md) and validated bit-for-bit against published
-deferred-commit-free arms. This driver replaces it: the grid and every fixed parameter now
-live in configs/q1_budget_frontier_v2.json (nothing relies on argparse defaults), each arm
-records its exact command, resolved configuration, environment and source commit, and
-completed arms are protected against silent overwrite.
+History. The original Fase C driver (`run_q1_faseC.py`, 113 lines,
+SHA256 655309bfec1c01924fd8708b6bde4c2ee055021ba6461959aea5502df11737c7) produced the 99
+published `results/raw/q1fc_*` arms but was never committed; it relied on the runner's argparse
+defaults for every fixed stream parameter and was validated bit-for-bit against the published
+deferred-commit-free arms (see docs/SCIENTIFIC_PROVENANCE.md). This driver replaces it: the grid
+and every fixed parameter now live in configs/q1_budget_frontier_v2.json (nothing relies on
+argparse defaults), each arm records its exact command, resolved configuration, environment and
+source commit, and completed arms are protected against silent overwrite.
 
 Usage:
   python -m src.experiments.run_q1_budget_frontier --list-arms
