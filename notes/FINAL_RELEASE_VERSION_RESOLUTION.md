@@ -58,3 +58,24 @@ collision; a MINOR is rejected — no scientific evidence added). Mechanical fie
 (`references.bib` note, `CITATION.cff` version, `.zenodo.json` version + a v1.22.5 sentence); science
 and concept DOIs unchanged; v1.22.5 version DOI **`10.5281/zenodo.21536924` (Published)** — minted by
 the automatic Zenodo–GitHub integration on publishing the GitHub Release.
+
+## Addendum — v1.22.6 (focal bibliographic patch + Git history rewrite)
+
+Two fused, user-authorized changes over the same sealed v1.22.0 science:
+- **Bibliographic patch:** +12 web-verified references, ~226 added words, novelty narrowed, and the
+  companion **Paper 1 reference removed** (this paper is now Paper 1). No scientific result, seed,
+  margin, family, estimand or the registered ATTENUATION outcome changed; `results/raw` and the
+  scientific manifest are byte-identical.
+- **Git history rewrite:** the `Co-Authored-By: Claude` commit trailers were stripped from all
+  history (`git filter-branch`), which **moved every prior tag to a new commit** (e.g. v1.22.0
+  `43d9c25`→`a46edbb`, v1.22.5 `e9449ca`→`a2278c4`). Consequences, accepted by the maintainer and
+  recorded here: the manuscript Data Availability continues to cite the **original** v1.22.0 sealing
+  commit `43d9c25` (consistent with the 5 already-published Zenodo PDFs, but no longer present in the
+  live repo after the rewrite); the 5 prior Zenodo deposits permanently retain the pre-rewrite
+  snapshots and SHAs; a local backup (`backup/pre-rewrite-main` + `refs/original/`) preserves the
+  pre-rewrite state.
+
+By the repo's PATCH pattern the next version after the public `v1.22.5` is **`v1.22.6`** (no
+`v1.22.6` tag/DOI existed; no collision; MINOR rejected — no scientific evidence added). Mechanical
+fields bumped to 1.22.6; science DOI `10.5281/zenodo.21517899` and concept DOI
+`10.5281/zenodo.21322256` unchanged; v1.22.6 version DOI **pending Zenodo publication**.
