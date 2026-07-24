@@ -1,9 +1,9 @@
 {
   "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-24T07:26:37Z",
-  "source_commit_sha": "f729d80fe944ca11e9aed66ff0b3e6c49bb0f541",
+  "generated_at_utc": "2026-07-24T12:54:28Z",
+  "source_commit_sha": "5ade58d6cdc268cb6e011d6a55692e69b101a1f9",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.22.2",
+  "artifact_version": "1.22.3",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -364,8 +364,8 @@
     "primary_results_changed": false,
     "scientific_csvs_changed": false,
     "article_word_count_before": 19413,
-    "article_word_count_after": 19361,
-    "article_word_reduction_pct": 0.3
+    "article_word_count_after": 17754,
+    "article_word_reduction_pct": 8.5
   },
   "symmetric_replication_v1_21": {
     "title": "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection",
@@ -493,9 +493,9 @@
     "unregistered_experiments": "none",
     "v1_20_2_raw_outputs": "unchanged (MANIFEST re-pin additive 164->173)",
     "manuscript_pages": {
-      "main.pdf": 33,
+      "main.pdf": 32,
       "supplement.pdf": 30,
-      "main_ieee.pdf": 25
+      "main_ieee.pdf": 24
     }
   },
   "size_matched_control_v1_22": {
@@ -631,7 +631,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 629,
-    "checks_total": 629
+    "checks_passed": 630,
+    "checks_total": 630
   }
 }
