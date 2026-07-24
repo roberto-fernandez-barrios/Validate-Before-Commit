@@ -1,8 +1,9 @@
 """Pre-submission audit: verify every headline number claimed in the manuscript against the artifacts.
 
-Each check encodes a numeric claim as written in manuscript/paper2_manuscript_draft_002.md (abstract +
-sections 5.1-5.7) and compares it to the corresponding value in the committed result CSVs. Run before
-submission; all checks must PASS. No new experiments -- verification only.
+Each check encodes a numeric claim as written in the manuscript sources (manuscript/main.tex,
+main_ieee.tex, supplement.tex; abstract + sections 5.1-5.7) and compares it to the corresponding
+value in the committed result CSVs. Run before submission; all checks must PASS. No new
+experiments -- verification only.
 """
 from __future__ import annotations
 import re
@@ -125,12 +126,16 @@ def main():
     check("5.7 net-harm ONLY for SVC", 1.0, float(only_svc_harm), 0.1)
     check("5.7 gate safe in all 12 cells", 1.0, float(bool(down["gate_avoids_harm"].all())), 0.1)
 
-    # --- Manuscript hygiene ---
-    md = open("manuscript/paper2_manuscript_draft_002.md", encoding="utf-8").read()
-    a = md.index("## Abstract"); b = md.index("## Contributions", a)
-    abstract = re.sub(r"[*_`]", "", md[a:b].split("\n", 2)[2].strip())
-    check("abstract <= 250 words (md tokenization; tex=250)", 254, float(len(abstract.split())), 0.5)
-    check("no [CITE] markers", 0, float(md.count("[CITE]")), 0.1)
+    # --- Manuscript hygiene (checked against the live LaTeX sources) ---
+    _mtex = open("manuscript/main.tex", encoding="utf-8").read()
+    _abm = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", _mtex, re.S).group(1)
+    _abm = re.sub(r"%.*", "", _abm)
+    _abm = re.sub(r"\\[a-zA-Z]+\*?", " ", _abm)
+    _abm = re.sub(r"[{}~\\]", " ", _abm)
+    check("main.tex abstract within 250-word limit", 1.0, float(len(_abm.split()) <= 250), 0.1)
+    _nocite = sum(open(f"manuscript/{f}", encoding="utf-8").read().count("[CITE]")
+                  for f in ("main.tex", "supplement.tex", "main_ieee.tex"))
+    check("no [CITE] markers in main/supplement/IEEE", 0, float(_nocite), 0.1)
 
     # --- Phase 2h: label-free gates (ATC/DoC) head-to-head ---
     lf = pd.read_csv(f"{T}/paper2_phase2h_labelfree_gates_001/paper2_labelfree_gates_summary.csv")
@@ -1132,7 +1137,7 @@ def main():
                     and "controlled balanced-probe" in _t)), 0.5)
     check("v121 E: no 'zero probability of harm' / 'eliminates harmful commits'", 0.0,
           float(_hits(r"zero probability of harm") + _hits(r"eliminates harmful commits")), 0.5)
-    # --- v1.20.2 guards (editorial compression + final claim scope) ----------------------
+    # --- v1.20.2 guards (final length reduction + final claim scope) ---------------------
     # E1 negative: no causal-inference language on claim surfaces (the LaTeX label
     # tab:causal_probe, the negation 'not as a causal proof', and the temporal
     # 'causal-information availability' sense are the only permitted survivals).
@@ -1285,8 +1290,8 @@ def main():
     # --- v1.21 sealing guards (title, scope phrasing, completeness, provenance) ---
     # v1.22: the definitive title changed with the size-matched rewrite (registered in
     # notes/size_matched_final_rewrite_protocol.md); the v1.21 title joins the retired list.
-    # Final KBS narrative rebuild (notes/Q1_FINAL_NARRATIVE_REBUILD_CHECKPOINT.md): the
-    # title no longer leads with the gate family; the v1.22 title joins the retired list.
+    # The v1.22 title (in the live main.tex/main_ieee.tex sources and docs/SCIENTIFIC_PROVENANCE.md)
+    # no longer leads with the gate family; the v1.22 title joins the retired list.
     import json as _json
     _NEW_TITLE = ("candidate comparability before promotion: "
                   "conditional validation in adaptive network intrusion detection")
