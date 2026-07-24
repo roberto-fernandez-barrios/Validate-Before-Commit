@@ -56,4 +56,5 @@ scientific manifest remain byte-identical; ATTENUATION preserved. By the repo's 
 next version after the public `v1.22.4` is **`v1.22.5`** (no `v1.22.5` tag/branch/DOI exists; no
 collision; a MINOR is rejected — no scientific evidence added). Mechanical fields bumped to 1.22.5
 (`references.bib` note, `CITATION.cff` version, `.zenodo.json` version + a v1.22.5 sentence); science
-and concept DOIs unchanged; v1.22.5 version DOI **pending Zenodo publication**.
+and concept DOIs unchanged; v1.22.5 version DOI **`10.5281/zenodo.21536924` (Published)** — minted by
+the automatic Zenodo–GitHub integration on publishing the GitHub Release.
