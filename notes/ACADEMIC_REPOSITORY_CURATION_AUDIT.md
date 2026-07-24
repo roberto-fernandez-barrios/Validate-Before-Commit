@@ -230,4 +230,62 @@ reorg), the moves are deferred to a follow-up that also rewrites the references 
 
 ## 6. Validation
 
-Appended after the removals in the "Validate curated academic repository" commit.
+All gates run with the `paper2` conda env (Python 3.11.15) on the curated tree; baseline
+values captured on `main` @ `a8d118a` before any removal.
+
+| Gate | Baseline | Curated tree | Status |
+|---|---|---|---|
+| `pytest tests` | 136 passed | 136 passed | ✅ unchanged |
+| Claim audit (`audit_paper2_claims`) | 630 PASS / 0 FAIL | 630 PASS / 0 FAIL | ✅ unchanged |
+| Manifest verify (`verify_results_manifest`) | 185/185, 0 unpinned | 185/185, 0 unpinned | ✅ unchanged |
+| `main.pdf` | 26 pp, 0 undef | 26 pp, 0 undef | ✅ unchanged |
+| `supplement.pdf` | 35 pp, 0 undef | 35 pp, 0 undef | ✅ unchanged |
+| `main_ieee.pdf` (committed source) | 18 pp, 0 undef | 18 pp, 0 undef | ✅ unchanged |
+
+Notes:
+
+- **IEEE page count**: the committed `main_ieee.tex` compiles to **18 pp**. (A baseline run
+  that first invoked `src.analysis.port_ieee` produced 19 pp because `port_ieee` regenerates
+  `main_ieee.tex` from `main.tex` and would overwrite the committed file's manual
+  `figure*`/listing tweaks — a **pre-existing** drift, out of scope here. The committed source
+  was restored; curation touched no IEEE file, and `main_ieee.tex` is byte-identical to its
+  committed blob.)
+- **Thumbnails**: after removal, `main.pdf` still loads `thumbnails/cas-email.jpeg` (5×) with
+  no missing-file errors; the 5 removed thumbnails load in no compilation.
+- **Release builders**: `make_results_manifest`, `make_final_experiment_ledger`, and
+  `make_final_manifest` all run clean (manifest 185 files; ledger 12 blocks / 562 arm dirs;
+  final manifest audit 630/630). `results/tables/MANIFEST.sha256` regenerates **byte-identical**.
+  `results/final_manifest.json` regenerated identically except for `generated_at_utc` and
+  `source_commit_sha` provenance fields; it was **restored to its committed bytes** so no
+  scientific manifest is modified.
+- **`results/raw/**`**: untouched; no tracked `results/` file was modified (only the transient
+  `final_manifest.json` provenance fields, since restored). **No experiment script was run** —
+  only analysis/audit/verify/compile over existing artifacts.
+- **ATTENUATION**: intact — asserted by the claim-audit guard
+  "v1221 A: registered ATTENUATION outcome retained (main+ieee)" (PASS) and present unchanged
+  in `main.tex`, `main_ieee.tex`, `supplement.tex`.
+- **Elsevier AI-usage declaration**: retained verbatim in `main.tex` §"Declaration of
+  generative AI…", `main_ieee.tex`, `supplement.tex`, and its generator
+  `make_paper2_latex.py`.
+
+### Residual editorial/conversational term scan
+
+Every remaining hit is legitimate:
+
+| Term | Remaining in | Why legitimate |
+|---|---|---|
+| `Claude` | `main.tex`/`main_ieee.tex`/`supplement.tex`, `make_paper2_latex.py` | mandatory Elsevier generative-AI declaration |
+| `Claude` / `scratchpad` | `run_q1_budget_frontier.py`, `frontier_driver_recovery_report.md` | reproducibility provenance of the recovered budget-frontier driver (with SHA-256) |
+| `scratchpad` | `port_ieee.py` | technical: temp build directory |
+| `PLAN_Q1_CLAUDE_CODE.md` | `.gitignore`, `REPRODUCE.md` | the file is intentionally git-ignored; `.gitignore` lists it and `REPRODUCE.md` cites it as a flag's origin (minor soft reference — left as-is, REPRODUCE.md not rewritten) |
+| `final verdict` | `main.tex`/`main_ieee.tex`, `make_paper2_final_q1_synthesis_v3.py`, kept synthesis checkpoints | scientific prose ("the program's final verdict bounds the gate itself"), not editorial workflow |
+| `hostile review` | `tests/test_claims.py`, kept protocols/checkpoints (`q1_max_protocol`, `q1_faseE_checkpoint`, rewrite protocols, etc.) | scientific-process references to the review *rounds* that motivated registered experiments; the hostile-review *documents* themselves were removed |
+| `ready for human review`, `hostile review` | `Q1_FINAL_NARRATIVE_REBUILD_CHECKPOINT.md` | borderline-KEEP file (cited by the claim audit); flagged in §3 for human veto |
+| `hostile review`, `red-team`, `focus cut`, … | `ACADEMIC_REPOSITORY_CURATION_AUDIT.md`, `SCIENTIFIC_PROVENANCE.md` | this audit and the provenance map necessarily name what was retired |
+
+No `ChatGPT`, `red team` (spaced), `ready for submission`, or stray conversation dumps remain.
+
+### Verdict
+
+**READY FOR HUMAN REVIEW — ACADEMIC REPOSITORY CURATION COMPLETE.** Branch not merged; no
+tag, release, version bump, history rewrite, or Zenodo change performed.
