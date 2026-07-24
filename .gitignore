@@ -124,3 +124,8 @@ notes/paper2_manuscript_skeleton_001.md
 manuscript/paper2_manuscript_skeleton_001.md
 notes/paper2_bibliography_ceiling_integration_001.md
 notes/release_notes_v1.1.0.md
+/PLAN_Q1_DEFINITIVO_VBC.md
+notes/recovered_run_q1_faseC.py.txt
+
+# Local release bundles (published to Zenodo / GitHub Releases, not versioned in-repo)
+/dist/
