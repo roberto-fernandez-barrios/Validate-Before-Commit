@@ -7,10 +7,10 @@ commitear. Ningún commit/push/tag/release/DOI ejecutado.
 
 - Lugares inspeccionados (trail completo en `notes/frontier_driver_recovery_report.md`):
   git history/pickaxe, reflog, fsck (16 blobs no alcanzables + 1 commit colgante + 2 trees),
-  ficheros gitignorados en disco, transcripts de Claude Code, file-history, scratchpads de
-  sesiones antiguas, `__pycache__`, y fingerprinting de los 99 outputs publicados.
-- **Driver recuperado: SÍ** — `run_q1_faseC.py` intacto en el scratchpad de la sesión
-  `68de88a2-…` (SHA256 `655309bf…`; copia verbatim conservada localmente sin versionar, identificada por ese SHA256;
+  ficheros gitignorados en disco, historial de ficheros, directorios de trabajo locales,
+  `__pycache__`, y fingerprinting de los 99 outputs publicados.
+- **Driver recuperado: SÍ** — `run_q1_faseC.py` intacto en el directorio de trabajo local
+  recuperado (SHA256 `655309bf…`; copia verbatim conservada localmente sin versionar, identificada por ese SHA256;
   también `run_q1_faseD.py` y `run_q1_faseD5.py`).
 - **Configuración exacta recuperada: SÍ** — los parámetros fijos son los defaults del runner
   (window 128, dim 8, train 2000/clase, adapt 512/clase, detector-ref 256, calib 30, thr-q

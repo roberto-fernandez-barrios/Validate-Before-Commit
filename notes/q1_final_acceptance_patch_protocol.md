@@ -224,7 +224,7 @@ Written after Block A completed and before any frontier derivative was regenerat
 
 The frontier driver `run_q1_faseC.py` was not in the repository (a reproducibility defect in
 itself). Per the authorized continuation order, a bounded forensic search recovered it intact
-from the scratchpad of Claude Code session `68de88a2-…` (SHA256 `655309bf…`; full trail in
+from the recovered local working directory (SHA256 `655309bf…`; full trail in
 `notes/frontier_driver_recovery_report.md`). Ruta A criteria were met before any rerun:
 
 - the recovered grid enumerates exactly the 99 published tags;

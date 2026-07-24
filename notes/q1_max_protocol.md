@@ -1,8 +1,8 @@
 # Q1-MAX PROTOCOL — frozen before execution (final-q1 branch)
 
 Registered: 2026-07-19, branch `final-q1`, base commit e7aae30 (v1.17.0 released,
-Zenodo 10.5281/zenodo.21440587). Source plan: `PLAN_Q1_CLAUDE_CODE.md` (Sol's Q1 plan,
-adopted with the registered deltas below). This protocol is FROZEN: hypotheses, configs,
+Zenodo 10.5281/zenodo.21440587). Source plan: the local Q1 planning file
+(adopted with the registered deltas below). This protocol is FROZEN: hypotheses, configs,
 seeds, margins and stopping rules are fixed before any run. Supersedes the stopping rule of
 `notes/final_kbs_protocol.md` by explicit order of Roberto (2026-07-19: "vamos a por ese
 Q1"), and re-freezes: **this is the last scientific phase**. After it: hostile review,
@@ -13,7 +13,7 @@ Local checkpoints per phase are allowed on `final-q1`.
 
 ---
 
-## Registered deltas vs PLAN_Q1_CLAUDE_CODE (with rationale, BEFORE running)
+## Registered deltas vs the source Q1 plan (with rationale, BEFORE running)
 
 **D1 — P0.1 gets a third, theory-first leg — under Roberto's precision (2026-07-19): the
 weak-null guarantee may be attributed to the current accumulate-across-windows variant ONLY
