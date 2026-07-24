@@ -73,7 +73,7 @@ box(50, 27.5, 48.5, 26.5,
 # ---- three evidence badges (scoped; no universal deployment rule) ----
 box(1.5, 3, 31.5, 19,
     "Frozen incumbent-owned\n"
-    "preprocessing manufactured the\n"
+    "preprocessing accounted for the\n"
     "full-drift harm (scaling, not projection)",
     "#fff8e1", "#795548", fs=11.5)
 box(34, 3, 31.5, 19,

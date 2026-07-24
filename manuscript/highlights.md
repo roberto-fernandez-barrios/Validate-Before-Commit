@@ -3,7 +3,7 @@
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 (Character counts shown for verification; remove before submission.)
 
-- Frozen incumbent-owned preprocessing can manufacture apparent promotion harm  [76]
+- Frozen incumbent-owned preprocessing produced the apparent promotion harm  [75]
 - A fourfold candidate-size disadvantage explains the residual zero-drift mean loss  [81]
 - Under zero drift, size-matched self-contained challengers meet the ±0.5-pp margin  [81]
 - Under that zero-drift control, point and strict gates provide no measurable gain  [80]

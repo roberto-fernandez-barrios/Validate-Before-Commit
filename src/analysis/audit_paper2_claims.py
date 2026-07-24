@@ -1186,7 +1186,7 @@ def main():
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
                     and "validate the challenger when its construction or evidence "
                         "conditions remain asymmetric or uncertain" in _t
-                    and "substitute for building a fair challenger" in _t)), 0.5)
+                    and "substitute for building a comparably constructed" in _t)), 0.5)
     check("v122 E2: chronological net-harm boundary retained (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
@@ -1578,6 +1578,17 @@ def main():
           float(_hits(r"near-elimination|effectively elimination|formal elimination")), 0.5)
     check("v1221 A: no 'residual mean harm under attenuation'", 0.0,
           float(_hits(r"residual mean harm under attenuation")), 0.5)
+
+    # --- v1.22.2 final wording microcorrections ---
+    check("v1222 W: no 'manufacture(d)' causal language in claim surfaces", 0.0,
+          float(_hits(r"manufactur")), 0.5)
+    check("v1222 W: no 'fair challenger' / 'fairly evidenced' ambiguity", 0.0,
+          float(_hits(r"fair challenger|fairly evidenced|fairly constructed|compete fairly")), 0.5)
+    check("v1222 W: +-0.5 margin justified via the materiality threshold (main+ieee)", 2.0,
+          _in_mains("equals the materiality threshold"), 0.5)
+    check("v1222 W: README zero-drift harm scoped to 512/class frozen configuration", 1.0,
+          float("512-per-class frozen-transformer configuration"
+                in _texts.get("README.md", "")), 0.5)
 
     # --- Report ---
     npass = sum(1 for ok, *_ in results if ok)

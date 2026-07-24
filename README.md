@@ -24,7 +24,7 @@ small commit-time check recovers the loss.
 > **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
 > Candidate construction, nominal evidence parity and promotion testing are sequential controls: validate the
 > challenger when its construction or evidence conditions remain asymmetric or uncertain, not as a substitute
-> for building a fair challenger.**
+> for building a comparably constructed, comparably evidenced challenger.**
 
 ---
 
@@ -35,8 +35,8 @@ small commit-time check recovers the loss.
   *never adapting* can beat every triggered strategy.
 - Whether an update helps tracks **how degraded the deployed model already is**: retraining restores
   accuracy to a nearly regime-invariant level, so the benefit is the deployed model's *headroom* — a quantity
-  drift-detector scores do not measure (at individual triggered decisions a hierarchical model clustered
-  on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). Within triggered decisions under the
+  the evaluated drift-detector scores did not track (at individual triggered decisions a hierarchical model
+  clustered on regime×seed gives β_deg = −1.02 [−1.61, −0.43] vs β_score ≈ 0). Within triggered decisions under the
   evaluated detectors — classical two-sample tests or quantum-kernel MMD — score magnitude provided no
   consistent incremental information about future candidate value beyond incumbent degradation: improving the
   monitor did not improve the update decision in any regime we evaluated.
@@ -50,8 +50,11 @@ small commit-time check recovers the loss.
   When candidate construction or evidence conditions remain asymmetric or uncertain, validate the challenger
   before replacing the incumbent. (In the preregistered zero-drift size-matched control, point and strict
   validation provided no measurable gain once self-contained challengers reached nominal 2,000-per-class
-  parity.) A **zero-drift control** makes the point: forcing updates on a healthy model
-  is net-harmful *even with no drift at all* (the gate reduces, but does not eliminate, that replacement cost).
+  parity.) A **zero-drift control** makes the point for the evaluated
+  512-per-class frozen-transformer configuration: forcing such updates on a healthy model was net-harmful
+  *even with no drift at all* (the gate reduces, but does not eliminate, that cost; the preregistered
+  size-matched own-transformer control below shows the mean zero-drift harm vanishes at nominal
+  2,000-per-class parity).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
 - **The symmetric-pipeline dynamic replication (preregistered, fresh seeds 3001–3030, margins and A/B/C decision
