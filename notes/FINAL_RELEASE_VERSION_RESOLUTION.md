@@ -44,4 +44,4 @@ version after the public `v1.22.3` is **`v1.22.4`**.
 
 - Observed state: latest public tag `v1.22.3`; no `v1.22.4` tag/branch/DOI exists locally or remotely; metadata at 1.22.3.
 - Rule branch 2 applies (v1.22.3 is public → next semantic PATCH); no ambiguity, no collision → **v1.22.4**. A MINOR (v1.23.0) is rejected: the focus cut adds no scientific evidence.
-- **Mechanical fields bumped to 1.22.4:** `manuscript/references.bib` note, `CITATION.cff` version, `.zenodo.json` version + a v1.22.4 history sentence. Manuscript Data Availability still cites the sealed v1.22.0 science DOI `10.5281/zenodo.21517899`; concept DOI `10.5281/zenodo.21322256` unchanged; v1.22.4 version DOI **pending Zenodo publication**.
+- **Mechanical fields bumped to 1.22.4:** `manuscript/references.bib` note, `CITATION.cff` version, `.zenodo.json` version + a v1.22.4 history sentence. Manuscript Data Availability still cites the sealed v1.22.0 science DOI `10.5281/zenodo.21517899`; concept DOI `10.5281/zenodo.21322256` unchanged; v1.22.4 version DOI **`10.5281/zenodo.21536366` (Published)** — minted by the automatic Zenodo–GitHub integration on publishing the GitHub Release.
