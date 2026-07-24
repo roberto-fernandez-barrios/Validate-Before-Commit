@@ -12,10 +12,10 @@ Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 ## Graphical abstract
 
 `docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
-above Elsevier's 1328×531 minimum). Four messages: a drift alarm proposes, but does not
-justify, promotion → check candidate construction → check evidence conditions → nominal
-parity evaluated? No/uncertain: validation may be useful; yes, under the ZERO-DRIFT
-CONTROL (own preprocessing + 2,000/class nominal size parity): mean BA equivalent within
-±0.5 pp, no measurable point/strict gain in this control — and incumbent health sets the
-operational trade-off (conservative gates can delay recovery; chronological net harm
-unobserved across the thirteen replays). No universal deployment rule.
+above Elsevier's 1328×531 minimum). A three-step figure (six boxes, ~50 words): DRIFT
+ALARM proposes a challenger → IS THE CHALLENGER COMPARABLE? (own preprocessing + adequate
+evidence) → VALIDATE CONDITIONALLY (when construction, evidence or incumbent health remain
+uncertain), over three results — frozen incumbent-owned preprocessing amplified apparent
+promotion harm; nominal size parity removed the detectable mean zero-drift harm under the
+ZERO-DRIFT CONTROL within the 0.5-pp margin; chronological replays show validation can
+protect a healthy incumbent but delay recovery after collapse.
