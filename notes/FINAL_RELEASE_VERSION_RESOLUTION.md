@@ -32,5 +32,5 @@ The directly controlling precedent is **v1.22.1**, which was comparable in struc
 
 - **Release version: `v1.22.3`** (editorial PATCH over the sealed v1.22.0 science).
 - **Manuscript Data Availability is NOT repointed:** it continues to cite artifact version v1.22.0 and DOI 10.5281/zenodo.21517899 (the sealed science), exactly as v1.22.1 and v1.22.2 did; this is audit-pinned and correct.
-- **Mechanical version fields to bump to 1.22.3:** `manuscript/references.bib` (`note = {Version 1.22.3}`, the `make_final_manifest` source-of-truth), `CITATION.cff` (`version`, `date-released`), `.zenodo.json` (`version`, description sentence). Concept DOI `10.5281/zenodo.21322256` unchanged; version DOI for v1.22.3 is **pending Zenodo publication**.
+- **Mechanical version fields to bump to 1.22.3:** `manuscript/references.bib` (`note = {Version 1.22.3}`, the `make_final_manifest` source-of-truth), `CITATION.cff` (`version`, `date-released`), `.zenodo.json` (`version`, description sentence). Concept DOI `10.5281/zenodo.21322256` unchanged; v1.22.3 version DOI **`10.5281/zenodo.21534289` (Published)** — minted by the automatic Zenodo–GitHub integration on publishing the GitHub Release.
 - **No collision / no block.** Proceed to fast-forward merge, seal, tag `v1.22.3`, and release.

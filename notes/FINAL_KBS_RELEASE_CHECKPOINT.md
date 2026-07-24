@@ -51,21 +51,21 @@ Attached to GitHub Release `v1.22.3`:
 | `main.pdf` | 1,194,854 | `8041228ecc56ad93d4c9c894d3dbb34ab6a1393cc6d04704ec9405be4f1d6164` |
 | `supplement.pdf` | 936,913 | `b9fa5f6f3b069907896a2b29aaf62544d0c80b5ec6cbaefd5bfc30a89970fe2c` |
 | `main_ieee.pdf` | 899,434 | `41f069f7725b12f8e6fe5e5ec759a277229364a88f4d78f55ef09bfd50b42513` |
-| `release_manifest.json` | 2,309 | `faa48a5caf73a342c847f04b69625d4d379cc4e51a0cfc28db52b4634333e66e` |
-| `v1.22.3_narrative_rebuild_artifacts.zip` | 299,078 | `cda1abc02ecfcdde37294ddf814ffab73fcb1c898a702a28762716dfa9505592` |
+| `release_manifest.json` | 2,534 | `585d2171b3176d1044b1d75ed8ed0c96d69983091d1a6d1df19c648d232d34eb` |
+| `v1.22.3_narrative_rebuild_artifacts.zip` | 299,229 | `646be3826d76ae3a52abc037e7550dc2f9a5a80b5276708b66b3d187e71de94a` |
 
 - **ZIP contents (reproducible, fixed timestamps):** `release_manifest.json`, `final_manifest.json`, `highlights.md`, `graphical_abstract.png`, `README.md`, `CITATION.cff`, `.zenodo.json`, `notes/FINAL_RELEASE_VERSION_RESOLUTION.md`, `notes/Q1_FINAL_NARRATIVE_REBUILD_CHECKPOINT.md`, `notes/Q1_FINAL_CLAIM_AUDIT.md`.
-- **`release_manifest.json`** carries: version 1.22.3, definitive title, scientific-source commit `43d9c25`, sealing/release commit `3fbe1e6`, asset hashes, pages, word counts, validation (pytest/audit/hashes), datasets, seeds, registered outcomes, and the no-new-experiments / results-raw-intact declarations. `release_version_doi` = `PENDING_ZENODO_PUBLICATION`.
+- **`release_manifest.json`** carries: version 1.22.3, definitive title, scientific-source commit `43d9c25`, sealing/release commit `3fbe1e6`, asset hashes, pages, word counts, validation (pytest/audit/hashes), datasets, seeds, registered outcomes, and the no-new-experiments / results-raw-intact declarations. `release_version_doi` = `10.5281/zenodo.21534289`, `zenodo_status` = `published`.
 
 ## G. Publication
 
 - **GitHub release URL:** https://github.com/roberto-fernandez-barrios/Validate-Before-Commit/releases/tag/v1.22.3 (published, marked latest; 5 assets, digests verified equal to local).
 - **Tag:** `v1.22.3` pushed (`origin` ref `a183d0c9…`).
 - **main:** pushed (`1e0c72f..3fbe1e6`).
-- **Concept DOI:** `10.5281/zenodo.21322256` (unchanged; resolves to latest).
+- **Concept DOI:** `10.5281/zenodo.21322256` (unchanged; now resolves to v1.22.3 as latest).
 - **Science version DOI (v1.22.0):** `10.5281/zenodo.21517899` (unchanged; cited by the manuscript Data Availability).
-- **v1.22.3 version DOI:** **PENDING**. Zenodo is **not authenticated in this environment** (no token, no config, no in-repo upload script); the project uses the Zenodo–GitHub webhook, which is configured on the maintainer's Zenodo account and cannot be verified or triggered from here.
-- **Zenodo status:** BLOCKED ON EXTERNAL AUTH — see section J for the exact pending steps. No Zenodo publication has been simulated.
+- **v1.22.3 version DOI:** **`10.5281/zenodo.21534289` — Published.** Minted by the automatic Zenodo–GitHub integration (maintainer's linked account) on publishing the GitHub Release; confirmed via public Zenodo record API and by the maintainer.
+- **Zenodo status:** **PUBLISHED.** No external block remains. Zenodo archived the standard GitHub source snapshot (`Validate-Before-Commit-v1.22.3.zip`); the three PDFs, `release_manifest.json` and the artifacts ZIP remain on the GitHub Release (consistent with prior versions — the deposit is deliberately left as-is, no manual attachment).
 
 ## H. Final submission package
 
@@ -78,53 +78,44 @@ Available and verified:
 - **Highlights:** `manuscript/highlights.md` (5 bullets, all ≤85 chars).
 - **Declarations:** competing interest, funding, data availability, generative-AI use — all present in `main.tex`.
 - **Repository URL:** https://github.com/roberto-fernandez-barrios/Validate-Before-Commit
-- **DOI:** concept `10.5281/zenodo.21322256`; v1.22.3 version DOI pending Zenodo.
+- **DOI:** concept `10.5281/zenodo.21322256`; v1.22.3 version DOI `10.5281/zenodo.21534289` (Published); v1.22.0 science DOI `10.5281/zenodo.21517899`.
 - **Release artifact:** `dist/v1.22.3_narrative_rebuild_artifacts.zip` + `dist/release_manifest.json`.
 
 ## I. Verdict
 
-**FINAL ARTIFACT RELEASED — READY FOR KBS SUBMISSION**
+**FINAL ARTIFACT RELEASED AND ARCHIVED — READY FOR KBS SUBMISSION**
 
-Integration, sealing, and GitHub publication are complete and verified: `main` is at the tagged
-sealing commit `3fbe1e6`, the GitHub Release `v1.22.3` is published with five assets whose SHA-256
-digests match local computation, and every gate is green (135 pytest, 630/630 audit, 185/185
-hashes) with the science bit-for-bit unchanged since v1.22.0. The **only** outstanding item is the
-Zenodo v1.22.3 version DOI, which is blocked on external Zenodo authentication not available in this
-environment (section J). The submission-ready PDFs, highlights, graphical abstract and declarations
-are all in hand; the concept DOI already cited across README/CITATION/manuscript resolves to the
-latest version, so KBS submission is not blocked by the pending version DOI.
+Integration, sealing, GitHub publication and Zenodo archival are complete and verified: `main` is at
+the tagged sealing commit `3fbe1e6`, the GitHub Release `v1.22.3` is published with five assets whose
+SHA-256 digests match local computation, the automatic Zenodo–GitHub integration has archived the
+release under version DOI **`10.5281/zenodo.21534289` (Published)**, and every gate is green
+(135 pytest, 630/630 audit, 185/185 hashes) with the science bit-for-bit unchanged since v1.22.0.
+No external block remains. The submission-ready PDFs, highlights, graphical abstract and declarations
+are all in hand.
 
-## J. Pending external step — Zenodo v1.22.3 version DOI (exact procedure)
+## J. Zenodo v1.22.3 archival — completed
 
-Zenodo could not be reached from this environment. The maintainer completes it as follows.
+The GitHub Release `v1.22.3` was ingested automatically by the maintainer-linked Zenodo–GitHub
+integration (no local token or manual upload). Confirmed via the public Zenodo record API and by the
+maintainer:
 
-**If the Zenodo–GitHub webhook is enabled** (the project's established workflow — the concept DOI
-`10.5281/zenodo.21322256` and the per-release version DOIs indicate it is):
+- **Version DOI:** `10.5281/zenodo.21534289` — state **Published**, version field `1.22.3`.
+- **Concept DOI:** `10.5281/zenodo.21322256` — now resolves to v1.22.3 as latest (`is_last: true`).
+- **Archived file:** `roberto-fernandez-barrios/Validate-Before-Commit-v1.22.3.zip` (GitHub source snapshot, 2.7 MB) — the standard integration behavior, matching prior versions; left as-is by decision. The three PDFs, `release_manifest.json` and the artifacts ZIP remain the GitHub Release assets and are not manually attached to Zenodo.
+- **Related identifier:** the GitHub `v1.22.3` release, `isSupplementTo` the paper, MIT license.
 
-1. Publishing the GitHub Release `v1.22.3` (done) triggers Zenodo to create a new draft version under the concept record.
-2. Sign in at https://zenodo.org → *Upload* → the concept record `10.5281/zenodo.21322256` → the new `v1.22.3` draft.
-3. Confirm the draft metadata matches `.zenodo.json` (title, `version: 1.22.3`, description, creators/ORCIDs, MIT license, keywords, related identifier = the GitHub release URL).
-4. **Publish** the draft → the v1.22.3 **version DOI** is minted.
+Historical record of the original pending flow (now satisfied): GitHub Release published → automatic
+integration → processing → version DOI minted.
 
-**If the webhook is not enabled** — mint via the API with a personal token (scope `deposit:write`):
-
-```bash
-export ZENODO_TOKEN=<personal-access-token>
-CONCEPT=21322256
-# 1. create a new version draft from the latest published deposit
-NEWID=$(curl -s -H "Authorization: Bearer $ZENODO_TOKEN" \
-  -X POST "https://zenodo.org/api/deposit/depositions/$CONCEPT/actions/newversion" \
-  | python -c "import sys,json;print(json.load(sys.stdin)['links']['latest_draft'].rsplit('/',1)[1])")
-# 2. clear old files, upload the five assets, PUT .zenodo.json metadata (version 1.22.3), then publish
-#    (bucket upload + metadata PUT + POST .../actions/publish)
-```
-
-Then, **after the version DOI is minted**, the only mechanical follow-up (no scientific/prose change):
-
-- If the repository convention records the version DOI anywhere machine-readable, add it (e.g. a `version_doi` field); the manuscript Data Availability is **not** changed — it correctly cites the sealed v1.22.0 science DOI. Re-run `pytest tests -q`, `audit_paper2_claims`, `verify_results_manifest` and confirm all green before any such commit.
+The mechanical closure applied at this step (no scientific/prose change): the DOI placeholder was
+replaced in `dist/release_manifest.json` (`release_version_doi` → `10.5281/zenodo.21534289`,
+`zenodo_status: published`), the artifacts ZIP regenerated, both re-uploaded to the GitHub Release,
+and this checkpoint plus `notes/FINAL_RELEASE_VERSION_RESOLUTION.md` updated. The manuscript Data
+Availability is unchanged — it correctly cites the sealed v1.22.0 science DOI `10.5281/zenodo.21517899`;
+the concept DOI already present is unchanged; the tag `v1.22.3` still points to sealing commit `3fbe1e6`.
 
 ---
 
-**STOP.** Integration, sealing and GitHub publication complete; Zenodo version DOI pending external
-authentication. No further review, experiment, extension, reframing, or manuscript change is to be
-performed in this phase.
+**STOP.** Integration, sealing, GitHub publication and Zenodo archival complete. No further review,
+experiment, extension, reframing, manuscript change, new version, new tag, new release, or manual
+Zenodo edit is to be performed. This is the definitive closure of v1.22.3.
