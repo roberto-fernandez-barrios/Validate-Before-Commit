@@ -19,8 +19,11 @@ ax.set_ylim(0, 100)
 ax.axis("off")
 
 
+PAD = 1.1  # rounded-box padding beyond the nominal rectangle
+
+
 def box(x, y, w, h, text, fc, ec, fs=13.0, bold=False):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=1.1",
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad={PAD}",
                                 fc=fc, ec=ec, lw=2.0, mutation_scale=1.0))
     ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
             fontweight="bold" if bold else "normal", linespacing=1.28)
@@ -28,21 +31,26 @@ def box(x, y, w, h, text, fc, ec, fs=13.0, bold=False):
 
 def arrow(x0, y0, x1, y1, color="0.3"):
     ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>",
-                                 mutation_scale=20, color=color, lw=2.4))
+                                 mutation_scale=13, shrinkA=0, shrinkB=0,
+                                 color=color, lw=2.6))
 
 
 # ---- title ----
 ax.text(50, 95, "A drift alarm proposes a challenger; comparability and conditional validation decide",
         ha="center", fontsize=15.0, fontweight="bold")
 
-# ---- three central steps ----
+# ---- three central steps; each connector runs from just below one box's padded
+#      bottom to just above the next box's padded top, so the shaft is fully visible ----
 cx, w = 26, 48
-box(cx, 74, w, 12, "DRIFT ALARM\nproposes a challenger", "#fff3e0", "#e65100", fs=13, bold=True)
-arrow(50, 73.5, 50, 69)
-box(cx, 55, w, 13, "IS THE CHALLENGER COMPARABLE?\nown preprocessing + adequate evidence",
+b1y, b1h = 76, 10
+b2y, b2h = 57, 10
+b3y, b3h = 34, 13
+box(cx, b1y, w, b1h, "DRIFT ALARM\nproposes a challenger", "#fff3e0", "#e65100", fs=13, bold=True)
+arrow(50, b1y - PAD - 0.2, 50, b2y + b2h + PAD + 0.2)
+box(cx, b2y, w, b2h, "IS THE CHALLENGER COMPARABLE?\nown preprocessing + adequate evidence",
     "#e3f2fd", "#1565c0", fs=13, bold=True)
-arrow(50, 54.5, 50, 50)
-box(cx, 34, w, 15, "VALIDATE CONDITIONALLY\nwhen construction, evidence or\nincumbent health remain uncertain",
+arrow(50, b2y - PAD - 0.2, 50, b3y + b3h + PAD + 0.2)
+box(cx, b3y, w, b3h, "VALIDATE CONDITIONALLY\nwhen construction, evidence or\nincumbent health remain uncertain",
     "#ede7f6", "#4527a0", fs=13, bold=True)
 
 # ---- three result messages ----
