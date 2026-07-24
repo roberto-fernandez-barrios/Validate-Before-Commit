@@ -109,10 +109,45 @@ def test_v1202_claim_scope_hardening():
         assert "adjudication count" in tt, f
 
 
-def test_paper1_reference_untouched():
+def test_paper1_reference_removed():
+    # KBS bibliographic ceiling (user decision): this paper is now "Paper 1", so the
+    # companion-study reference to a separate Paper 1 was removed. Guard that neither the
+    # citation nor the bib entry lingers anywhere.
     bib = (REPO / "manuscript" / "references.bib").read_text(encoding="utf-8")
-    i = bib.find("Authors' own prior work (Paper 1)")
-    assert i > 0, "Paper 1 section marker must exist"
-    # the pending Paper 1 entry must still be present and unmodified in its key fields
-    tail = bib[i:]
-    assert "arXiv" in tail or "unpublished" in tail or "@" in tail
+    assert "fernandez_paper1" not in bib, "companion Paper 1 bib entry must be gone"
+    assert "Authors' own prior work (Paper 1)" not in bib, "Paper 1 section marker must be gone"
+    for name in ("manuscript/main.tex", "manuscript/main_ieee.tex"):
+        t = (REPO / name).read_text(encoding="utf-8")
+        assert "fernandez_paper1" not in t, f"{name}: dangling Paper 1 citation"
+        assert "companion study" not in t.lower(), f"{name}: companion-study framing must be gone"
+
+
+def test_no_broad_priority_claims():
+    # KBS bibliographic ceiling: after adding active-testing / limited-label model-selection
+    # and retraining-decision references, the paper must not claim priority over those
+    # neighbours. The defensible novelty is the *combination* inside adaptive NIDS.
+    import re
+    forbidden = [
+        r"first to (compare|select|evaluate) models? with (few|limited|scarce) labels",
+        r"first (active[- ]testing|limited[- ]label model selection)",
+        r"novel (active[- ]testing|model comparison with (few|limited) labels)",
+        r"unlike all (previous|prior) work",
+        r"no (previous|prior) work (has )?(studies|studied|compares|compared|considers|considered)",
+        r"we (are the )?first to (decide|determine) (whether|when) retraining",
+    ]
+    for name in ("manuscript/main.tex", "manuscript/main_ieee.tex", "README.md",
+                 "manuscript/highlights.md"):
+        p = REPO / name
+        if not p.exists():
+            continue
+        t = re.sub(r"\s+", " ", p.read_text(encoding="utf-8").lower())
+        for pat in forbidden:
+            assert not re.search(pat, t), f"{name}: broad priority claim {pat!r}"
+    # the RW must position these literatures as prior work (cited, not claimed); the
+    # statistical procedures used must carry their original sources.
+    main = (REPO / "manuscript" / "main.tex").read_text(encoding="utf-8")
+    for key in ("sawade2012active", "kossen2021active", "karimi2021online", "han2024model",
+                "okanovic2025models", "zliobaite2015cost", "mahadevan2024cost",
+                "regol2025retrain", "mcnemar1947note", "holm1979simple",
+                "benjamini1995controlling", "schuirmann1987comparison"):
+        assert ("\\cite{" in main) and key in main, f"expected reference {key} cited in main"
