@@ -19,9 +19,9 @@ Compile: `cd manuscript && latexmk -pdf main.tex` (or `pdflatex main; bibtex mai
 
 ## Regenerate the LaTeX from source
 ```bash
-python -m src.analysis.make_paper2_latex_tables    # tables -> tables/ (Elsevier) and tables_ieee/ (IEEE)
-python -m src.analysis.make_paper2_latex ieee      # manuscript/main_ieee.tex   (TNSM, primary)
-python -m src.analysis.make_paper2_latex elsevier  # manuscript/main.tex        (fallback)
+python -m src.analysis.make_paper2_latex_tables    # result tables -> tables/ (Elsevier) and tables_ieee/ (IEEE)
+python -m src.analysis.port_ieee                   # regenerate manuscript/main_ieee.tex from main.tex
+# manuscript/main.tex is the hand-maintained Elsevier CAS source (not generated).
 ```
 Compile IEEE with `latexmk -pdf main_ieee.tex` (needs `IEEEtran.cls`, standard in TeX Live/MiKTeX).
 

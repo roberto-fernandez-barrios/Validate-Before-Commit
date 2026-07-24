@@ -3,7 +3,7 @@
 test_main_tables_final_only  -- the main body inputs exactly the final table set (no superseded
                                 or v1 tables); the v1 tables live only in the supplement.
 test_no_superseded_claims    -- the living documents carry none of the retracted/stale claims
-                                the final hostile review removed.
+                                the final independent verification removed.
 test_claim_table_consistency -- every pinned numeric claim matches the artifacts (the 439-check
                                 audit passes end to end).
 """
@@ -15,7 +15,7 @@ import sys
 
 from tests.conftest import REPO
 
-# KBS final focus cut: the main body keeps only the five primary/boundary result tables;
+# KBS final scope reduction: the main body keeps only the five primary/boundary result tables;
 # the eight secondary §5.5 tables move to the supplement (relocated main-paper result tables).
 FINAL_BODY_TABLES = {
     # v1.21 Scenario-A rewrite: the symmetric-pipeline replication is the central new
@@ -45,7 +45,7 @@ V1_SUPPLEMENT_TABLES = {
     # v1.22.1: the historical frozen-policy diagnostic table moved to S2.11 to make
     # room for the evidence-validation trade-off table (compact summary stays in §5.1)
     "table_v2_confirmatory",
-    # KBS final focus cut: the eight secondary §5.5 tables relocated to the supplement
+    # KBS final scope reduction: the eight secondary §5.5 tables relocated to the supplement
     # (S2 relocated main-paper result tables); the main body keeps their headline numbers
     "table_policy_frontier", "table_causal_probe", "table_zero_drift",
     "table_amendment009", "table_harm_generality", "table_budget_frontier",

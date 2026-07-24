@@ -458,7 +458,7 @@ def main(out: Path | None = None) -> None:
         # q1-final-patch (v1.20.1): the statistical-inference contract, read from the shipped
         # analysis tables themselves so the manifest can never drift from them.
         statistical_inference=statistical_inference_summary(),
-        # v1.20.2: editorial compression + final claim-scope hardening (no science changed).
+        # v1.20.2: final length reduction + final claim-scope hardening (no science changed).
         editorial_v1_20_2=editorial_v1202_summary(),
         # v1.21.0: the preregistered symmetric-pipeline dynamic replication (Scenario A).
         symmetric_replication_v1_21=symmetric_replication_v1_21_summary(),

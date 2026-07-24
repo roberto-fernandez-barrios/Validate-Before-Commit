@@ -86,6 +86,6 @@ The −0.894 law says: **adapt iff the deployed model has degraded.** So the dep
 1. **Add the mechanism law (r=−0.894) as a main result + figure.** It is now the paper's spine, sharper than the qualitative taxonomy.
 2. **Add a Threats-to-Validity subsection** stating the true-label retraining confound explicitly (benefits optimistic, harm conservative) — pre-empts the strongest honest attack and turns it into a strength for the harm claim.
 3. **Do not oversell the AUC-by-severity motivation** — QK triggers *later* on real drift; frame detection power as motivation-only, not a practical advantage.
-4. Keep the Q1-vs-Q2 fork (§4) explicit in the director conversation.
+4. Keep the Q1-vs-Q2 fork (§4) explicit in the project decision record.
 
 *No commit. No experiments. All audits are re-aggregations of existing window data + one code read.*

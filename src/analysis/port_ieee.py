@@ -10,9 +10,9 @@ Transformations applied to the body:
   * figures become starred floats (`figure*`) so they span both columns;
   * `width=\\linewidth` becomes `width=\\textwidth` for those spanning figures.
 
-This lived as an ad-hoc scratchpad script until final-q1; it is part of the artifact now
+This lived as an ad-hoc helper script until final-q1; it is part of the artifact now
 because otherwise `main_ieee.tex` silently drifts out of sync with `main.tex` (it had, by an
-abstract rewrite and seven hostile-review corrections). `make final-paper` runs it before
+abstract rewrite and seven independent-verification corrections). `make final-paper` runs it before
 compiling, so the two manuscripts cannot diverge again.
 """
 from __future__ import annotations

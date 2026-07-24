@@ -94,6 +94,6 @@ IEEE, 0 undefined references or citations in any of the three.
 
 ## Pending
 
-Fase F: `make final-paper` end to end, an independent hostile review of the result, freeze.
+Fase F: `make final-paper` end to end, an independent verification of the result, freeze.
 Then, only with Roberto's explicit authorization: commit/push of `final-q1`, release v1.18.0
 + Zenodo (v1.17.0 stays frozen), submission.

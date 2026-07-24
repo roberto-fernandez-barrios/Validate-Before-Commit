@@ -88,8 +88,8 @@ Amendment 013 (`notes/paper2_harness_v2_amendment_013.md`) adds the exact-zero-c
 (global value-dedup + abort-on-exhaustion; `--disjoint-window-frac`, UNSW-full at window 64 for
 pool feasibility), `--min-calib-windows`, the stratified per-class gate `labeled_probe_strat`, and
 the symmetric-A/B mechanism control; its `paper2_v14*_*` arms are enumerated there.
-The final-q1 protocol (`notes/q1_max_protocol.md`, frozen with registered deltas D1–D7 over
-`PLAN_Q1_CLAUDE_CODE.md`) adds `--vbc-defer-mode {accumulate,cohort,refresh}` (defer-continuation
+The final-q1 protocol (`notes/q1_max_protocol.md`, frozen with registered deltas D1–D7 before
+any run) adds `--vbc-defer-mode {accumulate,cohort,refresh}` (defer-continuation
 semantics; the accumulate mode's weak-conditional-null guarantee is Proposition 1 / supplement §S4),
 the per-seed symmetric-A/B output + scaler/PCA decomposition (`--decompose`, `--seed-start/--seed-end`,
 `--out-suffix` on `paper2_symmetric_ab_final`), and the bootstrap CI-based equivalence analysis
