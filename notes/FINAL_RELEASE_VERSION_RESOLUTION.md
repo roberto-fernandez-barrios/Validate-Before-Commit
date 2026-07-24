@@ -78,4 +78,5 @@ Two fused, user-authorized changes over the same sealed v1.22.0 science:
 By the repo's PATCH pattern the next version after the public `v1.22.5` is **`v1.22.6`** (no
 `v1.22.6` tag/DOI existed; no collision; MINOR rejected — no scientific evidence added). Mechanical
 fields bumped to 1.22.6; science DOI `10.5281/zenodo.21517899` and concept DOI
-`10.5281/zenodo.21322256` unchanged; v1.22.6 version DOI **pending Zenodo publication**.
+`10.5281/zenodo.21322256` unchanged; v1.22.6 version DOI **`10.5281/zenodo.21538275` (Published)** —
+minted by the automatic Zenodo–GitHub integration on publishing the GitHub Release.
