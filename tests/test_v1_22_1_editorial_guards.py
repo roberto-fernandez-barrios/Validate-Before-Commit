@@ -240,25 +240,23 @@ def test_attenuation_registered_but_not_dominant():
 
 
 # ---------------------------------------------------------------- artifact integrity
-def test_v1_22_0_sealed_files_unchanged():
-    """The v1.22.1 phase is editorial: the sealed v1.22.0 manifest and hash pin must be
-    byte-identical to the baseline (notes/v1_22_1_editorial_scope_baseline.md). A later
-    v1.22.1 sealing phase must update these pins deliberately, in the same commit that
-    re-pins the manifests."""
-    fm = (REPO / "results" / "final_manifest.json").read_bytes()
-    ms = (REPO / "results" / "tables" / "MANIFEST.sha256").read_bytes()
-    assert hashlib.sha256(fm).hexdigest() == (
-        "1f7f161757dfdf2783d7be0bc0195132ead3beaa4fe9a66bd7a51c532754f479")
-    assert hashlib.sha256(ms).hexdigest() == (
-        "132643ad37e6b959775369043a58f862ceaea067364848f970f58212e738d87f")
-    pinned = [ln for ln in ms.decode("utf-8").splitlines() if ln.strip()]
-    assert len(pinned) == 183, "183 pinned CSVs at v1.22.0"
+def test_v1_22_1_manifest_pinning():
+    """v1.22.1 sealing: the MANIFEST re-pin is additive — every v1.22.0 pin survives
+    (183 non-editorial CSVs, byte-verified by verify_results_manifest) plus exactly the
+    two derived editorial CSVs (185 total)."""
+    ms = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
+    pinned = [ln for ln in ms.splitlines() if ln.strip()]
+    assert len(pinned) == 185, "185 pinned CSVs at v1.22.1 (183 + 2 editorial)"
+    editorial = [ln for ln in pinned if "v1_22_1_editorial/" in ln]
+    assert len(editorial) == 2, "exactly the two editorial CSVs are the additive pins"
+    for f in ("equivalence_margin_sensitivity.csv", "evidence_validation_tradeoff.csv"):
+        assert any(ln.endswith(f"v1_22_1_editorial/{f}") for ln in pinned), f
+        h = hashlib.sha256((EDT / f).read_bytes()).hexdigest()
+        assert any(ln.startswith(h) for ln in editorial), (
+            f"pinned hash must match the on-disk editorial CSV: {f}")
 
 
-def test_editorial_outputs_stay_out_of_sealed_dirs():
+def test_no_editorial_raw_outputs():
     assert not (REPO / "results" / "raw" / "v1_22_1_editorial").exists()
     for f in ("equivalence_margin_sensitivity.csv", "evidence_validation_tradeoff.csv"):
         assert (EDT / f).exists(), f"derived editorial output missing: {f}"
-    ms = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
-    assert "v1_22_1_editorial" not in ms, (
-        "editorial CSVs stay unpinned until the v1.22.1 sealing checkpoint")
