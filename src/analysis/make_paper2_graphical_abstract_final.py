@@ -1,11 +1,13 @@
-"""Graphical abstract, v1.22.1 editorial-scope revision (protocol
-notes/v1_22_1_editorial_scope_protocol.md; supersedes the size-matched rewrite spec).
+"""Graphical abstract, final KBS narrative-rebuild revision (protocol
+notes/Q1_FINAL_NARRATIVE_BASELINE.md; supersedes the v1.22.1 editorial-scope spec).
 
-Spec: Trigger != superiority -> check candidate construction -> check evidence
-conditions -> nominal parity evaluated?  No/uncertain -> validation may be useful;
-yes, under the ZERO-DRIFT CONTROL (own preprocessing + 2,000/class nominal size
-parity) -> mean BA equivalent within +-0.5 pp, no measurable point/strict gain in
-this control. No universal deployment rule. Output above Elsevier's 1328x531 minimum.
+Spec (four messages): (1) a drift alarm proposes, but does not justify, promotion;
+(2) candidate construction and evidence size alter promotion outcomes; (3) validation
+helps conditionally -> no/uncertain branch; yes, under the ZERO-DRIFT CONTROL (own
+preprocessing + 2,000/class nominal size parity) -> mean BA equivalent within +-0.5 pp,
+no measurable point/strict gain in this control; (4) incumbent health determines the
+operational trade-off (chronological replays, net harm unobserved). No universal
+deployment rule. Output above Elsevier's 1328x531 minimum.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -59,9 +61,9 @@ ax.text(83, 58.5, "yes, under zero drift", fontsize=11.5, ha="right", color="#1b
 
 box(2, 31, 44, 21,
     "VALIDATION MAY BE USEFUL\n"
-    "validate before commit: gates recovered the\n"
-    "loss where construction or evidence\n"
-    "conditions were asymmetric",
+    "gates recovered the loss where construction or\n"
+    "evidence conditions were asymmetric — most\n"
+    "valuable when a healthy incumbent is at risk",
     "#ede7f6", "#4527a0", fs=11.5, bold=True)
 box(50, 27.5, 48.5, 26.5,
     "ZERO-DRIFT CONTROL\n"
@@ -82,10 +84,11 @@ box(34, 3, 31.5, 19,
     "(+1.89 / +0.63 / +0.23 pp, Holm-sig.)",
     "#f5f5f5", "#455a64", fs=11.5)
 box(66.5, 3, 32, 19,
-    "Scope: zero drift, balanced pools,\n"
-    "SVC-RBF, random proposals;\n"
-    "chronological net harm unobserved",
-    "#eceff1", "#37474f", fs=11.5)
+    "Incumbent health sets the operational\n"
+    "trade-off: conservative gates can delay\n"
+    "recovery when the incumbent collapses;\n"
+    "chronological net harm unobserved (13 replays)",
+    "#eceff1", "#37474f", fs=10.5)
 
 fig.savefig("docs/img/graphical_abstract.png", dpi=200, bbox_inches="tight",
             facecolor="white")

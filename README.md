@@ -1,6 +1,8 @@
 # Validate Before Commit
 
-**A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection**
+**Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection**
+
+*Validate Before Commit* is the name of this repository and of the gate family it releases; the paper's title reflects its final thesis --- candidate construction and evidence comparability precede candidate validation, and validation is a conditional safeguard, not a universal requirement.
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -279,8 +281,8 @@ The paper is under review; cite it as below. To cite the **software artifact** i
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
-  title  = {Validate Before Commit: A Controlled Study of Pipeline Construction,
-            Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection},
+  title  = {Candidate Comparability Before Promotion: Conditional Validation in
+            Adaptive Network Intrusion Detection},
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},

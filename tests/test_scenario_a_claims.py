@@ -105,11 +105,13 @@ def test_zero_drift_gate_contrasts_positive_and_significant():
     assert gates.significant_holm.all()
 
 
-NEW_TITLE = ("A Controlled Study of Pipeline Construction, Evidence Asymmetry, "
-             "and Candidate Promotion in Network Intrusion Detection")
+NEW_TITLE = ("Candidate Comparability Before Promotion: Conditional Validation in "
+             "Adaptive Network Intrusion Detection")
 OLD_TITLE_FRAGMENT = "Label-Efficient Commit Decisions for Drift-Triggered Classifier Updates"
 V121_TITLE_FRAGMENT = ("Candidate Governance for Drift-Triggered Classifier Pipelines "
                        "in Network Intrusion Detection")
+V122_TITLE_FRAGMENT = ("A Controlled Study of Pipeline Construction, Evidence Asymmetry, "
+                       "and Candidate Promotion in Network Intrusion Detection")
 
 
 def test_definitive_title_everywhere():
@@ -123,6 +125,7 @@ def test_definitive_title_everywhere():
             assert NEW_TITLE in t, p
         assert OLD_TITLE_FRAGMENT not in t, f"{p}: pre-v1.21 title still present"
         assert V121_TITLE_FRAGMENT not in t, f"{p}: v1.21 title still present"
+        assert V122_TITLE_FRAGMENT not in t, f"{p}: v1.22 title still present"
 
 
 def test_unsw_zero_strict_guardrail_recorded():

@@ -1285,12 +1285,16 @@ def main():
     # --- v1.21 sealing guards (title, scope phrasing, completeness, provenance) ---
     # v1.22: the definitive title changed with the size-matched rewrite (registered in
     # notes/size_matched_final_rewrite_protocol.md); the v1.21 title joins the retired list.
+    # Final KBS narrative rebuild (notes/Q1_FINAL_NARRATIVE_REBUILD_CHECKPOINT.md): the
+    # title no longer leads with the gate family; the v1.22 title joins the retired list.
     import json as _json
-    _NEW_TITLE = ("validate before commit: a controlled study of pipeline construction, "
-                  "evidence asymmetry, and candidate promotion in network intrusion detection")
+    _NEW_TITLE = ("candidate comparability before promotion: "
+                  "conditional validation in adaptive network intrusion detection")
     _OLD_TITLE = "label-efficient commit decisions for drift-triggered classifier updates"
     _V121_TITLE = ("candidate governance for drift-triggered classifier pipelines "
                    "in network intrusion detection")
+    _V122_TITLE = ("a controlled study of pipeline construction, "
+                   "evidence asymmetry, and candidate promotion in network intrusion detection")
     _live = {n: t for n, t in _texts.items()
              if n.endswith(("/main.tex", "/main_ieee.tex", "/supplement.tex",
                             "README.md", "REPRODUCE.md", "highlights.md"))}
@@ -1306,6 +1310,8 @@ def main():
           float(sum(1 for _t in _live.values() if _OLD_TITLE in _t)), 0.5)
     check("v122seal T3: v1.21 title absent from live surfaces", 0.0,
           float(sum(1 for _t in _live.values() if _V121_TITLE in _t)), 0.5)
+    check("finalseal T4: v1.22 title absent from live surfaces", 0.0,
+          float(sum(1 for _t in _live.values() if _V122_TITLE in _t)), 0.5)
     # ("NOT the sole cause..." is the REQUIRED phrasing and is excluded by the lookbehind)
     check("v121seal C1: no positive 'ownership explains all'/'sole cause' phrasing", 0.0,
           float(_hits(r"ownership explains all|all (?:the )?harm is caused by preprocessing|"

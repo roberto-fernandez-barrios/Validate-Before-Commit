@@ -26,7 +26,7 @@ doi: "10.5281/zenodo.21322256"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished
-  title: "Validate Before Commit: A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection"
+  title: "Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection"
   authors:
     - family-names: "Fernández-Barrios"
       given-names: "Roberto"
