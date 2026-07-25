@@ -11,11 +11,11 @@ Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 
 ## Graphical abstract
 
-`docs/img/graphical_abstract.png` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
+`docs/img/graphical_abstract.png` and `.pdf` (rendered by `python -m src.analysis.make_paper2_graphical_abstract_final`;
 above Elsevier's 1328×531 minimum). A three-step figure (six boxes, ~50 words): DRIFT
 ALARM proposes a challenger → IS THE CHALLENGER COMPARABLE? (own preprocessing + adequate
-evidence) → VALIDATE CONDITIONALLY (when construction, evidence or incumbent health remain
-uncertain), over three results — frozen incumbent-owned preprocessing amplified apparent
+evidence) → VALIDATE WHEN WARRANTED (fixed policies evaluated; no online meta-controller),
+over three results — frozen incumbent-owned preprocessing amplified apparent
 promotion harm; nominal size parity removed the detectable mean zero-drift harm under the
 ZERO-DRIFT CONTROL within the 0.5-pp margin; chronological replays show validation can
 protect a healthy incumbent but delay recovery after collapse.

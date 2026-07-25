@@ -250,13 +250,14 @@ def main() -> None:
 \\label{{tab:evidence_validation_tradeoff}}
 \\footnotesize
 \\setlength{{\\tabcolsep}}{{3.5pt}}
+\\resizebox{{\\ifdim\\width>\\linewidth \\linewidth\\else\\width\\fi}}{{!}}{{%
 \\begin{{tabular}}{{l l r r l l r}}
 \\toprule
 Dataset & Policy & Cand. & Probe & BA vs never [CI95] & Gate gain vs naive [CI95] & Commits/seed \\\\
 \\midrule
 {body}
 \\bottomrule
-\\end{{tabular}}
+\\end{{tabular}}}}
 \\end{{table}}
 """
     (GEN / "table_evidence_validation_tradeoff.tex").write_text(tex, encoding="utf-8",

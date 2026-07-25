@@ -8,7 +8,7 @@
 % captions (e.g. table_amendment009 cites main \S5.2/\S5.5). build_pdfs compiles main
 % first, so main.aux is available; a standalone supplement build degrades these to '??'.
 \usepackage{xr}
-\externaldocument{main}
+\externaldocument[][nocite]{main}
 \newcommand{\bsection}[1]{\section{#1}}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thesubsection}{S\arabic{section}.\arabic{subsection}}
@@ -65,7 +65,7 @@ Acquisition yield / prevalence & Operational & frozen, 512/class & --- & Attack-
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig1_regime_spectrum.png}
+\includegraphics[width=\linewidth]{docs/img/fig1_regime_spectrum.pdf}
 \caption{Readaptation value is regime-dependent and sometimes harmful: best detector-triggered gain over no-adaptation per dataset and attack regime.}
 \label{fig:1}
 \end{figure}
@@ -100,7 +100,7 @@ If the decision is the lever, the natural fix is a smarter trigger policy. We pr
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig4_phase2_gate.png}
+\includegraphics[width=\linewidth]{docs/img/fig4_phase2_gate.pdf}
 \caption{The validate-before-commit gate preserves benefit and avoids harm, with the same sign pattern for a classical (KS-max) and a quantum (QK-ZZ) detector (magnitudes differ; see text).}
 \label{fig:4}
 \end{figure}
@@ -118,7 +118,7 @@ The gate's power comes from labels, not from the confirmation heuristic: a zero-
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig5_label_budget_curve.png}
+\includegraphics[width=\linewidth]{docs/img/fig5_label_budget_curve.pdf}
 \caption{Label-efficiency frontier: gain over no-adaptation versus probe budget; a small probe suffices to avoid harm.}
 \label{fig:5}
 \end{figure}
@@ -127,11 +127,11 @@ Ten extensions beyond the pre-specified design (explicitly labeled as robustness
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig8_probe_poison.png}
+\includegraphics[width=\linewidth]{docs/img/fig8_probe_poison.pdf}
 \caption{The gate remains harm-avoiding under randomly corrupted validation labels (up to 40\% flipped, initial study; replicated on the hardened harness in \S5.5 of the main paper).}
 \label{fig:8}
 \end{figure}
-\emph{Label latency:} the probe need not be current. Drawing it from traffic labeled up to 20 windows in the past (Fig.~\ref{fig:7}) leaves the gate safe and effective at every lag --- in the harmful regime the gate holds at +0.9 to +1.1 (vs naive $-$1.36) for lags of 5, 10 and 20 windows, and the benefit regimes are essentially unchanged --- so the method tolerates realistic labeling delay rather than requiring instantaneous labels. \emph{Harm breadth:} the net-harm of naive triggering (with the fragile SVC-RBF downstream) is not confined to one ToN-IoT regime --- it also appears in ToN-IoT DDoS (naive \textbf{$-$16.81}) and Injection ($-$1.21), and the gate converts all three to net-positive (+1.26, +0.80, +0.93). \emph{Cost knob:} raising the commit margin $\varepsilon$ from 0 to 0.01--0.02 cuts committed adaptations by ~30\% (e.g. PortScan 3.1$\to$2.2 commits) at equal downstream gain, giving a simple operating characteristic that trades update frequency for benefit. \emph{Randomly corrupted validation labels:} because the gate trusts a labeled probe, we test a faulty labeler (or non-adaptive attacker) that flips a uniformly random fraction of the probe labels --- the random variant of the label-flipping poisoning threat against SVM-family learners \cite{biggio2012poisoning} (Fig.~\ref{fig:8}). The gate avoids harm under this corruption process: even with 40\% of validation labels corrupted --- near the point where the probe is pure noise --- it still matches-or-beats naive triggering in every regime (ToN-IoT degrades gracefully from +0.93 to +0.32 but never goes negative; benefit and mixed regimes are essentially unchanged). Label noise perturbs the deployed and candidate estimates symmetrically, so it moves the gate along the naive-to-oracle line without pushing it below the safe baseline. (A candidate-aware adversary that chooses \emph{which} labels to flip is a strictly stronger threat we do not model; \S7 of the main paper.) \emph{Label-free estimators head-to-head:} the zero-label variant of \S S1.4 is deliberately naive, so we also instantiate the two standard label-free accuracy estimators --- ATC \cite{garg2022atc} and DoC \cite{guillory2021doc} --- as gates in the same harness: each model estimates its target-window accuracy from its own confidences plus a labeled validation sample drawn at its training time, using zero target-window labels. Both avoid harm --- on the fragile SVC-RBF downstream, ToN-IoT moves from $-$1.36 (naive) to +0.40 (ATC) and +1.16 (DoC) --- but both pay for safety with benefit: on PortScan they lose 24\% (ATC) and 60\% (DoC) of the naive gain ($-$1.86 [$-$3.48, $-$0.17] and $-$4.64 [$-$6.86, $-$2.26] vs naive, CI95), and they remain significantly below naive even for random forest with native predicted probabilities. The labeled probe is thus the only gate on the benefit--safety Pareto front \emph{among those evaluated}. The mechanism mirrors the degradation law: confidence-based estimates are trustworthy only while the incumbent is healthy --- exactly the regime where the gate is least needed --- and misrank incumbent against candidate once the incumbent has degraded, which is where the benefit lives; related estimators share the same calibration premise \cite{jiang2022disagreement,baek2022agreement,rosenfeld2023dis2,deng2021labels}. \emph{Replay retraining:} the harmful baseline retrains on a narrow current window and fully replaces the incumbent, so we also test the standard label-free mitigation --- retrain-current-plus-replay, augmenting each candidate's training set with an equal-size sample from the reference regime (50/50) --- under pre-fixed criteria (KS-max, SVC-RBF, 30 seeds). The tested fixed 50/50 replay does not rescue naive triggering: in the harm regime it remains significantly net-harmful ($-$4.54, CI95 [$-$7.06, $-$2.34] vs no-adaptation; worse than full replacement's $-$1.36, since under a still-advancing ramp a replay-anchored candidate misfits later windows even more), and in the benefit regime it \emph{loses} part of the gain (+6.59 vs +7.79 naive). The gate, by contrast, is orthogonal to the update rule: placed on top of replay it restores safety and benefit in every regime --- ToN-IoT +0.59, significantly above both no-adaptation ([0.23, 0.97]) and replay-naive (+5.13 [2.96, 7.60]); PortScan +8.26, recovering the benefit replay-naive loses (+1.66 [0.52, 3.04]). Harmful adaptation is therefore not an artifact of full-replacement retraining, and the gate's value composes with the update strategy. \emph{Probe prevalence:} the probes above are class-balanced, which presumes an enrichment mechanism. An initial low-prevalence experiment (conditioned on the probe containing at least one attack) suggested the gate was indifferent down to $\pi=0.01$; that conditioning turned out to force a minority-class flow into every probe and the claim was an artifact. \S5.5 of the main paper reports the corrected experiment, in which the attack count is drawn honestly as $\mathrm{Binomial}(b,\pi)$: the gate tolerates genuinely random inspection down to $\pi\approx0.05$, but its harm-regime guarantee dissolves at $\pi=0.01$ (where two-thirds of 32-flow probes contain no attack at all). We report the corrected bound and withdraw the stronger one. \emph{Candidate size and dimensionality:} two controls address the concern that the harm is a pipeline artifact. Size-matching \emph{under this study's frozen transformer and advancing full-drift ramp}: training every candidate on 2{,}000 flows per class --- the same budget as the initial model, removing the 4$\times$ size asymmetry --- \emph{deepens} the harm (ToN-IoT naive $-$5.34, CI95 [$-$8.73, $-$2.49], vs $-$1.36 at 512/class): a larger candidate fits the current mixture better and mis-specializes harder while the ramp keeps advancing, the opposite of what a small-sample explanation predicts in that configuration (the preregistered own-transformer zero-drift control of \S5.2 of the main paper and \S S8 shows that with self-contained preprocessing and no drift, size matching \emph{removes} the mean harm --- the two settings answer different questions and both are reported); the gate remains safe and beneficial throughout (+0.58 / +9.33 / +3.37 across the three regimes), and candidate size does shift the marginal regime's magnitude (UNSW +3.31 vs +0.92), so magnitudes are pipeline-dependent even where signs are not. Dimensionality: with the PCA bottleneck removed (full feature space, classical detector), the benefit grows (PortScan +16.2) and the harm regime's point estimate remains negative ($-$0.65 [$-$3.03, +1.44], not significant at 30 seeds) --- neither the candidate's sample size nor the 8-dimensional projection generates the phenomenon, though full dimensionality attenuates the harm and we report that plainly. \emph{Significance of the safety claim.} Paired bootstrap CIs in the harm regime confirm the guarantee is not noise: the gate significantly outperforms naive triggering under every label-latency and every probe-poison level tested (CI95 excludes zero), and in no robustness condition --- across downstream models, latencies or poison levels --- is it significantly \emph{worse} than either naive triggering or no-adaptation. Where the gate is not significantly better than naive (the robust downstream models, where naive is already non-harmful), it is statistically indistinguishable from it, i.e. never worse.
+\emph{Label latency:} the probe need not be current. Drawing it from traffic labeled up to 20 windows in the past (Fig.~\ref{fig:7}) leaves the gate safe and effective at every lag --- in the harmful regime the gate holds at +0.9 to +1.1 (vs naive $-$1.36) for lags of 5, 10 and 20 windows, and the benefit regimes are essentially unchanged --- so the method tolerates realistic labeling delay rather than requiring instantaneous labels. \emph{Harm breadth:} the net-harm of naive triggering (with the fragile SVC-RBF downstream) is not confined to one ToN-IoT regime --- it also appears in ToN-IoT DDoS (naive \textbf{$-$16.81}) and Injection ($-$1.21), and the gate converts all three to net-positive (+1.26, +0.80, +0.93). \emph{Cost knob:} raising the commit margin $\varepsilon$ from 0 to 0.01--0.02 cuts committed adaptations by ~30\% (e.g. PortScan 3.1$\to$2.2 commits) at equal downstream gain, giving a simple operating characteristic that trades update frequency for benefit. \emph{Randomly corrupted validation labels:} because the gate trusts a labeled probe, we test a faulty labeler (or non-adaptive attacker) that flips a uniformly random fraction of the probe labels --- the random variant of the label-flipping poisoning threat against SVM-family learners \cite{biggio2012poisoning} (Fig.~\ref{fig:8}). The gate avoids harm under this corruption process: even with 40\% of validation labels corrupted --- near the point where the probe is pure noise --- it still matches-or-beats naive triggering in every regime (ToN-IoT degrades gracefully from +0.93 to +0.32 but never goes negative; benefit and mixed regimes are essentially unchanged). Label noise perturbs the deployed and candidate estimates symmetrically, so it moves the gate along the naive-to-oracle line without pushing it below the safe baseline. (A candidate-aware adversary that chooses \emph{which} labels to flip is a strictly stronger threat we do not model; \S7 of the main paper.) \emph{Label-free estimators head-to-head:} the zero-label variant of \S S1.4 is deliberately naive, so we also instantiate the two standard label-free accuracy estimators --- ATC \cite{garg2022atc} and DoC \cite{guillory2021doc} --- as gates in the same harness: each model estimates its target-window accuracy from its own confidences plus a labeled validation sample drawn at its training time, using zero target-window labels. Both avoid harm --- on the fragile SVC-RBF downstream, ToN-IoT moves from $-$1.36 (naive) to +0.40 (ATC) and +1.16 (DoC) --- but both pay for safety with benefit: on PortScan they lose 24\% (ATC) and 60\% (DoC) of the naive gain ($-$1.86 [$-$3.48, $-$0.17] and $-$4.64 [$-$6.86, $-$2.26] vs naive, CI95), and they remain significantly below naive even for random forest with native predicted probabilities. The labeled probe is thus the only gate on the benefit--safety Pareto front \emph{among those evaluated}. The mechanism mirrors the degradation law: confidence-based estimates are trustworthy only while the incumbent is healthy --- exactly the regime where the gate is least needed --- and misrank incumbent against candidate once the incumbent has degraded, which is where the benefit lives; related estimators share the same calibration premise \cite{jiang2022disagreement,baek2022agreement,rosenfeld2023dis2,deng2021labels}. \emph{Replay retraining:} the harmful baseline retrains on a narrow current window and fully replaces the incumbent, so we also test the standard label-free mitigation --- retrain-current-plus-replay, augmenting each candidate's training set with an equal-size sample from the reference regime (50/50) --- under pre-fixed criteria (KS-max, SVC-RBF, 30 seeds). The tested fixed 50/50 replay does not rescue naive triggering: in the harm regime it remains significantly net-harmful ($-$4.54, CI95 [$-$7.06, $-$2.34] vs no-adaptation; worse than full replacement's $-$1.36, since under a still-advancing ramp a replay-anchored candidate misfits later windows even more), and in the benefit regime it \emph{loses} part of the gain (+6.59 vs +7.79 naive). The gate, by contrast, is orthogonal to the update rule: placed on top of replay it restores safety and benefit in every regime --- ToN-IoT +0.59, significantly above both no-adaptation ([0.23, 0.97]) and replay-naive (+5.13 [2.96, 7.60]); PortScan +8.26, recovering the benefit replay-naive loses (+1.66 [0.52, 3.04]). Harmful adaptation is therefore not an artifact of full-replacement retraining, and the gate's value composes with the update strategy. \emph{Probe prevalence:} the probes above are class-balanced, which presumes an enrichment mechanism. An initial low-prevalence experiment (conditioned on the probe containing at least one attack) suggested the gate was indifferent down to $\pi=0.01$; that conditioning turned out to force a minority-class flow into every probe and the claim was an artifact. \S5.5 of the main paper reports the corrected experiment, in which the attack count is drawn honestly as $\mathrm{Binomial}(b,\pi)$: the gate tolerates genuinely random inspection down to $\pi\approx0.05$, but its harm-regime guarantee dissolves at $\pi=0.01$ (where two-thirds of 32-flow probes contain no attack at all). We report the corrected bound and withdraw the stronger one. \emph{Candidate size and dimensionality:} two controls address the concern that the harm is a pipeline artifact. Size-matching \emph{under this study's frozen transformer and advancing full-drift ramp}: training every candidate on 2{,}000 flows per class --- the same budget as the initial model, removing the 4$\times$ size asymmetry --- \emph{deepens} the harm (ToN-IoT naive $-$5.34, CI95 [$-$8.73, $-$2.49], vs $-$1.36 at 512/class): a larger candidate fits the current mixture better and mis-specializes harder while the ramp keeps advancing, the opposite of what a small-sample explanation predicts in that configuration (the preregistered own-transformer zero-drift control of \S5.2 of the main paper and \S S8 shows that with self-contained preprocessing and no drift, size matching \emph{removes} the mean harm --- the two settings answer different questions and both are reported); the gate remains safe and beneficial throughout (+0.58 / +9.33 / +3.37 across the three regimes), and candidate size does shift the marginal regime's magnitude (UNSW +3.31 vs +0.92), so magnitudes are pipeline-dependent even where signs are not. Dimensionality: with the PCA bottleneck removed (full feature space, classical detector), the benefit grows (PortScan +16.2) and the harm regime's point estimate remains negative ($-$0.65 [$-$3.03, +1.44], not significant at 30 seeds) --- neither the candidate's sample size nor the 8-dimensional projection generates the phenomenon, though full dimensionality attenuates the harm and we report that plainly. \emph{Significance of the safety claim.} Paired bootstrap CIs in the harm regime confirm the guarantee is not noise: the gate significantly outperforms naive triggering under every label-latency and every probe-poison level tested (CI95 excludes zero), and in no robustness condition --- across downstream models, latencies or poison levels --- is it significantly \emph{worse} than either naive triggering or no-adaptation. For the robust downstream models where the gate is not significantly better than naive, the comparison resolves no difference; failure to reject equality is not a non-inferiority result and does not establish that the gate is never worse.
 
 
 \subsection{Generalization across downstream classifiers}
@@ -139,7 +139,7 @@ Ten extensions beyond the pre-specified design (explicitly labeled as robustness
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig6_downstream_generalization.png}
+\includegraphics[width=\linewidth]{docs/img/fig6_downstream_generalization.pdf}
 \caption{Generalization across four downstream classifiers: net-harm is specific to SVC-RBF; the gate is safe for all.}
 \label{fig:6}
 \end{figure}
@@ -315,14 +315,14 @@ The floats below support the initial exploratory study of \S S1: the descriptive
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig2_mechanism_law.png}
+\includegraphics[width=\linewidth]{docs/img/fig2_mechanism_law.pdf}
 \caption{Descriptive regime-level view: adaptation gain vs deployed-model BA (SVC-RBF). The regime-level coefficient is mathematically coupled to the marginals (\S S1.1) and is shown for description only; the confirmatory, non-coupled evidence is the per-trigger analysis in \S5.5 of the main paper.}
 \label{fig:2}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.png}
+\includegraphics[width=\linewidth]{docs/img/fig2b_mechanism_law_pooled.pdf}
 \caption{The degradation--benefit law pooled across four downstream classifiers ($r=-0.81$, bootstrap 95\% CI).}
 \label{fig:2b}
 \end{figure}
@@ -330,7 +330,7 @@ The floats below support the initial exploratory study of \S S1: the descriptive
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.png}
+\includegraphics[width=\linewidth]{docs/img/fig3_oracle_regret.pdf}
 \caption{Decision oracle-regret grows with the fraction of streams on which adapting hurts.}
 \label{fig:3}
 \end{figure}
@@ -339,7 +339,7 @@ The floats below support the initial exploratory study of \S S1: the descriptive
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{docs/img/fig7_label_latency.png}
+\includegraphics[width=\linewidth]{docs/img/fig7_label_latency.pdf}
 \caption{Gate robustness to label latency: safe with validation labels up to 20 windows stale.}
 \label{fig:7}
 \end{figure}
@@ -457,7 +457,7 @@ table and agree with the primary analysis; they never replace it. Survival under
 frontier cells survive BH (the two non-survivors are exactly the never-committing
 configurations, whose paired gain is identically zero); all 7 chronological replays survive
 BH. The full machine-readable table is
-\texttt{results/tables/paper2\_final\_q1/multiplicity.csv} in the artifact.
+\path{results/tables/paper2_final_q1/multiplicity.csv} in the artifact.
 
 \section{Symmetric-pipeline confirmatory replication: full matrices}
 \label{sec:supp_symmetric}
@@ -466,10 +466,10 @@ This section carries the complete machine-generated evidence behind the main tex
 symmetric-pipeline section (the registered symmetric-pipeline dynamic replication;
 protocol and Appendix~A frozen before any confirmatory seed ran; seeds 3001--3030;
 42 arms, KS-max, six scenarios). Every number traces to
-\texttt{results/tables/symmetric\_pipeline\_dynamic\_001/} in the artifact; raw per-arm
+\path{results/tables/symmetric_pipeline_dynamic_001/} in the artifact; raw per-arm
 outputs (window logs, trigger logs, resolution logs, raw-stream hashes, pipeline
 provenance including scaler/PCA parameter hashes and fitted SVC $\gamma$) are under
-\texttt{results/raw/symmetric\_pipeline/}.
+\path{results/raw/symmetric_pipeline/}.
 
 Table~\ref{tab:symmetric_supp_contrasts} lists all 24 contrasts of the four frozen
 families with raw and Holm-adjusted $p$-values and the $\pm0.5$-point CI90 equivalence
@@ -500,11 +500,11 @@ This section carries the complete machine-generated evidence behind the main tex
 size-matched control (\S5.2 of the main paper; registered protocol, config, seeds,
 margins, families and P/A/E outcome rules frozen before any confirmatory seed ran;
 seeds 4001--4030; 21 arms, zero drift, \texttt{own\_transformer\_per\_model} only).
-Every number traces to \texttt{results/tables/size\_matched\_own\_transformer\_001/}
+Every number traces to \path{results/tables/size_matched_own_transformer_001/}
 in the artifact; raw per-arm outputs (window logs, trigger logs, resolution logs,
 raw-stream hashes, and per-candidate provenance including the full training-batch row
 hash, the nested 512-prefix row hash, scaler/PCA parameter hashes and the fitted SVC
-$\gamma$) are under \texttt{results/raw/size\_matched\_own\_transformer/}.
+$\gamma$) are under \path{results/raw/size_matched_own_transformer/}.
 
 \textbf{Nesting provenance.} The canonical draw guarantees
 $\mathrm{batch}_{512} \subset \mathrm{batch}_{2000}$ at every proposal: the 512

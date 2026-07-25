@@ -2,7 +2,7 @@
 
 Pin the factual, scope, terminology and derived-table corrections of the v1.22.1
 editorial phase so they cannot silently regress: exact artifact identity in Data
-Availability, zero-drift scoping of every size-matched claim, conditional (not
+    Availability, zero-drift scoping of every size-matched claim, conditional (not
 universal) gating recommendations, nominal-parity terminology, the +-0.2/0.5/1.0
 equivalence sensitivities, the evidence-validation trade-off table, the historical
 re-captioning, detector-score scoping, and v1.22.0 artifact integrity.
@@ -35,19 +35,21 @@ def test_data_availability_declares_exact_v1_22_0_identity():
         f = _flat(t)
         assert "10.5281/zenodo.21517899" in f, f"{name}: exact version DOI missing"
         assert "10.5281/zenodo.21322256" in f, f"{name}: concept DOI missing"
-        assert "43d9c255af48db9bcc3c6eb341a153381b18c8e8" in f, f"{name}: sealing commit missing"
         assert "artifact version v1.22.0" in f, f"{name}: artifact version declaration missing"
+        assert "the exact version doi" in f, f"{name}: immutable snapshot identity missing"
+        assert "43d9c255af48db9bcc3c6eb341a153381b18c8e8" not in f, (
+            f"{name}: stale repository-SHA attribution must be absent")
         assert not re.search(r"artifact version\s*v?1\.20\.2", f), (
             f"{name}: stale v1.20.2 artifact declaration must be gone")
         assert "v1.22.1" not in f, f"{name}: must not claim v1.22.1 exists yet"
 
 
-def test_version_doi_and_tag_declared_together():
+def test_version_doi_and_artifact_version_declared_together():
     for t in (MAIN, IEEE):
         f = _flat(t)
         i = f.index("10.5281/zenodo.21517899")
         window = f[max(0, i - 400): i + 400]
-        assert "v1.22.0" in window, "version DOI must be declared alongside tag v1.22.0"
+        assert "v1.22.0" in window, "version DOI must be declared alongside artifact version v1.22.0"
 
 
 # ---------------------------------------------------------------- highlights
@@ -75,6 +77,7 @@ def test_graphical_abstract_scoped():
     assert "nominal size parity" in src
     assert "0.5" in src
     assert (REPO / "docs" / "img" / "graphical_abstract.png").exists()
+    assert (REPO / "docs" / "img" / "graphical_abstract.pdf").exists()
 
 
 # ---------------------------------------------------------------- scope of claims
@@ -228,7 +231,7 @@ def test_detector_score_claims_scoped():
 
 
 # ---------------------------------------------------------------- ATTENUATION wording
-def test_attenuation_registered_but_not_dominant():
+def test_attenuation_registered_in_body_but_absent_from_abstracts():
     for name, t in (("main.tex", MAIN), ("main_ieee.tex", IEEE)):
         f = _flat(t)
         assert "attenuation" in f, f"{name}: registered outcome must stay"
@@ -236,9 +239,8 @@ def test_attenuation_registered_but_not_dominant():
         assert "effectively elimination" not in f, name
         assert "formal elimination" not in f, name
         assert "residual mean harm under attenuation" not in f, name
-    abstract = re.search(r"\\begin\{abstract\}\n(.*?)\n\\end\{abstract\}", MAIN, re.S).group(1)
-    sentences = [s for s in re.split(r"(?<=[.!?])\s+", abstract) if "ATTENUATION" in s]
-    assert len(sentences) == 1, "abstract: exactly one sentence on the taxonomy"
+        abstract = re.search(r"\\begin\{abstract\}\n(.*?)\n\\end\{abstract\}", t, re.S).group(1)
+        assert "ATTENUATION" not in abstract, f"{name}: taxonomy label must stay out of abstract"
 
 
 # ---------------------------------------------------------------- artifact integrity
