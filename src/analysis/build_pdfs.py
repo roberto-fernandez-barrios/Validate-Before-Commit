@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+import locale
 from pathlib import Path
 
 MS = Path(__file__).resolve().parents[2] / "manuscript"
@@ -15,7 +16,15 @@ DOCS = ["main", "supplement", "main_ieee"]
 
 
 def run(cmd: list[str]) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, cwd=MS, capture_output=True, text=True, timeout=600)
+    return subprocess.run(
+        cmd,
+        cwd=MS,
+        capture_output=True,
+        text=True,
+        encoding=locale.getpreferredencoding(False),
+        errors="replace",
+        timeout=600,
+    )
 
 
 def build(doc: str) -> None:

@@ -141,13 +141,14 @@ sets the RBF kernel's geometry. The final block is the ownership \\emph{{inversi
 generated the hypothesis: whichever model's data fits the transformer gains the advantage.}}
 \\label{{tab:ab_equivalence}}
 \\small
+\\resizebox{{\\ifdim\\width>\\linewidth \\linewidth\\else\\width\\fi}}{{!}}{{%
 \\begin{{tabular}}{{l l r l l}}
 \\toprule
 Condition & Benchmark & gap & CI90 & equivalence ($\\pm1.0$) \\\\
 \\midrule
 {body}
 \\bottomrule
-\\end{{tabular}}
+\\end{{tabular}}}}
 \\end{{table}}
 """
     write("table_ab_equivalence.tex", tex)

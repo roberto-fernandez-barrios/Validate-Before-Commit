@@ -6,6 +6,8 @@ question each stage answers. Pure editorial figure; no result data is drawn.
 """
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
@@ -19,7 +21,7 @@ STAGES = [
     ("DRIFT\nSIGNAL", "proposes\nan update", "#fff3e0", "#e65100"),
     ("CANDIDATE\nCONSTRUCTION", "own preprocessing?\nevidence size?", "#e3f2fd", "#1565c0"),
     ("COMPARABILITY\nAUDIT", "is the comparison\ninformative?", "#e3f2fd", "#1565c0"),
-    ("OPTIONAL\nVALIDATION", "probe-based\nsign estimate", "#ede7f6", "#4527a0"),
+    ("OPTIONAL\nVALIDATION", "fixed policies;\nno meta-controller", "#ede7f6", "#4527a0"),
     ("COMMIT /\nREJECT / DEFER", "decision,\nnot reflex", "#f3e5f5", "#6a1b9a"),
     ("DEPLOYMENT\nMONITORING", "future value is\ndecided here", "#e8f5e9", "#1b5e20"),
 ]
@@ -50,6 +52,8 @@ ax.text(50, 8, "A drift alarm proposes, but does not justify, promotion; "
                "which is conditional, not universal.",
         ha="center", fontsize=9.2, color="0.30")
 
-fig.savefig("docs/img/fig_pipeline.png", dpi=200, bbox_inches="tight",
+fig.savefig("docs/img/fig_pipeline.png", dpi=300, bbox_inches="tight",
             facecolor="white")
-print("pipeline figure written (docs/img/fig_pipeline.png)")
+fig.savefig("docs/img/fig_pipeline.pdf", bbox_inches="tight",
+            facecolor="white")
+print("pipeline figure written (docs/img/fig_pipeline.png/.pdf)")

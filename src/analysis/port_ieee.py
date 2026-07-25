@@ -1,7 +1,7 @@
 """Regenerate manuscript/main_ieee.tex from manuscript/main.tex (IEEEtran backup format).
 
 The CAS manuscript (`main.tex`, the KBS submission format) is the single source of truth for
-the abstract and the body; the IEEE version is a mechanical port kept for a possible TDSC
+the abstract, body and data-availability statement; the IEEE version is a mechanical port kept for a possible TDSC
 submission. This script rebuilds it as: IEEE preamble (kept, with the abstract refreshed from
 CAS) + transformed CAS body + IEEE tail.
 
@@ -30,7 +30,12 @@ def main() -> None:
     body = cas[cas.index("\\section{Introduction}"):
                cas.index("\\section*{Declaration of competing interest}")]
     head = ieee[:ieee.index("\\section{Introduction}")]
-    tail = ieee[ieee.index("\\section*{Data Availability}"):]
+    ieee_bibliography = ieee[ieee.index("\\bibliographystyle{IEEEtran}"):]
+    data_availability = cas[
+        cas.index("\\section*{Data availability}"):
+        cas.index("\\section*{Declaration of generative AI")
+    ].replace("\\section*{Data availability}", "\\section*{Data Availability}", 1)
+    tail = data_availability + "\n" + ieee_bibliography
 
     new_abs = re.search(r"\\begin\{abstract\}\n(.*?)\n\\end\{abstract\}", cas, re.S).group(1)
     head = re.sub(r"(\\begin\{abstract\}\n).*?(\n\\end\{abstract\})",
@@ -45,6 +50,16 @@ def main() -> None:
     body = body.replace("\\begin{figure}", "\\begin{figure*}")
     body = body.replace("\\end{figure}", "\\end{figure*}")
     body = body.replace("width=\\linewidth]{docs/img", "width=\\textwidth]{docs/img")
+    # The single algorithm listing is readable at full text width but clips badly in one
+    # IEEE column. Keep its content verbatim and span it mechanically in the backup port.
+    body = body.replace(
+        "\\begin{verbatim}",
+        "\\begin{figure*}[t]\n\\small\n\\begin{verbatim}",
+    )
+    body = body.replace(
+        "\\end{verbatim}",
+        "\\end{verbatim}\n\\end{figure*}",
+    )
 
     out = head + body + tail
     (MS / "main_ieee.tex").write_text(out, encoding="utf-8", newline="\n")

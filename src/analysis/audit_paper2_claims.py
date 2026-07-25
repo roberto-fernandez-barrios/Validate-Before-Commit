@@ -1472,13 +1472,15 @@ def main():
                          if _n.endswith(("/main.tex", "/main_ieee.tex"))
                          and all(nd in _t for nd in needles)))
 
-    # Data availability: exact v1.22.0 identity declared; stale v1.20.2 declaration gone.
+    # Data availability: exact v1.22.0 DOI identity declared; mutable repository SHA omitted.
     check("v1221 DA: exact version DOI 10.5281/zenodo.21517899 (main+ieee)", 2.0,
           _in_mains("10.5281/zenodo.21517899"), 0.5)
     check("v1221 DA: concept DOI 10.5281/zenodo.21322256 (main+ieee)", 2.0,
           _in_mains("10.5281/zenodo.21322256"), 0.5)
-    check("v1221 DA: sealing commit 43d9c25... declared (main+ieee)", 2.0,
-          _in_mains("43d9c255af48db9bcc3c6eb341a153381b18c8e8"), 0.5)
+    check("v1221 DA: exact DOI identified as archived snapshot (main+ieee)", 2.0,
+          _in_mains("the exact version doi"), 0.5)
+    check("v1221 DA: stale repository SHA attribution absent", 0.0,
+          float(_hits(r"43d9c255af48db9bcc3c6eb341a153381b18c8e8")), 0.5)
     check("v1221 DA: artifact version v1.22.0 declared (main+ieee)", 2.0,
           _in_mains("artifact version v1.22.0"), 0.5)
     check("v1221 DA: no 'artifact version v1.20.2' declaration anywhere", 0.0,
@@ -1613,4 +1615,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

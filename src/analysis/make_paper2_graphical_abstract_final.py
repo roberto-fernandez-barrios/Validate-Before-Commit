@@ -1,14 +1,16 @@
 """Graphical abstract, KBS final scope reduction: a radically simplified three-step figure.
 
 Three steps down the centre --- DRIFT ALARM proposes a challenger; IS THE CHALLENGER
-COMPARABLE? (own preprocessing + adequate evidence); VALIDATE CONDITIONALLY (when
-construction, evidence or incumbent health remain uncertain) --- over three result
+COMPARABLE? (own preprocessing + adequate evidence); VALIDATE WHEN WARRANTED (fixed
+policies evaluated; no online selector) --- over three result
 messages. Six boxes, ~50 words inside the diagram, no confidence intervals, no secondary
 numbers. The nominal size parity result is stated under the ZERO-DRIFT CONTROL within the
 0.5-pp margin. Output above Elsevier's 1328x531 minimum.
 """
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
@@ -36,7 +38,7 @@ def arrow(x0, y0, x1, y1, color="0.3"):
 
 
 # ---- title ----
-ax.text(50, 95, "A drift alarm proposes a challenger; comparability and conditional validation decide",
+ax.text(50, 95, "A drift alarm proposes a challenger; construction and evidence condition promotion",
         ha="center", fontsize=15.0, fontweight="bold")
 
 # ---- three central steps; each connector runs from just below one box's padded
@@ -44,14 +46,14 @@ ax.text(50, 95, "A drift alarm proposes a challenger; comparability and conditio
 cx, w = 26, 48
 b1y, b1h = 76, 10
 b2y, b2h = 57, 10
-b3y, b3h = 34, 13
+b3y, b3h = 33, 15
 box(cx, b1y, w, b1h, "DRIFT ALARM\nproposes a challenger", "#fff3e0", "#e65100", fs=13, bold=True)
 arrow(50, b1y - PAD - 0.2, 50, b2y + b2h + PAD + 0.2)
 box(cx, b2y, w, b2h, "IS THE CHALLENGER COMPARABLE?\nown preprocessing + adequate evidence",
     "#e3f2fd", "#1565c0", fs=13, bold=True)
 arrow(50, b2y - PAD - 0.2, 50, b3y + b3h + PAD + 0.2)
-box(cx, b3y, w, b3h, "VALIDATE CONDITIONALLY\nwhen construction, evidence or\nincumbent health remain uncertain",
-    "#ede7f6", "#4527a0", fs=13, bold=True)
+box(cx, b3y, w, b3h, "VALIDATE WHEN WARRANTED\nfixed policies evaluated;\nno online meta-controller",
+    "#ede7f6", "#4527a0", fs=12.2, bold=True)
 
 # ---- three result messages ----
 box(1.5, 3, 31, 24,
@@ -64,6 +66,8 @@ box(67.5, 3, 31, 24,
     "Chronological replays:\nvalidation can protect a healthy\nincumbent but delay recovery\nafter incumbent collapse",
     "#eceff1", "#37474f", fs=12)
 
-fig.savefig("docs/img/graphical_abstract.png", dpi=200, bbox_inches="tight",
+fig.savefig("docs/img/graphical_abstract.png", dpi=300, bbox_inches="tight",
             facecolor="white")
-print("graphical abstract written (docs/img/graphical_abstract.png)")
+fig.savefig("docs/img/graphical_abstract.pdf", bbox_inches="tight",
+            facecolor="white")
+print("graphical abstract written (docs/img/graphical_abstract.png/.pdf)")

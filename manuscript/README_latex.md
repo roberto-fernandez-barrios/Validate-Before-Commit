@@ -1,7 +1,7 @@
-# Building the Elsevier (elsarticle) manuscript
+# Building the Elsevier CAS manuscript
 
-`main.tex` is a compilable Elsevier `elsarticle` document generated from the Markdown source. It pulls in the
-bibliography (`references.bib`), the six result tables (`tables/*.tex`), and the figures (`../docs/img/*.png`,
+`main.tex` is the hand-maintained, compilable Elsevier CAS (`cas-sc`) source. It pulls in the
+bibliography (`references.bib`), the generated result tables (`tables/*.tex`), and the figures (`../docs/img/*.pdf`,
 via `\graphicspath{{../}}`).
 
 ## Two targets
@@ -25,7 +25,7 @@ python -m src.analysis.port_ieee                   # regenerate manuscript/main_
 ```
 Compile IEEE with `latexmk -pdf main_ieee.tex` (needs `IEEEtran.cls`, standard in TeX Live/MiKTeX).
 
-## Compile (needs a TeX distribution: TeX Live / MiKTeX; elsarticle.cls is standard)
+## Compile (needs a TeX distribution: TeX Live / MiKTeX)
 ```bash
 cd manuscript
 latexmk -pdf main.tex          # preferred; runs pdflatex + bibtex as needed
@@ -43,8 +43,8 @@ pdflatex main && bibtex main && pdflatex main && pdflatex main
   `\resizebox{\linewidth}{!}{...}`.
 - **Highlights** are a separate submission file — see `manuscript/highlights.md` (Elsevier submits highlights
   outside the main PDF).
-- **Graphical abstract:** `../docs/img/graphical_abstract.png`.
+- **Graphical abstract:** `../docs/img/graphical_abstract.pdf` (with a 300-dpi PNG companion).
 - **Title:** default is "Validate Before Commit: …"; the alternative hook "Knowing When Not to Retrain: …" is
   in a comment/notes if you prefer it.
-- The document uses `\documentclass[preprint,11pt]{elsarticle}`; switch to `[review]` for double-spaced review
-  copy, or the journal's required option.
+- The document uses `\documentclass[a4paper,fleqn]{cas-sc}`; adjust the CAS options only if required by the
+  journal.
