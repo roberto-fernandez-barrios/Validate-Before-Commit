@@ -4,8 +4,9 @@ Three steps down the centre --- DRIFT ALARM proposes a challenger; IS THE CHALLE
 COMPARABLE? (own preprocessing + adequate evidence); VALIDATE WHEN WARRANTED (fixed
 policies evaluated; no online selector) --- over three result
 messages. Six boxes, ~50 words inside the diagram, no confidence intervals, no secondary
-numbers. The nominal size parity result is stated under the ZERO-DRIFT CONTROL within the
-0.5-pp margin. Output above Elsevier's 1328x531 minimum.
+numbers. The nominal size parity result is stated as mean compatibility under the
+ZERO-DRIFT CONTROL within the 0.5-pp margin, with PortScan boundary-close and no
+absence-of-effect claim. Output above Elsevier's 1328x531 minimum.
 """
 import matplotlib
 matplotlib.use("Agg")
@@ -60,8 +61,8 @@ box(1.5, 3, 31, 24,
     "Frozen incumbent-owned\npreprocessing amplified\napparent promotion harm",
     "#fff8e1", "#795548", fs=12)
 box(34.5, 3, 31, 24,
-    "Nominal size parity removed\nthe detectable mean zero-drift\nharm (ZERO-DRIFT CONTROL,\nwithin the 0.5-pp margin)",
-    "#e8f5e9", "#1b5e20", fs=12)
+    "Matched-size mean effects\ncompatible within 0.5 pp\n(ZERO-DRIFT CONTROL;\nPortScan boundary-close;\nnot absence of effect)",
+    "#e8f5e9", "#1b5e20", fs=10.8)
 box(67.5, 3, 31, 24,
     "Chronological replays:\nvalidation can protect a healthy\nincumbent but delay recovery\nafter incumbent collapse",
     "#eceff1", "#37474f", fs=12)

@@ -61,7 +61,7 @@ Other arms swap `--adaptation-gate` (`none` = naive, `labeled_probe_holdout` →
 `--stream-prevalence 0.05`, `--adapt-strategy {ensemble,ensemble_cal,sliding_window}`,
 `--trigger-mode {ddm,adwin,ddm_river,adwin_river}`, `--probe-size {8,16,64,128}`, `--probe-latency {5,20}`,
 `--probe-flip-frac {0.10,0.25,0.40}`, `--max-severity {0.25,0.50}` (the mild-drift prediction test), and the
-amendment-006 causal flags `--probe-source observed` (with `--adapt-strategy sliding_window`: candidate and
+amendment-006 observed-data flags `--probe-source observed` (with `--adapt-strategy sliding_window`: candidate and
 probe come only from observed past traffic), `--probe-prevalence {0.10,0.05,0.01}` (Binomial probe composition,
 zero-attack probes allowed) and `--health-ref-mode per_incumbent`. The full arm
 lists, with seeds and output-dir naming, are enumerated in
@@ -82,7 +82,7 @@ its `paper2_v12_*` arms plus the standalone CS coverage simulation are enumerate
 Amendment 012 (`notes/paper2_harness_v2_amendment_012.md`) fixes three code bugs and adds
 `--no-probe-policy {commit,reject}` (early-trigger behaviour when the observed probe is unavailable),
 corrects the `cn` regularization to `C = 2*train_size/n_unique` (C∝1/n), and its `paper2_v13_*` arms
-(corrected cn; McNemar α=0.10; causal reject-policy; size-matched RF/LogReg/MLP; strict-`>` baseline)
+(corrected cn; McNemar α=0.10; observed-data reject-policy; size-matched RF/LogReg/MLP; strict-`>` baseline)
 are enumerated there.
 Amendment 013 (`notes/paper2_harness_v2_amendment_013.md`) adds the exact-zero-collision stream
 (global value-dedup + abort-on-exhaustion; `--disjoint-window-frac`, UNSW-full at window 64 for
@@ -246,17 +246,17 @@ python -m src.analysis.aggregate_paper2_size_dim_controls   # Phase 2k: candidat
 python -m src.analysis.aggregate_paper2_v2_replication      # Harness-v2 registered replication verdict
 python -m src.analysis.aggregate_paper2_amendment_004       # v2 robustness suite, cost table, temporal streams
 python -m src.analysis.aggregate_paper2_amendment_005       # split two-stage, monitor budgets, stratified/UNSW temporal
-python -m src.analysis.aggregate_paper2_amendment_006       # causal observed-data gate, binomial-prevalence probes,
+python -m src.analysis.aggregate_paper2_amendment_006       # observed-data gate, binomial-prevalence probes,
                                                            #   McNemar gate, mild-drift prediction test, harm breadth
 python -m src.analysis.aggregate_paper2_amendment_009_tail  # amendment 009: tail/worst-case/CVaR metrics (item 8)
 python -m src.analysis.aggregate_paper2_amendment_009       # amendment 009: 4-classifier + no-PCA mild/zero drift,
                                                            #   zero-drift generator sweep (ensemble/sliding/cumulative/replay),
                                                            #   confidence-sequence gate, Tuesday chronological
 python -m src.analysis.make_paper2_amendment009_table       # Table (tab:amendment009) -> tables/ and tables_ieee/
-python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: leakage-free causal, cumulative
+python -m src.analysis.aggregate_paper2_amendment_011        # amendment 011: leakage-free observed-data, cumulative
                                                            #   controls, EB-CS budget sweep, per-stream harmful-commit
 python -m src.analysis.paper2_cs_coverage_011               # amendment 011: CS empirical coverage (iid/no-replace/autocorr)
-python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn fix, McNemar a=0.10, causal reject-policy,
+python -m src.analysis.aggregate_paper2_amendment_012        # amendment 012: cn fix, McNemar a=0.10, observed-data reject-policy,
                                                            #   size-matched RF/LogReg/MLP zero-drift, strict-> baseline
 python -m src.analysis.aggregate_paper2_amendment_013        # amendment 013: FINAL leakage-free observed-data arm, stratified gate,
                                                            #   strict outside zero drift, calib-min sweep
@@ -264,7 +264,7 @@ python -m src.analysis.paper2_symmetric_ab_013               # amendment 013: sy
 python -m src.analysis.make_paper2_causal_final_table        # Table 8 emitter (superseded by final-kbs)
 python -m src.analysis.aggregate_paper2_amendment_014        # amendment 014: stratified/defer/lifetime gates, e2e-lite
 python -m src.analysis.paper2_symmetric_ab_014               # amendment 014: A/B disjoint + role-randomized (2 conditions)
-python -m src.analysis.aggregate_paper2_final_kbs             # final-kbs: causal-64 matrix, VBC-SG, prevalence sweep
+python -m src.analysis.aggregate_paper2_final_kbs             # final-kbs: observed-data 64-flow matrix, VBC-SG, prevalence sweep
 python -m src.analysis.paper2_symmetric_ab_final              # final-kbs: A/B 4 conditions (the mechanism table)
 python -m src.analysis.make_paper2_final_tables               # final tables: causal-64 (tab:causal_probe) + tab:symmetric_ab
 python -m src.analysis.paper2_decision_quality_004          # per-trigger decision metrics + hierarchical model (004 spec)
@@ -301,7 +301,7 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | DDM/ADWIN validated vs reference implementations (river): DDM net-harm replicates; our ADWIN variant under-fires, reference reported | `paper2_monitor_validation_004.csv`, `paper2_v6_*_{ddm,adwin}river_none/` |
 | Calibrated soft ensemble: strongest label-free rule, harm-avoiding everywhere, beats gate in marginal regime, cannot decline updates | `paper2_v6_*_enscal_none/`, `paper2_amendment_004/robustness.csv` |
 | Chronological streams (corrected runner): deep-benefit recoveries on all CICIDS days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday or external UNSW | `paper2_amendment_004/temporal.csv`, temporal-streams table (§5.3), Supp §S2.6 |
-| Causal-64 matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
+| Observed-data 64-flow matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
 | Symmetric-pipeline replication (Scenario A): mean full-drift harm does not persist under self-contained pipelines (+7.21/+2.55/+1.03); ownership interaction up to +5.98; zero-drift harm persists (−1.74/−0.65 material, −0.38 resolved) and gates recover it (6/6 Holm-sig.); unsw_zero strict = recall↔FPR trade-off | `symmetric_pipeline_dynamic_001/` (CLAIM_INTERPRETATION.json), tab:symmetric_pipeline, Supp §S7 |
 | Frozen-mode parity: the new self-contained harness reproduces published v1.20.2 arms bit-for-bit (4 arms × 30 seeds; deferred arm 5/5 files byte-identical) | `results/smoke/symmetric_pipeline/parity/*/parity_report.json` |
 | Detector score carries no consistent incremental signal within triggered decisions (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |

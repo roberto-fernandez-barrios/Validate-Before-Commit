@@ -2,10 +2,10 @@
 
 Main body:
   tab:size_matched -- the central 3-row decisive-control matrix (one row per zero-drift
-  benchmark: 512 harm replication, 2000 equivalence, size effect, gate effects at 2000)
+  benchmark: 512 harm replication, 2000 margin compatibility, size effect, gate effects at 2000)
   tab:size_matched_security -- guardrail summary at the matched size
 Supplement (S8):
-  table_size_matched_supp_contrasts -- all 18 F1-F4 contrasts, Holm + CI90 equivalence
+  table_size_matched_supp_contrasts -- all 18 F1-F4 contrasts, Holm + CI90 compatibility
   table_size_matched_supp_harm      -- future-negative sign accounting at H1/3/5/10 + censoring
   table_size_matched_supp_interaction -- gate x size interactions (F4, secondary)
 
@@ -82,14 +82,15 @@ def main_table(df, con, mult, eq, desc):
 variable is the challenger's per-class training size (512 vs.\\ the incumbent's 2{{,}}000),
 with nested candidate batches (\\S\\ref{{sec:sizematched_method}}). BA points, paired within
 seed, 30 fresh seeds, paired-bootstrap CI95; $\\dagger$ = Holm-significant within its
-registered family; the 512-vs-never column is descriptive (uncorrected). \\emph{{eq}}: CI90
-fully inside the preregistered $\\pm0.5$-point equivalence margin.}}
+registered family; the 512-vs-never column is descriptive (uncorrected). \\emph{{compat.}}:
+CI90 fully inside the preregistered $\\pm0.5$-point margin; PortScan is boundary-close
+(upper bound $0.494$, $0.006$ inside) and does not demonstrate absence of an effect.}}
 \\label{{tab:size_matched}}
 \\small
 \\resizebox{{\\ifdim\\width>\\linewidth \\linewidth\\else\\width\\fi}}{{!}}{{%
 \\begin{{tabular}}{{l r l l c l l l}}
 \\toprule
-Regime & Never BA & Naive$_{{512}}-$never & Naive$_{{2000}}-$never & eq &
+Regime & Never BA & Naive$_{{512}}-$never & Naive$_{{2000}}-$never & compat. &
 Naive$_{{2000}}-$naive$_{{512}}$ & Point$_{{2000}}-$naive$_{{2000}}$ &
 Strict$_{{2000}}-$naive$_{{2000}}$ \\\\
 \\midrule
@@ -159,7 +160,7 @@ def supp_contrasts(con, mult, eq):
 \\centering
 \\caption{{Size-matched control: every contrast of the four frozen families (F1--F4),
 deterministic centered paired bootstrap (100k resamples), Holm within family.
-\\emph{{equiv}}: CI90 fully inside the preregistered $\\pm0.5$-point equivalence margin
+\\emph{{compat.}}: CI90 fully inside the preregistered $\\pm0.5$-point margin
 ($\\pm0.2$/$\\pm1.0$ sensitivities in \\texttt{{equivalence.csv}}). F4 interactions are
 secondary. Sensitivity $p$-values (paired $t$, Wilcoxon) are in the artifact
 (\\texttt{{paired\\_contrasts.csv}}).}}
@@ -167,7 +168,7 @@ secondary. Sensitivity $p$-values (paired $t$, Wilcoxon) are in the artifact
 \\scriptsize
 \\begin{{tabular}}{{l r r r c}}
 \\toprule
-Contrast & effect [CI95] & $p$ & $p_{{\\mathrm{{Holm}}}}$ & equiv $\\pm0.5$ \\\\
+Contrast & effect [CI95] & $p$ & $p_{{\\mathrm{{Holm}}}}$ & compat. $\\pm0.5$ \\\\
 \\midrule
 {body}
 \\bottomrule

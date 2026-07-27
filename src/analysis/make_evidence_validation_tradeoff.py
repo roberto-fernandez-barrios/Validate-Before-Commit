@@ -239,7 +239,7 @@ def main() -> None:
         "never is registered F1, gate gains at 2{,}000 are registered F3 (none "
         "Holm-significant), 512-side and gate-vs-never cells are descriptive, "
         "uncorrected. The supplementary point/strict-2{,}000 policies differ from "
-        "naive-2{,}000 by $<0.14$ pp (non-significant, CI90-equivalent within "
+        "naive-2{,}000 by $<0.14$ pp (non-significant, CI90 compatible within "
         "$\\pm$0.5 pp). Guardrails: all matched-size gate cells pass recall/FPR "
         "non-inferiority; at 512 the UNSW strict cell fails recall non-inferiority "
         "(Supplementary~\\S S8).")
