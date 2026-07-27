@@ -83,7 +83,15 @@ def main():
     ax.set_ylabel("Gain vs no-adaptation (BA pts)")
     ax.set_title("Label-efficiency frontier: a small probe suffices to avoid harm")
     ax.legend(fontsize=8)
-    ax.annotate("naive triggering (dotted)", (0.5, 0.04), xycoords="axes fraction", fontsize=7, color="gray")
+    ax.annotate(
+        "naive triggering (dotted)",
+        (0.5, 0.105),
+        xycoords="axes fraction",
+        ha="center",
+        va="center",
+        fontsize=7,
+        color="gray",
+    )
     fig.savefig(f"{OUTF}/fig5_label_budget_curve.png", dpi=200, bbox_inches="tight")
     fig.savefig(f"{OUTF}/fig5_label_budget_curve.pdf", bbox_inches="tight")
     plt.close(fig)
