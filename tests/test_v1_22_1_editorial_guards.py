@@ -60,8 +60,12 @@ def test_highlights_scoped_and_within_limit():
     assert "zero drift" in block, "highlights must carry the zero-drift scope"
     assert "0.5" in block, "highlights must carry the +-0.5 margin"
     assert "once sizes match" not in block, "unscoped once-sizes-match highlight banned"
-    bullets = re.findall(r"^- (.+?)\s+\[\d+\]$", HIGHLIGHTS, re.M)
-    assert len(bullets) == 5, "highlights.md must list 5 bullets with char counts"
+    bullets = re.findall(r"^- (.+)$", HIGHLIGHTS, re.M)
+    assert len(bullets) == 5, "highlights.md must list 5 submission-ready bullets"
+    assert not re.search(r"\[\d+\]\s*$", HIGHLIGHTS, re.M), (
+        "submission highlights must not retain character-count suffixes")
+    assert "remove before submission" not in HIGHLIGHTS.lower(), (
+        "submission highlights must not retain internal removal notes")
     for b in bullets:
         assert len(b) <= 85, f"highlight exceeds 85 chars: {b!r} ({len(b)})"
     joined = " ".join(bullets).lower()

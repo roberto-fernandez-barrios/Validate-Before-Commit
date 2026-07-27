@@ -1,13 +1,12 @@
 # Highlights
 
 Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
-(Character counts shown for verification; remove before submission.)
 
-- Drift alarms propose challengers; they do not establish challenger superiority  [78]
-- Incumbent-owned frozen preprocessing amplified apparent promotion harm  [70]
-- Under zero drift, nominal size parity meets the ±0.5-point equivalence margin  [77]
-- Gates helped under limited candidate evidence, not under the size-matched control  [81]
-- No net harm from always deploying across thirteen chronological replays  [71]
+- Drift alarms propose challengers; they do not establish challenger superiority
+- Incumbent-owned frozen preprocessing amplified apparent promotion harm
+- Under zero drift, nominal size parity meets the ±0.5-point equivalence margin
+- Gates helped under limited candidate evidence, not under the size-matched control
+- No net harm from always deploying across thirteen chronological replays
 
 ## Graphical abstract
 

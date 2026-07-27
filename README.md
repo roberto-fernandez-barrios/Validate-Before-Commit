@@ -2,7 +2,7 @@
 
 **Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection**
 
-*Validate Before Commit* is the name of this repository and of the gate family it releases; the paper's title reflects its final thesis --- candidate construction and evidence comparability precede candidate validation, and validation is a conditional safeguard, not a universal requirement.
+*Validate Before Commit* is the name of this repository and of the gate family it releases. The paper's central contribution is the requirement that incumbent–challenger comparability precede promotion; VBC-SG is an optional formalization for promotion under uncertainty, and validation is a conditional safeguard, not a universal requirement.
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -22,6 +22,9 @@ In the preregistered zero-drift control, with both asymmetries removed (own prep
 2,000-per-class sample-size parity), always-deploy is mean-equivalent to never-adapt within the ±0.5-pp margin
 and point/strict validation gates add no measurable value; where construction or evidence is asymmetric, a
 small commit-time check recovers the loss.
+
+Here, **preregistered** refers to each stage-specific protocol being specified and sealed in version control
+before that stage ran; it does not imply one external registry covering the sequential program as a whole.
 
 > **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
 > Candidate construction, nominal evidence parity and promotion testing are sequential controls: validate the
@@ -97,9 +100,10 @@ small commit-time check recovers the loss.
 - **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the
   paper's principal limit on external validity, stated as such. Where the incumbent collapses, always-deploy is
   excellent and the gate pays a real premium. On the healthy-incumbent timelines the picture is favorable but not
-  universal: **point and strict gates outperform always-deploying on the two healthy UNSW timelines** (the
-  no-additional-label strict rule by up to +2.8 points while committing 2.5 times per stream against naive's 13),
-  VBC-SG does so on one of the two, and the healthy Wednesday intra-day replay remains an unresolved
+  universal: **point and strict gates have higher point estimates than always-deploying on the two healthy UNSW
+  timelines** (the no-additional-label strict rule by up to +2.8 points while committing 2.5 times per stream
+  against naive's 13). These are descriptive comparisons, not direct inferential superiority claims; VBC-SG's
+  point estimate is higher on one of the two, and the healthy Wednesday intra-day replay remains an unresolved
   counterexample where the gates sit slightly below naive.
 - **Attack-label acquisition yield, measured on the right sample:** at operating prevalence the honest unit for
   *finding attack labels* is inspected flows, not adjudicated labels. Alert-guided inspection finds an attack

@@ -16,6 +16,7 @@ sets the RBF kernel's geometry. The final block is the ownership \emph{inversion
 generated the hypothesis: whichever model's data fits the transformer gains the advantage.}
 \label{tab:ab_equivalence}
 \small
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{l l r l l}
 \toprule
 Condition & Benchmark & gap & CI90 & equivalence ($\pm1.0$) \\
@@ -35,5 +36,5 @@ Independent scaler, incumbent \emph{PCA} & ToN-IoT & $+0.16$ & [$-2.37$, $+2.67$
 Transformer fitted on the \emph{incumbent} & ToN-IoT & $-12.35$ & [$-19.33$, $-6.45$] & --- \\
 Transformer fitted on the \emph{challenger} & ToN-IoT & $+17.77$ & [$+11.00$, $+24.75$] & --- \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table*}
