@@ -28,7 +28,7 @@ The label column is `Label` (BENIGN vs. attack); features are numeric, standardi
 `src/experiments/run_paper2_progressive_readaptation.py` runs one (dataset→regime, detector) stream over
 30 seeds × 100 post-drift windows. Key flags:
 - `--methods` : `energy_distance,mmd_rbf,ks_max,jsd,qk_mmd_zz,qk_mmd_pauli_xz`
-- `--adaptation-gate` : `none` (naive) | `labeled_probe` | `unsup_disagree`  ← **the contribution**
+- `--adaptation-gate` : `none` (naive) | `labeled_probe` | `unsup_disagree`
 - `--probe-size B` (labeled_probe) ; `--gate-margin` ; `--gate-disagree-threshold`
 
 Example — the harm regime with the label-efficient gate:
