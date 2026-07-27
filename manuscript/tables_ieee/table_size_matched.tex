@@ -5,14 +5,15 @@
 variable is the challenger's per-class training size (512 vs.\ the incumbent's 2{,}000),
 with nested candidate batches (\S\ref{sec:sizematched_method}). BA points, paired within
 seed, 30 fresh seeds, paired-bootstrap CI95; $\dagger$ = Holm-significant within its
-registered family; the 512-vs-never column is descriptive (uncorrected). \emph{eq}: CI90
-fully inside the preregistered $\pm0.5$-point equivalence margin.}
+registered family; the 512-vs-never column is descriptive (uncorrected). \emph{compat.}:
+CI90 fully inside the preregistered $\pm0.5$-point margin; PortScan is boundary-close
+(upper bound $0.494$, $0.006$ inside) and does not demonstrate absence of an effect.}
 \label{tab:size_matched}
 \small
 \resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{l r l l c l l l}
 \toprule
-Regime & Never BA & Naive$_{512}-$never & Naive$_{2000}-$never & eq &
+Regime & Never BA & Naive$_{512}-$never & Naive$_{2000}-$never & compat. &
 Naive$_{2000}-$naive$_{512}$ & Point$_{2000}-$naive$_{2000}$ &
 Strict$_{2000}-$naive$_{2000}$ \\
 \midrule

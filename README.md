@@ -19,9 +19,10 @@ challenger, and whether promoting it helps depends on **how the challenger is co
 preregistered controls trace the observed mean promotion harm to two construction asymmetries — frozen
 incumbent-owned preprocessing (full drift) and a 4× nominal candidate-training-size disadvantage (zero drift).
 In the preregistered zero-drift control, with both asymmetries removed (own preprocessing + nominal
-2,000-per-class sample-size parity), always-deploy is mean-equivalent to never-adapt within the ±0.5-pp margin
-and point/strict validation gates add no measurable value; where construction or evidence is asymmetric, a
-small commit-time check recovers the loss.
+2,000-per-class sample-size parity), all three mean effects are compatible with the ±0.5-pp margin and
+point/strict validation gates add no measurable value. PortScan is boundary-close and the comparison does not
+demonstrate absence of an effect; where construction or evidence is asymmetric, a small commit-time check
+recovers the loss.
 
 Here, **preregistered** refers to each stage-specific protocol being specified and sealed in version control
 before that stage ran; it does not imply one external registry covering the sequential program as a whole.
@@ -58,8 +59,8 @@ before that stage ran; it does not imply one external registry covering the sequ
   parity.) A **zero-drift control** makes the point for the evaluated
   512-per-class frozen-transformer configuration: forcing such updates on a healthy model was net-harmful
   *even with no drift at all* (the gate reduces, but does not eliminate, that cost; the preregistered
-  size-matched own-transformer control below shows the mean zero-drift harm vanishes at nominal
-  2,000-per-class parity).
+  size-matched own-transformer control below finds mean effects compatible with the registered ±0.5-pp margin
+  at nominal 2,000-per-class parity, with PortScan boundary-close and no claim of effect absence).
   Confirmed by a **replication registered before execution** on a hardened harness across two detectors and four
   downstream models, and by a **leakage-free observed-data arm** (candidate, probe and detector recalibration from observed traffic only; free of simulator-oracle information).
 - **The symmetric-pipeline dynamic replication (preregistered, fresh seeds 3001–3030, margins and A/B/C decision
@@ -76,18 +77,22 @@ before that stage ran; it does not imply one external registry covering the sequ
 - **The size-matched control (the decisive final result — preregistered, fresh seeds 4001–4030, nested candidate
   batches, P/A/E outcome rules frozen before execution):** those residual-harm challengers were also trained on
   **one quarter of the incumbent's per-class evidence** (512 vs 2,000). Giving the identical nested candidates
-  the incumbent's 2,000/class **removes the mean zero-drift harm in all three benchmarks** (naive − never:
-  +0.19 / −0.02 / −0.01, CI90 inside the ±0.5-pp equivalence margin in 3/3; PortScan is margin-sensitive at the
-  ±0.2-pp sensitivity), the candidate-size effect is Holm-significant everywhere (+1.89 / +0.63 / +0.23), and
+  the incumbent's 2,000/class yields mean effects **compatible with the preregistered ±0.5-pp margin**
+  (naive − never: +0.19 / −0.02 / −0.01). PortScan is boundary-close: its CI90 upper bound is 0.494, only
+  0.006 points inside, and it fails the ±0.2-pp sensitivity; this does not demonstrate absence of an effect.
+  The candidate-size effect is Holm-significant everywhere (+1.89 / +0.63 / +0.23), and
   **point/strict gates add no measurable value at the matched nominal size under this zero-drift control**
   (all six effects <0.14 pp, none significant; the gate×size interactions are uniformly negative —
   the gates' value at 512 was largely compensation for the nominal evidence asymmetry). Nominal per-class
   sample-size parity isolates training-set size; it does not by itself establish equivalence in temporal
   coverage, diversity, subtype support, label quality or effective sample size. The **registered outcome is
   ATTENUATION**: the preregistered sign-based H5 future-value criterion remained inconclusive (near-50%
-  negative-sign rates), so ELIMINATION was not assigned, while the mean five-window future value of committed
-  size-matched challengers is ≈0 — proposal-level variability around a null mean, not systematic net harm, and
-  not a deployment-risk probability. Formal outcome and substantive reading are both reported, and kept distinct.
+  negative-sign rates), so ELIMINATION was not assigned. Those sign rates are within-trajectory proposal
+  variability, not a deployment-risk probability. The formal outcome and the margin-based mean comparison are
+  reported separately; neither establishes absence of an effect.
+- **No jointly demonstrated operational recipe:** the self-contained challenger + nominal size matching +
+  observed-data construction + real alarm + natural prevalence combination was not evaluated jointly. The
+  operational sequence is a design hypothesis derived from separate controls, not a demonstrated policy.
 - **A named policy whose deployment-long guarantee is non-vacuous within the evaluated balanced-probe adjudication budget:** **VBC-SG** — stratified per-class anytime-valid bounds driving
   commit/reject/defer, plus a *deployment-long* risk budget. A registered budget frontier shows that guarantee is not
   vacuous: at a configured probe cap of 512 (about 578 adjudicated probe labels per proposal after deferrals) a
@@ -97,8 +102,9 @@ before that stage ran; it does not imply one external registry covering the sequ
   control traces it to *who owns the preprocessing*, and a decomposition puts it in the **feature standardizer**
   (per-model scaling removes the static gap, equivalence-tested on 100 fresh seeds; the symmetric-pipeline dynamic
   replication then confirms at trajectory scale that ownership amplifies but does not explain all of the risk).
-- **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** — the
-  paper's principal limit on external validity, stated as such. Where the incumbent collapses, always-deploy is
+- **Honest boundary:** across **13 chronologically ordered replays**, chronological net harm **never appears** —
+  external empirical support on those enumerated streams and a limit on generalization, not an estimate or bound
+  on deployment harm frequency. Where the incumbent collapses, always-deploy is
   excellent and the gate pays a real premium. On the healthy-incumbent timelines the picture is favorable but not
   universal: **point and strict gates have higher point estimates than always-deploying on the two healthy UNSW
   timelines** (the no-additional-label strict rule by up to +2.8 points while committing 2.5 times per stream
@@ -197,7 +203,7 @@ Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.p
 `--vbc-defer-mode {accumulate,cohort,refresh}` (what a DEFER continues on: same e-process at the current
 mixture — weak conditional null, Proposition 1; same e-process at the proposal-time cohort; or fresh
 per-window evidence at α/(1+D)), `--candidate-latency`.
-The **observed-data (causal) gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`
+The **observed-data gate** is `--probe-source observed --adapt-strategy sliding_window --recal-source observed`
 (final leakage-free form adds `--stream-disjoint-windows --no-probe-policy reject --min-calib-windows 30`);
 the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **anytime-valid gates** are
 `--adaptation-gate labeled_probe_ebcs` (pooled) and `labeled_probe_ebcs_strat` (stratified); the named policy is
@@ -270,6 +276,10 @@ The three public benchmarks are **not redistributed** here (place them under `da
 - **CICIDS2017** — Sharafaldin, Lashkari & Ghorbani, *ICISSP* 2018.
 - **UNSW-NB15** — Moustafa & Slay, *MilCIS* 2015.
 - **ToN-IoT** — Alsaedi et al., *IEEE Access* 2020.
+
+The release includes selected confirmatory result summaries pinned by hash, but it does not
+redistribute the complete collection of raw or generated outputs; the released pipeline regenerates
+those outputs from the public benchmarks.
 
 ## Manuscript
 
