@@ -1,0 +1,37 @@
+{
+  "config_version": "1.0.0",
+  "matrix_kind": "post_kbs_size_matched_drift",
+  "implementation_status": "PROTOCOL FROZEN - implementation and execution NOT authorized; the drift-domain nested draw is DEFINED in the protocol but deliberately NOT implemented (the existing nested_candidate_draw asserts severity==0 and must not be reused); no smoke or confirmatory seed has been executed; no results exist",
+  "description": "Registered size-matched self-contained challenger control under full progressive drift (notes/post_kbs_size_matched_drift_protocol_001.md). 21 confirmatory arms = 3 full-drift scenarios x (never + {naive, point, strict} x candidate size {512, 2000}/class), own_transformer_per_model only, confirmatory seeds 6001-6030 (RESERVED, virgin; repository-wide collision scan clean), smoke 6401-6402, parity reference 4242-4243 (stored smoke outputs; comparison only, never evidence).",
+  "protocol": {
+    "file": "notes/post_kbs_size_matched_drift_protocol_001.md",
+    "frozen_on_branch": "post-kbs-hardening",
+    "preflight": "audits/post_kbs_protocol_preflight.md"
+  },
+  "runner_module": "src.experiments.run_symmetric_pipeline_replication",
+  "science_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "confirmatory_seeds": {"start": 6001, "end": 6030, "status": "RESERVED - virgin block, collision scan 2026-08-31; MUST NOT be executed before separate authorization"},
+  "smoke_seeds": [6401, 6402],
+  "parity_seeds": {"start": 4242, "end": 4243, "note": "stored symmetric-pipeline smoke outputs; flag-off byte-parity and 512-draw byte-parity checks only, never new evidence"},
+  "expected_arms": 21,
+  "scenarios": ["ps_full", "unsw_full", "ton_full"],
+  "transformer_policies": ["own_transformer_per_model"],
+  "candidate_sizes_per_class": [512, 2000],
+  "incumbent_train_size_per_class": 2000,
+  "detector_transform_policy": "frozen_initial",
+  "nested_draw_at_drift": {
+    "definition": "protocol section 2.1: at proposal (seed, t) draw B512 at sev(t) exactly as the historical own-transformer draw, then continue the SAME per-trigger RNG stream to draw E1488 at the SAME sev(t); B2000 = concat(B512, E1488); training uses the size-selected prefix; per-candidate provenance records sev(t), full-batch row hash and 512-prefix row hash",
+    "coupling_scope": "protocol section 2.2: naive-512 vs naive-2000 exactly proposal-coupled (identical trigger/commit timelines); gated cross-size contrasts seed-paired only"
+  },
+  "families": {
+    "G1_value_of_updating": {"contrasts": 6, "correction": "Holm"},
+    "G2_size_effect_primary": {"contrasts": 3, "correction": "Holm"},
+    "G3_gate_value_at_2000": {"contrasts": 6, "correction": "Holm"},
+    "G4_gate_x_size_interaction_secondary": {"contrasts": 6, "correction": "Holm"}
+  },
+  "margins": {"equivalence_pp": 0.5, "sensitivities_pp": [0.2, 1.0], "recall_ni_pp": -1.0, "fpr_ni_pp": 0.5},
+  "outcome_rules": "protocol section 4 (SIZE BENEFIT / SIZE COST / NO MATERIAL SIZE EFFECT / SUB-MATERIAL-UNRESOLVED per scenario; HOMOGENEOUS/HETEROGENEOUS program label; future-value summaries descriptive only; no sign-rate criterion anywhere; the historical P/A/E taxonomy explicitly does not apply)",
+  "stop_rule": "one pass over seeds 6001-6030 after all 21 arms complete; no extension, no interim analysis; confirmatory analysis script must be committed before the run",
+  "fixed_flags_source": "configs/symmetric_pipeline_dynamic_v1.json (byte-identical fixed flags except the candidate-size axis of this matrix)"
+}

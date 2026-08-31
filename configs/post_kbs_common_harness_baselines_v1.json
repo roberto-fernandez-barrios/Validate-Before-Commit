@@ -1,0 +1,43 @@
+{
+  "config_version": "1.0.0",
+  "matrix_kind": "post_kbs_common_harness_baselines",
+  "implementation_status": "PROTOCOL FROZEN - implementation and execution NOT authorized; no runner code for this matrix exists yet; no smoke or confirmatory seed has been executed; no results exist",
+  "description": "Registered common-harness evaluation of published/external baselines under the final self-contained harness (notes/post_kbs_common_harness_baselines_protocol_001.md). 60 confirmatory arms = 6 scenarios (PortScan/UNSW-Recon/ToN-IoT x full/zero drift) x 10 policies, own_transformer_per_model, candidate size 512/class, confirmatory seeds 5001-5030 (RESERVED, virgin; repository-wide collision scan clean), smoke 5401-5402. Fixed flags byte-for-byte the v1.21.0 symmetric-pipeline values.",
+  "protocol": {
+    "file": "notes/post_kbs_common_harness_baselines_protocol_001.md",
+    "frozen_on_branch": "post-kbs-hardening",
+    "preflight": "audits/post_kbs_protocol_preflight.md"
+  },
+  "runner_module": "src.experiments.run_symmetric_pipeline_replication",
+  "science_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "confirmatory_seeds": {"start": 5001, "end": 5030, "status": "RESERVED - virgin block, collision scan 2026-08-31; MUST NOT be executed before separate authorization"},
+  "smoke_seeds": [5401, 5402],
+  "expected_arms": 60,
+  "scenarios": ["ps_full", "unsw_full", "ton_full", "ps_zero", "unsw_zero", "ton_zero"],
+  "transformer_policies": ["own_transformer_per_model"],
+  "candidate_size_per_class": 512,
+  "incumbent_train_size_per_class": 2000,
+  "detector_transform_policy": "frozen_initial",
+  "policies": {
+    "never":    {"origin": "anchor", "labels_at_decision": 0},
+    "naive":    {"origin": "anchor", "labels_at_decision": 0},
+    "point":    {"origin": "anchor-ours", "--adaptation-gate": "labeled_probe", "--probe-size": "32"},
+    "strict":   {"origin": "anchor-ours", "--adaptation-gate": "labeled_probe", "--probe-size": "32", "--gate-margin": "0.001"},
+    "atc":      {"origin": "published-generic", "cite": "garg2022atc", "--adaptation-gate": "atc", "target_labels": 0, "training_time_validation_rows": 512},
+    "doc":      {"origin": "published-generic", "cite": "guillory2021doc", "--adaptation-gate": "doc", "target_labels": 0, "training_time_validation_rows": 512},
+    "ddm_river":   {"origin": "reference-implementation", "--trigger-mode": "ddm_river", "monitor_labels_per_window": 8},
+    "adwin_river": {"origin": "reference-implementation", "--trigger-mode": "adwin_river", "monitor_labels_per_window": 8},
+    "ensemble_cal": {"origin": "standard-baseline", "--adapt-strategy": "ensemble_cal"},
+    "replay":       {"origin": "standard-baseline", "--adapt-strategy": "replay"}
+  },
+  "families": {
+    "F1_zero_drift_loss_avoidance": {"contrasts": 18, "correction": "Holm"},
+    "F2_full_drift_benefit_retention": {"contrasts": 18, "correction": "Holm"},
+    "F3_vs_point_gate": {"contrasts": 12, "correction": "Holm"}
+  },
+  "margins": {"equivalence_pp": 0.5, "sensitivities_pp": [0.2, 1.0], "recall_ni_pp": -1.0, "fpr_ni_pp": 0.5},
+  "outcome_rules": "protocol section 5 (magnitude-aware MATERIAL GAIN / MATERIAL COST / COMPATIBLE / UNRESOLVED; no sign-rate criterion anywhere)",
+  "stop_rule": "one pass over seeds 5001-5030 after all 60 arms complete; no extension, no interim analysis",
+  "fixed_flags_source": "configs/symmetric_pipeline_dynamic_v1.json (byte-identical fixed flags except the policy axis of this matrix)"
+}
