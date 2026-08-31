@@ -1,0 +1,20 @@
+statement,policy,holds,detail
+S1 avoids zero-drift loss under final harness,atc,False,"{""ps_zero"": ""COMPATIBLE"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,atc,False,"{""ps_full"": ""UNRESOLVED"", ""unsw_full"": ""COMPATIBLE"", ""ton_full"": ""COMPATIBLE""}"
+S1 avoids zero-drift loss under final harness,doc,False,"{""ps_zero"": ""UNRESOLVED"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,doc,True,"{""ps_full"": ""MATERIAL COST"", ""unsw_full"": ""MATERIAL COST"", ""ton_full"": ""COMPATIBLE""}"
+S1 avoids zero-drift loss under final harness,enscal,False,"{""ps_zero"": ""MATERIAL GAIN"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,enscal,False,"{""ps_full"": ""COMPATIBLE"", ""unsw_full"": ""COMPATIBLE"", ""ton_full"": ""COMPATIBLE""}"
+S1 avoids zero-drift loss under final harness,replay,False,"{""ps_zero"": ""COMPATIBLE"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,replay,True,"{""ps_full"": ""MATERIAL COST"", ""unsw_full"": ""MATERIAL COST"", ""ton_full"": ""MATERIAL COST""}"
+S1 avoids zero-drift loss under final harness,ddm,False,"{""ps_zero"": ""UNRESOLVED"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,ddm,True,"{""ps_full"": ""MATERIAL COST"", ""unsw_full"": ""MATERIAL COST"", ""ton_full"": ""MATERIAL COST""}"
+S1 avoids zero-drift loss under final harness,adwin,False,"{""ps_zero"": ""UNRESOLVED"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S2 pays for it at full drift,adwin,True,"{""ps_full"": ""MATERIAL COST"", ""unsw_full"": ""MATERIAL COST"", ""ton_full"": ""MATERIAL COST""}"
+S3 matches the point gate (all six COMPATIBLE),atc,False,"{""ps_full"": ""UNRESOLVED"", ""unsw_full"": ""COMPATIBLE"", ""ton_full"": ""COMPATIBLE"", ""ps_zero"": ""COMPATIBLE"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S3 matches the point gate (all six COMPATIBLE),doc,False,"{""ps_full"": ""MATERIAL COST"", ""unsw_full"": ""MATERIAL COST"", ""ton_full"": ""COMPATIBLE"", ""ps_zero"": ""COMPATIBLE"", ""unsw_zero"": ""COMPATIBLE"", ""ton_zero"": ""COMPATIBLE""}"
+S4 method ordering changes with candidate size,point,False,no material ordering change was resolved
+S4 method ordering changes with candidate size,strict,False,no material ordering change was resolved
+S4 method ordering changes with candidate size,atc,True,"[{""scenario"": ""ps_zero"", ""interaction_pp"": -1.3807, ""cls_2000"": ""COMPATIBLE"", ""cls_512"": ""MATERIAL GAIN""}]"
+S4 method ordering changes with candidate size,doc,False,no material ordering change was resolved
+S4 method ordering changes with candidate size,enscal,True,"[{""scenario"": ""ps_full"", ""interaction_pp"": -0.5997, ""cls_2000"": ""COMPATIBLE"", ""cls_512"": ""MATERIAL GAIN""}, {""scenario"": ""ton_full"", ""interaction_pp"": -1.038, ""cls_2000"": ""COMPATIBLE"", ""cls_512"": ""MATERIAL GAIN""}]"
