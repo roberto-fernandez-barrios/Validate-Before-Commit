@@ -1,8 +1,11 @@
 # Reproducibility — "Validate Before Commit"
 
-Artifact for the paper on label-efficient gating of drift-triggered classifier updates for NIDS.
+Artifact for *Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network
+Intrusion Detection* (the validate-before-commit gate family is one of the instruments it evaluates).
 Everything below regenerates from raw data; results tables/figures live under `results/` (git-ignored) and
-are rebuilt by the analysis scripts. Manuscript + bibliography: `manuscript/`.
+are rebuilt by the analysis scripts. Manuscript + bibliography: `manuscript/`. A reviewer-oriented map of
+the main manuscript, supplement, protocols, result tables, replication drivers, chronological evidence and
+baseline comparison is in `README.md` ("Reviewer quick map").
 
 ## 1. Environment
 
@@ -275,7 +278,7 @@ python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cro
 
 Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit;
 `make final-paper` = hash verification + invariant tests (`tests/`) + analysis + final tables + figures +
-`results/final_manifest.json` + CAS/supplement/IEEE compilation + the 439-check audit — the P10 workflow).
+`results/final_manifest.json` + CAS/supplement/IEEE compilation + the claim audit (`src/analysis/audit_paper2_claims.py`) — the P10 workflow).
 The small confirmatory CSVs are **committed** under `results/tables/` and pinned by
 `results/tables/MANIFEST.sha256`; regenerated outputs can be diffed against them. The
 UNSW chronological staging is `python -m src.analysis.prepare_paper2_unsw_chronological`
@@ -291,17 +294,20 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Benefit ~ deployed-model degradation, r = −0.89 (descriptive; coupling-aware) | Supp §S1.1/S3 (`make_paper2_figures`) |
 | The law survives disaggregation (r = −0.91 per-seed) and any leave-one-out | `paper2_mechanism_law_robustness_001/`, Supp §S3 |
 | Replay retraining does not rescue naive triggering; the gate composes with it | `paper2_phase2i_replay_baseline_001/`, Supp §S1.5 |
-| Natural-prevalence probes: the initial "probe need not be balanced" claim is RETRACTED; the corrected Binomial rerun holds to π≈0.05 and dissolves at π=0.01 | `paper2_phase2j_probe_prevalence_001/` (superseded) + amendment-006 binomial arms; main §5.3, Supp §S2.3 |
+| Natural-prevalence probes: the initial "probe need not be balanced" claim is RETRACTED; the corrected Binomial rerun holds to π≈0.05 and dissolves at π=0.01 | `paper2_phase2j_probe_prevalence_001/` (superseded) + amendment-006 binomial arms; main §5.5, Supp §S2.3 |
 | Harm is not a size/PCA artifact: deepens with size-matched candidates; persists point-wise at full dim | `paper2_phase2k_size_dim_controls_001/`, Supp §S1.5 |
-| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, §5.3, tag `harness-v2-protocol` |
+| Registered replication (harness v2, common streams, disjoint partitions, fresh seeds): all criteria pass; per-trigger mechanism (r_deg −0.65..−0.70 vs r_score ≈0) | `paper2_v2_replication_001/`, main §5.5 (historical frozen-policy diagnostic), Supp §S2.11, tag `harness-v2-protocol` |
 | Hierarchical per-trigger model, regime×seed clusters (β_deg −1.02 [−1.61,−0.43]; score ≈ 0) + decision metrics (local per-decision regret ~22× lower than always-commit in the harm regime) | `paper2_decision_quality_004/` + `paper2_decision_quality_005/` |
 | v2 robustness: budget (b=32 operating point; b=8 corrected), latency 20, corruption (harm-avoidance to 40%, net benefit to 25%) | `paper2_amendment_004/robustness.csv` |
 | Split two-stage gate: 69% fewer candidates, ~½ of naive's total labels, above naive; net gain vs never-adapt honestly unresolved at 30 seeds | `paper2_amendment_005/` + `paper2_amendment_004/label_cost.csv` |
-| Total label/compute accounting per policy (candidates dominate; probe ≈3% of the gate's bill) | `paper2_amendment_004/label_cost.csv`, label-cost table (§5.3) |
+| Total label/compute accounting per policy (candidates dominate; probe ≈3% of the gate's bill) | `paper2_amendment_004/label_cost.csv`, label-cost table (Supp §S5) |
 | DDM/ADWIN validated vs reference implementations (river): DDM net-harm replicates; our ADWIN variant under-fires, reference reported | `paper2_monitor_validation_004.csv`, `paper2_v6_*_{ddm,adwin}river_none/` |
 | Calibrated soft ensemble: strongest label-free rule, harm-avoiding everywhere, beats gate in marginal regime, cannot decline updates | `paper2_v6_*_enscal_none/`, `paper2_amendment_004/robustness.csv` |
-| Chronological streams (corrected runner): deep-benefit recoveries on all CICIDS days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday or external UNSW | `paper2_amendment_004/temporal.csv`, temporal-streams table (§5.3), Supp §S2.6 |
-| Observed-data 64-flow matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, Tables causal_probe/symmetric_ab, §5.3 |
+| Chronological streams (corrected runner): deep-benefit recoveries on all CICIDS days; gate premium on Friday/Thursday BA, gate ahead on overall accuracy; no premium on Wednesday or external UNSW | `paper2_amendment_004/temporal.csv`, temporal-streams table (Supp §S2.6), main §5.4 |
+| Pre-enumerated chronological matrix (seven further replays; net harm unobserved; healthy UNSW timelines vs the unresolved Wednesday counterexample) | `paper2_final_q1/chronological_replays.csv`, tab:chronological_q1, main §5.4 |
+| Observed-data 64-flow matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, `paper2_final_q1/budget_frontier.csv`, Tables causal_probe/symmetric_ab/budget_frontier (Supp §S2.12), main §5.5 |
+| Size-matched self-contained challenger control (ATTENUATION; matched-size means compatible with ±0.5 pp under zero drift, PortScan boundary-close; candidate-size effect Holm-significant; no gate gain at 2,000/class) | `size_matched_own_transformer_001/` (CLAIM_INTERPRETATION.json), tab:size_matched, main §5.2–§5.3, Supp §S8 |
+| Baseline / SoTA comparison (label-free rules, ATC/DoC, DDM/ADWIN, update generators, McNemar/CS/VBC-SG; descriptive across blocks, paired within block) | `paper2_policy_frontier_005/frontier.csv`, `paper2_phase2h_labelfree_gates_001/`, `paper2_phase2i_replay_baseline_001/`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_008/summary.csv`, `paper2_final_q1/budget_frontier.csv`; main §5.6 (tab:baselines) |
 | Symmetric-pipeline replication (Scenario A): mean full-drift harm does not persist under self-contained pipelines (+7.21/+2.55/+1.03); ownership interaction up to +5.98; zero-drift harm persists (−1.74/−0.65 material, −0.38 resolved) and gates recover it (6/6 Holm-sig.); unsw_zero strict = recall↔FPR trade-off | `symmetric_pipeline_dynamic_001/` (CLAIM_INTERPRETATION.json), tab:symmetric_pipeline, Supp §S7 |
 | Frozen-mode parity: the new self-contained harness reproduces published v1.20.2 arms bit-for-bit (4 arms × 30 seeds; deferred arm 5/5 files byte-identical) | `results/smoke/symmetric_pipeline/parity/*/parity_report.json` |
 | Detector score carries no consistent incremental signal within triggered decisions (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |

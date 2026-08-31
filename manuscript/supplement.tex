@@ -21,7 +21,7 @@ Conditional Validation in Adaptive Network Intrusion Detection''}
 \begin{document}
 \maketitle
 
-\noindent This supplement contains the initial exploratory study (harness v1) in full (\S S1; its additional figures and tables in \S S3), as summarized in \S5.5 of the main paper, together with the verbatim detail of several registered extensions summarized in \S5.4--\S5.5 of the main paper (\S S2), the proof of Proposition 1 of the main paper (\S S4), and the complete matrices of the two preregistered replications (\S S7, \S S8). Section numbering, figures and tables are prefixed S.
+\noindent This supplement contains the initial exploratory study (harness v1) in full (\S S1; its additional figures and tables in \S S3), as summarized in \S5.5 of the main paper, together with the verbatim detail of several registered extensions summarized in \S5.4--\S5.6 of the main paper (\S S2), the implementation-level definitions of the VBC-SG family relocated from \S3.5 of the main paper (\S S2.13), the proof of Proposition 1 of the main paper (\S S4), the label ledger (\S S5), the multiplicity table (\S S6), and the complete matrices of the two preregistered replications (\S S7, \S S8). Section numbering, figures and tables are prefixed S.
 The registered confirmatory evidence lives in the main paper; material here is context, and is
 superseded by the main paper's v2 numbers where noted. Bibliographic references are resolved
 against the same bibliography file as the main paper; numbering is local to this supplement.
@@ -46,14 +46,15 @@ Evidence block & Role & Configuration & Seeds & Primary claim supported & Locati
 Symmetric-pipeline replication & Primary & own vs frozen transformer & 3001--3030 & Preprocessing ownership amplified apparent harm & Main \S5.1; \S S7 \\
 Size-matched control & Primary & own transformer, 512 vs 2{,}000/class & 4001--4030 & Candidate size explains residual zero-drift harm; ATTENUATION & Main \S5.2; \S S8 \\
 Evidence--validation trade-off & Primary & derived from size-matched & 4001--4030 & Conditional value of validation & Main \S5.3 \\
+Baseline-policy comparison & Support & blocks I--V as labelled (frozen v2, zero-drift, v1, frontier, self-contained) & 104--133, 501--530, 3001--3030, 4001--4030 & Gates vs label-free, monitor and statistical alternatives (descriptive across blocks) & Main \S5.6 \\
 Chronological matrix & Boundary & real time-ordered streams & 601--630 & External support and generalization limit & Main \S5.4 \\
 Frozen-policy diagnostic & Historical & frozen transformer, 512/class & 104--133 & Reference gate-rescue behaviour & \S S2.11 \\
 Per-trigger mechanism & Support & frozen, 512/class & 104--133 & Degradation predicts update value & Main \S5.5; \S S1.1 \\
 Observed-data arm & Feasibility & leakage-free observed traffic & --- & Decision works without simulator privileges & \S S2.7 \\
 Classifier / generator controls & Robustness & 4 learners, 4 generators & --- & Sign general; magnitude SVC-specific & \S S1.5--S1.6 \\
-Ownership A/B & Support & role-randomized transformer & 2001--2100 & Feature scaling owns the effect & \S S6 \\
-Mild-drift matrix & Robustness & frozen, 512/class & --- & Harm tracks incumbent health & \S S2 \\
-VBC-SG budget frontier & Formal & frozen, 512/class & 501--530 & Price of formal guarantees & \S S2.8 \\
+Ownership A/B & Support & role-randomized transformer & 2001--2100 & Feature scaling owns the effect & \S S2.12 \\
+Mild-drift matrix & Robustness & frozen, 512/class & --- & Harm tracks incumbent health & \S S2.12 \\
+VBC-SG budget frontier & Formal & frozen, 512/class & 501--530 & Price of formal guarantees & Main \S5.5; \S S2.12--S2.13 \\
 Acquisition yield / prevalence & Operational & frozen, 512/class & --- & Attack-label discovery cost & \S S2.3 \\
 \bottomrule
 \end{tabular}
@@ -313,6 +314,75 @@ delay simulation follow in order.
 \input{tables/table_budget_frontier.tex}
 \input{tables/table_operational_e2e.tex}
 
+\subsection{VBC-SG: continuation modes, risk budget and stated properties (relocated from main \S3.5)}
+\label{sec:S2_vbcsg}
+
+The main text (\S3.5) states the risk-controlled gates at the level needed to read the results.
+This subsection carries the implementation-level definitions that were previously in the main
+text; nothing here changes the guarantee or its scope.
+
+\textbf{Levels and stratification.} The confidence sequences run at $\alpha=0.10$; the
+exact-McNemar gate at its registered $\alpha=0.05$ (stricter, hence if anything \emph{more}
+conservative at zero drift); re-running McNemar at $\alpha=0.10$ leaves the zero-drift conclusion
+unchanged ($\approx 0$ commits; main \S5.5). The effective per-arm $\alpha$ is recorded in the run
+manifest. Because the probe is drawn with \emph{fixed class quotas} ($b/2$ per class) rather than
+i.i.d.\ from one distribution, the pooled tests match the sampling only approximately; the
+\emph{stratified} variants close that gap by lower-bounding each class's mean correctness
+difference at $\alpha/2$ (Bonferroni over the two classes) and committing iff
+$\tfrac12(L_{\mathrm{ben}}+L_{\mathrm{att}})>0$, which bounds the false-superiority probability for
+the \emph{balanced-accuracy} difference under the stratified design actually used. We evaluate a
+\emph{fixed-sample} version (per-class one-sided normal LCB; no sequential validity) and the
+\emph{anytime-valid} version, in which each class's bound is an empirical-Bernstein confidence
+sequence inspected at the same sequential looks as the pooled gate; only the latter supports the
+anytime-valid claim.
+
+\textbf{The family and its named member.} The rules of main \S3.5 form a family --- a sequential
+decision-support instantiation for settings in which validation is chosen --- and what the paper
+contributes is that family together with the frontier it spans, \emph{not} a claim that any one
+member dominates, not a claim of fundamental mathematical novelty, and not the source of the
+paper's final verdict. We name its maximally-guaranteed member, the \emph{Validate-Before-Commit
+Sequential Gate}, because it is the configuration that carries every layer of control at once;
+main \S5.5 shows what each layer costs, and that a \emph{less} stratified sibling and even the
+no-additional-label strict rule are the better buy at some operating points.
+
+\textbf{Continuation modes under deferral.} Deferral raises a question the gate must answer
+explicitly: once the stream drifts \emph{between} windows, what does a sequence that keeps
+acquiring labels at later windows estimate? Three registered continuation modes make the answer
+precise. \emph{Cohort-sim} (fixed-target): additional labels are resampled from the proposal-time
+target distribution available to the simulator (the mixture the proposal was raised on), so the
+sequence estimates one fixed mean and the per-proposal guarantee is the clean fixed-target one.
+Cohort-sim does not model retention and delayed adjudication of a literal production cohort, so
+this acquisition scheme is not claimed to be directly deployable. \emph{Refresh}: each deferral
+window opens a \emph{fresh} evidence set tested at $\alpha_j/(1+D)$ (Bonferroni over the at most
+$1+D$ sets a proposal with deferral cap $D$ may open), so observations from temporally different
+targets are never mixed. \emph{Accumulate} (retained as an ablation): the same sequences continue
+on labels drawn at each current window; by Proposition~1 of the main paper (proof in \S S4) this
+mode still bounds false commits, but only under the \emph{weak conditional null} that the
+challenger is at no time conditionally better on the probe stream, which is why cohort and
+refresh are the interpretable variants under drift.
+
+\textbf{Deployment-long risk budget.} A deployment-long risk budget allocates each proposal's
+level $\alpha_j$ by a declared spending schedule (Bonferroni $\alpha_{\mathrm{life}}/M$, or the
+$p$-series $\alpha_j = 6\alpha_{\mathrm{life}}/(\pi^2 j^2)$, which needs no horizon $M$); the
+effective $\alpha_j$ of every proposal is logged. Without a spending schedule the guarantee is
+\emph{per proposal} only (union bound $M\alpha$ over $M$ tested proposals); a lifetime bound
+requires alpha-spending across proposals or a single deployment-long e-process, which is exactly
+what the risk budget supplies.
+
+\textbf{Four properties, stated at the strength we can support.} (i) \emph{Per-proposal}: the
+probability of falsely establishing positive expected balanced-accuracy difference on the probe
+distribution is at most $\alpha_j$, uniformly over the sampling schedule --- under within-class
+i.i.d.\ sampling from the proposal's target for the cohort/refresh modes, and under the weak
+conditional null of Proposition~1 for the accumulate mode. (ii) \emph{Deployment-long}: by the
+union bound over the spending schedule, the probability of \emph{ever} making such a false commit
+over the deployment is at most $\alpha_{\mathrm{life}}$, under the same assumptions. (iii)
+\emph{Label cost}: labels per proposal are bounded by the per-window budget times $(1 + D)$, and
+the observed cost concentrates far below the bound because most proposals resolve early. (iv)
+\emph{Transfer}: none of (i)--(iii) bounds future deployed accuracy unless the probe is
+representative of the evaluation horizon --- the stale-probe and dependence results (main
+\S5.4--\S5.5) quantify exactly where that premise fails. No stronger guarantee is claimed; the
+empirical sections of the main paper report the price of each.
+
 \section{Additional figures and tables (initial study)}
 The floats below support the initial exploratory study of \S S1: the descriptive mechanism-law views, oracle-regret, label-latency, and the Phase-1 negative-policy table.
 
@@ -395,7 +465,7 @@ $W_0 = 1$, and Ville's inequality yields $\Pr(\exists n: W_n \ge 1/\alpha) \le \
 \cite{waudbysmith2023betting,howard2021timeuniform}; we claim only the correspondence to this
 implementation. Rejecting the weak null establishes that the challenger was conditionally better
 at \emph{some} point of the adjudication stream --- not that it is better at commit time, which is
-why the cohort and refresh continuation modes of \S3.5 of the main paper exist. The stratified
+why the cohort and refresh continuation modes of \S S2.13 (relocated from \S3.5 of the main paper) exist. The stratified
 gates run one such process per class at $\alpha/2$ (or $\alpha/4$ with a futility side) and
 Bonferroni preserves the level. A registered null simulation with time-varying conditional means
 (all $\le 0$) and time-varying tie probabilities verifies the bound empirically

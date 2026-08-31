@@ -34,6 +34,28 @@ before that stage ran; it does not imply one external registry covering the sequ
 
 ---
 
+## Reviewer quick map
+
+Where to find each piece of evidence without reading the whole repository. Section numbers refer to
+`manuscript/main.tex` (§) and `manuscript/supplement.tex` (S).
+
+| # | What | Where |
+|---|---|---|
+| 1 | Main manuscript (Elsevier CAS source; the single source of truth) | [`manuscript/main.tex`](manuscript/main.tex) — compile with `cd manuscript && latexmk -pdf main.tex`; IEEE port `manuscript/main_ieee.tex` is regenerated from it by `python -m src.analysis.port_ieee` |
+| 2 | Supplement | [`manuscript/supplement.tex`](manuscript/supplement.tex) — S0 evidence hierarchy and provenance table; S1 initial exploratory study; S2 relocated registered-extension details (S2.12 full result tables, S2.13 VBC-SG definitions); S4 proof of Proposition 1; S5 label ledger; S6 multiplicity; S7–S8 full replication matrices |
+| 3 | Preregistered protocols and amendments | index in [`docs/SCIENTIFIC_PROVENANCE.md`](docs/SCIENTIFIC_PROVENANCE.md); symmetric pipeline: [`notes/paper2_symmetric_pipeline_dynamic_protocol_001.md`](notes/paper2_symmetric_pipeline_dynamic_protocol_001.md) + [`notes/symmetric_pipeline_scenario_a_rewrite_protocol.md`](notes/symmetric_pipeline_scenario_a_rewrite_protocol.md); size-matched: [`notes/paper2_size_matched_own_transformer_protocol_001.md`](notes/paper2_size_matched_own_transformer_protocol_001.md) + [`notes/size_matched_final_rewrite_protocol.md`](notes/size_matched_final_rewrite_protocol.md); harness v2: [`notes/paper2_harness_v2_registered_replication_protocol_001.md`](notes/paper2_harness_v2_registered_replication_protocol_001.md) + `notes/paper2_harness_v2_amendment_002…014.md`; final-q1: [`notes/q1_max_protocol.md`](notes/q1_max_protocol.md) |
+| 4 | Result tables | sealed CSVs under `results/tables/`, byte-pinned by `results/tables/MANIFEST.sha256` (`make verify-hashes`); LaTeX tables `manuscript/tables/`; table → protocol → config ledger `results/final_experiment_ledger.csv`; machine-readable manifest `results/final_manifest.json` |
+| 5 | Reproduction commands | [`REPRODUCE.md`](REPRODUCE.md); one command: `make final-paper` (hash verification → analysis → tables/figures → manifests → tests → PDF compilation → claim audit) |
+| 6 | Symmetric-pipeline replication (§5.1, S7) | config `configs/symmetric_pipeline_dynamic_v1.json`; `python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized`; outputs `results/tables/symmetric_pipeline_dynamic_001/` (`CLAIM_INTERPRETATION.json`: Scenario A) |
+| 7 | Size-matched replication (§5.2–§5.3, S8) | config `configs/size_matched_own_transformer_v1.json`; same driver with `--config`; outputs `results/tables/size_matched_own_transformer_001/` (`CLAIM_INTERPRETATION.json`: ATTENUATION); derived evidence–validation trade-off `results/tables/v1_22_1_editorial/` |
+| 8 | Chronological replay evidence (§5.4, S2.6) | pre-enumerated matrix `results/tables/paper2_final_q1/chronological_replays.csv` (seeds 601–630); first six replays `results/tables/paper2_amendment_004/temporal.csv`, `results/tables/paper2_amendment_005/temporal_stratified.csv`, `results/tables/paper2_amendment_006/temporal_wed2thu.csv` |
+| 9 | Baseline / SoTA comparison (§5.6; policy properties + outcomes by block) | policy frontier `results/tables/paper2_policy_frontier_005/frontier.csv`; ATC/DoC `results/tables/paper2_phase2h_labelfree_gates_001/`; replay `results/tables/paper2_phase2i_replay_baseline_001/`; DDM/ADWIN vs `river` `results/tables/paper2_monitor_validation_004.csv`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_005/twostage_and_monitors.csv`; zero-drift risk gates `results/tables/paper2_amendment_008/`; VBC-SG frontier `results/tables/paper2_final_q1/budget_frontier.csv` |
+
+The editorial audit trail for the post-KBS revision (what changed, why, and the response to reviewers) is in
+[`audits/`](audits/).
+
+---
+
 ## TL;DR
 
 - Across **three public benchmarks** (CICIDS2017, UNSW-NB15, ToN-IoT) and multiple attack regimes, the value of
@@ -136,19 +158,20 @@ before that stage ran; it does not imply one external registry covering the sequ
 model's headroom. Per-trigger, non-coupled test (hardened harness): pre-trigger incumbent degradation predicts the
 future value of committing, while the detector score at the same triggers shows no consistent signal (both KS-max and
 QK-ZZ; one small exception in QK/PortScan is reported in the paper). Coupling-aware analysis in Supplement §S1.1;
-hierarchical model in the paper, §5.3.**
+hierarchical model in the paper, §5.5.**
 
 ![Per-trigger mechanism](docs/img/fig9_pertrigger.png)
 
 **3 — In the three controlled regimes, the validate-before-commit gate preserves benefit, avoids net harm, and beats
 naive retraining in the harm regime — with the same sign pattern for a classical (KS-max) and a quantum (QK-ZZ)
-detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper, policy-frontier table).**
+detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper §5.6, the
+baseline-comparison table; full policy frontier in Supplement S2.12).**
 
 ![Gate results](docs/img/fig4_phase2_gate.png)
 
 **4 — The gate is harm-avoiding under randomly corrupted validation labels: at up to 40% flipped labels it stays
 significantly above naive in the harm regime; net benefit over no-adaptation survives to 25% (hardened-harness
-numbers in the paper, §5.3).**
+numbers in the paper, §5.5; Supplement S2.2).**
 
 ![Adversarial probe](docs/img/fig8_probe_poison.png)
 
@@ -224,6 +247,8 @@ data/             Public benchmark datasets (git-ignored; see Data availability)
 docs/img/         Figures used in this README
 notes/            Protocols, pre-registrations, and checkpoints
 tests/            Invariant tests run by `make final-paper` (disjointness, gate validity, claims)
+audits/           Editorial audit trail (post-KBS revision report, response to reviewers, derived
+                  wall-clock summary); no experimental outputs live here
 REPRODUCE.md      One-command regeneration of every table and figure
 ```
 
