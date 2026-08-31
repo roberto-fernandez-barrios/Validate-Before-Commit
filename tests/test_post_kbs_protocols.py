@@ -44,16 +44,32 @@ def test_reserved_seed_blocks_are_disjoint_from_all_used_blocks():
         != (B2_CFG["confirmatory_seeds"]["start"], B2_CFG["confirmatory_seeds"]["end"])
 
 
-def test_execution_not_authorized_and_no_results_exist():
+def test_preregistration_state_and_result_hygiene():
+    """State-aware guard. The v1 configs keep their freeze-time status strings as a
+    historical record. B2 implementation+execution were AUTHORIZED by user decision on
+    2026-08-31 (recorded in notes/post_kbs_size_matched_drift_implementation_checkpoint.md);
+    B1 implementation is authorized only after amendment 001's commit, and its confirmatory
+    outputs only after its fidelity gates."""
     for cfg in (B1_CFG, B2_CFG):
-        assert "NOT authorized" in cfg["implementation_status"]
         assert "RESERVED" in cfg["confirmatory_seeds"]["status"]
-    # no output directory for either block may exist before authorization
-    for pat in ("post_kbs_common_harness", "post_kbs_size_matched_drift"):
-        assert not list((REPO / "results").rglob(f"*{pat}*")), (
-            f"results for frozen-but-unauthorized protocol found: {pat}")
-        assert not list((REPO / "src").rglob(f"*{pat}*")), (
-            f"implementation for frozen-but-unauthorized protocol found: {pat}")
+    # any B2 confirmatory output must be authorized-mode on the reserved block only
+    raw = REPO / "results" / "raw" / "post_kbs_size_matched_drift"
+    if raw.exists():
+        for d in raw.iterdir():
+            if not d.is_dir():
+                continue
+            rc = json.loads((d / "run_config.json").read_text(encoding="utf-8"))
+            assert rc["mode"] == "run", d
+            assert set(rc["seeds"]) <= set(range(6001, 6031)), d
+    # any B1 confirmatory output must be authorized-mode on ITS reserved block only
+    raw1 = REPO / "results" / "raw" / "post_kbs_common_harness_baselines"
+    if raw1.exists():
+        for d in raw1.iterdir():
+            if not d.is_dir():
+                continue
+            rc = json.loads((d / "run_config.json").read_text(encoding="utf-8"))
+            assert rc["mode"] == "run", d
+            assert set(rc["seeds"]) <= set(range(5001, 5031)), d
 
 
 def test_protocols_frozen_before_implementation_wording():

@@ -374,22 +374,33 @@ def nested_candidate_draw(pools, args, csize, sev_c, cand_rng):
     same rows, labels, order and row hash; the extra samples are the only additional
     information of the larger condition. Training uses the prefix selected by
     --candidate-size-per-class. Both conditions execute this identical draw, so nesting
-    holds at every proposal. Only defined at severity 0 under full_replace (the entire
-    scope of the registered experiment)."""
+    holds at every proposal. Under the sealed size-matched control this is only defined
+    at severity 0 (--nested-draw-domain zero, the default: byte-identical behaviour).
+    post-KBS B2 (protocol notes/post_kbs_size_matched_drift_protocol_001.md, section
+    2.1): --nested-draw-domain drift extends the SAME construction to severity > 0 --
+    B_base then the extension are drawn from the SAME per-trigger RNG stream, BOTH at
+    the proposal-time severity sev(t), so the two size conditions sample the same
+    proposal-time target mixture and differ only in nominal candidate evidence."""
     base = int(args.adapt_size_per_class)
     full = int(args.train_size_per_class)
+    domain = getattr(args, "nested_draw_domain", "zero")
     if args.adapt_strategy != "full_replace":
         raise SystemExit("--candidate-size-per-class requires --adapt-strategy full_replace")
-    if float(sev_c) != 0.0:
-        raise SystemExit("--candidate-size-per-class is only defined at severity 0 "
-                         f"(got severity {sev_c!r})")
+    if domain == "zero":
+        if float(sev_c) != 0.0:
+            raise SystemExit("--candidate-size-per-class is only defined at severity 0 "
+                             f"(got severity {sev_c!r}); severity>0 requires the"
+                             " registered --nested-draw-domain drift (post-KBS B2)")
+        sev_draw = 0.0
+    else:
+        sev_draw = float(sev_c)
     if int(csize) not in (base, full):
         raise SystemExit(f"--candidate-size-per-class must be {base} (adapt size) or "
                          f"{full} (train size), got {csize}")
     Xb, yb = sample_balanced_from_distribution(
-        pools, n_per_class=base, severity=0.0, rng=cand_rng)
+        pools, n_per_class=base, severity=sev_draw, rng=cand_rng)
     Xe, ye = sample_balanced_from_distribution(
-        pools, n_per_class=full - base, severity=0.0, rng=cand_rng)
+        pools, n_per_class=full - base, severity=sev_draw, rng=cand_rng)
     if int(csize) == base:
         return Xb, yb
     return np.vstack([Xb, Xe]), np.concatenate([yb, ye])
@@ -1301,6 +1312,13 @@ def build_parser() -> argparse.ArgumentParser:
                         "valid with --adapt-strategy full_replace at severity 0; None = historical "
                         "behavior, byte-identical.")
     p.add_argument("--detector-ref-size-per-class", type=int, default=256)
+    p.add_argument("--nested-draw-domain", type=str, default="zero",
+                   choices=["zero", "drift"],
+                   help="post-KBS B2 (protocol post_kbs_size_matched_drift_001 section 2.1): "
+                        "'drift' extends the nested canonical candidate draw to severity>0 "
+                        "(B_base then the extension from the SAME per-trigger RNG stream, "
+                        "both at sev(t)); 'zero' (default) is the sealed size-matched "
+                        "behaviour, refusing severity>0 -- byte-identical.")
     p.add_argument("--post-windows", type=int, default=100)
     p.add_argument("--ramp-windows", type=int, default=80)
     p.add_argument("--max-severity", type=float, default=1.0)

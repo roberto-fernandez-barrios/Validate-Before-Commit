@@ -52,6 +52,44 @@ def load_config(path: Path | None = None) -> dict:
     with open(path, encoding="utf-8") as f:
         cfg = json.load(f)
     cfg["_config_path"] = str(path.resolve().relative_to(ROOT)).replace(os.sep, "/")
+    if cfg.get("matrix_kind") == "post_kbs_size_matched_drift" and "fixed_flags" not in cfg:
+        # post-KBS B2: the frozen preregistration config pins every fixed parameter BY
+        # REFERENCE (fixed_flags_source = the sealed symmetric-pipeline config); derive
+        # the runnable keys here so the frozen JSON never has to be edited. The base
+        # config's SHA-256 is recorded so the derivation is auditable per arm.
+        base_path = ROOT / "configs" / "symmetric_pipeline_dynamic_v1.json"
+        with open(base_path, encoding="utf-8") as bf:
+            base = json.load(bf)
+        cfg["_derived_operational_from"] = (
+            "configs/symmetric_pipeline_dynamic_v1.json@sha256:" + sha256_file(base_path))
+        sc_list = list(cfg["scenarios"])
+        cfg["fixed_flags"] = base["fixed_flags"]
+        cfg["data"] = base["data"]
+        cfg["scenarios"] = {sc: base["scenarios"][sc] for sc in sc_list}
+        cfg["policies"] = base["policies"]
+        cfg["output_paths"] = {
+            "confirmatory_outroot": "results/raw/post_kbs_size_matched_drift",
+            "smoke_outroot": "results/smoke/post_kbs_size_matched_drift",
+            "parity_outroot": "results/smoke/post_kbs_size_matched_drift/parity",
+            "tables_outdir": "results/tables/post_kbs_size_matched_drift_001"}
+        cfg["smoke_arms"] = ["smd_ps_full_naive_512", "smd_ps_full_naive_2000",
+                             "smd_ton_full_strict_2000"]
+        cfg["parity_arms"] = [
+            dict(tag="parity_smd_ps_full_point_own", scenario="ps_full", policy="point",
+                 transformer_policy="own_transformer_per_model",
+                 published_dir="results/smoke/symmetric_pipeline/sp_ps_full_point_own",
+                 note="flag-off own-transformer full-drift path reproduces the stored "
+                      "v1.21.0-code smoke outputs bit-for-bit (seeds 4242-4243)"),
+            dict(tag="parity_smd_ps_full_point_own_nested512", scenario="ps_full",
+                 policy="point", transformer_policy="own_transformer_per_model",
+                 policy_flags={"--adaptation-gate": "labeled_probe", "--probe-size": "32",
+                               "--candidate-size-per-class": "512",
+                               "--nested-draw-domain": "drift"},
+                 published_dir="results/smoke/symmetric_pipeline/sp_ps_full_point_own",
+                 note="the nested drift-domain 512 path must ALSO reproduce those stored "
+                      "outputs bit-for-bit: the extension consumes per-trigger RNG only "
+                      "after the training batch, and nothing downstream reads it")]
+        cfg["tag_pattern"] = "smd_{scenario}_{policy}_{512|2000}; never: smd_{scenario}_never"
     return cfg
 
 
@@ -102,8 +140,42 @@ def size_matched_arms(cfg: dict) -> list[dict]:
     return arms
 
 
+def size_matched_drift_arms(cfg: dict) -> list[dict]:
+    """post-KBS B2 (protocol post_kbs_size_matched_drift_001): the registered 21-arm
+    full-drift matrix -- per full-drift scenario, 1 never-adapt + 3 policies x 2 nested
+    candidate sizes, own_transformer_per_model only, --nested-draw-domain drift. The
+    ONLY flags that vary between size conditions are --candidate-size-per-class (nested
+    canonical draw at sev(t)) with the shared drift-domain switch."""
+    arms = []
+    for sc, sdef in cfg["scenarios"].items():
+        base = _merge(cfg["fixed_flags"], sdef["override_flags"])
+        arms.append(dict(tag=f"smd_{sc}_never", scenario=sc, policy="never",
+                         transformer_policy="frozen_initial_transformer",
+                         candidate_size=None,
+                         data=cfg["data"][sdef["data"]],
+                         flags=dict(base, **{"--adaptation-gate": "none"})))
+        for pol in ("naive", "point", "strict"):
+            pflags = cfg["policies"][pol]
+            for size in cfg["candidate_sizes_per_class"]:
+                arms.append(dict(tag=f"smd_{sc}_{pol}_{size}", scenario=sc,
+                                 policy=pol, transformer_policy="own_transformer_per_model",
+                                 candidate_size=int(size),
+                                 data=cfg["data"][sdef["data"]],
+                                 flags=_merge(base, pflags,
+                                              {"--candidate-size-per-class": str(size),
+                                               "--nested-draw-domain": "drift"})))
+    if len(arms) != cfg["expected_arms"]:
+        raise SystemExit(f"grid enumerates {len(arms)} arms, expected {cfg['expected_arms']}")
+    tags = [a["tag"] for a in arms]
+    if len(set(tags)) != len(tags):
+        raise SystemExit("duplicate arm tags in grid")
+    return arms
+
+
 def confirmatory_arms(cfg: dict) -> list[dict]:
     """The registered confirmatory matrix for the loaded config."""
+    if cfg.get("matrix_kind") == "post_kbs_size_matched_drift":
+        return size_matched_drift_arms(cfg)
     if cfg.get("matrix_kind") == "size_matched":
         return size_matched_arms(cfg)
     arms = []
@@ -215,7 +287,8 @@ def load_pools(arm: dict):
     return _POOLS_CACHE[key]
 
 
-def _recording_candidate_factory(inner, seed: int, base_per_class: int, records: list):
+def _recording_candidate_factory(inner, seed: int, base_per_class: int, records: list,
+                                 stream_raw=None):
     """Provenance capture for the size-matched control (protocol section 2.4): wraps the
     environment's candidate_factory, recording per candidate the size, the full
     training-batch row hash, the row hash of the nested initial `base_per_class` subset
@@ -234,6 +307,11 @@ def _recording_candidate_factory(inner, seed: int, base_per_class: int, records:
                    nested_prefix_row_hash=rows_hash(X_raw[: 2 * base_per_class],
                                                     y[: 2 * base_per_class]),
                    **{k: v for k, v in pipe.metadata.items()})
+        if stream_raw is not None:
+            cw = rec.get("creation_window")
+            rec["candidate_sev"] = (float(stream_raw[cw][2])
+                                    if cw is not None and 0 <= cw < len(stream_raw)
+                                    else None)
         records.append(rec)
         return pipe
 
@@ -263,7 +341,8 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
         env = build_raw_environment(pools, args, seed, arm["transformer_policy"])
         if size_matched:
             env.candidate_factory = _recording_candidate_factory(
-                env.candidate_factory, seed, int(args.adapt_size_per_class), prov_records)
+                env.candidate_factory, seed, int(args.adapt_size_per_class), prov_records,
+                stream_raw=env.stream_raw)
         shashes.append((seed, stream_raw_hash(env.stream_raw)))
         w_, t_, s_, r_ = v2.run_seed(env, args, seed, methods)
         win_rows.extend(w_); trig_rows.extend(t_); sum_rows.extend(s_); res_all.extend(r_)
@@ -288,6 +367,7 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
         transformer_policy=arm["transformer_policy"],
         detector_transform_policy=cfg["detector_transform_policy"],
         data=arm["data"], resolved_flags=arm["flags"], argv=argv,
+        derived_operational_from=cfg.get("_derived_operational_from"),
         smoke_only=bool(smoke), started_utc=t0.isoformat(), finished_utc=t1.isoformat(),
         **git_source()), indent=2), encoding="utf-8")
     if smoke:
