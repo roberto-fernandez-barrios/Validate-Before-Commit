@@ -1,0 +1,7 @@
+scenario,contrast,effect_pp,ci95_lo,ci95_hi,note
+ps_full,ps_full: point-512 vs naive-512,0.1646,-0.0549,0.4224,"descriptive, outside the frozen families, uncorrected"
+ps_full,ps_full: strict-512 vs naive-512,-0.118,-0.4852,0.257,"descriptive, outside the frozen families, uncorrected"
+unsw_full,unsw_full: point-512 vs naive-512,0.0219,-0.1313,0.194,"descriptive, outside the frozen families, uncorrected"
+unsw_full,unsw_full: strict-512 vs naive-512,-0.0307,-0.2099,0.1698,"descriptive, outside the frozen families, uncorrected"
+ton_full,ton_full: point-512 vs naive-512,0.4581,0.0906,0.881,"descriptive, outside the frozen families, uncorrected"
+ton_full,ton_full: strict-512 vs naive-512,0.3505,-0.1016,0.799,"descriptive, outside the frozen families, uncorrected"

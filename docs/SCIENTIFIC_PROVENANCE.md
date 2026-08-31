@@ -24,7 +24,7 @@ Reproduction entry points: `REPRODUCE.md` (experiment commands) and `make final-
 
 - **ATTENUATION**: the registered attenuation outcome under frozen P/A/E rules is retained in
   `main.tex`, `main_ieee.tex`, and `supplement.tex`, and is asserted by `audit_paper2_claims.py`.
-- **Manifest pinning**: 185 result CSVs match `MANIFEST.sha256` with zero unpinned extras.
+- **Manifest pinning**: the 185 sealed result CSVs match `MANIFEST.sha256` byte-for-byte. Post-KBS confirmatory tables (`results/tables/post_kbs_*`) live UNPINNED alongside them until a separately authorized release re-pins the manifest; `verify-hashes` lists them as warnings only and the sealed set is never re-pinned in this phase.
 - **Sealed science**: `results/raw/**` and the pinned CSVs are byte-stable; the v1.22 line is the
   v1.22.0 science.
 

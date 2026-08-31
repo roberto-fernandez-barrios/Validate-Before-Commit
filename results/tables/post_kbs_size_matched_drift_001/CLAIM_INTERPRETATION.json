@@ -1,0 +1,64 @@
+{
+  "outcome": "HOMOGENEOUS-SIZE BENEFIT",
+  "per_scenario": {
+    "ps_full": {
+      "contrast": "ps_full: naive-2000 vs naive-512",
+      "effect_pp": 0.8224,
+      "ci95": [
+        0.6711,
+        0.9833
+      ],
+      "ci90": [
+        0.6937,
+        0.957
+      ],
+      "p_holm": 2.999970000299997e-05,
+      "classification": "SIZE BENEFIT"
+    },
+    "unsw_full": {
+      "contrast": "unsw_full: naive-2000 vs naive-512",
+      "effect_pp": 1.6617,
+      "ci95": [
+        1.5057,
+        1.8104
+      ],
+      "ci90": [
+        1.5313,
+        1.7883
+      ],
+      "p_holm": 2.999970000299997e-05,
+      "classification": "SIZE BENEFIT"
+    },
+    "ton_full": {
+      "contrast": "ton_full: naive-2000 vs naive-512",
+      "effect_pp": 0.9984,
+      "ci95": [
+        0.6047,
+        1.3883
+      ],
+      "ci90": [
+        0.6677,
+        1.3242
+      ],
+      "p_holm": 2.999970000299997e-05,
+      "classification": "SIZE BENEFIT"
+    }
+  },
+  "protocol_file": "notes/post_kbs_size_matched_drift_protocol_001.md",
+  "config_sha256": "2ca8f4d3679b034c644ee8131605836c9bc75f59096fe5dd57e9796a96a03ea9",
+  "confirmatory_seeds": "6001-6030",
+  "taxonomy": "protocol section 4 (SIZE BENEFIT / SIZE COST / NO MATERIAL SIZE EFFECT / RESOLVED SUB-MATERIAL / UNRESOLVED; program HOMOGENEOUS/HETEROGENEOUS)",
+  "permitted_readings": {
+    "ps_full": "More candidate evidence helps under drift too; the zero-drift account extends directionally.",
+    "unsw_full": "More candidate evidence helps under drift too; the zero-drift account extends directionally.",
+    "ton_full": "More candidate evidence helps under drift too; the zero-drift account extends directionally."
+  },
+  "nesting_pairs_verified": 707,
+  "forbidden_claims": [
+    "Any PERSISTENCE/ATTENUATION/ELIMINATION label (that taxonomy does not apply here).",
+    "Any binomial bound, population probability or production-prevalence estimate derived from harmful committed proposals (descriptive only; commits cluster within seed).",
+    "Any proposal-coupling claim for gated cross-size contrasts (seed-paired only).",
+    "Any presentation of this control as observed-data or operational evidence."
+  ],
+  "follow_up_authorized": false
+}
