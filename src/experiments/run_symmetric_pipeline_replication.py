@@ -172,8 +172,48 @@ def size_matched_drift_arms(cfg: dict) -> list[dict]:
     return arms
 
 
+def common_harness_arms(cfg: dict) -> list[dict]:
+    """post-KBS B1 (protocol post_kbs_common_harness_baselines_001 + amendment 001):
+    the amended 96-arm matrix -- per scenario, 1 never-adapt + the primary policies at
+    2,000/class (plain balanced draw at proposal-time severity) + the secondary
+    512-sensitivity policies. own_transformer_per_model only; per-policy flags come
+    from the frozen v2 config (origins recorded per arm).
+    """
+    arms = []
+    for sc in cfg["scenarios_list"]:
+        sdef = cfg["scenarios"][sc]
+        base = _merge(cfg["fixed_flags"], sdef["override_flags"])
+        arms.append(dict(tag=f"bh_{sc}_never", scenario=sc, policy="never",
+                         transformer_policy="frozen_initial_transformer",
+                         candidate_size=None, origin="anchor",
+                         data=cfg["data"][sdef["data"]],
+                         flags=dict(base, **{"--adaptation-gate": "none"})))
+        for size_key, pols in ((str(cfg["primary_candidate_size_per_class"]),
+                                cfg["primary_policies"]),
+                               (str(cfg["secondary_candidate_size_per_class"]),
+                                cfg["secondary_policies_512"])):
+            for pol in pols:
+                pdef = cfg["policies"][pol]
+                arms.append(dict(tag=f"bh_{sc}_{pol}_{size_key}", scenario=sc,
+                                 policy=pol,
+                                 transformer_policy="own_transformer_per_model",
+                                 candidate_size=int(size_key),
+                                 origin=pdef.get("origin", ""),
+                                 data=cfg["data"][sdef["data"]],
+                                 flags=_merge(base, pdef["flags"],
+                                              {"--adapt-size-per-class": size_key})))
+    if len(arms) != cfg["expected_arms"]:
+        raise SystemExit(f"grid enumerates {len(arms)} arms, expected {cfg['expected_arms']}")
+    tags = [a["tag"] for a in arms]
+    if len(set(tags)) != len(tags):
+        raise SystemExit("duplicate arm tags in grid")
+    return arms
+
+
 def confirmatory_arms(cfg: dict) -> list[dict]:
     """The registered confirmatory matrix for the loaded config."""
+    if cfg.get("matrix_kind") == "post_kbs_common_harness_baselines":
+        return common_harness_arms(cfg)
     if cfg.get("matrix_kind") == "post_kbs_size_matched_drift":
         return size_matched_drift_arms(cfg)
     if cfg.get("matrix_kind") == "size_matched":
