@@ -1,0 +1,142 @@
+{
+  "config_version": "2.0.0",
+  "matrix_kind": "post_kbs_common_harness_baselines",
+  "supersedes": "configs/post_kbs_common_harness_baselines_v1.json",
+  "implementation_status": "AMENDED PREREGISTRATION (amendment 001, frozen pre-implementation, pre-execution). Implementation is authorized ONLY after the amendment commit exists; confirmatory execution ONLY after all smoke/parity/fidelity gates pass. No result of this experiment exists at freeze time.",
+  "description": "Amended registered common-harness evaluation of published/external baselines under the final self-contained harness (notes/post_kbs_common_harness_baselines_protocol_001.md + notes/post_kbs_common_harness_baselines_amendment_001.md). 96 confirmatory arms = 6 scenarios x (never + 9 policies at 2000/class primary + 6 policies at 512/class secondary), own_transformer_per_model, confirmatory seeds 5001-5030 (RESERVED, virgin at freeze - retained from v1 because no run ever occurred), smoke 5401-5402. Fixed flags byte-for-byte the v1.21.0 symmetric-pipeline values.",
+  "protocol": {
+    "file": "notes/post_kbs_common_harness_baselines_protocol_001.md",
+    "amendment": "notes/post_kbs_common_harness_baselines_amendment_001.md",
+    "frozen_on_branch": "post-kbs-hardening",
+    "preflight": "audits/post_kbs_protocol_preflight.md",
+    "amendment_preflight": "audits/post_kbs_common_harness_amendment_preflight.md"
+  },
+  "runner_module": "src.experiments.run_symmetric_pipeline_replication",
+  "science_module": "src.experiments.run_paper2_readaptation_v2",
+  "methods": "ks_max",
+  "confirmatory_seeds": {"start": 5001, "end": 5030, "status": "RESERVED - virgin block, collision scan 2026-08-31 re-verified at amendment freeze; retained from v1 (no experimental run has ever used it); MUST NOT run before all gates pass"},
+  "smoke_seeds": [5401, 5402],
+  "parity_seeds": {"start": 4242, "end": 4243, "note": "stored symmetric-pipeline smoke outputs; anchor flag-off byte-parity ONLY, never new evidence"},
+  "expected_arms": 96,
+  "scenarios_list": ["ps_full", "unsw_full", "ton_full", "ps_zero", "unsw_zero", "ton_zero"],
+  "transformer_policies": ["own_transformer_per_model"],
+  "primary_candidate_size_per_class": 2000,
+  "secondary_candidate_size_per_class": 512,
+  "incumbent_train_size_per_class": 2000,
+  "detector_transform_policy": "frozen_initial",
+  "fixed_flags": {
+    "--label-col": "Label",
+    "--dim": "8",
+    "--window-size": "128",
+    "--train-size-per-class": "2000",
+    "--adapt-size-per-class": "512",
+    "--detector-ref-size-per-class": "256",
+    "--post-windows": "100",
+    "--ramp-windows": "80",
+    "--max-severity": "1.0",
+    "--calibration-windows": "30",
+    "--threshold-quantile": "0.95",
+    "--consecutive-k": "3",
+    "--cooldown-windows": "10",
+    "--downstream-model": "svc_rbf",
+    "--ks-reduction": "max",
+    "--adapt-strategy": "full_replace",
+    "--trigger-mode": "detector",
+    "--recal-source": "pools",
+    "--probe-source": "pools",
+    "--stream-prevalence": "0.5",
+    "--gate-margin": "0.0",
+    "--probe-latency": "0",
+    "--probe-flip-frac": "0.0",
+    "--candidate-latency": "0",
+    "--min-calib-windows": "0",
+    "--no-probe-policy": "commit",
+    "--lifetime-max-proposals": "10",
+    "--adaptation-policy": "consecutive"
+  },
+  "data": {
+    "portscan": {
+      "ref": "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
+      "cur": "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    },
+    "unsw_recon": {
+      "ref": "data/processed/unsw_nb15/unsw_ref_no_reconnaissance_binary.csv",
+      "cur": "data/processed/unsw_nb15/unsw_cur_reconnaissance_binary.csv"
+    },
+    "ton_scanning": {
+      "ref": "data/processed/ton_iot_q1_gate/ton_iot_ref_no_scanning_binary.csv",
+      "cur": "data/processed/ton_iot_q1_gate/ton_iot_cur_scanning_binary.csv"
+    }
+  },
+  "scenarios": {
+    "ps_full": {"data": "portscan", "override_flags": {}},
+    "unsw_full": {"data": "unsw_recon", "override_flags": {}},
+    "ton_full": {"data": "ton_scanning", "override_flags": {}},
+    "ps_zero": {"data": "portscan",
+                "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                   "--max-severity": "0"}},
+    "unsw_zero": {"data": "unsw_recon",
+                  "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                     "--max-severity": "0"}},
+    "ton_zero": {"data": "ton_scanning",
+                 "override_flags": {"--trigger-mode": "random", "--trigger-prob": "0.05",
+                                    "--max-severity": "0"}}
+  },
+  "policies": {
+    "never":  {"origin": "anchor", "flags": {"--adaptation-gate": "none"}},
+    "naive":  {"origin": "anchor", "flags": {"--adaptation-gate": "none"}},
+    "point":  {"origin": "anchor-ours", "flags": {"--adaptation-gate": "labeled_probe", "--probe-size": "32"}},
+    "strict": {"origin": "anchor-ours", "flags": {"--adaptation-gate": "labeled_probe", "--probe-size": "32", "--gate-margin": "0.001"}},
+    "atc":    {"origin": "published-generic", "cite": "garg2022atc",
+               "flags": {"--adaptation-gate": "atc", "--gate-val-size": "512"}},
+    "doc":    {"origin": "published-generic", "cite": "guillory2021doc",
+               "flags": {"--adaptation-gate": "doc", "--gate-val-size": "512"}},
+    "enscal": {"origin": "standard-baseline",
+               "flags": {"--adaptation-gate": "none", "--adapt-strategy": "ensemble_cal"}},
+    "replay": {"origin": "standard-baseline",
+               "flags": {"--adaptation-gate": "none", "--adapt-strategy": "replay"}},
+    "ddm":    {"origin": "reference-implementation",
+               "flags": {"--adaptation-gate": "none", "--trigger-mode": "ddm_river", "--monitor-labels": "8"}},
+    "adwin":  {"origin": "reference-implementation",
+               "flags": {"--adaptation-gate": "none", "--trigger-mode": "adwin_river", "--monitor-labels": "8"}}
+  },
+  "primary_policies": ["naive", "point", "strict", "atc", "doc", "enscal", "replay", "ddm", "adwin"],
+  "secondary_policies_512": ["naive", "point", "strict", "atc", "doc", "enscal"],
+  "size_axis_note": "512-side arms use the PLAIN historical draw (--adapt-size-per-class 512): cross-size contrasts are seed-paired only, never proposal-coupled (amendment section 2). DDM/ADWIN/replay are not duplicated at 512 (amendment section 2 rationale).",
+  "statistical_families": {
+    "PF1_zero_drift_loss_avoidance_2000": {"contrasts": 18, "contrast": "{atc,doc,enscal,replay,ddm,adwin} vs naive @2000", "regimes": "zero x3", "correction": "Holm FWER", "status": "primary"},
+    "PF2_full_drift_benefit_retention_2000": {"contrasts": 18, "contrast": "{atc,doc,enscal,replay,ddm,adwin} vs naive @2000", "regimes": "full x3", "correction": "Holm FWER", "status": "primary"},
+    "PF3_estimators_vs_point_2000": {"contrasts": 12, "contrast": "{atc,doc} vs point @2000", "regimes": "all 6", "correction": "Holm FWER", "status": "primary"},
+    "SF4_512_sensitivity": {"contrasts": 18, "contrast": "{atc,doc,enscal} vs naive @512", "regimes": "all 6", "correction": "Holm FWER", "status": "secondary"},
+    "SF5_method_x_size_interaction": {"contrasts": 30, "contrast": "(k - naive)@2000 - (k - naive)@512, k in {point,strict,atc,doc,enscal}", "regimes": "all 6", "correction": "Holm FWER", "status": "secondary; seed-paired only"}
+  },
+  "anchor_contrasts_note": "naive-never and point/strict-naive contrasts are DESCRIPTIVE in this experiment (their registered hypotheses live in the sealed size-matched control and in experiment post_kbs_size_matched_drift); this experiment must not double-test them.",
+  "margins": {"ba_equivalence_primary_pp": 0.5, "ba_equivalence_sensitivities_pp": [0.2, 1.0],
+              "attack_recall_noninferiority_pp": 1.0, "attack_recall_sensitivities_pp": [0.5, 2.0],
+              "fpr_noninferiority_pp": 0.5, "fpr_sensitivities_pp": [0.25, 1.0]},
+  "outcome_rules": "amendment section 4: per-cell MATERIAL GAIN / MATERIAL COST / COMPATIBLE / UNRESOLVED (magnitude-aware; no sign-rate criterion anywhere); statements S1-S3 at 2000/class; S4 ordering-change rule",
+  "stop_rule": "one pass over seeds 5001-5030 after all 96 arms complete; no extension, no interim analysis; confirmatory analysis script committed before the run",
+  "fidelity_gates": [
+    "anchor flag-off byte-parity vs stored symmetric-pipeline smoke outputs (4242-4243)",
+    "ATC/DoC decisions bit-agree with the v1 implementation on a shared configuration",
+    "DDM/ADWIN are the river reference objects fed per-flow Bernoulli errors; version pinned",
+    "raw-stream hashes identical across all arms of a scenario/seed",
+    "smoke arms cover every new code path (atc, doc, enscal, ddm, adwin, replay) under own-transformer raw mode"
+  ],
+  "smoke_arms": ["bh_ps_zero_atc_2000", "bh_ton_full_doc_2000", "bh_ps_full_enscal_2000",
+                 "bh_unsw_zero_ddm_2000", "bh_ton_full_replay_2000", "bh_ps_full_adwin_2000"],
+  "parity_arms": [
+    {"tag": "parity_bh_ton_zero_naive_512", "scenario": "ton_zero", "policy": "naive",
+     "transformer_policy": "own_transformer_per_model",
+     "policy_flags": {"--adaptation-gate": "none", "--adapt-size-per-class": "512"},
+     "published_dir": "results/smoke/symmetric_pipeline/sp_ton_zero_naive_own",
+     "note": "anchor fidelity: the flag-off 512 anchor path must reproduce the stored v1.21.0-code smoke outputs bit-for-bit (seeds 4242-4243)"}
+  ],
+  "output_paths": {
+    "confirmatory_outroot": "results/raw/post_kbs_common_harness_baselines",
+    "smoke_outroot": "results/smoke/post_kbs_common_harness_baselines",
+    "parity_outroot": "results/smoke/post_kbs_common_harness_baselines/parity",
+    "tables_outdir": "results/tables/post_kbs_common_harness_baselines_001"
+  },
+  "tag_pattern": "bh_{scenario}_{policy}_{2000|512}; never arms: bh_{scenario}_never"
+}
