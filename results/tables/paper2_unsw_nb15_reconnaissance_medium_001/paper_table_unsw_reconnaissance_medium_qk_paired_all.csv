@@ -1,0 +1,51 @@
+scenario,method_a,method_b,metric,n_pairs,mean_diff_a_minus_b,ci95_low,ci95_high,ci_excludes_zero_positive,ci_excludes_zero_negative
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,Energy distance,mean_balanced_accuracy,10,0.0010234374999999907,-0.0034064453124999774,0.004999999999999982,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,Energy distance,cumulative_error_area,10,-0.10234375,-0.5,0.3406445312499997,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,Energy distance,cumulative_gain_vs_no_adapt,10,0.10234375,-0.34064453125,0.5,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,Energy distance,n_adaptations,10,0.4,0.1,0.7,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,Energy distance,detector_runtime_sec_total,10,7.1800189798464995,7.006353445606073,7.386531070484198,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,MMD-RBF,mean_balanced_accuracy,10,0.001546874999999981,-0.001922265625000038,0.005007812499999976,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,MMD-RBF,cumulative_error_area,10,-0.1546875,-0.50078125,0.19222656249999945,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,MMD-RBF,cumulative_gain_vs_no_adapt,10,0.1546875,-0.19222656249999998,0.50078125,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,MMD-RBF,n_adaptations,10,0.1,-0.2,0.4,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,MMD-RBF,detector_runtime_sec_total,10,2.826508209691383,2.6359408333303875,3.0685702123161174,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,KS-max,mean_balanced_accuracy,10,0.002539062499999978,-0.0025470703124999927,0.007640624999999968,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,KS-max,cumulative_error_area,10,-0.25390625,-0.7640625,0.2547070312499997,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,KS-max,cumulative_gain_vs_no_adapt,10,0.25390625,-0.25470703125,0.7640625,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,KS-max,n_adaptations,10,0.2,-0.3,0.6,False,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,KS-max,detector_runtime_sec_total,10,6.977793709561229,6.807355742974906,7.180233483795892,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,JSD,mean_balanced_accuracy,10,0.0047265625000000085,0.00028125000000002123,0.00955488281249999,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,JSD,cumulative_error_area,10,-0.47265625,-0.95548828125,-0.028125,False,True
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,JSD,cumulative_gain_vs_no_adapt,10,0.47265625,0.028125,0.9554882812499997,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,JSD,n_adaptations,10,0.6,0.3,0.9,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,JSD,detector_runtime_sec_total,10,7.219376509799622,7.048294415906421,7.423108330287504,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,QK-MMD PauliXZ,mean_balanced_accuracy,10,0.003718749999999993,0.00021093749999999688,0.006890820312500002,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,QK-MMD PauliXZ,cumulative_error_area,10,-0.371875,-0.68908203125,-0.02109375,False,True
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,QK-MMD PauliXZ,cumulative_gain_vs_no_adapt,10,0.371875,0.02109375,0.6890820312499998,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,QK-MMD PauliXZ,n_adaptations,10,0.5,0.1,0.9,True,False
+UNSW-NB15 Reconnaissance,QK-MMD ZZ,QK-MMD PauliXZ,detector_runtime_sec_total,10,-0.351636340119876,-0.47677302073687317,-0.21680514453852082,False,True
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,Energy distance,mean_balanced_accuracy,10,-0.0026953125000000024,-0.006898632812499976,0.0017890624999999834,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,Energy distance,cumulative_error_area,10,0.26953125,-0.17890625,0.6898632812499997,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,Energy distance,cumulative_gain_vs_no_adapt,10,-0.26953125,-0.68986328125,0.17890625,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,Energy distance,n_adaptations,10,-0.1,-0.5,0.3,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,Energy distance,detector_runtime_sec_total,10,7.531655319966376,7.314969478697749,7.787157788490294,True,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,MMD-RBF,mean_balanced_accuracy,10,-0.002171875000000012,-0.007703125000000022,0.003531249999999975,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,MMD-RBF,cumulative_error_area,10,0.2171875,-0.353125,0.7703125,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,MMD-RBF,cumulative_gain_vs_no_adapt,10,-0.2171875,-0.7703125,0.353125,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,MMD-RBF,n_adaptations,10,-0.4,-0.7,-0.1,False,True
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,MMD-RBF,detector_runtime_sec_total,10,3.178144549811259,2.9624213862826583,3.465967286362429,True,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,KS-max,mean_balanced_accuracy,10,-0.0011796875000000151,-0.007234375000000015,0.0055785156249999945,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,KS-max,cumulative_error_area,10,0.11796875,-0.5578515625,0.7234375,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,KS-max,cumulative_gain_vs_no_adapt,10,-0.11796875,-0.7234375,0.5578515624999995,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,KS-max,n_adaptations,10,-0.3,-0.7,0.1,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,KS-max,detector_runtime_sec_total,10,7.329430049681105,7.114956725197844,7.581700915649999,True,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,JSD,mean_balanced_accuracy,10,0.001007812500000016,-0.003312499999999985,0.005164062499999999,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,JSD,cumulative_error_area,10,-0.10078125,-0.51640625,0.33125,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,JSD,cumulative_gain_vs_no_adapt,10,0.10078125,-0.33125,0.51640625,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,JSD,n_adaptations,10,0.1,-0.3,0.5,False,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,JSD,detector_runtime_sec_total,10,7.571012849919498,7.356723567493027,7.823171506057843,True,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,QK-MMD ZZ,mean_balanced_accuracy,10,-0.003718749999999993,-0.006890820312500005,-0.00021093749999999688,False,True
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,QK-MMD ZZ,cumulative_error_area,10,0.371875,0.02109375,0.6890820312499998,True,False
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,QK-MMD ZZ,cumulative_gain_vs_no_adapt,10,-0.371875,-0.68908203125,-0.02109375,False,True
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,QK-MMD ZZ,n_adaptations,10,-0.5,-0.9,-0.1,False,True
+UNSW-NB15 Reconnaissance,QK-MMD PauliXZ,QK-MMD ZZ,detector_runtime_sec_total,10,0.351636340119876,0.21680514453852082,0.4767730207368731,True,False

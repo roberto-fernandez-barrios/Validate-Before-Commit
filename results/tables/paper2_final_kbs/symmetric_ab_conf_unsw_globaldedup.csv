@@ -1,0 +1,5 @@
+n_raw,n_unique_global,n_label_conflicts,n_dropped_duplicate,dataset,model,condition,contrast,n_seeds,n_per_block,gap,lo,hi
+164850,94218,230,70402,unsw_recon,svc_rbf,independent,rand,100,2000,0.004,-0.062,0.07
+164850,94218,230,70402,unsw_recon,svc_rbf,independent,m2_minus_m1,100,2000,0.024,-0.043,0.091
+164850,94218,230,70402,unsw_recon,svc_rbf,own_transformer,rand,100,2000,0.052,-0.012,0.117
+164850,94218,230,70402,unsw_recon,svc_rbf,own_transformer,m2_minus_m1,100,2000,0.014,-0.051,0.08

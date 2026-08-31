@@ -1,0 +1,10 @@
+regime,gate,streams,commits_per_stream,harmful_per_stream,n_commits_total,n_harmful_total,harmful_frac_of_commits,ci_basis,ci_num,ci_den,ci_lo,ci_hi
+portscan,lp32_eps0,27,3.0,0.444,81,12,0.148,per-commit,12,81,0.079,0.2445
+portscan,mcnemar_zero,30,0.0,0.0,0,0,0.0,per-stream,0,30,0.0,0.1157
+portscan,ebcs_full,30,0.667,0.0,20,0,0.0,per-commit,0,20,0.0,0.1684
+unsw_recon,lp32_eps0,27,2.333,0.741,63,20,0.317,per-commit,20,63,0.2058,0.4469
+unsw_recon,mcnemar_zero,30,0.0,0.0,0,0,0.0,per-stream,0,30,0.0,0.1157
+unsw_recon,ebcs_full,30,0.0,0.0,0,0,0.0,per-stream,0,30,0.0,0.1157
+ton_scanning,lp32_eps0,27,2.074,0.519,56,14,0.25,per-commit,14,56,0.1439,0.3837
+ton_scanning,mcnemar_zero,30,0.0,0.0,0,0,0.0,per-stream,0,30,0.0,0.1157
+ton_scanning,ebcs_full,30,0.0,0.0,0,0,0.0,per-stream,0,30,0.0,0.1157

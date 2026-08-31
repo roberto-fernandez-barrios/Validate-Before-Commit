@@ -1,0 +1,16 @@
+analysis,detail,n,r,r_min,r_max
+svc7_full,7 regime means,7,-0.888,,
+svc7_loro,without CICIDS DDoS,6,-0.716,,
+svc7_loro,without CICIDS PortScan,6,-0.922,,
+svc7_loro,without CICIDS WebAttacks,6,-0.899,,
+svc7_loro,without CICIDS Wednesday,6,-0.874,,
+svc7_loro,without ToN-IoT Scanning,6,-0.864,,
+svc7_loro,without UNSW-NB15 DoS,6,-0.918,,
+svc7_loro,without UNSW-NB15 Reconnaissance,6,-0.922,,
+svc7_loro_range,min..max over 7 leave-outs,6,,-0.922,-0.716
+pooled16_full,7 SVC + 9 downstream points,16,-0.813,,
+pooled16_lodo,without cicids,9,-0.524,,
+pooled16_lodo,without unsw,11,-0.951,,
+pooled16_lodo,without ton_iot,12,-0.811,,
+svc7_seed_bootstrap,"resample 30 seeds/regime, 5000x",7,-0.889,-0.9,-0.877
+per_seed_pooled,7 regimes x 30 seeds,210,-0.91,,

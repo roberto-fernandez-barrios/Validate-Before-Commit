@@ -1,0 +1,13 @@
+criterion,ton,portscan,passed
+P1 pi=0.10 b=32 (ToN >= -0.5 AND PortScan >= naive-0.3),0.996,7.93,True
+P2 pi=0.01 b=32 (same thresholds),1.011,7.62,True
+P3 pi=0.01 b=320 recovery (ToN >= -0.5),0.675,7.998,True
+G portscan p10_b32 not sig. below no-adapt,,,True
+G portscan p01_b32 not sig. below no-adapt,,,True
+G portscan p01_b320 not sig. below no-adapt,,,True
+G unsw_recon p10_b32 not sig. below no-adapt,,,True
+G unsw_recon p01_b32 not sig. below no-adapt,,,True
+G unsw_recon p01_b320 not sig. below no-adapt,,,True
+G ton_scanning p10_b32 not sig. below no-adapt,,,True
+G ton_scanning p01_b32 not sig. below no-adapt,,,True
+G ton_scanning p01_b320 not sig. below no-adapt,,,True

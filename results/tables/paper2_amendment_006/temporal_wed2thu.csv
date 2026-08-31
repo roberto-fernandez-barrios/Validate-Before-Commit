@@ -1,0 +1,9 @@
+metric,quantity,value,ci_lo,ci_hi,n
+BA_two_class,no_adapt_level,48.703,48.508,48.905,30
+BA_two_class,naive_vs_noadapt,33.658,33.264,34.043,30
+BA_two_class,gate_vs_noadapt,18.581,13.859,23.128,30
+BA_two_class,gate_vs_naive,-15.077,-19.574,-10.539,30
+accuracy_all,no_adapt_level,93.758,93.501,94.003,30
+accuracy_all,naive_vs_noadapt,3.599,3.182,3.983,30
+accuracy_all,gate_vs_noadapt,3.516,3.178,3.878,30
+accuracy_all,gate_vs_naive,-0.083,-0.302,0.147,30

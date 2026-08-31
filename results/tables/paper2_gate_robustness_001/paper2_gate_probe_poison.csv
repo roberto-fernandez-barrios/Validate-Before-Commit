@@ -1,0 +1,13 @@
+regime,probe_poison,gate_gain,naive_gain,commits,still_beats_naive,avoids_harm
+portscan,0.0,8.27,7.79,3.13,True,True
+portscan,0.1,8.23,7.79,3.1,True,True
+portscan,0.2,8.07,7.79,2.9,True,True
+portscan,0.4,7.81,7.79,2.75,True,True
+unsw_recon,0.0,1.13,0.92,2.57,True,True
+unsw_recon,0.1,1.36,0.92,2.3,True,True
+unsw_recon,0.2,1.24,0.92,2.3,True,True
+unsw_recon,0.4,1.06,0.92,2.3,True,True
+ton_scanning,0.0,0.93,-1.36,2.2,True,True
+ton_scanning,0.1,0.88,-1.36,2.05,True,True
+ton_scanning,0.2,0.89,-1.36,1.95,True,True
+ton_scanning,0.4,0.32,-1.36,2.35,True,True

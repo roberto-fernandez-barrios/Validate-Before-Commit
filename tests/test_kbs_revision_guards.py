@@ -23,6 +23,8 @@ IEEE = (REPO / "manuscript" / "main_ieee.tex").read_text(encoding="utf-8")
 SUPP = (REPO / "manuscript" / "supplement.tex").read_text(encoding="utf-8")
 README = (REPO / "README.md").read_text(encoding="utf-8")
 T = REPO / "results" / "tables"
+FULLTAB = (REPO / "manuscript" / "tables" / "table_baselines_full.tex"
+           ).read_text(encoding="utf-8")
 
 
 def _flat(s: str) -> str:
@@ -74,9 +76,10 @@ def test_section_5_2_information_parity_paragraph():
 
 
 # ---------------------------------------------------------------- baseline comparison section
-def _table_rows() -> dict[str, list[str]]:
-    """Map the leading cell of every data row of tab:baselines to its cell list."""
-    block = MAIN.split("\\label{tab:baselines}")[1].split("\\end{tabular}")[0]
+def _table_rows(src: str = None, label: str = "tab:baselines_full") -> dict[str, list[str]]:
+    """Map the leading cell of every data row of a baselines table to its cell list."""
+    block = (FULLTAB if src is None else src).split(
+        "\\label{" + label + "}")[1].split("\\end{tabular}")[0]
     rows = {}
     for line in block.splitlines():
         if "&" not in line or line.strip().startswith(("Policy", "\\multicolumn")):
@@ -101,13 +104,17 @@ def test_baselines_section_present_and_wired():
     assert "\\label{sec:baselines}" in MAIN and "\\label{tab:baselines}" in MAIN
     assert MAIN.count("\\ref{sec:baselines}") >= 3
     f = _flat(MAIN)
-    assert "comparison with strong baselines and alternative update policies" in f
+    assert "comparison with evaluated baselines and alternative update policies" in f
+    assert "comparison with strong baselines" not in f, "SoTA-style title banned"
     assert "cross-block comparisons are descriptive" in f
-    assert "the table supports no common ranking" in f
+    assert "supports no common ranking" in f
+    assert "\\label{tab:baselines}" in MAIN, "compact core table must stay in the body"
+    assert "\\label{tab:baselines_full}" in FULLTAB
+    assert "\\input{tables/table_baselines_full.tex}" in SUPP
     # the section is the last Results subsection so supplement '§5.5' pointers stay valid
     results = MAIN.split("\\section{Results}")[1].split("\\section{Discussion}")[0]
     subs = re.findall(r"\\subsection\{([^}]*)\}", results)
-    assert subs[-1].startswith("Comparison with strong baselines")
+    assert subs[-1].startswith("Comparison with evaluated baselines")
     assert len(subs) == 6
 
 
@@ -119,14 +126,14 @@ def test_baselines_block_I_matches_policy_frontier_csv():
         return float(F[(F.policy == policy) & (F.regime == regime)].gain.iloc[0])
 
     expect = {
-        "Always-deploy (naive)": "naive",
-        "Sliding-window update, always deploy": "sliding_window",
-        "Calibrated soft ensemble, always deploy": "ensemble_cal",
-        "DDM trigger (\\texttt{river}, 8 labels/window)": "ddm_river_b8",
-        "Point gate, $b{=}32$": "labeled_probe_b32",
-        "Holdout gate (dedup.\\ batch probe)": "holdout_dedup",
-        "LCB gate, $b{=}64$": "lcb_b64",
-        "Two-stage split gate ($\\delta{=}0.05$)": "two_stage_split_d05",
+        "Always-deploy (naive) [std]": "naive",
+        "Sliding-window update, always deploy [std]": "sliding_window",
+        "Calibrated soft ensemble, always deploy [std]": "ensemble_cal",
+        "DDM trigger (\\texttt{river}, 8 labels/window) [ref]": "ddm_river_b8",
+        "Point gate, $b{=}32$ [ours]": "labeled_probe_b32",
+        "Holdout gate (dedup.\\ batch probe) [ours-var]": "holdout_dedup",
+        "LCB gate, $b{=}64$ [ours-var]": "lcb_b64",
+        "Two-stage split gate ($\\delta{=}0.05$) [ours]": "two_stage_split_d05",
     }
     for label, pol in expect.items():
         cells = _nth(rows, label, 0)          # first occurrence = Block I
@@ -136,12 +143,12 @@ def test_baselines_block_I_matches_policy_frontier_csv():
         assert abs(_num(cells[8] + ".0") - tot) < 1.0, (label, "labels")
     # McNemar and ADWIN come from their own sealed CSVs
     A6 = pd.read_csv(T / "paper2_amendment_006" / "summary.csv")
-    mc = _nth(rows, "Exact McNemar, $b{=}32$, $\\alpha{=}0.05$", 0)
+    mc = _nth(rows, "Exact McNemar, $b{=}32$, $\\alpha{=}0.05$ [ours-var]", 0)
     for i, regime in ((5, "portscan"), (6, "unsw_recon"), (7, "ton_scanning")):
         v = float(A6[(A6.arm == "mcnemar32") & (A6.regime == regime)].gain.iloc[0])
         assert abs(_num(mc[i]) - v) <= 0.006, ("mcnemar", regime)
     R4 = pd.read_csv(T / "paper2_amendment_004" / "robustness.csv")
-    ad = _nth(rows, "ADWIN trigger (\\texttt{river}, 8 labels/window)", 0)
+    ad = _nth(rows, "ADWIN trigger (\\texttt{river}, 8 labels/window) [ref]", 0)
     for i, regime in ((5, "portscan"), (6, "unsw_recon"), (7, "ton_scanning")):
         v = float(R4[(R4.arm == "adwinriver_none") & (R4.regime == regime)].gain.iloc[0])
         assert abs(_num(ad[i]) - v) <= 0.006, ("adwin", regime)
@@ -154,11 +161,12 @@ def test_baselines_block_II_matches_zero_drift_csv():
     def g(arm, regime):
         return float(A8[(A8.arm == arm) & (A8.regime == regime)].gain.iloc[0])
 
-    expect = {("Always-deploy (naive)", 1): "rand_s0_none",
-              ("Point gate, $b{=}32$", 1): "rand_s0_lp32",
-              ("Exact McNemar, $b{=}32$", 0): "rz_mcnemar32",
-              ("Anytime-valid CS, $b{=}64$", 0): "rz_seqav64",
-              ("Always-deploy, real KS-max trigger$^{a}$", 0):
+    expect = {("Always-deploy (naive) [std]", 1): "rand_s0_none",
+              ("Point gate, $b{=}32$ [ours]", 1): "rand_s0_lp32",
+              ("Exact McNemar, $b{=}32$ [ours-var]", 0): "rz_mcnemar32",
+              ("Sequential probe (4-look Bonferroni), $b{\\le}64$ [ours-var]", 0):
+                  "rz_seqav64",
+              ("Always-deploy, real KS-max trigger$^{a}$ [std]", 0):
                   "sev0_none"}
     for (label, n), arm in expect.items():
         cells = _nth(rows, label, n)
@@ -178,13 +186,13 @@ def test_baselines_block_III_matches_exploratory_csvs():
     def rp(arm, regime):
         return float(RP[(RP.arm == arm) & (RP.regime == regime)].gain_pts.iloc[0])
 
-    expect = {("Always-deploy (naive)", 2): ("lf", "naive"),
-              ("Point gate, $b{=}32$", 2): ("lf", "lp32"),
-              ("Disagreement gate ($\\tau{=}0.15$)", 0): ("lf", "unsup"),
-              ("ATC gate \\cite{garg2022atc}", 0): ("lf", "atc"),
-              ("DoC gate \\cite{guillory2021doc}", 0): ("lf", "doc"),
-              ("Replay 50/50 retraining, always deploy", 0): ("rp", "replay_naive"),
-              ("Replay 50/50 $+$ point gate, $b{=}32$", 0): ("rp", "replay_lp32")}
+    expect = {("Always-deploy (naive) [std]", 2): ("lf", "naive"),
+              ("Point gate, $b{=}32$ [ours]", 2): ("lf", "lp32"),
+              ("Disagreement gate ($\\tau{=}0.15$) [ours-var]", 0): ("lf", "unsup"),
+              ("ATC gate \\cite{garg2022atc} [pub]", 0): ("lf", "atc"),
+              ("DoC gate \\cite{guillory2021doc} [pub]", 0): ("lf", "doc"),
+              ("Replay 50/50 retraining, always deploy [std]", 0): ("rp", "replay_naive"),
+              ("Replay 50/50 $+$ point gate, $b{=}32$ [ours-var]", 0): ("rp", "replay_lp32")}
     for (label, n), (src, key) in expect.items():
         cells = _nth(rows, label, n)
         for i, regime in ((5, "portscan"), (6, "unsw_recon"), (7, "ton_scanning")):
@@ -200,15 +208,15 @@ def test_baselines_block_IV_matches_budget_frontier():
     def anchor(policy, scenario):
         return float(A[(A.policy == policy) & (A.scenario == scenario)].gain.iloc[0])
 
-    for label, n, pol in (("Always-deploy (naive)", 3, "none"),
-                          ("Point gate, $b{=}32$", 3, "point"),
-                          ("Strict gate (reject ties), $b{=}32$", 0, "strict")):
+    for label, n, pol in (("Always-deploy (naive) [std]", 3, "none"),
+                          ("Point gate, $b{=}32$ [ours]", 3, "point"),
+                          ("Strict gate (reject ties), $b{=}32$ [ours]", 0, "strict")):
         cells = _nth(rows, label, n)
         assert abs(_num(cells[5]) - anchor(pol, "ps_full")) <= 0.006, (label, "ps_full")
         assert abs(_num(cells[7]) - anchor(pol, "ton_zero")) <= 0.006, (label, "ton_zero")
-    for label, pol in (("Pooled EB-CS $+$ defer, cap 512", "ebcsdef"),
-                       ("VBC-SG-Cohort-sim, cap 512", "vbccoh"),
-                       ("VBC-SG-Refresh, cap 512", "vbcref")):
+    for label, pol in (("Pooled EB-CS $+$ defer, cap 512 [ours-var]", "ebcsdef"),
+                       ("VBC-SG-Cohort-sim, cap 512 [ours]", "vbccoh"),
+                       ("VBC-SG-Refresh, cap 512 [ours-var]", "vbcref")):
         cells = _nth(rows, label, 0)
         r = B[(B.scenario == "ps_full") & (B.policy == pol) & (B.cap == 512)
               & (B.schedule == "bonf")].iloc[0]
@@ -225,14 +233,14 @@ def test_baselines_block_IV_matches_budget_frontier():
 def test_baselines_block_V_matches_registered_replications():
     rows = _table_rows()
     C = pd.read_csv(T / "symmetric_pipeline_dynamic_001" / "paired_contrasts.csv")
-    full = _nth(rows, "Always-deploy, 512/class, full drift", 0)
+    full = _nth(rows, "Always-deploy, 512/class, full drift [std]", 0)
     for i, sc in ((5, "ps_full"), (6, "unsw_full"), (7, "ton_full")):
         v = float(C[C.contrast == f"{sc}: own-naive vs never"].effect_pp.iloc[0])
         assert abs(_num(full[i]) - v) <= 0.006, sc
     E = pd.read_csv(T / "v1_22_1_editorial" / "evidence_validation_tradeoff.csv")
-    for label, pol in (("Always-deploy, 512/class, zero drift", "naive_512"),
-                       ("Strict gate, 512/class, zero drift", "strict_512"),
-                       ("Always-deploy, 2{,}000/class, zero drift",
+    for label, pol in (("Always-deploy, 512/class, zero drift [std]", "naive_512"),
+                       ("Strict gate, 512/class, zero drift [ours]", "strict_512"),
+                       ("Always-deploy, 2{,}000/class, zero drift [std]",
                         "naive_2000")):
         cells = _nth(rows, label, 0)
         for i, sc in ((5, "ps_zero"), (6, "unsw_zero"), (7, "ton_zero")):
@@ -241,7 +249,7 @@ def test_baselines_block_V_matches_registered_replications():
 
 
 def test_baselines_93_percent_marked_pooled_and_near_81():
-    f = _flat(MAIN)
+    f = _flat(MAIN) + " " + _flat(FULLTAB)
     for m in re.finditer(r"93\\%", f):
         w = f[max(0, m.start() - 40): m.end() + 240]
         assert "pooled" in w or "approximate" in w
@@ -337,3 +345,49 @@ def test_readme_reviewer_quick_map_paths_exist():
         if p.startswith(("manuscript/", "configs/", "notes/", "docs/", "results/",
                          "REPRODUCE.md", "audits/")):
             assert (REPO / p.rstrip("/")).exists(), p
+
+
+def test_baselines_compact_core_matches_csvs():
+    """The compact in-body table (paired v2 panel + exploratory ATC/DoC panel) matches the
+    sealed CSVs, and its two panels are explicitly labelled with their comparability."""
+    rows = _table_rows(src=MAIN, label="tab:baselines")
+    F = pd.read_csv(T / "paper2_policy_frontier_005" / "frontier.csv")
+
+    def g(policy, regime):
+        return float(F[(F.policy == policy) & (F.regime == regime)].gain.iloc[0])
+
+    core = {"Always-deploy (naive)": "naive",
+            "Sliding-window update": "sliding_window",
+            "Calibrated soft ensemble": "ensemble_cal",
+            "DDM trigger (\\texttt{river})": "ddm_river_b8",
+            "Point gate, $b{=}32$": "labeled_probe_b32",
+            "Two-stage split gate ($\\delta{=}0.05$)": "two_stage_split_d05"}
+    for label, pol in core.items():
+        cells = _nth(rows, label, 0)
+        for i, regime in ((4, "portscan"), (5, "unsw_recon"), (6, "ton_scanning")):
+            assert abs(_num(cells[i]) - g(pol, regime)) <= 0.006, (label, regime)
+    A6 = pd.read_csv(T / "paper2_amendment_006" / "summary.csv")
+    mc = _nth(rows, "Exact McNemar, $b{=}32$", 0)
+    R4 = pd.read_csv(T / "paper2_amendment_004" / "robustness.csv")
+    ad = _nth(rows, "ADWIN trigger (\\texttt{river})", 0)
+    LF = pd.read_csv(T / "paper2_phase2h_labelfree_gates_001"
+                     / "paper2_labelfree_gates_summary.csv")
+    LF = LF[LF.downstream == "svc_rbf"]
+
+    def lf(gate, regime):
+        return float(LF[(LF.gate == gate) & (LF.regime == regime)].gain_pts.iloc[0])
+
+    for i, regime in ((4, "portscan"), (5, "unsw_recon"), (6, "ton_scanning")):
+        v = float(A6[(A6.arm == "mcnemar32") & (A6.regime == regime)].gain.iloc[0])
+        assert abs(_num(mc[i]) - v) <= 0.006, ("mcnemar", regime)
+        v = float(R4[(R4.arm == "adwinriver_none") & (R4.regime == regime)].gain.iloc[0])
+        assert abs(_num(ad[i]) - v) <= 0.006, ("adwin", regime)
+        for label, key in (("Always-deploy (naive, v1)", "naive"),
+                           ("ATC gate \\cite{garg2022atc}", "atc"),
+                           ("DoC gate \\cite{guillory2021doc}", "doc"),
+                           ("Point gate, $b{=}32$ (v1)", "lp32")):
+            cells = _nth(rows, label, 0)
+            assert abs(_num(cells[i]) - lf(key, regime)) <= 0.006, (label, regime)
+    cap = MAIN.split("\\label{tab:baselines}")[0][-2200:]
+    fcap = _flat(cap)
+    assert "directly comparable" in fcap and "not comparable with the top panel" in fcap

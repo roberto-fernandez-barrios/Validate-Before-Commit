@@ -49,7 +49,7 @@ Where to find each piece of evidence without reading the whole repository. Secti
 | 6 | Symmetric-pipeline replication (§5.1, S7) | config `configs/symmetric_pipeline_dynamic_v1.json`; `python -m src.experiments.run_symmetric_pipeline_replication --run --confirmatory-authorized`; outputs `results/tables/symmetric_pipeline_dynamic_001/` (`CLAIM_INTERPRETATION.json`: Scenario A) |
 | 7 | Size-matched replication (§5.2–§5.3, S8) | config `configs/size_matched_own_transformer_v1.json`; same driver with `--config`; outputs `results/tables/size_matched_own_transformer_001/` (`CLAIM_INTERPRETATION.json`: ATTENUATION); derived evidence–validation trade-off `results/tables/v1_22_1_editorial/` |
 | 8 | Chronological replay evidence (§5.4, S2.6) | pre-enumerated matrix `results/tables/paper2_final_q1/chronological_replays.csv` (seeds 601–630); first six replays `results/tables/paper2_amendment_004/temporal.csv`, `results/tables/paper2_amendment_005/temporal_stratified.csv`, `results/tables/paper2_amendment_006/temporal_wed2thu.csv` |
-| 9 | Baseline / SoTA comparison (§5.6; policy properties + outcomes by block) | policy frontier `results/tables/paper2_policy_frontier_005/frontier.csv`; ATC/DoC `results/tables/paper2_phase2h_labelfree_gates_001/`; replay `results/tables/paper2_phase2i_replay_baseline_001/`; DDM/ADWIN vs `river` `results/tables/paper2_monitor_validation_004.csv`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_005/twostage_and_monitors.csv`; zero-drift risk gates `results/tables/paper2_amendment_008/`; VBC-SG frontier `results/tables/paper2_final_q1/budget_frontier.csv` |
+| 9 | Baseline comparison (§5.6 compact paired core; full all-block matrix Supp. S2.12; policy properties + outcomes by block) | policy frontier `results/tables/paper2_policy_frontier_005/frontier.csv`; ATC/DoC `results/tables/paper2_phase2h_labelfree_gates_001/`; replay `results/tables/paper2_phase2i_replay_baseline_001/`; DDM/ADWIN vs `river` `results/tables/paper2_monitor_validation_004.csv`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_005/twostage_and_monitors.csv`; zero-drift risk gates `results/tables/paper2_amendment_008/`; VBC-SG frontier `results/tables/paper2_final_q1/budget_frontier.csv` |
 
 The editorial audit trail for the post-KBS revision (what changed, why, and the response to reviewers) is in
 [`audits/`](audits/).
@@ -162,7 +162,7 @@ hierarchical model in the paper, §5.5.**
 
 ![Per-trigger mechanism](docs/img/fig9_pertrigger.png)
 
-**3 — In the three controlled regimes, the validate-before-commit gate preserves benefit, avoids net harm, and beats
+**3 — In the three controlled regimes of the historical frozen-transformer configuration, the validate-before-commit gate preserves benefit, avoids net harm, and beats
 naive retraining in the harm regime — with the same sign pattern for a classical (KS-max) and a quantum (QK-ZZ)
 detector. It is not a dominant policy: no policy dominates the accuracy–labels–updates frontier (paper §5.6, the
 baseline-comparison table; full policy frontier in Supplement S2.12).**
@@ -177,7 +177,7 @@ numbers in the paper, §5.5; Supplement S2.2).**
 
 ---
 
-## Results at a glance (ToN-IoT harm regime — registered replication, harness v2, pristine seeds 104–133)
+## Results at a glance (ToN-IoT harm regime — registered replication, harness v2, pristine seeds 104–133; historical frozen-transformer configuration — the symmetric-pipeline replication below corrects it for self-contained pipelines)
 
 | Detector | naive (always deploy) | **validate-before-commit gate** | gate vs naive (CI95) | gate vs never-adapt (CI95) |
 |---|---:|---:|---|---|
@@ -241,8 +241,9 @@ deployment-long budget).
 manuscript/     Manuscript (main.tex, CAS) + supplement.tex + references.bib
 src/experiments/  Progressive-drift readaptation runner (detectors, gate, downstream models)
 src/analysis/     Reproducible aggregation, statistics, tables and figures
-results/          Generated tables/figures (mostly git-ignored; small confirmatory CSVs are
-                  committed under results/tables/ and pinned by MANIFEST.sha256)
+results/          Generated tables/figures (raw outputs git-ignored; ALL 185 manifest-pinned
+                  confirmatory CSVs are committed under results/tables/, byte-exact, and
+                  pinned by MANIFEST.sha256 — `make verify-hashes` passes on a fresh clone)
 data/             Public benchmark datasets (git-ignored; see Data availability)
 docs/img/         Figures used in this README
 notes/            Protocols, pre-registrations, and checkpoints

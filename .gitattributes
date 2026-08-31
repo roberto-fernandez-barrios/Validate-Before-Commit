@@ -7,3 +7,8 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.json text eol=lf
+
+# Sealed result artifacts under results/tables are byte-exact (SHA-256-pinned by
+# results/tables/MANIFEST.sha256); text/eol conversion must never touch them, or a
+# fresh clone would check out different bytes than the pinned hashes (post-KBS hardening).
+results/tables/** -text

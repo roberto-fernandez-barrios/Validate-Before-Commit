@@ -50,6 +50,9 @@ V1_SUPPLEMENT_TABLES = {
     "table_policy_frontier", "table_causal_probe", "table_zero_drift",
     "table_amendment009", "table_harm_generality", "table_budget_frontier",
     "table_ab_equivalence", "table_operational_e2e",
+    # post-KBS hardening: the full baseline matrix relocated from the main body
+    # (the compact paired core stays inline in section 5.6)
+    "table_baselines_full",
 }
 
 

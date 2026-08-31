@@ -1,0 +1,626 @@
+experiment_block,severity,strategy,method,metric,n,mean,std,ci95_low,ci95_high
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.919140625,0.02607388452460788,0.9087887369791667,0.9270706380208333
+downstream_global,0.1,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.9172395833333333,0.024723333857392015,0.9076689453125,0.9245312499999999
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9404947916666668,0.030523156368774243,0.9289189453125002,0.9500133463541667
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.9187630208333333,0.02384291146053603,0.9095960286458334,0.9258987630208334
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.9191145833333334,0.023985584475195484,0.9095960286458331,0.926328125
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.9047395833333333,0.030346713032439014,0.8936972656250002,0.9145846354166665
+downstream_global,0.25,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.8617447916666667,0.022826983155394234,0.8528906250000001,0.8686591796875002
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9296874999999999,0.027522889181176263,0.9191015625,0.9383867187500001
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8850651041666667,0.037850219431959736,0.8710660807291666,0.8982167968750001
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.884921875,0.03770633451174248,0.8708971354166666,0.8978515624999998
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8939973958333333,0.021616702428233117,0.8855208333333332,0.9005735677083333
+downstream_global,0.5,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.7672916666666666,0.02094102129314443,0.7592705078125,0.7736848958333333
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9153776041666666,0.021909004928523435,0.906705078125,0.9220052083333333
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8929296875,0.022333544039227212,0.8843222656249999,0.8999873046875
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8926822916666666,0.02309532306674819,0.8842047526041666,0.8997399088541667
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8648567708333332,0.8780078124999999
+downstream_global,0.75,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.6747265624999998,0.02185048801765409,0.6664449869791668,0.6816018880208334
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9074348958333333,0.018684918517698195,0.9001298828125001,0.9131380208333332
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8645699869791669,0.8778515625
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8644915364583332,0.8780081380208333
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8414576822916666,0.8553125
+downstream_global,1.0,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.5808072916666667,0.024525255051209303,0.5713789062500001,0.5884248046874999
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.8961067708333333,0.020432978285571207,0.8882027994791668,0.9025520833333334
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8417965494791669,0.8552477213541667
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8418098958333334,0.8554820963541665
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.023997395833333327,0.00762827189567296,0.02108040364583333,0.0264453125
+downstream_global,0.1,no_adaptation,No adaptation,degradation_area,30,0.025898437499999996,0.005847374564556472,0.023541341145833335,0.027682291666666668
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.024374999999999997,0.007301153516562557,0.021549479166666663,0.026666666666666665
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.024023437499999998,0.00727093133306605,0.02134114583333334,0.026341145833333333
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.025091145833333335,0.022323961156229224,0.0177861328125,0.03307291666666666
+downstream_global,0.25,no_adaptation,No adaptation,degradation_area,30,0.06890625,0.012913503404491043,0.06368457031250001,0.07244791666666668
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.04558593749999999,0.02755921687760845,0.036080078125000005,0.05516959635416667
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.04572916666666667,0.027432110414581174,0.03581966145833333,0.05526041666666667
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.02138020833333333,0.0025970628683928804,0.020494791666666665,0.022304687499999996
+downstream_global,0.5,no_adaptation,No adaptation,degradation_area,30,0.14808593749999996,0.009396499010932004,0.1448697916666667,0.15147167968749997
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.022447916666666668,0.00571594690189412,0.02072916666666667,0.024817708333333334
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.022695312500000002,0.005745892797902623,0.02098958333333333,0.024960937499999995
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.03407552083333333,0.03658854166666667
+downstream_global,0.75,no_adaptation,No adaptation,degradation_area,30,0.23270833333333332,0.01297096232514941,0.22880208333333332,0.23780013020833332
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.0341015625,0.036640624999999996
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.034140625,0.03658854166666666
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.046888020833333335,0.004473240982676701,0.04541666666666667,0.04852897135416667
+downstream_global,1.0,no_adaptation,No adaptation,degradation_area,30,0.3152994791666666,0.020109982685526086,0.3091793619791667,0.32356835937499995
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.046888020833333335,0.004473240982676701,0.04548177083333334,0.048554687500000006
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.046888020833333335,0.004473240982676701,0.04544270833333334,0.04858072916666666
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.0019010416666666598,0.006269109167207012,0.0,0.0044010416666666495
+downstream_global,0.1,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.02325520833333331,0.01941878539927001,0.01566406249999999,0.027630208333333312
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.0015234374999999899,0.004663134862336965,0.0,0.003425130208333301
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.0018749999999999867,0.004934025608112334,0.0003515624999999967,0.0037373046874999687
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.04299479166666663,0.02568513573435361,0.033905924479166655,0.05135449218749996
+downstream_global,0.25,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.06794270833333328,0.017853280287048124,0.060898111979166634,0.0724479166666666
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.02332031249999998,0.027947489315589477,0.013774414062499992,0.032930664062499976
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.023177083333333313,0.02781674746399322,0.013736979166666663,0.033203450520833316
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.12670572916666661,0.007679007218454817,0.12417968749999998,0.12949218749999994
+downstream_global,0.5,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.14808593749999996,0.009396499010932,0.14493489583333333,0.1515494791666666
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.12563802083333328,0.00861178269040567,0.12260384114583328,0.12871093749999996
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.12539062499999995,0.008679043809933285,0.12234374999999999,0.1285286458333333
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.1940364583333333,0.20175813802083328
+downstream_global,0.75,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.23270833333333324,0.012970962325149429,0.22881510416666664,0.23795572916666663
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19407519531249992,0.20160156249999994
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19411458333333328,0.2017190755208333
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.26352832031249995,0.2746227213541667
+downstream_global,1.0,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.3152994791666666,0.020109982685526093,0.30940006510416673,0.3231380208333334
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.26341113281249995,0.27490950520833335
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.2635026041666666,0.27484407552083334
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+downstream_global,0.1,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.06666666666666667,0.2537081317024625,0.0,0.16666666666666666
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.1,0.30512857662936466,0.0,0.2008333333333212
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.8,0.4068381021724862,0.6333333333333333,0.9333333333333333
+downstream_global,0.25,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.4,0.49827287912243984,0.23333333333333334,0.5666666666666667
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.4,0.49827287912243984,0.23333333333333334,0.5666666666666667
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,1.0,0.0,1.0,1.0
+downstream_global,0.5,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,0.75,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.9333333333333333,0.2537081317024625,0.8333333333333334,1.0
+downstream_global,1.0,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.00106770833333333,0.004506581060383518,0.0,0.00291666666666666
+downstream_global,0.1,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.0010286458333333267,0.003931067892564521,0.0,0.0026171874999999832
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.0013802083333333234,0.004291034104844253,0.0,0.00302083333333331
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.04371093749999996,0.024074355338428832,0.03505143229166662,0.05149804687499997
+downstream_global,0.25,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.021210937499999985,0.027205653047701037,0.012031249999999993,0.031003580729166636
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.02106770833333332,0.02705978111508014,0.011744791666666659,0.03082031249999997
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.12670572916666661,0.007679007218454817,0.1241536458333333,0.1294664713541666
+downstream_global,0.5,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.12149739583333329,0.024508461536429257,0.11162727864583331,0.12808593749999997
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.12124999999999996,0.024488942281085474,0.11131412760416663,0.12778678385416664
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.1907942708333333,0.03766879040797114,0.17558430989583326,0.20059928385416664
+downstream_global,0.75,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.19087239583333332,0.03768007502203304,0.17510319010416658,0.2005865885416666
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.19087239583333332,0.03768007502203304,0.1757418619791666,0.20046874999999992
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.2511197916666667,0.07014720553276028,0.22235579427083327,0.2715888671875
+downstream_global,1.0,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.2596484375,0.05168787717822759,0.23911425781249995,0.2734248046875
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.2596484375,0.05168787717822759,0.23874837239583335,0.2734251302083333
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.1,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.75,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.06666666666666667,0.2537081317024625,0.0,0.16666666666666666
+downstream_global,1.0,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+downstream_global,0.1,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.13333333333333333,0.34574590364176044,0.03333333333333333,0.26666666666666666
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.8333333333333334,0.3790490217894517,0.6666666666666666,0.9666666666666667
+downstream_global,0.25,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.43333333333333335,0.5040069329937308,0.26666666666666666,0.6
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.43333333333333335,0.5040069329937308,0.26666666666666666,0.6
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.5,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.75,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,1.0,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_global,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,3,5.666666666666667,6.350852961085883,2.0,13.0
+downstream_global,0.1,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_global,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,3,8.666666666666666,2.081665999466133,7.0,11.0
+downstream_global,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,4,9.5,2.3804761428476167,7.5,11.5
+downstream_global,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,25,3.68,2.824299323136035,2.72,4.92
+downstream_global,0.25,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_global,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,13,4.153846153846154,2.7032743678162428,2.923076923076923,5.6923076923076925
+downstream_global,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,13,4.230769230769231,2.743290182543769,2.923076923076923,5.769230769230769
+downstream_global,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,0.5,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_global,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.1333333333333333,0.5713464637233656,2.0,2.3666666666666667
+downstream_global,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.1666666666666665,0.5920934999167601,2.0,2.4
+downstream_global,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,0.75,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_global,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,1.0,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_global,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_global,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.9206901041666666,0.027329984861389822,0.9099085286458334,0.929349609375
+downstream_optimized,0.1,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.9172395833333333,0.024723333857392015,0.907603515625,0.9245312499999999
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9404947916666668,0.030523156368774243,0.9287076822916668,0.9502083333333332
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.9191145833333334,0.023985584475195484,0.9095703125,0.9261331380208332
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.9204296875,0.025279025715603018,0.9103766276041667,0.9285550130208332
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.9014713541666668,0.03267087072764453,0.8898434244791669,0.9122659505208334
+downstream_optimized,0.25,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.8617447916666667,0.022826983155394234,0.8529554036458333,0.8686458333333333
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9296874999999999,0.027522889181176263,0.9189840494791668,0.9383336588541666
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8891406249999999,0.036872956639031264,0.8757161458333336,0.9018108723958335
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8970963541666668,0.03518866491345264,0.8845052083333333,0.9092190755208334
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.9010546874999998,0.021623922289613202,0.892421875,0.9077347005208333
+downstream_optimized,0.5,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.7672916666666666,0.02094102129314443,0.7591923828125001,0.7738675130208333
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9153776041666666,0.021909004928523435,0.9069003906249998,0.9221360677083332
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8931901041666667,0.02245462531556895,0.8839973958333333,0.9000911458333333
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.9005729166666666,0.022215999155779237,0.8919788411458335,0.9072789713541668
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8837109375,0.018730950160226873,0.8763802083333333,0.8894404296875
+downstream_optimized,0.75,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.6747265624999998,0.02185048801765409,0.6664957682291667,0.6815240885416669
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9074348958333333,0.018684918517698195,0.8999212239583333,0.9131123046875
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8646611328125001,0.8778779296874999
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8837109375,0.018730950160226873,0.8766402994791668,0.8893753255208333
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8651041666666667,0.019810060975410878,0.8576949869791668,0.8713414713541666
+downstream_optimized,1.0,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.5808072916666667,0.024525255051209303,0.5717050781249999,0.5886461588541666
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.8961067708333333,0.020432978285571207,0.8881770833333335,0.9025921223958334
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8414062500000001,0.8554300130208334
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8651041666666667,0.019810060975410878,0.8575257161458335,0.8714453125000001
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.022447916666666665,0.008918089277493838,0.019062499999999996,0.025260742187499997
+downstream_optimized,0.1,no_adaptation,No adaptation,degradation_area,30,0.025898437499999996,0.005847374564556472,0.023567382812499992,0.027643229166666665
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.024023437499999998,0.00727093133306605,0.021354166666666667,0.026458333333333337
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.02212239583333333,0.008536917368989844,0.018997070312499996,0.025039062499999997
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.028359375,0.026387728469236676,0.019244791666666667,0.03819010416666667
+downstream_optimized,0.25,no_adaptation,No adaptation,degradation_area,30,0.06890625,0.012913503404491043,0.06372395833333333,0.0725
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.040755208333333334,0.026790770339040187,0.03149707031250001,0.05003938802083334
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.03270833333333333,0.026620265008346244,0.023789062500000003,0.04250032552083334
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.014322916666666666,0.0019418677016258899,0.013684895833333332,0.015026041666666665
+downstream_optimized,0.5,no_adaptation,No adaptation,degradation_area,30,0.14808593749999996,0.009396499010932004,0.14493489583333333,0.15155013020833333
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.022187500000000002,0.00551225765995189,0.02061165364583333,0.024361979166666665
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.0148046875,0.002603975837117339,0.0139453125,0.015768229166666665
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.023723958333333336,0.0022566738804077045,0.022916666666666672,0.024544270833333333
+downstream_optimized,0.75,no_adaptation,No adaptation,degradation_area,30,0.23270833333333332,0.01297096232514941,0.22874999999999998,0.237865234375
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.03407552083333334,0.03665364583333333
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.023723958333333336,0.0022566738804077045,0.022955729166666668,0.024518229166666673
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.031002604166666666,0.003215426816818249,0.029934895833333332,0.03220052083333333
+downstream_optimized,1.0,no_adaptation,No adaptation,degradation_area,30,0.3152994791666666,0.020109982685526086,0.30933561197916665,0.32330729166666666
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.046888020833333335,0.004473240982676701,0.0454296875,0.0486982421875
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.031002604166666666,0.003215426816818249,0.029895833333333333,0.03216145833333333
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.0034505208333333263,0.008254013525568156,0.0008072916666666667,0.006653645833333323
+downstream_optimized,0.1,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.02325520833333331,0.01941878539927001,0.015546549479166638,0.027604166666666652
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.0018749999999999867,0.004934025608112334,0.0003515624999999967,0.003802083333333306
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.00319010416666665,0.008183591874725442,0.0002604166666666535,0.006263020833333305
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.03972656249999998,0.02933773192747587,0.029179687499999992,0.04962239583333331
+downstream_optimized,0.25,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.06794270833333328,0.017853280287048124,0.06066406249999998,0.07244791666666663
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.027395833333333307,0.028763871552054215,0.017564453124999987,0.03730501302083331
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.035351562499999975,0.028342436178704005,0.024921549479166645,0.045482421874999956
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.13376302083333327,0.008099966702988943,0.13098958333333327,0.13671874999999994
+downstream_optimized,0.5,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.14808593749999996,0.009396499010932,0.14494791666666662,0.15162760416666662
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.12589843749999996,0.008947785547884874,0.12277311197916663,0.12911458333333328
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.13328124999999996,0.00782084683424637,0.13061165364583327,0.1360416666666666
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.20898437499999994,0.011953908513311138,0.2054036458333333,0.2137763671874999
+downstream_optimized,0.75,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.23270833333333324,0.012970962325149429,0.22881477864583324,0.23769531249999995
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19414062499999993,0.20173177083333327
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.20898437499999994,0.011953908513311138,0.20537760416666664,0.21356770833333324
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.28429687499999995,0.017746114193409147,0.2788020833333333,0.2912633463541666
+downstream_optimized,1.0,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.3152994791666666,0.020109982685526093,0.3092054036458333,0.32347688802083335
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.2636328125,0.27489615885416663
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.28429687499999995,0.017746114193409147,0.2788932291666667,0.2910026041666666
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.13333333333333333,0.34574590364176044,0.03333333333333333,0.26666666666666666
+downstream_optimized,0.1,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.2,0.40683810217248634,0.06666666666666667,0.3333333333333333
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.7666666666666667,0.43018306715207627,0.6,0.9
+downstream_optimized,0.25,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.4666666666666667,0.507416263404925,0.3,0.6333333333333333
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.5,0.5085476277156078,0.3333333333333333,0.6666666666666666
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.5,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9,0.30512857662936466,0.8,1.0
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_optimized,0.75,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9,0.3051285766293646,0.8,1.0
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.8,0.4068381021724863,0.6666666666666666,0.9333333333333333
+downstream_optimized,1.0,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.8333333333333334,0.3790490217894517,0.7,0.9666666666666667
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.002669270833333327,0.007357495943183994,0.00028645833333333003,0.005572916666666661
+downstream_optimized,0.1,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.0013802083333333234,0.004291034104844253,0.0,0.0031119791666666436
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.0026953124999999903,0.006418910626012055,0.0007552083333333267,0.00518229166666665
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.04037760416666665,0.028170887817913062,0.03018164062499999,0.05007812499999997
+downstream_optimized,0.25,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.021992187499999975,0.026632164525844052,0.012656249999999987,0.031510416666666645
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.02493489583333331,0.027117693056865684,0.015351236979166655,0.03481868489583328
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.13376302083333327,0.008099966702988943,0.1310413411458333,0.13673209635416664
+downstream_optimized,0.5,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.12175781249999997,0.024673785525953746,0.11156184895833332,0.12843749999999993
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.11990885416666662,0.041379617346432265,0.10386686197916664,0.13324218749999994
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.20226562499999992,0.040003930260509586,0.18643196614583327,0.21266959635416657
+downstream_optimized,0.75,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.19087239583333332,0.03768007502203304,0.17587207031249993,0.20058626302083324
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.1882942708333333,0.06493079780991273,0.16405989583333325,0.20846386718749996
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.2287760416666666,0.11744087789838994,0.18761490885416665,0.2677483723958333
+downstream_optimized,1.0,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.2596484375,0.05168787717822759,0.2386975911458333,0.27336067708333334
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.2376041666666666,0.1094278050128155,0.1969397786458333,0.2739856770833333
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_optimized,0.1,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.16666666666666666,0.3790490217894517,0.03333333333333333,0.3
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.1,0.30512857662936466,0.0,0.2
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.2,0.4068381021724863,0.06666666666666667,0.36666666666666664
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_optimized,0.75,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.1,0.30512857662936466,0.0,0.2
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.2,0.4068381021724863,0.06666666666666667,0.3333333333333333
+downstream_optimized,1.0,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.16666666666666666,0.3790490217894517,0.03333333333333333,0.3
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.16666666666666666,0.3790490217894517,0.06666666666666667,0.3
+downstream_optimized,0.1,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.13333333333333333,0.34574590364176044,0.03333333333333333,0.26666666666666666
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.3,0.466091599699399,0.13333333333333333,0.4666666666666667
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.8,0.4068381021724863,0.6666666666666666,0.9333333333333333
+downstream_optimized,0.25,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.6333333333333333,0.4901325178535609,0.4658333333333336,0.8
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.7333333333333333,0.4497764451088037,0.5666666666666667,0.9
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.5,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.75,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,5,4.8,4.8166378315169185,1.8,9.0
+downstream_optimized,0.1,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,4,9.5,2.3804761428476167,7.5,11.5
+downstream_optimized,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,9,10.11111111111111,5.060742150229659,7.0,13.11111111111111
+downstream_optimized,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,24,4.208333333333333,5.141300517815775,2.375,6.291666666666667
+downstream_optimized,0.25,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,19,6.052631578947368,5.190522176798425,3.9473684210526314,8.473684210526315
+downstream_optimized,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,22,4.454545454545454,4.125729635063963,2.8636363636363638,6.181818181818182
+downstream_optimized,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.5,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.1,0.5477225575051661,2.0,2.3
+downstream_optimized,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,1.0666666666666667,0.2537081317024625,1.0,1.1666666666666667
+downstream_optimized,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,1.0,0.0,1.0,1.0
+downstream_optimized,0.75,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_optimized,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_optimized,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,1.0,0.0,1.0,1.0
+downstream_optimized,1.0,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+downstream_optimized,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+downstream_optimized,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,post_balanced_accuracy_mean,30,0.9209635416666667,0.025796008162733718,0.9114967447916665,0.9288675130208333
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.919140625,0.02607388452460788,0.9090485026041666,0.9268880208333333
+hybrid_selected,0.1,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.9172395833333333,0.024723333857392015,0.9074479166666668,0.9246487630208334
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9404947916666668,0.030523156368774243,0.9285537109375,0.950078125
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.9187630208333333,0.02384291146053603,0.9094785156249998,0.925912109375
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.9191145833333334,0.023985584475195484,0.9095169270833331,0.9262893880208333
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,post_balanced_accuracy_mean,30,0.9084635416666667,0.02979741826161238,0.8974606119791668,0.9184638671874998
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.9047395833333333,0.030346713032439014,0.893359375,0.9147281901041666
+hybrid_selected,0.25,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.8617447916666667,0.022826983155394234,0.8526949869791668,0.8686982421875001
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9296874999999999,0.027522889181176263,0.918892578125,0.9382438151041668
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8850651041666667,0.037850219431959736,0.8713147786458335,0.8976435546874999
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.884921875,0.03770633451174248,0.8710026041666666,0.8974869791666665
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,post_balanced_accuracy_mean,30,0.8939973958333333,0.021616702428233117,0.8857151692708333,0.900546875
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8939973958333333,0.021616702428233117,0.8858330078124999,0.9005598958333333
+hybrid_selected,0.5,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.7672916666666666,0.02094102129314443,0.7590751953124999,0.7739065755208332
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9153776041666666,0.021909004928523435,0.9068479817708333,0.9220576171875
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8929296875,0.022333544039227212,0.884140625,0.8996748046874999
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8926822916666666,0.02309532306674819,0.8838011067708332,0.8998570963541667
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8645179036458334,0.8779951171875001
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8646611328125,0.8780078124999999
+hybrid_selected,0.75,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.6747265624999998,0.02185048801765409,0.6662623697916668,0.6814329427083335
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.9074348958333333,0.018684918517698195,0.9000117187499999,0.9131904296875
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8646608072916665,0.8779820963541668
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8720963541666666,0.018966701713732905,0.8647916666666667,0.8779430338541668
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.841939453125,0.8552216796875
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8417835286458335,0.855390625
+hybrid_selected,1.0,no_adaptation,No adaptation,post_balanced_accuracy_mean,30,0.5808072916666667,0.024525255051209303,0.5718616536458333,0.5885159505208333
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,post_balanced_accuracy_mean,30,0.8961067708333333,0.020432978285571207,0.8888528645833332,0.9028388671875001
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8418476562499999,0.8553909505208332
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,post_balanced_accuracy_mean,30,0.8492187500000001,0.019419399558240364,0.8418222656250001,0.8553909505208335
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,degradation_area,30,0.02171875,0.008643566426604282,0.018606445312499997,0.024609375000000003
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.023997395833333327,0.00762827189567296,0.021184570312499998,0.026406250000000003
+hybrid_selected,0.1,no_adaptation,No adaptation,degradation_area,30,0.025898437499999996,0.005847374564556472,0.023515625,0.02766927083333333
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.024374999999999997,0.007301153516562557,0.021536458333333338,0.02666666666666667
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.024023437499999998,0.00727093133306605,0.021184570312499998,0.026406250000000003
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,degradation_area,30,0.021367187500000002,0.01890514510789,0.015324869791666668,0.02865885416666666
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.025091145833333335,0.022323961156229224,0.017734375000000004,0.03307356770833333
+hybrid_selected,0.25,no_adaptation,No adaptation,degradation_area,30,0.06890625,0.012913503404491043,0.0638408203125,0.07263020833333332
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.04558593749999999,0.02755921687760845,0.036119140625,0.055182617187500005
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.04572916666666667,0.027432110414581174,0.036119791666666665,0.05503971354166667
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,degradation_area,30,0.02138020833333333,0.0025970628683928804,0.020455729166666665,0.02235677083333333
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.02138020833333333,0.0025970628683928804,0.020507486979166663,0.022331054687499994
+hybrid_selected,0.5,no_adaptation,No adaptation,degradation_area,30,0.14808593749999996,0.009396499010932004,0.1449866536458333,0.1516018880208333
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.022447916666666668,0.00571594690189412,0.020729166666666663,0.02471354166666667
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.022695312500000002,0.005745892797902623,0.021015624999999996,0.024960937500000002
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.034101562499999995,0.036640625
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.034062499999999996,0.036601888020833334
+hybrid_selected,0.75,no_adaptation,No adaptation,degradation_area,30,0.23270833333333332,0.01297096232514941,0.22871061197916664,0.23803385416666664
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.034101562499999995,0.036601562500000004
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.035338541666666674,0.0035797453259162923,0.034114583333333344,0.03661458333333333
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,degradation_area,30,0.046888020833333335,0.004473240982676701,0.04548177083333334,0.048567708333333334
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,degradation_area,30,0.046888020833333335,0.004473240982676701,0.045429687499999996,0.0485546875
+hybrid_selected,1.0,no_adaptation,No adaptation,degradation_area,30,0.3152994791666666,0.020109982685526086,0.30923177083333336,0.32328287760416663
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,degradation_area,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,degradation_area,30,0.046888020833333335,0.004473240982676701,0.045468424479166665,0.04855468749999999
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,degradation_area,30,0.046888020833333335,0.004473240982676701,0.0454296875,0.04859407552083333
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,adaptation_gain_vs_no_adapt,30,0.003723958333333317,0.008774148225516419,0.0008460286458333268,0.006953124999999973
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.0019010416666666598,0.006269109167207012,0.0,0.00434895833333332
+hybrid_selected,0.1,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.02325520833333331,0.01941878539927001,0.015312174479166642,0.027630208333333302
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.0015234374999999899,0.004663134862336965,0.0,0.0032291666666666467
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.0018749999999999867,0.004934025608112334,0.0003515624999999967,0.0037763671874999688
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,adaptation_gain_vs_no_adapt,30,0.04671874999999996,0.023562793690431617,0.0376819661458333,0.0545706380208333
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.04299479166666663,0.02568513573435361,0.03380045572916663,0.05138053385416663
+hybrid_selected,0.25,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.06794270833333328,0.017853280287048124,0.06079394531249998,0.07251334635416662
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.02332031249999998,0.027947489315589477,0.013228841145833323,0.033217447916666615
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.023177083333333313,0.02781674746399322,0.013605468749999997,0.03269563802083331
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,adaptation_gain_vs_no_adapt,30,0.12670572916666661,0.007679007218454817,0.12407519531249994,0.12945312499999997
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.12670572916666661,0.007679007218454817,0.12403645833333328,0.12953124999999993
+hybrid_selected,0.5,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.14808593749999996,0.009396499010932,0.14488248697916664,0.15158886718749998
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.12563802083333328,0.00861178269040567,0.12260416666666663,0.1286331380208333
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.12539062499999995,0.008679043809933285,0.12229166666666663,0.12850292968749996
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19407519531249992,0.20175781249999994
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19415364583333322,0.20175781249999994
+hybrid_selected,0.75,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.23270833333333324,0.012970962325149429,0.22874967447916658,0.23774902343749993
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.1941536458333333,0.20187499999999994
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.19736979166666666,0.010972529599003416,0.19406249999999994,0.20162760416666667
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.2635677083333333,0.2753782552083333
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.2635416666666667,0.27473990885416666
+hybrid_selected,1.0,no_adaptation,No adaptation,adaptation_gain_vs_no_adapt,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,adaptation_gain_vs_no_adapt,30,0.3152994791666666,0.020109982685526093,0.30927083333333333,0.3228658854166667
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.26338509114583325,0.27453190104166664
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,adaptation_gain_vs_no_adapt,30,0.26841145833333335,0.01636538338666714,0.2633981119791667,0.27471451822916665
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,clean_downstream_adaptation,30,0.16666666666666666,0.3790490217894517,0.03333333333333333,0.3
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+hybrid_selected,0.1,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.06666666666666667,0.2537081317024625,0.0,0.16666666666666666
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,clean_downstream_adaptation,30,0.8333333333333334,0.3790490217894517,0.7,0.9666666666666667
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.8,0.4068381021724862,0.6666666666666666,0.9333333333333333
+hybrid_selected,0.25,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.4,0.49827287912243984,0.23333333333333334,0.5666666666666667
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.4,0.49827287912243984,0.23333333333333334,0.5666666666666667
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.5,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,clean_downstream_adaptation,30,0.9333333333333333,0.2537081317024625,0.8333333333333334,1.0
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.75,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,clean_downstream_adaptation,30,0.8666666666666667,0.34574590364176044,0.7333333333333333,0.9666666666666667
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_downstream_adaptation,30,0.9333333333333333,0.2537081317024625,0.8333333333333334,1.0
+hybrid_selected,1.0,no_adaptation,No adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,clean_downstream_adaptation,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_downstream_adaptation,30,0.9666666666666667,0.18257418583505533,0.9,1.0
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,clean_adaptation_gain,30,0.0028515624999999895,0.0068793074647651485,0.0007552083333333267,0.0054557291666666435
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.00106770833333333,0.004506581060383518,0.0,0.00291666666666666
+hybrid_selected,0.1,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.0010286458333333267,0.003931067892564521,0.0,0.0026171874999999837
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.0013802083333333234,0.004291034104844253,0.0,0.00308593749999998
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,clean_adaptation_gain,30,0.0453255208333333,0.0231054703630393,0.03644466145833331,0.052890624999999955
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.04371093749999996,0.024074355338428832,0.034830078124999955,0.051575520833333284
+hybrid_selected,0.25,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.021210937499999985,0.027205653047701037,0.011901041666666667,0.03104166666666664
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.02106770833333332,0.02705978111508014,0.011848307291666655,0.030638346354166637
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,clean_adaptation_gain,30,0.12256510416666663,0.024384747126681497,0.11236881510416663,0.12886718749999992
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.12670572916666661,0.007679007218454817,0.12411458333333328,0.12954427083333328
+hybrid_selected,0.5,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.12149739583333329,0.024508461536429257,0.11127604166666664,0.12793001302083326
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.12124999999999996,0.024488942281085474,0.11171842447916662,0.12779980468749996
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,clean_adaptation_gain,30,0.18429687499999997,0.051282896066954006,0.16390429687499997,0.19893359374999992
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.1907942708333333,0.03766879040797114,0.17550716145833328,0.20085937499999995
+hybrid_selected,0.75,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.19087239583333332,0.03768007502203304,0.17580729166666662,0.20048177083333332
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.19087239583333332,0.03768007502203304,0.17585807291666664,0.20061197916666662
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,clean_adaptation_gain,30,0.23354166666666665,0.09454693010213766,0.197681640625,0.26277376302083333
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,clean_adaptation_gain,30,0.2511197916666667,0.07014720553276028,0.22338281249999997,0.2713284505208334
+hybrid_selected,1.0,no_adaptation,No adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,clean_adaptation_gain,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,clean_adaptation_gain,30,0.2596484375,0.05168787717822759,0.23838509114583334,0.27328287760416664
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,clean_adaptation_gain,30,0.2596484375,0.05168787717822759,0.23950488281250001,0.2733984375
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,false_alarm_any,30,0.1,0.30512857662936466,0.0,0.23333333333333334
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.1,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.06666666666666667,0.2537081317024624,0.0,0.16666666666666666
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,false_alarm_any,30,0.06666666666666667,0.2537081317024625,0.0,0.16666666666666666
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.75,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,false_alarm_any,30,0.13333333333333333,0.34574590364176044,0.03333333333333333,0.26666666666666666
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,false_alarm_any,30,0.06666666666666667,0.2537081317024625,0.0,0.16666666666666666
+hybrid_selected,1.0,no_adaptation,No adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,false_alarm_any,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,false_alarm_any,30,0.03333333333333333,0.18257418583505533,0.0,0.1
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,triggered_post,30,0.26666666666666666,0.44977644510880366,0.1,0.43333333333333335
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.1,0.30512857662936466,0.0,0.2
+hybrid_selected,0.1,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.1,0.30512857662936466,0.0,0.2
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.13333333333333333,0.34574590364176044,0.03333333333333333,0.26666666666666666
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,triggered_post,30,0.9,0.30512857662936466,0.8,1.0
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,0.8333333333333334,0.3790490217894517,0.7,0.9666666666666667
+hybrid_selected,0.25,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,0.43333333333333335,0.5040069329937308,0.26666666666666666,0.6
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,0.43333333333333335,0.5040069329937308,0.26666666666666666,0.6
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.5,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.75,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,1.0,no_adaptation,No adaptation,triggered_post,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,triggered_post,30,1.0,0.0,1.0,1.0
+hybrid_selected,0.1,hybrid_or_triggered_adaptation,Hybrid OR,trigger_delay_windows,8,8.125,4.998213966722799,5.0,11.375
+hybrid_selected,0.1,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,3,5.666666666666667,6.350852961085883,2.0,13.0
+hybrid_selected,0.1,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.1,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,3,8.666666666666666,2.081665999466133,7.0,11.0
+hybrid_selected,0.1,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,4,9.5,2.3804761428476167,7.5,11.5
+hybrid_selected,0.25,hybrid_or_triggered_adaptation,Hybrid OR,trigger_delay_windows,27,3.6666666666666665,3.05085107923876,2.7037037037037037,4.888888888888889
+hybrid_selected,0.25,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,25,3.68,2.824299323136035,2.72,4.92
+hybrid_selected,0.25,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.25,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,13,4.153846153846154,2.7032743678162428,2.923076923076923,5.615384615384615
+hybrid_selected,0.25,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,13,4.230769230769231,2.743290182543769,2.923076923076923,5.6923076923076925
+hybrid_selected,0.5,hybrid_or_triggered_adaptation,Hybrid OR,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,0.5,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,0.5,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.5,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.1333333333333333,0.5713464637233656,2.0,2.3666666666666667
+hybrid_selected,0.5,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.1666666666666665,0.5920934999167601,2.0,2.4
+hybrid_selected,0.75,hybrid_or_triggered_adaptation,Hybrid OR,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,0.75,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,0.75,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+hybrid_selected,0.75,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,0.75,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,1.0,hybrid_or_triggered_adaptation,Hybrid OR,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,1.0,mmd_rbf_triggered_adaptation,MMD-RBF,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,1.0,oracle_adaptation,Oracle adaptation,trigger_delay_windows,30,0.0,0.0,0.0,0.0
+hybrid_selected,1.0,qk_mmd_pauli_xz_triggered_adaptation,QK-MMD PauliXZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0
+hybrid_selected,1.0,qk_mmd_zz_triggered_adaptation,QK-MMD ZZ,trigger_delay_windows,30,2.0,0.0,2.0,2.0

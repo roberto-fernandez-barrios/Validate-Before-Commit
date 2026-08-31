@@ -1,0 +1,7 @@
+detector,gate,A_benefit_preservation,B_harm_avoidance,C_mixed_nondegradation,passes_ABC
+ks_max,lp32,True,True,True,True
+ks_max,lp64,True,True,True,True
+ks_max,unsup,False,False,False,False
+qk_mmd_zz,lp32,True,True,True,True
+qk_mmd_zz,lp64,True,True,True,True
+qk_mmd_zz,unsup,False,False,False,False

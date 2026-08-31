@@ -1,0 +1,10 @@
+scenario,policy,gain,lo,hi,commits,labels_probe
+ps_full,none,7.216,5.01,9.391,3.43,0.0
+ps_full,point,7.654,5.527,9.7,2.93,130.1
+ps_full,strict,7.568,5.537,9.534,2.07,171.7
+ton_full,none,-1.968,-4.005,-0.141,2.63,0.0
+ton_full,point,1.166,0.669,1.795,2.17,109.9
+ton_full,strict,1.089,0.568,1.789,0.9,173.9
+ton_zero,none,-5.351,-7.767,-3.134,3.03,0.0
+ton_zero,point,-0.175,-0.364,-0.025,1.93,97.1
+ton_zero,strict,-0.01,-0.022,0.001,0.13,97.1

@@ -1,0 +1,13 @@
+regime,gate_margin,gate_gain,commits
+portscan,0.0,8.27,3.13
+portscan,0.01,8.29,2.15
+portscan,0.02,8.29,2.15
+portscan,0.05,7.91,1.6
+unsw_recon,0.0,1.13,2.57
+unsw_recon,0.01,1.23,2.0
+unsw_recon,0.02,1.23,2.0
+unsw_recon,0.05,1.08,1.1
+ton_scanning,0.0,0.93,2.2
+ton_scanning,0.01,0.82,1.15
+ton_scanning,0.02,0.82,1.15
+ton_scanning,0.05,0.27,0.5

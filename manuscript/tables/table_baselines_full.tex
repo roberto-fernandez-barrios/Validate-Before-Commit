@@ -1,0 +1,75 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Complete matrix of evaluated baselines and update policies, by registered
+block.} Balanced-accuracy points over never adapting, taken from the sealed outputs of the
+block named in each header; no new experiments. \emph{Origin} (first bracket in each Policy
+cell): [std] standard baseline; [pub] published method instantiated in this harness; [ref]
+reference implementation; [ours] this paper's gates; [ours-var] an ablation or
+implementation variant of them. No published adaptive-NIDS system is reproduced end to end
+in any block. \emph{Labels at decision}: target labels the rule needs on current traffic to
+decide one proposal (candidate-training labels are consumed by every policy that trains a
+candidate and are excluded; DDM/ADWIN consume 800 monitoring labels per stream instead).
+AV = anytime-valid; ``0 commits'' = no proposal committed over the 91 zero-drift proposals.
+$^{a}$The real KS-max detector fires ${\sim}0.1$ times per stream under zero drift.
+Block~IV runs at $\alpha_{\mathrm{life}}{=}0.10$ with Bonferroni spending; all blocks use
+KS-max and SVC-RBF. \emph{Labels}: Block~I, total labels per stream in the harm regime;
+Block~IV, probe labels per proposal after deferral continuations. Only within-block
+contrasts are paired (Blocks I, II, IV and V on bit-identical streams; Block~III on
+seed-matched but unpaired realizations); cross-block differences reflect different
+harnesses, seeds and configurations --- descriptive only, no common ranking. Blocks I--IV
+use the historical frozen-transformer policy at 512/class; Block~V is the self-contained
+evidence of the main paper. Confidence intervals and multiplicity adjustments for every
+cell are in the cited tables and in Supplementary \S S2.12 and \S S6--\S S8.}
+\label{tab:baselines_full}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
+\begin{tabular}{l l c c l r r r r}
+\toprule
+Policy & Labels at decision & $h'$ vs $h$ & Reject & Probe-level guarantee & PortScan & UNSW-Recon & ToN-IoT & Labels \\
+\midrule
+\multicolumn{9}{l}{\emph{Block I --- frozen policy, full drift (harness v2, seeds 104--133, 512/class; registered; paired)}} \\
+Always-deploy (naive) [std] & 0 & no & no & none & $+8.25$ & $+1.21$ & $-1.64$ & 2{,}594 \\
+Sliding-window update, always deploy [std] & 0 & no & no & none & $+8.04$ & $+0.96$ & $-2.44$ & 2{,}594 \\
+Calibrated soft ensemble, always deploy [std] & 0 & no & no & none & $+8.55$ & $+1.72$ & $+0.56$ & 2{,}594 \\
+DDM trigger (\texttt{river}, 8 labels/window) [ref] & 0; 800/stream monitoring & no & no & none & $+8.28$ & $+0.14$ & $-2.23$ & 1{,}551 \\
+ADWIN trigger (\texttt{river}, 8 labels/window) [ref] & 0; 800/stream monitoring & no & no & none & $+1.77$ & $+0.00$ & $+0.00$ & 800 \\
+Point gate, $b{=}32$ [ours] & 32 & yes & yes & none & $+9.12$ & $+1.35$ & $+0.79$ & 3{,}626 \\
+Holdout gate (dedup.\ batch probe) [ours-var] & 0 extra & yes & yes & none & $+9.08$ & $+0.90$ & $-0.77$ & 3{,}413 \\
+LCB gate, $b{=}64$ [ours-var] & 64 & yes & yes & fixed-sample LCB & $+8.51$ & $+1.24$ & $+0.34$ & 6{,}202 \\
+Exact McNemar, $b{=}32$, $\alpha{=}0.05$ [ours-var] & 32 & yes & yes & per-proposal (fixed) & $+5.45$ & $+0.15$ & $+0.00$ & 7{,}357 \\
+Two-stage split gate ($\delta{=}0.05$) [ours] & 16 $+$ 16 (split) & yes & yes & none & $+7.87$ & $+1.38$ & $+0.15$ & 1{,}341 \\
+\midrule
+\multicolumn{9}{l}{\emph{Block II --- zero-drift control, frozen policy (amendment 008, seeds 104--133, random proposals, 512/class; registered; paired)}} \\
+Always-deploy (naive) [std] & 0 & no & no & none & $-2.76$ & $-0.75$ & $-4.75$ & --- \\
+Point gate, $b{=}32$ [ours] & 32 & yes & yes & none & $-1.11$ & $-0.56$ & $-0.25$ & --- \\
+Exact McNemar, $b{=}32$ [ours-var] & 32 & yes & yes & per-proposal (fixed) & $+0.00$ & $+0.00$ & $+0.00$ & --- \\
+Sequential probe (4-look Bonferroni), $b{\le}64$ [ours-var] & $\le 64$ & yes & yes & per-proposal (4 pre-declared looks; superseded by EB-CS, \S S2.9) & $-0.00$ & $-0.00$ & $+0.00$ & --- \\
+Always-deploy, real KS-max trigger$^{a}$ [std] & 0 & no & no & none & $-0.23$ & $-0.04$ & $-1.03$ & --- \\
+\midrule
+\multicolumn{9}{l}{\emph{Block III --- initial exploratory harness v1 (30 seeds; seed-matched but unpaired realizations; exploratory; descriptive)}} \\
+Always-deploy (naive) [std] & 0 & no & no & none & $+7.79$ & $+0.92$ & $-1.36$ & --- \\
+Point gate, $b{=}32$ [ours] & 32 & yes & yes & none & $+8.27$ & $+1.13$ & $+0.93$ & --- \\
+Disagreement gate ($\tau{=}0.15$) [ours-var] & 0 & proxy & yes & none & $+5.68$ & $+0.11$ & $-4.95$ & --- \\
+ATC gate \cite{garg2022atc} [pub] & 0 & estimated & yes & none & $+5.93$ & $+1.02$ & $+0.40$ & --- \\
+DoC gate \cite{guillory2021doc} [pub] & 0 & estimated & yes & none & $+3.15$ & $+0.80$ & $+1.16$ & --- \\
+Replay 50/50 retraining, always deploy [std] & 0 & no & no & none & $+6.59$ & $+0.16$ & $-4.54$ & --- \\
+Replay 50/50 $+$ point gate, $b{=}32$ [ours-var] & 32 & yes & yes & none & $+8.26$ & $+0.28$ & $+0.59$ & --- \\
+\midrule
+\multicolumn{9}{l}{\emph{Block IV --- lifetime-budgeted gates, frozen policy (seeds 501--530; PortScan full drift, ToN-IoT zero drift; registered follow-up; paired)}} \\
+Always-deploy (naive) [std] & 0 & no & no & none & $+7.22$ & --- & $-5.35$ & 0 \\
+Point gate, $b{=}32$ [ours] & 32 & yes & yes & none & $+7.65$ & --- & $-0.17$ & 32 \\
+Strict gate (reject ties), $b{=}32$ [ours] & 32 & yes & yes & none & $+7.57$ & --- & $-0.01$ & 32 \\
+Pooled EB-CS $+$ defer, cap 512 [ours-var] & 16/block & yes & yes/defer & lifetime (approx.\ pooled) & $+6.73$ (93\%) & --- & 0 commits & 578 \\
+VBC-SG-Cohort-sim, cap 512 [ours] & 16/block & yes & yes/defer & strat., AV, lifetime & $+5.83$ (81\%) & --- & 0 commits & 580 \\
+VBC-SG-Refresh, cap 512 [ours-var] & 16/block & yes & yes/defer & strat., AV, lifetime & $+4.92$ (68\%) & --- & 0 commits & 579 \\
+\midrule
+\multicolumn{9}{l}{\emph{Block V --- self-contained (own-transformer) challengers (seeds 3001--3030 full drift, 4001--4030 zero drift; registered; paired)}} \\
+Always-deploy, 512/class, full drift [std] & 0 & no & no & none & $+7.21$ & $+2.55$ & $+1.03$ & --- \\
+Always-deploy, 512/class, zero drift [std] & 0 & no & no & none & $-1.70$ & $-0.65$ & $-0.24$ & --- \\
+Strict gate, 512/class, zero drift [ours] & 32 & yes & yes & none & $-0.03$ & $-0.19$ & $+0.00$ & --- \\
+Always-deploy, 2{,}000/class, zero drift [std] & 0 & no & no & none & $+0.19$ & $-0.02$ & $-0.01$ & --- \\
+\bottomrule
+\end{tabular}}
+\end{table*}

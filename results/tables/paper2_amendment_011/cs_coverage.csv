@@ -1,0 +1,9 @@
+method,regime,target,rate,nominal
+robbins,iid_mean0,false-commit,0.0,0.1
+robbins,noreplace_mean0,false-commit,0.0,0.1
+robbins,autocorr_mean0,false-commit,0.0185,0.1
+robbins,stale_probe+0.05_future-0.05,future-harm,0.0,
+eb,iid_mean0,false-commit,0.0018,0.1
+eb,noreplace_mean0,false-commit,0.0016,0.1
+eb,autocorr_mean0,false-commit,0.1789,0.1
+eb,stale_probe+0.05_future-0.05,future-harm,0.0102,

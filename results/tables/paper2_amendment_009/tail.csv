@@ -1,0 +1,13 @@
+regime,label,level,naive_gap,naive_lo,naive_hi,gate_gap,gate_lo,gate_hi,n
+portscan,PortScan (benefit),mean,7.773,5.134,10.083,8.7,6.635,10.639,27
+portscan,PortScan (benefit),p10,10.049,3.86,14.994,13.226,9.936,16.348,27
+portscan,PortScan (benefit),worst,10.561,4.514,15.48,12.818,9.317,16.175,27
+portscan,PortScan (benefit),cvar10,10.376,4.259,15.313,13.264,9.922,16.386,27
+unsw_recon,UNSW Recon (marginal),mean,1.229,0.964,1.475,1.313,1.114,1.508,27
+unsw_recon,UNSW Recon (marginal),p10,2.234,1.774,2.662,2.295,1.927,2.665,27
+unsw_recon,UNSW Recon (marginal),worst,2.894,2.199,3.588,2.778,2.025,3.501,27
+unsw_recon,UNSW Recon (marginal),cvar10,2.321,1.878,2.769,2.335,1.968,2.714,27
+ton_scanning,ToN Scanning (harm),mean,-1.376,-2.52,-0.324,0.804,0.509,1.109,27
+ton_scanning,ToN Scanning (harm),p10,-4.482,-7.208,-2.034,0.7,0.289,1.157,27
+ton_scanning,ToN Scanning (harm),worst,-5.237,-8.391,-2.344,0.723,0.116,1.331,27
+ton_scanning,ToN Scanning (harm),cvar10,-4.742,-7.627,-2.115,0.781,0.367,1.204,27

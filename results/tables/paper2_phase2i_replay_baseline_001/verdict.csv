@@ -1,0 +1,10 @@
+criterion,value,passed
+R1 harm avoidance (ToN replay-naive >= -0.5),-4.54,False
+R2 benefit (PortScan replay-naive >= 7.79-0.3),6.593,False
+R3 marginal (UNSW replay-naive >= 0.92-0.3),0.162,False
+G portscan replay_lp32_vs_replay_naive not sig. below (ci_hi >= 0),1.662,True
+G portscan replay_lp32_vs_noadapt not sig. below (ci_hi >= 0),8.255,True
+G unsw_recon replay_lp32_vs_replay_naive not sig. below (ci_hi >= 0),0.113,True
+G unsw_recon replay_lp32_vs_noadapt not sig. below (ci_hi >= 0),0.275,True
+G ton_scanning replay_lp32_vs_replay_naive not sig. below (ci_hi >= 0),5.125,True
+G ton_scanning replay_lp32_vs_noadapt not sig. below (ci_hi >= 0),0.585,True

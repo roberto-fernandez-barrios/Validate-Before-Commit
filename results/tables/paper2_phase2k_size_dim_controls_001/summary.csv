@@ -1,0 +1,9 @@
+control,regime,arm,gain_pts,ci_lo,ci_hi
+cand2000,ton_scanning,none,-5.341,-8.725,-2.486
+cand2000,ton_scanning,lp32,0.582,-0.035,1.141
+cand2000,portscan,none,6.699,3.55,9.464
+cand2000,portscan,lp32,9.327,7.076,11.482
+cand2000,unsw_recon,none,3.313,3.004,3.592
+cand2000,unsw_recon,lp32,3.367,3.09,3.631
+fulldim,ton_scanning,none,-0.651,-3.031,1.438
+fulldim,portscan,none,16.226,15.006,17.417

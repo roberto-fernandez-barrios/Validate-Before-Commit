@@ -1,0 +1,13 @@
+block,regime,drift,which,gate_vs_naive,lo,hi,collisions
+causal,portscan,full,clean,-0.064,-0.333,0.183,0.5
+causal,portscan,full,leaky,0.95,0.12,2.074,387.6
+causal,portscan,mild,clean,0.021,-0.271,0.334,132.6
+causal,portscan,mild,leaky,1.067,-0.027,3.118,271.6
+causal,unsw_recon,full,clean,-0.039,-0.285,0.184,721.3
+causal,unsw_recon,full,leaky,0.111,-0.101,0.365,1319.1
+causal,unsw_recon,mild,clean,0.008,0.0,0.023,4.5
+causal,unsw_recon,mild,leaky,0.028,0.009,0.051,110.4
+causal,ton_scanning,full,clean,2.949,1.533,4.502,1.1
+causal,ton_scanning,full,leaky,3.859,1.682,6.69,462.1
+causal,ton_scanning,mild,clean,1.398,0.287,2.873,0.2
+causal,ton_scanning,mild,leaky,0.299,0.002,0.796,83.1

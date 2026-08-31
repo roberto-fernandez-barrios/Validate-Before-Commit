@@ -82,6 +82,17 @@ every fixed stream parameter.
   are reused. These fields are recorded structurally in `results/final_manifest.json`
   (`recovered_driver_sha256`, `frontier_reused_verified_arms`, `reuse_criterion`).
 
+## Historical commit identifiers
+
+Frozen notes, configs and sealed verdict files record git SHAs from the development history
+in which they were written (e.g. `8838566`, `96576bb`, `114513f…`, `7f9ea40…`). That history
+was consolidated when the repository was curated for publication, so those objects are not
+resolvable from the published history; `audits/protocol_commit_reachability.csv` enumerates
+every such reference and its status. No identifier was rewritten or replaced — the notes are
+frozen. The pre-run-freeze evidence that *is* verifiable from the published history is its
+own commit chronology: each registered protocol and config commit precedes the corresponding
+results commit.
+
 ## Datasets
 
 Public benchmarks, not redistributed: CICIDS2017 (Sharafaldin et al. 2018), UNSW-NB15

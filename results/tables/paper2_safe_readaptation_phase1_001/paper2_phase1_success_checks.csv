@@ -1,0 +1,4 @@
+criterion,passed,value_1,value_2,interpretation
+A_benefit_preservation_portscan,False,1.05787414411477,-1.7999999999999998,Need >=70% legacy gain retained and fewer adaptations.
+B_harm_avoidance_ton_iot,False,-0.1890624999999999,-0.3999999999999999,Need less harm than legacy and fewer adaptations.
+C_mixed_regime_non_degradation_unsw_recon,True,-0.00015625000000007994,-0.3999999999999999,Need not materially underperform legacy. Threshold: BA delta >= -0.002.

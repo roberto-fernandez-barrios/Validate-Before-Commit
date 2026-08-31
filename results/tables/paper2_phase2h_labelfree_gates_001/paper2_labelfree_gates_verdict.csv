@@ -1,0 +1,5 @@
+downstream,gate,B_harm_avoid,A_benefit,C_marginal,passes_all
+svc_rbf,atc,True,False,True,False
+svc_rbf,doc,True,False,True,False
+random_forest,atc,True,False,True,False
+random_forest,doc,True,False,True,False

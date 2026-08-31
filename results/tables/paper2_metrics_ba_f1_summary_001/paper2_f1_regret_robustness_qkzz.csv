@@ -1,0 +1,8 @@
+regime,klass,QKzz_naive_F1,QKzz_decOracle_F1,regret_F1_pts,ci_lo,ci_hi,harm_seed_pct
+CICIDS Wednesday,benefit,0.88409,0.88409,0.0,0.0,0.0,0.0
+CICIDS DDoS,benefit,0.89516,0.89516,0.0,0.0,0.0,0.0
+CICIDS PortScan,benefit,0.942,0.94359,0.159,0.042,0.303,20.0
+CICIDS WebAttacks,benefit,0.91793,0.92425,0.632,0.243,1.129,43.3
+UNSW-NB15 DoS,marginal,0.85981,0.86427,0.447,0.218,0.714,43.3
+UNSW-NB15 Reconnaissance,marginal,0.86404,0.86481,0.076,0.021,0.144,23.3
+ToN-IoT Scanning,harmful,0.87182,0.92675,5.493,2.146,9.645,60.0

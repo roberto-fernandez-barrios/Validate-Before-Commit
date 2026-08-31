@@ -1,0 +1,13 @@
+dataset,model,condition,n,gap_B_minus_A,lo,hi
+portscan,svc_rbf,independent_transformer,30,-1.905,-6.823,2.852
+portscan,svc_rbf,A_fit_transformer,30,-3.637,-8.292,-0.358
+portscan,random_forest,independent_transformer,30,0.007,-0.038,0.055
+portscan,random_forest,A_fit_transformer,30,0.023,-0.026,0.073
+unsw_recon,svc_rbf,independent_transformer,30,0.0,-0.081,0.084
+unsw_recon,svc_rbf,A_fit_transformer,30,-0.184,-0.378,-0.007
+unsw_recon,random_forest,independent_transformer,30,0.04,-0.116,0.209
+unsw_recon,random_forest,A_fit_transformer,30,0.122,-0.019,0.262
+ton_scanning,svc_rbf,independent_transformer,30,4.988,0.281,10.264
+ton_scanning,svc_rbf,A_fit_transformer,30,-10.454,-16.172,-5.302
+ton_scanning,random_forest,independent_transformer,30,0.009,-0.047,0.062
+ton_scanning,random_forest,A_fit_transformer,30,-0.042,-0.093,0.007

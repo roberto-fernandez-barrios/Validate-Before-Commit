@@ -1,0 +1,3 @@
+n_raw,n_unique_global,n_label_conflicts,n_dropped_duplicate,dataset,model,condition,contrast,n_seeds,n_per_block,gap,lo,hi
+95521,85245,0,10276,ton_scanning,svc_rbf,independent,rand,2,2000,-0.775,-1.125,-0.425
+95521,85245,0,10276,ton_scanning,svc_rbf,independent,m2_minus_m1,2,2000,0.35,-0.425,1.125

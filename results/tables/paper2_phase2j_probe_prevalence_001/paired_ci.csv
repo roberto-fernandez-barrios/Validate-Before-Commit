@@ -1,0 +1,10 @@
+regime,arm,contrast,diff,ci_lo,ci_hi
+portscan,p10_b32,vs_noadapt,7.93,5.836,9.937
+portscan,p01_b32,vs_noadapt,7.62,5.612,9.54
+portscan,p01_b320,vs_noadapt,7.998,5.883,9.95
+unsw_recon,p10_b32,vs_noadapt,1.261,1.003,1.513
+unsw_recon,p01_b32,vs_noadapt,1.279,1.029,1.54
+unsw_recon,p01_b320,vs_noadapt,1.496,1.257,1.733
+ton_scanning,p10_b32,vs_noadapt,0.996,0.663,1.39
+ton_scanning,p01_b32,vs_noadapt,1.011,0.69,1.4
+ton_scanning,p01_b320,vs_noadapt,0.675,0.381,1.029

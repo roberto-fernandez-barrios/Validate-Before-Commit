@@ -1,0 +1,8 @@
+regime_id,regime,klass,noadapt_BA,best_adaptive_method,best_adaptive_BA,best_gain_BA_pts,worst_gain_BA_pts,best_gain_F1_pts
+cicids_wednesday,CICIDS Wednesday,benefit,0.76593,qk_mmd_zz,0.88483,11.889,11.128,18.322
+cicids_ddos,CICIDS DDoS,benefit,0.6983,qk_mmd_zz,0.89327,19.497,18.584,32.257
+cicids_portscan,CICIDS PortScan,benefit,0.87708,qk_mmd_zz,0.93911,6.204,2.94,7.81
+cicids_webattacks,CICIDS WebAttacks,benefit,0.84263,qk_mmd_pauli_xz,0.91911,7.648,5.745,12.202
+unsw_dos,UNSW-NB15 DoS,marginal,0.83681,ks_max,0.85134,1.453,0.948,0.502
+unsw_recon,UNSW-NB15 Reconnaissance,marginal,0.84393,qk_mmd_zz,0.84892,0.499,0.157,0.232
+ton_iot_scanning,ToN-IoT Scanning,harmful,0.9225,energy_distance,0.91735,-0.516,-4.582,-0.239

@@ -1,0 +1,19 @@
+dataset,contrast,effect_pp,ci90_lo,ci90_hi,equivalent_pm0p2,equivalent_pm0p5,equivalent_pm1p0,registered_primary_margin,interpretation
+CICIDS2017-PortScan,ps_zero: naive-2000 vs never,0.1854,-0.0995,0.494,False,True,True,0.5,equivalent at the preregistered primary +-0.5 pp margin and at +-1.0 pp; not at the stricter +-0.2 pp sensitivity -- margin-sensitive
+UNSW-NB15,unsw_zero: naive-2000 vs never,-0.0206,-0.0904,0.0474,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+ToN-IoT,ton_zero: naive-2000 vs never,-0.0094,-0.0471,0.0289,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+CICIDS2017-PortScan,ps_zero: naive-2000 vs naive-512,1.8883,1.5958,2.1732,False,False,False,0.5,not equivalent at any preregistered margin
+UNSW-NB15,unsw_zero: naive-2000 vs naive-512,0.6331,0.55,0.7164,False,False,True,0.5,not equivalent at the primary +-0.5 pp margin; equivalent only at +-1.0 pp
+ToN-IoT,ton_zero: naive-2000 vs naive-512,0.2279,0.119,0.3484,False,True,True,0.5,equivalent at the preregistered primary +-0.5 pp margin and at +-1.0 pp; not at the stricter +-0.2 pp sensitivity -- margin-sensitive
+CICIDS2017-PortScan,ps_zero: point-2000 vs naive-2000,0.0547,0.0073,0.107,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+CICIDS2017-PortScan,ps_zero: strict-2000 vs naive-2000,0.1313,-0.0393,0.3083,False,True,True,0.5,equivalent at the preregistered primary +-0.5 pp margin and at +-1.0 pp; not at the stricter +-0.2 pp sensitivity -- margin-sensitive
+UNSW-NB15,unsw_zero: point-2000 vs naive-2000,0.0073,-0.0154,0.031,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+UNSW-NB15,unsw_zero: strict-2000 vs naive-2000,0.0578,0.0036,0.1135,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+ToN-IoT,ton_zero: point-2000 vs naive-2000,0.0164,0.001,0.0417,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+ToN-IoT,ton_zero: strict-2000 vs naive-2000,0.0339,-0.0039,0.0732,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+CICIDS2017-PortScan,ps_zero: (point-naive)@2000 - (point-naive)@512,-0.9174,-1.1945,-0.6549,False,False,False,0.5,not equivalent at any preregistered margin
+CICIDS2017-PortScan,ps_zero: (strict-naive)@2000 - (strict-naive)@512,-1.5427,-1.8312,-1.2539,False,False,False,0.5,not equivalent at any preregistered margin
+UNSW-NB15,unsw_zero: (point-naive)@2000 - (point-naive)@512,-0.1813,-0.2674,-0.1026,False,True,True,0.5,equivalent at the preregistered primary +-0.5 pp margin and at +-1.0 pp; not at the stricter +-0.2 pp sensitivity -- margin-sensitive
+UNSW-NB15,unsw_zero: (strict-naive)@2000 - (strict-naive)@512,-0.4062,-0.5052,-0.3055,False,False,True,0.5,not equivalent at the primary +-0.5 pp margin; equivalent only at +-1.0 pp
+ToN-IoT,ton_zero: (point-naive)@2000 - (point-naive)@512,-0.1003,-0.1904,-0.0284,True,True,True,0.5,"equivalent at every preregistered margin (+-0.2, +-0.5, +-1.0 pp)"
+ToN-IoT,ton_zero: (strict-naive)@2000 - (strict-naive)@512,-0.2042,-0.3182,-0.1031,False,True,True,0.5,equivalent at the preregistered primary +-0.5 pp margin and at +-1.0 pp; not at the stricter +-0.2 pp sensitivity -- margin-sensitive

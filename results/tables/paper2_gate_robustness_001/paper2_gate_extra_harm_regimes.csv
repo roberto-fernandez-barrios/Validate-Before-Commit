@@ -1,0 +1,3 @@
+regime,noadapt_BA,naive_gain,gate_gain,harm_reproduced,gate_avoids_harm
+ToN-IoT ddos,0.9119,-16.81,1.26,True,True
+ToN-IoT injection,0.9249,-1.21,0.8,True,True

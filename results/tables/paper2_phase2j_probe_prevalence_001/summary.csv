@@ -1,0 +1,13 @@
+regime,arm,gain_pts,fullreplace_naive_gain
+portscan,balanced_b32,8.27,7.79
+unsw_recon,balanced_b32,1.13,0.917
+ton_scanning,balanced_b32,0.934,-1.362
+portscan,p10_b32,7.93,7.79
+portscan,p01_b32,7.62,7.79
+portscan,p01_b320,7.998,7.79
+unsw_recon,p10_b32,1.261,0.917
+unsw_recon,p01_b32,1.279,0.917
+unsw_recon,p01_b320,1.496,0.917
+ton_scanning,p10_b32,0.996,-1.362
+ton_scanning,p01_b32,1.011,-1.362
+ton_scanning,p01_b320,0.675,-1.362

@@ -161,8 +161,10 @@ unified window-64 causal matrix (`paper2_fk_*_c64_*`), the operational-prevalenc
 (`paper2_fk_*_e2e*`), and the 4-condition disjoint role-randomized symmetric A/B.
 
 **Symmetric-pipeline dynamic replication (v1.21 — the central new evidence block).**
-Registered protocol `notes/paper2_symmetric_pipeline_dynamic_protocol_001.md` (frozen commit
-`8838566`; margins + machine-evaluable A/B/C decision rules in Appendix A, commit `96576bb`);
+Registered protocol `notes/paper2_symmetric_pipeline_dynamic_protocol_001.md` (the note records
+development-history freeze commits `8838566` / `96576bb`, which predate the repository's curation
+and are not resolvable from the published history — see `audits/protocol_commit_reachability.csv`;
+in the published history the protocol and config commits verifiably precede the results commit);
 config `configs/symmetric_pipeline_dynamic_v1.json`. Incumbent and challengers are
 self-contained `ModelPipeline`s over a shared raw stream (`src/experiments/symmetric_pipeline.py`);
 the drift monitor keeps the initial-transformer representation under both policies
@@ -190,8 +192,10 @@ role symmetry, temporal semantics, determinism, provenance, seed firewall):
 `tests/test_symmetric_pipeline.py`.
 
 **Size-matched self-contained challenger control (v1.22 candidate — the decisive final block).**
-Registered protocol `notes/paper2_size_matched_own_transformer_protocol_001.md` (frozen commit
-`114513f` BEFORE implementation; machine-evaluable P/A/E outcome rules in §6); config
+Registered protocol `notes/paper2_size_matched_own_transformer_protocol_001.md` (machine-evaluable
+P/A/E outcome rules in §6; the note records development-history freeze commit `114513f…`, not
+resolvable from the published history — see `audits/protocol_commit_reachability.csv`; the
+published history shows the protocol and config committed before the results commit); config
 `configs/size_matched_own_transformer_v1.json` (SHA-256 recorded in every arm's `run_config.json`).
 21 arms = 3 zero-drift scenarios × (never + {naive, point, strict} × candidate size {512, 2000}/class),
 own-transformer only, confirmatory seeds 4001–4030 (firewalled), smoke 4401–4402. The
@@ -214,8 +218,8 @@ raw_stream_hash/candidate_provenance.jsonl/completion marker) and
 `results/tables/size_matched_own_transformer_001/` (by_seed, paired_contrasts, multiplicity,
 equivalence, security_metrics, harmful_commit_summary, candidate_size_interaction,
 descriptive_contrasts, run_completion, CLAIM_INTERPRETATION.json — machine verdict:
-**ATTENUATION**, with the substantive reading — mean zero-drift harm equivalent to zero within the
-preregistered ±0.5-pp margin — recorded alongside). Invariants
+**ATTENUATION**, with the substantive reading — matched-size mean effects compatible with the
+preregistered ±0.5-pp margin (CI90 inclusion; PortScan boundary-close) — recorded alongside). Invariants
 (flag-off bit-parity, nesting, raw-stream pairing, probe identity, leakage, hyperparameter
 identity, complete-bundle commit, determinism, seed firewall, metric recomputation, sealed
 v1.21.0 artifact unchanged): `tests/test_size_matched_control.py`.
@@ -279,8 +283,10 @@ python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cro
 Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit;
 `make final-paper` = hash verification + invariant tests (`tests/`) + analysis + final tables + figures +
 `results/final_manifest.json` + CAS/supplement/IEEE compilation + the claim audit (`src/analysis/audit_paper2_claims.py`) — the P10 workflow).
-The small confirmatory CSVs are **committed** under `results/tables/` and pinned by
-`results/tables/MANIFEST.sha256`; regenerated outputs can be diffed against them. The
+All 185 manifest-pinned confirmatory CSVs are **committed** under `results/tables/`
+(byte-exact; a `-text` git attribute prevents eol mangling) and pinned by
+`results/tables/MANIFEST.sha256`; `make verify-hashes` passes on a fresh clone, and
+regenerated outputs can be diffed against the committed values. The
 UNSW chronological staging is `python -m src.analysis.prepare_paper2_unsw_chronological`
 (raw captures 1–4 sorted by Stime; train = first 30% of the timeline).
 
@@ -307,12 +313,12 @@ Outputs: `results/tables/paper2_*` and `results/figures/paper2/*.{png,pdf}`.
 | Pre-enumerated chronological matrix (seven further replays; net harm unobserved; healthy UNSW timelines vs the unresolved Wednesday counterexample) | `paper2_final_q1/chronological_replays.csv`, tab:chronological_q1, main §5.4 |
 | Observed-data 64-flow matrix, VBC-SG frontier, prevalence sweep (final-kbs) | `paper2_final_kbs/`, `paper2_final_q1/budget_frontier.csv`, Tables causal_probe/symmetric_ab/budget_frontier (Supp §S2.12), main §5.5 |
 | Size-matched self-contained challenger control (ATTENUATION; matched-size means compatible with ±0.5 pp under zero drift, PortScan boundary-close; candidate-size effect Holm-significant; no gate gain at 2,000/class) | `size_matched_own_transformer_001/` (CLAIM_INTERPRETATION.json), tab:size_matched, main §5.2–§5.3, Supp §S8 |
-| Baseline / SoTA comparison (label-free rules, ATC/DoC, DDM/ADWIN, update generators, McNemar/CS/VBC-SG; descriptive across blocks, paired within block) | `paper2_policy_frontier_005/frontier.csv`, `paper2_phase2h_labelfree_gates_001/`, `paper2_phase2i_replay_baseline_001/`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_008/summary.csv`, `paper2_final_q1/budget_frontier.csv`; main §5.6 (tab:baselines) |
+| Baseline comparison (compact paired core §5.6; full all-block matrix Supp §S2.12; label-free rules, ATC/DoC, DDM/ADWIN, update generators, McNemar/CS/VBC-SG; descriptive across blocks, paired within block) | `paper2_policy_frontier_005/frontier.csv`, `paper2_phase2h_labelfree_gates_001/`, `paper2_phase2i_replay_baseline_001/`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_008/summary.csv`, `paper2_final_q1/budget_frontier.csv`; main §5.6 (tab:baselines) |
 | Symmetric-pipeline replication (Scenario A): mean full-drift harm does not persist under self-contained pipelines (+7.21/+2.55/+1.03); ownership interaction up to +5.98; zero-drift harm persists (−1.74/−0.65 material, −0.38 resolved) and gates recover it (6/6 Holm-sig.); unsw_zero strict = recall↔FPR trade-off | `symmetric_pipeline_dynamic_001/` (CLAIM_INTERPRETATION.json), tab:symmetric_pipeline, Supp §S7 |
 | Frozen-mode parity: the new self-contained harness reproduces published v1.20.2 arms bit-for-bit (4 arms × 30 seeds; deferred arm 5/5 files byte-identical) | `results/smoke/symmetric_pipeline/parity/*/parity_report.json` |
 | Detector score carries no consistent incremental signal within triggered decisions (oracle-regret, invariance) | `paper2_oracle_regret_decision_001/`, Supp §S1.1–S1.2 |
 | Simple k-of-n/cooldown policies fail (pre-registered) | Supp §S1.3/S3; `notes/paper2_safe_readaptation_phase1_*` |
-| Label-efficient gate solves it (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Supp §S1.4 |
+| Label-efficient gate converts the harm regime in the initial study (30 seeds, both detectors) | `paper2_phase2_gated_readaptation_001/`, Supp §S1.4 |
 | ~how few labels suffice (label-efficiency frontier) | `paper2_phase2b_budget_curve_001/`, Supp §S1.5 |
 
 ## 6. Notes

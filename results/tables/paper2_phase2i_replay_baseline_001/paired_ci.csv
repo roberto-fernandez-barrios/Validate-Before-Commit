@@ -1,0 +1,10 @@
+regime,contrast,diff,ci_lo,ci_hi
+portscan,replay_lp32_vs_replay_naive,1.662,0.523,3.041
+portscan,replay_lp32_vs_noadapt,8.255,6.096,10.338
+portscan,replay_naive_vs_noadapt,6.593,4.372,8.817
+unsw_recon,replay_lp32_vs_replay_naive,0.113,-0.16,0.401
+unsw_recon,replay_lp32_vs_noadapt,0.275,-0.018,0.552
+unsw_recon,replay_naive_vs_noadapt,0.162,-0.213,0.496
+ton_scanning,replay_lp32_vs_replay_naive,5.125,2.955,7.596
+ton_scanning,replay_lp32_vs_noadapt,0.585,0.227,0.97
+ton_scanning,replay_naive_vs_noadapt,-4.54,-7.058,-2.34

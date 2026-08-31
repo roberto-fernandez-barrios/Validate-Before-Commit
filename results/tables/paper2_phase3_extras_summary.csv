@@ -1,0 +1,13 @@
+regime,arm,gain,lo,hi,labels
+portscan,perf_none,5.402,3.816,6.996,800.0
+portscan,perf_lp32,5.402,3.845,6.96,822.0
+portscan,natprev_none,9.061,6.802,11.185,0.0
+portscan,natprev_lp32,9.408,7.293,11.406,288.0
+unsw_recon,perf_none,0.036,0.0,0.109,800.0
+unsw_recon,perf_lp32,0.0,0.0,0.0,802.0
+unsw_recon,natprev_none,1.538,1.299,1.765,0.0
+unsw_recon,natprev_lp32,1.536,1.312,1.753,283.0
+ton_scanning,perf_none,0.0,0.0,0.0,800.0
+ton_scanning,perf_lp32,0.0,0.0,0.0,800.0
+ton_scanning,natprev_none,-2.626,-4.068,-1.373,0.0
+ton_scanning,natprev_lp32,0.801,0.441,1.201,288.0

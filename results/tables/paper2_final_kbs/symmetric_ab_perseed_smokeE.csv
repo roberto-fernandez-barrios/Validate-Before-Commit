@@ -1,0 +1,3 @@
+dataset,model,condition,seed,n_per_block,inc_is_m1,ba_incumbent,ba_challenger,gap_rand,gap_m2_minus_m1
+ton_scanning,svc_rbf,independent,1999,2000,False,95.475,94.35,-1.125,1.125
+ton_scanning,svc_rbf,independent,2000,2000,True,95.2,94.775,-0.425,-0.425

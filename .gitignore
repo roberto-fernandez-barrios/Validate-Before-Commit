@@ -46,22 +46,19 @@ results/**
 !results/
 !results/**/
 !results/**/.gitkeep
-# ... but the small confirmatory tables ARE versioned (reproducibility: reviewers can diff
-# regenerated outputs against these committed values; MANIFEST.sha256 pins the full set)
-!results/tables/paper2_v2_replication_001/*.csv
-!results/tables/paper2_amendment_004/*.csv
-!results/tables/paper2_amendment_005/*.csv
-!results/tables/paper2_decision_quality_004/*.csv
-!results/tables/paper2_decision_quality_005/*.csv
-!results/tables/paper2_policy_frontier_005/*.csv
-!results/tables/paper2_monitor_validation_004.csv
-# symmetric-pipeline confirmatory replication (registered block; NOT yet in MANIFEST.sha256
-# -- the sealed artifact manifest is untouched until a future authorized release phase)
-!results/tables/symmetric_pipeline_dynamic_001/*.csv
+# Post-KBS hardening: EVERY CSV pinned by results/tables/MANIFEST.sha256 is versioned,
+# so a fresh clone passes `make verify-hashes` from repository contents alone. All CSVs
+# under results/tables are pinned (verify_results_manifest reports 0 unpinned extras);
+# unpinned generated .tex side-products there stay unversioned. The machine-verdict JSONs
+# of the two registered replications ship as well.
+!results/tables/**/*.csv
 !results/tables/symmetric_pipeline_dynamic_001/*.json
+!results/tables/size_matched_own_transformer_001/*.json
 !results/tables/MANIFEST.sha256
 # final-kbs P10: the machine-readable final manifest ships with the artifact
 !results/final_manifest.json
+# table -> protocol -> config ledger referenced by README/PROVENANCE (derived, small)
+!results/final_experiment_ledger.csv
 
 # Large artifacts
 *.pkl

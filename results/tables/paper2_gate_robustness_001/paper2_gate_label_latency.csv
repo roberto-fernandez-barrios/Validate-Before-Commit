@@ -1,0 +1,13 @@
+regime,probe_lag,gate_gain,naive_gain,gate_avoids_harm
+portscan,0,8.27,7.79,True
+portscan,5,8.39,7.79,True
+portscan,10,8.2,7.79,True
+portscan,20,8.06,7.79,True
+unsw_recon,0,1.13,0.92,True
+unsw_recon,5,1.26,0.92,True
+unsw_recon,10,1.17,0.92,True
+unsw_recon,20,0.97,0.92,True
+ton_scanning,0,0.93,-1.36,True
+ton_scanning,5,0.98,-1.36,True
+ton_scanning,10,1.06,-1.36,True
+ton_scanning,20,0.95,-1.36,True

@@ -1,0 +1,17 @@
+base_BA,gain,source
+76.593,11.889,svc_taxonomy
+69.83,19.497,svc_taxonomy
+87.708,6.204,svc_taxonomy
+84.263,7.648,svc_taxonomy
+83.68100000000001,1.453,svc_taxonomy
+84.393,0.499,svc_taxonomy
+92.25,-0.516,svc_taxonomy
+69.57,27.73,random_forest
+86.2,2.31,random_forest
+97.02,1.88,random_forest
+93.87,1.46,logreg
+71.85000000000001,4.29,logreg
+84.24000000000001,6.7,logreg
+68.92,27.08,mlp
+86.81,1.0,mlp
+94.78,0.24,mlp

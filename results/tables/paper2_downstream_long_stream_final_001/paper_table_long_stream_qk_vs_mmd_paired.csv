@@ -1,0 +1,25 @@
+severity,method_a,method_b,metric,n_pairs,mean_diff_a_minus_b,std_diff,min_diff,max_diff,prob_diff_gt_0
+0.75,QK-MMD ZZ,MMD-RBF,post_balanced_accuracy_mean,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD ZZ,MMD-RBF,degradation_area,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD ZZ,MMD-RBF,clean_adaptation_gain,30,-0.007174479166666667,0.07080831556101622,-0.2271875,0.22421875,0.03333333333333333
+0.75,QK-MMD ZZ,MMD-RBF,trigger_delay_windows,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD ZZ,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.31984191497474607,-1.0,1.0,0.06666666666666667
+0.75,QK-MMD ZZ,MMD-RBF,triggered_post,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD PauliXZ,MMD-RBF,post_balanced_accuracy_mean,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD PauliXZ,MMD-RBF,degradation_area,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD PauliXZ,MMD-RBF,clean_adaptation_gain,30,-0.007174479166666667,0.07080831556101622,-0.2271875,0.22421875,0.03333333333333333
+0.75,QK-MMD PauliXZ,MMD-RBF,trigger_delay_windows,30,0.0,0.0,0.0,0.0,0.0
+0.75,QK-MMD PauliXZ,MMD-RBF,false_alarm_any,30,0.03333333333333333,0.31984191497474607,-1.0,1.0,0.06666666666666667
+0.75,QK-MMD PauliXZ,MMD-RBF,triggered_post,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,post_balanced_accuracy_mean,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,degradation_area,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,clean_adaptation_gain,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,trigger_delay_windows,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD ZZ,MMD-RBF,triggered_post,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,post_balanced_accuracy_mean,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,degradation_area,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,clean_adaptation_gain,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,trigger_delay_windows,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,false_alarm_any,30,0.0,0.0,0.0,0.0,0.0
+1.0,QK-MMD PauliXZ,MMD-RBF,triggered_post,30,0.0,0.0,0.0,0.0,0.0

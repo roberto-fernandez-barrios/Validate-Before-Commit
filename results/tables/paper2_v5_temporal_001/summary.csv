@@ -1,0 +1,7 @@
+metric,value,lo,hi
+naive_vs_noadapt,21.333,20.65,22.048
+gate_vs_noadapt,19.917,18.578,21.158
+gate_vs_naive,-1.416,-2.446,-0.47
+labels_mean,548.3,,
+n_adapt_mean,14.1,,
+noadapt_BA,68.38,,
