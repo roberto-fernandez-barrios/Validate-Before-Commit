@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "results" / "final_manifest.json"
 
 # Bump when the manifest's field layout changes so consumers can branch on it.
-MANIFEST_SCHEMA_VERSION = "1.2.0"
+MANIFEST_SCHEMA_VERSION = "1.2.1"
 
 CORE_DATASETS = [
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
@@ -321,6 +321,26 @@ def post_kbs_confirmatory_v1_23_summary() -> dict:
     )
 
 
+def vbcsg_per_proposal_cells() -> dict:
+    """final-kbs VBC-SG per-proposal cells (PortScan full, ToN zero-drift) -- the only claim-audit
+    inputs that live exclusively in raw per-seed logs (they are not part of the fk summary
+    table). Computed from raw where raw exists so the sealed manifest carries them and a fresh
+    clone (which does not ship results/raw) can still audit the corresponding claims."""
+    out = {}
+    for reg, tag in (("portscan", "full_vbcpp"), ("ton_scanning", "rz_vbcpp")):
+        f = REPO / "results" / "raw" / f"paper2_fk_{reg}_{tag}" / "paper2_progressive_readaptation_by_seed.csv"
+        if not f.exists():
+            out[f"{reg}_{tag}"] = "missing (raw outputs not present)"
+            continue
+        d = pd.read_csv(f)
+        d = d[d.seed.isin(set(range(104, 134)))]
+        g = d[d.method == "ks_max"].set_index("seed")["mean_balanced_accuracy"]
+        b = d[d.method == "no_adaptation"].set_index("seed")["mean_balanced_accuracy"]
+        out[f"{reg}_{tag}"] = dict(gain_pp_vs_no_adaptation=float(((g - b) * 100).mean()),
+                                   n_seeds=int(len(g)), seeds="104-133")
+    return out
+
+
 def causal_matrix_counters() -> dict:
     """Sum the collision/label counters of the final-kbs causal-64 matrix arms."""
     rows = []
@@ -555,6 +575,9 @@ def main(out: Path | None = None) -> None:
                         "causal/operational feasibility", "external boundary (chronological)",
                         "exploratory"],
         collision_counts=causal_matrix_counters(),
+        # v1.23.0: the two raw-only VBC-SG per-proposal cells, sealed here so the claim audit
+        # is runnable from repository contents alone (fallback when results/raw is absent).
+        final_kbs_vbcsg_per_proposal=vbcsg_per_proposal_cells(),
         experiment_ledger=ledger_summary(),
         harmful_commits=harm_summary(),
         # q1-final-patch (v1.20.0): the deferred-commit temporal fix and its frontier rerun.

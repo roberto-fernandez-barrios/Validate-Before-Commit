@@ -1,7 +1,7 @@
 {
-  "manifest_schema_version": "1.2.0",
-  "generated_at_utc": "2026-09-01T10:28:05Z",
-  "source_commit_sha": "19d5a8039d9122b0315fa15e27d8f1e00ce58d52",
+  "manifest_schema_version": "1.2.1",
+  "generated_at_utc": "2026-09-01T10:40:08Z",
+  "source_commit_sha": "7b87c2f324e430f1c24515cd4da5c55be0016e54",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
   "artifact_version": "1.23.0",
   "datasets": {
@@ -299,6 +299,18 @@
     "total_cand_future_collisions": 0,
     "total_commit_no_probe": 0
   },
+  "final_kbs_vbcsg_per_proposal": {
+    "portscan_full_vbcpp": {
+      "gain_pp_vs_no_adaptation": 3.016406249999999,
+      "n_seeds": 30,
+      "seeds": "104-133"
+    },
+    "ton_scanning_rz_vbcpp": {
+      "gain_pp_vs_no_adaptation": 0.0,
+      "n_seeds": 30,
+      "seeds": "104-133"
+    }
+  },
   "experiment_ledger": {
     "path": "results/final_experiment_ledger.csv",
     "n_blocks": 14,
@@ -492,7 +504,11 @@
     "experiments_rerun_after_frozen_protocol": "exactly the registered 42-arm matrix, seeds 3001-3030",
     "unregistered_experiments": "none",
     "v1_20_2_raw_outputs": "unchanged (MANIFEST re-pin additive 164->173)",
-    "manuscript_pages": "pypdf unavailable"
+    "manuscript_pages": {
+      "main.pdf": 30,
+      "supplement.pdf": 45,
+      "main_ieee.pdf": 23
+    }
   },
   "size_matched_control_v1_22": {
     "title": "Validate Before Commit: A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection",

@@ -812,11 +812,24 @@ def main():
 
     # final-kbs: VBC-SG per-proposal cells (read raw; not in fk summary)
     def vbc_gain(reg, tag):
-        d = pd.read_csv(f"results/raw/paper2_fk_{reg}_{tag}/paper2_progressive_readaptation_by_seed.csv")
-        d = d[d.seed.isin(set(range(104, 134)))]
-        g = d[d.method == "ks_max"].set_index("seed")["mean_balanced_accuracy"]
-        b = d[d.method == "no_adaptation"].set_index("seed")["mean_balanced_accuracy"]
-        return float(((g - b) * 100).mean())
+        import os as _os
+        raw = f"results/raw/paper2_fk_{reg}_{tag}/paper2_progressive_readaptation_by_seed.csv"
+        if _os.path.exists(raw):
+            d = pd.read_csv(raw)
+            d = d[d.seed.isin(set(range(104, 134)))]
+            g = d[d.method == "ks_max"].set_index("seed")["mean_balanced_accuracy"]
+            b = d[d.method == "no_adaptation"].set_index("seed")["mean_balanced_accuracy"]
+            return float(((g - b) * 100).mean())
+        # v1.23.0: results/raw is not shipped; the two per-proposal cells are sealed in the
+        # final manifest (computed from raw at stamping time), so a fresh clone audits them
+        # against the sealed value rather than skipping the check.
+        import json as _json
+        m = _json.load(open("results/final_manifest.json", encoding="utf-8"))
+        cell = m.get("final_kbs_vbcsg_per_proposal", {}).get(f"{reg}_{tag}")
+        if not isinstance(cell, dict):
+            raise FileNotFoundError(f"{raw} absent and no sealed value in final_manifest.json")
+        print(f"  [note] {reg}_{tag}: raw absent; using the sealed final_manifest.json cell")
+        return float(cell["gain_pp_vs_no_adaptation"])
     check("fk VBC-SG per-proposal PortScan full +3.02", 3.016, vbc_gain("portscan", "full_vbcpp"), 0.03)
     check("fk VBC-SG per-proposal ToN zero 0.00 (safe)", 0.0, vbc_gain("ton_scanning", "rz_vbcpp"), 0.005)
 
