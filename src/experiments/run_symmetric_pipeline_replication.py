@@ -52,6 +52,33 @@ def load_config(path: Path | None = None) -> dict:
     with open(path, encoding="utf-8") as f:
         cfg = json.load(f)
     cfg["_config_path"] = str(path.resolve().relative_to(ROOT)).replace(os.sep, "/")
+    if cfg.get("matrix_kind") in ("ijis_exact_value_disjoint_b2",
+                                  "ijis_exact_value_disjoint_b1"):
+        # The final IJIS sensitivity inherits every scientific constant from the sealed
+        # B2/B1 config and changes only the seed blocks, outputs and explicit role mode.
+        sensitivity = cfg
+        base = load_config(ROOT / sensitivity["base_config"])
+        base_scenarios = base["scenarios"]
+        base_policies = base["policies"]
+        base_fixed = dict(base["fixed_flags"])
+        base.update(sensitivity)
+        cfg = base
+        cfg["_config_path"] = str(path.resolve().relative_to(ROOT)).replace(os.sep, "/")
+        cfg["_derived_operational_from"] = (
+            sensitivity["base_config"] + "@sha256:" + sensitivity["base_config_sha256"])
+        base_fixed["--role-split-mode"] = "exact_feature_group"
+        cfg["fixed_flags"] = base_fixed
+        cfg["policies"] = base_policies
+        selected = sensitivity["scenarios"]
+        cfg["scenarios"] = {name: base_scenarios[name] for name in selected}
+        cfg["parity_arms"] = []
+        if sensitivity["matrix_kind"] == "ijis_exact_value_disjoint_b2":
+            cfg["_tag_prefix"] = "xvd_b2"
+            cfg["tag_pattern"] = "xvd_b2_{scenario}_{policy}_{512|2000}; never: xvd_b2_{scenario}_never"
+        else:
+            cfg["_tag_prefix"] = "xvd_b1"
+            cfg["scenarios_list"] = list(selected)
+            cfg["tag_pattern"] = "xvd_b1_{scenario}_{policy}_{2000|512}; never: xvd_b1_{scenario}_never"
     if cfg.get("matrix_kind") == "post_kbs_size_matched_drift" and "fixed_flags" not in cfg:
         # post-KBS B2: the frozen preregistration config pins every fixed parameter BY
         # REFERENCE (fixed_flags_source = the sealed symmetric-pipeline config); derive
@@ -147,9 +174,10 @@ def size_matched_drift_arms(cfg: dict) -> list[dict]:
     ONLY flags that vary between size conditions are --candidate-size-per-class (nested
     canonical draw at sev(t)) with the shared drift-domain switch."""
     arms = []
+    prefix = cfg.get("_tag_prefix", "smd")
     for sc, sdef in cfg["scenarios"].items():
         base = _merge(cfg["fixed_flags"], sdef["override_flags"])
-        arms.append(dict(tag=f"smd_{sc}_never", scenario=sc, policy="never",
+        arms.append(dict(tag=f"{prefix}_{sc}_never", scenario=sc, policy="never",
                          transformer_policy="frozen_initial_transformer",
                          candidate_size=None,
                          data=cfg["data"][sdef["data"]],
@@ -157,7 +185,7 @@ def size_matched_drift_arms(cfg: dict) -> list[dict]:
         for pol in ("naive", "point", "strict"):
             pflags = cfg["policies"][pol]
             for size in cfg["candidate_sizes_per_class"]:
-                arms.append(dict(tag=f"smd_{sc}_{pol}_{size}", scenario=sc,
+                arms.append(dict(tag=f"{prefix}_{sc}_{pol}_{size}", scenario=sc,
                                  policy=pol, transformer_policy="own_transformer_per_model",
                                  candidate_size=int(size),
                                  data=cfg["data"][sdef["data"]],
@@ -180,10 +208,11 @@ def common_harness_arms(cfg: dict) -> list[dict]:
     from the frozen v2 config (origins recorded per arm).
     """
     arms = []
+    prefix = cfg.get("_tag_prefix", "bh")
     for sc in cfg["scenarios_list"]:
         sdef = cfg["scenarios"][sc]
         base = _merge(cfg["fixed_flags"], sdef["override_flags"])
-        arms.append(dict(tag=f"bh_{sc}_never", scenario=sc, policy="never",
+        arms.append(dict(tag=f"{prefix}_{sc}_never", scenario=sc, policy="never",
                          transformer_policy="frozen_initial_transformer",
                          candidate_size=None, origin="anchor",
                          data=cfg["data"][sdef["data"]],
@@ -194,7 +223,7 @@ def common_harness_arms(cfg: dict) -> list[dict]:
                                 cfg["secondary_policies_512"])):
             for pol in pols:
                 pdef = cfg["policies"][pol]
-                arms.append(dict(tag=f"bh_{sc}_{pol}_{size_key}", scenario=sc,
+                arms.append(dict(tag=f"{prefix}_{sc}_{pol}_{size_key}", scenario=sc,
                                  policy=pol,
                                  transformer_policy="own_transformer_per_model",
                                  candidate_size=int(size_key),
@@ -212,9 +241,11 @@ def common_harness_arms(cfg: dict) -> list[dict]:
 
 def confirmatory_arms(cfg: dict) -> list[dict]:
     """The registered confirmatory matrix for the loaded config."""
-    if cfg.get("matrix_kind") == "post_kbs_common_harness_baselines":
+    if cfg.get("matrix_kind") in ("post_kbs_common_harness_baselines",
+                                   "ijis_exact_value_disjoint_b1"):
         return common_harness_arms(cfg)
-    if cfg.get("matrix_kind") == "post_kbs_size_matched_drift":
+    if cfg.get("matrix_kind") in ("post_kbs_size_matched_drift",
+                                   "ijis_exact_value_disjoint_b2"):
         return size_matched_drift_arms(cfg)
     if cfg.get("matrix_kind") == "size_matched":
         return size_matched_arms(cfg)
@@ -375,10 +406,13 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
 
     size_matched = "--candidate-size-per-class" in arm["flags"]
     prov_records: list[dict] = []
-    win_rows, trig_rows, sum_rows, res_all, shashes = [], [], [], [], []
+    win_rows, trig_rows, sum_rows, res_all, shashes, role_audits = [], [], [], [], [], []
     for seed in seeds:
         print(f"[{arm['tag']} SEED={seed}]", flush=True)
         env = build_raw_environment(pools, args, seed, arm["transformer_policy"])
+        if env.role_assignment_audit is not None:
+            role_audits.append(dict(arm=arm["tag"], scenario=arm["scenario"],
+                                    **env.role_assignment_audit))
         if size_matched:
             env.candidate_factory = _recording_candidate_factory(
                 env.candidate_factory, seed, int(args.adapt_size_per_class), prov_records,
@@ -390,6 +424,9 @@ def run_one_arm(cfg: dict, arm: dict, outdir: Path, seeds: list[int], *,
         with open(outdir / "candidate_provenance.jsonl", "w", encoding="utf-8") as fh:
             for rec in prov_records:
                 fh.write(json.dumps(rec, sort_keys=True) + "\n")
+    if role_audits:
+        import pandas as pd
+        pd.DataFrame(role_audits).to_csv(outdir / "role_assignment_audit.csv", index=False)
 
     agg = v2.write_outputs(outdir, win_rows, trig_rows, sum_rows, res_all)
     print(agg.to_string(index=False))

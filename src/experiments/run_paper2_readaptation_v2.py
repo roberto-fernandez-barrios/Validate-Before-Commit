@@ -28,6 +28,7 @@ paper2_v2_trigger_log.csv.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -52,6 +53,8 @@ from src.experiments.run_paper2_progressive_readaptation import (
 from scipy.stats import binomtest
 
 ROLE_FRACS = {"window": 0.5, "train": 0.3, "probe": 0.2}
+_FEATURE_GROUP_METADATA_CACHE: dict[tuple[int, ...], dict] = {}
+_FEATURE_GROUP_ASSIGNMENT_CACHE: dict[tuple[int, int], np.ndarray] = {}
 
 
 class DDM:
@@ -211,6 +214,197 @@ def split_pools(pools: Pools, seed: int, fracs: dict | None = None) -> dict[str,
     return {role: Pools(**parts[role]) for role in fr}
 
 
+def _canonical_feature_digest(row: np.ndarray) -> bytes:
+    """Exact cleaned-raw-X key frozen by the final IJIS sensitivity protocol."""
+    x = np.asarray(row, dtype="<f8")
+    if np.any((x == 0.0) & np.signbit(x)):
+        x = x.copy()
+        x[x == 0.0] = 0.0
+    x = np.ascontiguousarray(x)
+    if not np.isfinite(x).all():
+        raise AssertionError("non-finite cleaned raw feature in role splitter")
+    return hashlib.sha256(memoryview(x)).digest()
+
+
+def _feature_group_metadata(pools: Pools) -> dict:
+    """Build collision-checked exact-X groups once per in-process dataset object."""
+    names = ("ref_benign", "ref_attack", "cur_benign", "cur_attack")
+    arrays = [getattr(pools, n) for n in names]
+    # The cache retains these arrays, so their identities cannot be reused while the entry
+    # exists. Keying on the arrays avoids the (theoretical but real) risk that a short-lived
+    # Pools wrapper is collected and its Python object id is reused for another dataset.
+    cache_key = tuple(id(a) for a in arrays)
+    if cache_key in _FEATURE_GROUP_METADATA_CACHE:
+        return _FEATURE_GROUP_METADATA_CACHE[cache_key]
+    keys_by_stratum = []
+    for a in arrays:
+        keys = np.empty(len(a), dtype="V32")
+        for i, row in enumerate(a):
+            keys[i] = np.void(_canonical_feature_digest(row))
+        keys_by_stratum.append(keys)
+    all_keys = np.concatenate(keys_by_stratum)
+    unique_keys, inverse, counts = np.unique(
+        all_keys, return_inverse=True, return_counts=True
+    )
+    offsets = np.r_[0, np.cumsum([len(a) for a in arrays])]
+    inverse_by_stratum = [inverse[offsets[i] : offsets[i + 1]] for i in range(4)]
+
+    # Collision-safe verification without concatenating another copy of the feature matrices.
+    order = np.argsort(inverse, kind="stable")
+    starts = np.r_[0, np.cumsum(counts[:-1])]
+
+    def fetch(global_index: int) -> np.ndarray:
+        s = int(np.searchsorted(offsets[1:], global_index, side="right"))
+        return arrays[s][global_index - offsets[s]]
+
+    for gid in np.flatnonzero(counts > 1):
+        idx = order[starts[gid] : starts[gid] + counts[gid]]
+        base = fetch(int(idx[0]))
+        base_digest = _canonical_feature_digest(base)
+        a = np.asarray(base, dtype="<f8").copy()
+        a[a == 0.0] = 0.0
+        for j in idx[1:]:
+            other = fetch(int(j))
+            if _canonical_feature_digest(other) != base_digest:
+                raise RuntimeError("SHA-256 collision while grouping exact raw X")
+            b = np.asarray(other, dtype="<f8").copy()
+            b[b == 0.0] = 0.0
+            if not np.array_equal(a, b):
+                raise RuntimeError("SHA-256 collision while verifying exact raw X")
+
+    composition = np.column_stack(
+        [np.bincount(inv_s, minlength=len(unique_keys)) for inv_s in inverse_by_stratum]
+    ).astype(np.int64, copy=False)
+    totals = composition.sum(axis=0)
+    label_mask = ((composition[:, 0] + composition[:, 2] > 0).astype(np.uint8)
+                  | ((composition[:, 1] + composition[:, 3] > 0).astype(np.uint8) << 1))
+    membership_mask = ((composition[:, 0] + composition[:, 1] > 0).astype(np.uint8)
+                       | ((composition[:, 2] + composition[:, 3] > 0).astype(np.uint8) << 1))
+    meta = dict(
+        names=names,
+        arrays=arrays,
+        keys_by_stratum=keys_by_stratum,
+        unique_keys=unique_keys,
+        inverse_by_stratum=inverse_by_stratum,
+        composition=composition,
+        totals=totals,
+        n_rows=int(totals.sum()),
+        conflicting_label_groups=int((label_mask == 3).sum()),
+        conflicting_label_rows=int(counts[label_mask == 3].sum()),
+        conflicting_ref_current_groups=int((membership_mask == 3).sum()),
+        max_multiplicity=int(counts.max()),
+    )
+    _FEATURE_GROUP_METADATA_CACHE[cache_key] = meta
+    return meta
+
+
+def _assign_feature_groups(meta: dict, seed: int) -> np.ndarray:
+    """Frozen deterministic greedy assignment from protocol section 3.1."""
+    cache_key = (id(meta), int(seed))
+    if cache_key in _FEATURE_GROUP_ASSIGNMENT_CACHE:
+        return _FEATURE_GROUP_ASSIGNMENT_CACHE[cache_key]
+
+    comp = meta["composition"]
+    totals = meta["totals"].astype(float)
+    n_groups = len(comp)
+    shares = np.max(comp / totals, axis=1)
+    multiplicity = comp.sum(axis=1)
+    seed_bytes = int(seed).to_bytes(8, "little", signed=False)
+    seeded_tie = np.empty(n_groups, dtype="V32")
+    for i, key in enumerate(meta["unique_keys"]):
+        seeded_tie[i] = np.void(hashlib.sha256(seed_bytes + bytes(key)).digest())
+    # np.lexsort uses the last key as primary. Negative numeric keys sort descending.
+    order = np.lexsort((seeded_tie, -multiplicity, -shares))
+
+    targets = np.asarray([0.5, 0.3, 0.2])[:, None] * totals[None, :]
+    assigned = np.zeros((3, 4), dtype=float)
+    normalized = np.zeros((3, 4), dtype=float) - targets / totals[None, :]
+    group_role = np.empty(n_groups, dtype=np.uint8)
+    role_names = (b"window", b"train", b"probe")
+    for gid in order:
+        increment = comp[gid] / totals
+        objectives = []
+        for role in range(3):
+            trial = normalized.copy()
+            trial[role] += increment
+            objectives.append(float(np.max(np.abs(trial)) + np.square(trial).sum()))
+        best = min(objectives)
+        tied = [r for r, value in enumerate(objectives) if value == best]
+        if len(tied) > 1:
+            group_key = bytes(meta["unique_keys"][gid])
+            tied.sort(key=lambda r: hashlib.sha256(
+                seed_bytes + group_key + role_names[r]
+            ).digest())
+        role = tied[0]
+        group_role[gid] = role
+        assigned[role] += comp[gid]
+        normalized[role] += increment
+
+    fractions = assigned / totals[None, :]
+    target_fracs = np.asarray([0.5, 0.3, 0.2])[:, None]
+    max_dev_pp = float(np.max(np.abs(fractions - target_fracs)) * 100)
+    if max_dev_pp > 0.5 + 1e-12:
+        raise RuntimeError(
+            f"exact-feature group assignment exceeds frozen 0.50-pp tolerance: {max_dev_pp:.6f}"
+        )
+    if np.any(assigned <= 0):
+        raise RuntimeError("exact-feature group assignment produced an empty stratum/role")
+    _FEATURE_GROUP_ASSIGNMENT_CACHE[cache_key] = group_role
+    return group_role
+
+
+def split_pools_feature_group_disjoint(pools: Pools, seed: int) -> tuple[dict[str, Pools], dict]:
+    """Assign whole exact cleaned-raw-X groups to roles while preserving all rows."""
+    meta = _feature_group_metadata(pools)
+    group_role = _assign_feature_groups(meta, seed)
+    role_names = ("window", "train", "probe")
+    parts: dict[str, dict[str, np.ndarray]] = {r: {} for r in role_names}
+    audit = dict(
+        seed=int(seed),
+        role_split_mode="exact_feature_group",
+        total_input_rows=meta["n_rows"],
+        unique_x_groups=len(meta["unique_keys"]),
+        conflicting_label_x_groups=meta["conflicting_label_groups"],
+        conflicting_label_rows=meta["conflicting_label_rows"],
+        conflicting_ref_current_x_groups=meta["conflicting_ref_current_groups"],
+        max_group_multiplicity=meta["max_multiplicity"],
+        sha256_collisions=0,
+    )
+    total_output = 0
+    for sidx, name in enumerate(meta["names"]):
+        inv = meta["inverse_by_stratum"][sidx]
+        source = meta["arrays"][sidx]
+        n = len(source)
+        for ridx, role in enumerate(role_names):
+            keep = group_role[inv] == ridx
+            parts[role][name] = source[keep]
+            count = int(keep.sum())
+            total_output += count
+            audit[f"rows_{name}_{role}"] = count
+            audit[f"fraction_{name}_{role}"] = count / n
+            audit[f"deviation_pp_{name}_{role}"] = 100.0 * (
+                count / n - ROLE_FRACS[role]
+            )
+    if total_output != meta["n_rows"]:
+        raise AssertionError("feature-group role split did not preserve every source row exactly once")
+    audit["total_output_rows"] = total_output
+    audit["multiplicity_preserved"] = True
+    audit["max_abs_fraction_deviation_pp"] = max(
+        abs(v) for k, v in audit.items() if k.startswith("deviation_pp_")
+    )
+    role_group_sets = [set(np.flatnonzero(group_role == ridx).tolist()) for ridx in range(3)]
+    overlaps = {
+        "window_train": len(role_group_sets[0] & role_group_sets[1]),
+        "window_probe": len(role_group_sets[0] & role_group_sets[2]),
+        "train_probe": len(role_group_sets[1] & role_group_sets[2]),
+    }
+    if any(overlaps.values()):
+        raise AssertionError(f"exact-X groups cross roles: {overlaps}")
+    audit.update({f"exact_x_overlap_groups_{k}": v for k, v in overlaps.items()})
+    audit["verdict"] = "PASS"
+    return {role: Pools(**parts[role]) for role in role_names}, audit
+
+
 @dataclass
 class Environment:
     """Everything shared across arms for one seed: transformer, initial model, stream."""
@@ -228,11 +422,17 @@ class Environment:
     init_train_raw: tuple = None                           # (X_tr_raw, y_tr) before any transform
     detector_factory: object = None                        # (method, args, seed) -> detector
     candidate_factory: object = None                       # (X, y, seed, C, proba) -> model
+    role_assignment_audit: dict = None                     # exact-X sensitivity diagnostics
 
 
 def build_environment(pools: Pools, args, seed: int) -> Environment:
     dw = getattr(args, "disjoint_window_frac", 0.5)
-    if getattr(args, "stream_disjoint_windows", False) and dw != 0.5:
+    role_audit = None
+    if getattr(args, "role_split_mode", "source_row") == "exact_feature_group":
+        if getattr(args, "stream_disjoint_windows", False):
+            raise ValueError("exact_feature_group role mode is separate from stream_disjoint_windows")
+        role, role_audit = split_pools_feature_group_disjoint(pools, seed)
+    elif getattr(args, "stream_disjoint_windows", False) and dw != 0.5:
         rest = 1.0 - dw
         role = split_pools(pools, seed, {"window": dw, "train": rest * 0.6, "probe": rest * 0.4})
     else:
@@ -299,7 +499,8 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
             stream_raw.append((Xw_raw_p, yw_p, sev))
         return Environment(scaler, pca, initial_model, stream, role["window"], role["train"],
                            role["probe"], (X_tr, y_tr),
-                           stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr))
+                           stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr),
+                           role_assignment_audit=role_audit)
     for t in range(args.post_windows):
         sev = progressive_severity(t, args)
         if args.stream_prevalence != 0.5:
@@ -313,7 +514,8 @@ def build_environment(pools: Pools, args, seed: int) -> Environment:
         stream_raw.append((Xw_raw, yw, sev))
     return Environment(scaler, pca, initial_model, stream, role["window"], role["train"],
                        role["probe"], (X_tr, y_tr),
-                       stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr))
+                       stream_raw=stream_raw, init_train_raw=(X_tr_raw, y_tr),
+                       role_assignment_audit=role_audit)
 
 
 def calibrate(detector, env: Environment, severity: float, args, rng) -> tuple[object, float]:
@@ -1399,6 +1601,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--stream-prevalence", type=float, default=0.5,
                    help="Attack fraction of EVALUATION windows (0.5 = balanced; natural-"
                         "prevalence streams report FPR/recall/alert volume).")
+    p.add_argument("--role-split-mode", type=str, default="source_row",
+                   choices=["source_row", "exact_feature_group"],
+                   help="Final IJIS sensitivity: assign every exact cleaned raw-X group to one "
+                        "window/train/probe role. Default preserves the historical row-index split.")
     p.add_argument("--stream-disjoint-windows", action="store_true",
                    help="amendment 011: draw stream windows WITHOUT replacement within the window "
                         "pool, so no row recurs across windows (removes candidate-train/future-eval "

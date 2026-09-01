@@ -237,4 +237,5 @@ def build_raw_environment(pools, args, seed: int, transformer_policy: str) -> En
         train_pools=hist.train_pools, probe_pools=hist.probe_pools,
         init_train=hist.init_train_raw,
         stream_raw=hist.stream_raw, init_train_raw=hist.init_train_raw,
-        detector_factory=detector_factory, candidate_factory=candidate_factory)
+        detector_factory=detector_factory, candidate_factory=candidate_factory,
+        role_assignment_audit=hist.role_assignment_audit)
