@@ -1,10 +1,15 @@
-"""Regenerate the per-trigger mechanism figure (docs/img/fig9_pertrigger.png).
+"""Regenerate the per-trigger mechanism figure (docs/img/fig9_pertrigger.{png,pdf}).
 
 Amendment 007: this figure had been produced ad hoc and its generator was never versioned --- a
 reproducibility defect. It is rebuilt here from the committed trigger logs, for BOTH detectors,
 with wording that matches what the statistics support: at triggered decisions the incumbent's
 recent health predicts the future value of committing, while the detectors' scalar scores show
 no consistent association (one small exception, QK/PortScan, is reported in the paper).
+
+IJIS submission pass (2026-09-01): the figure carries no title or explanatory caption inside
+the illustration (Springer: "Do not include titles or captions within your illustrations");
+each panel is labelled with the detector and the POOLED correlation only, and the explanatory
+text lives in the LaTeX caption. Data, axes and annotations are unchanged.
 """
 from __future__ import annotations
 import os
@@ -36,7 +41,8 @@ def load(reg: str, det: str) -> pd.DataFrame:
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    fig, axes = plt.subplots(2, 2, figsize=(11.5, 8.2))
+    fig, axes = plt.subplots(2, 2, figsize=(11.5, 7.9))
+    panel = iter("abcd")
     for i, (det, dname) in enumerate([("ks", "KS-max (classical)"), ("qk", "QK-ZZ (quantum)")]):
         data = {r: load(r, det) for r, _, _ in REGIMES}
         allr = pd.concat(data.values())
@@ -52,16 +58,14 @@ def main():
             ax.axhline(0, color="#495057", lw=1, ls="--")
             ax.set_xlabel(xlabel, fontsize=9.5)
             ax.set_ylabel("Candidate $-$ incumbent BA\nover the 5 windows AFTER (pts)", fontsize=9.5)
-            title = ("Incumbent health predicts\nthe value of committing"
-                     if xcol == "deg_pre5"
-                     else "No consistent score–value\nassociation at triggers")
-            ax.set_title(f"{dname}\n{title}  (pooled r = {r:+.2f})", fontsize=10, weight="bold")
+            # Panel label + pooled statistic as an in-axes annotation (no panel title).
+            ax.text(0.02, 0.97, f"({next(panel)}) {dname}\npooled r = {r:+.2f}, n = {len(allr)}",
+                    transform=ax.transAxes, ha="left", va="top", fontsize=9,
+                    bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="#adb5bd", lw=0.6, alpha=0.9))
             ax.tick_params(labelsize=8.5)
             ax.grid(alpha=0.15)
     fig.legend(loc="lower center", ncol=3, frameon=False, fontsize=10, bbox_to_anchor=(0.5, -0.015))
-    fig.suptitle("Per-trigger test (harness v2, pristine seeds): predictor and outcome share no algebraic term",
-                 fontsize=12.5, weight="bold", y=0.995)
-    fig.tight_layout(rect=[0, 0.035, 1, 0.97])
+    fig.tight_layout(rect=[0, 0.035, 1, 1])
     fig.savefig(f"{OUT}/fig9_pertrigger.png", dpi=200, bbox_inches="tight")
     fig.savefig(f"{OUT}/fig9_pertrigger.pdf", bbox_inches="tight")
     plt.close(fig)

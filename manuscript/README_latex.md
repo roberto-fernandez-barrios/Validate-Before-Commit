@@ -45,7 +45,10 @@ Needs a TeX distribution (TeX Live / MiKTeX) with `pdflatex` + `bibtex` on PATH;
 ## Notes
 - **Author metadata** (affiliation, co-authors, ORCIDs, CRediT roles, funding/conflict statements) lives
   once, in the `main.tex` front matter; the ports read it from there.
-- **Algorithm 1** is emitted as a `verbatim` block (spanned across both columns in the two-column ports).
+- The **gated-update pseudocode** is a captioned `figure` in `main.tex` (`\label{fig:algorithm}`, a
+  `verbatim` block inside); the two-column ports turn it into `figure*` like every other figure, and
+  they also span the supporting-evidence map (`tab:evidence_map`) as `table*` because it overflows one
+  column.
 - **Wide tables** use `\footnotesize` inside `table*`; if a row overflows, wrap the `tabular` in
   `\resizebox{\linewidth}{!}{...}`.
 - **Highlights / graphical abstract** (`highlights.md`, `../docs/img/graphical_abstract.pdf`) are

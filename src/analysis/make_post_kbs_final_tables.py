@@ -4,8 +4,8 @@ Every scientific number in these tables is read from a result CSV (never hand-en
   * results/tables/symmetric_pipeline_dynamic_001/   (sealed; frozen vs own, seeds 3001-3030)
   * results/tables/size_matched_own_transformer_001/ (sealed; zero-drift size control, 4001-4030)
   * results/tables/paper2_amendment_008/             (sealed; frozen 2,000/class zero drift, 104-133)
-  * results/tables/post_kbs_size_matched_drift_001/  (post-v1.22; B2, seeds 6001-6030)
-  * results/tables/post_kbs_common_harness_baselines_001/ (post-v1.22; B1, seeds 5001-5030)
+  * results/tables/post_kbs_size_matched_drift_001/  (sealed at v1.23.0; B2, seeds 6001-6030)
+  * results/tables/post_kbs_common_harness_baselines_001/ (sealed at v1.23.0; B1, seeds 5001-5030)
 
 Outputs (identical copies under manuscript/tables and manuscript/tables_ieee):
   table_synthesis.tex                      central evidence matrix (main body)
@@ -144,19 +144,30 @@ def make_synthesis() -> None:
                              for s in ORDER3 for g in ("point", "strict")))
     strict_unsw = float(b2con.loc["unsw_full: strict-2000 vs naive-2000", "effect_pp"])
 
+    # Provenance is stated per sub-cell: the seed block of every Delta and of every validation
+    # summary is named where the two come from different registered blocks (the 512/class
+    # validation summaries of rows 3-4 come from the symmetric replication, whose 512/class
+    # gate contrasts were the registered ones; the size-matched controls carry them only as
+    # descriptive cells). A reader must never infer joint estimation in one block where there
+    # was none.
+    SYM_BLK = r"seeds 3001--3030, Table~\ref{tab:symmetric_pipeline}"
     body = rf"""\begin{{table*}}[t]
 \centering
 \caption{{\textbf{{Central evidence matrix: how the apparent value of promotion depends on
 challenger construction and evidence.}} Each cell reports always-deploy minus never-adapt in
 balanced-accuracy points (PortScan / UNSW-Recon / ToN-IoT) and whether point/strict validation
-adds Holm-significant average value over always-deploy in that configuration. Row 1 is the
-historical frozen incumbent-owned preprocessing configuration (descriptive; sealed symmetric
-replication, seeds 3001--3030; its 2{{,}}000/class zero-drift cell is the sealed amendment-008
-control on seeds 104--133). Rows 2--3 are self-contained challengers: the zero-drift cells are
-the sealed size-matched control (seeds 4001--4030; 512 column descriptive, 2{{,}}000 column
-registered F1), the full-drift cells are the registered post-v1.22 size-matched-under-drift
-control (seeds 6001--6030; both registered G1). ``not evaluated'' cells were never run under a
-registered protocol.}}
+adds Holm-significant average value over always-deploy in that configuration; every value
+names the 30-seed block it was estimated in, and where a cell's validation summary comes from
+a different registered block than its $\Delta$, that block is named in the cell. Rows 1--2 are
+the historical frozen incumbent-owned preprocessing configuration (descriptive; the frozen arm
+of the symmetric replication, seeds 3001--3030, and, for the 2{{,}}000/class zero-drift cell,
+the registered frozen size-matched control on seeds 104--133). Rows 3--4 are self-contained
+challengers: zero-drift $\Delta$s from the registered size-matched control (seeds 4001--4030;
+512 column descriptive, 2{{,}}000 column registered F1), full-drift $\Delta$s from the
+registered size-matched control under drift (seeds 6001--6030; registered G1). Absolute
+frozen-configuration magnitudes differ between seed blocks (\S\ref{{sec:historical}}); only
+within-block contrasts are paired. ``not evaluated'' cells were never run under a registered
+protocol.}}
 \label{{tab:synthesis}}
 \footnotesize
 \setlength{{\tabcolsep}}{{4pt}}
@@ -166,20 +177,20 @@ registered protocol.}}
 Configuration & 512/class challenger & 2{{,}}000/class challenger \\
 \midrule
 Frozen incumbent-owned preprocessing (historical), full drift &
-$\Delta$ vs never: {trip(fz_full)}\newline validation: point $-$ naive {trip(fz_gate_full)} (descriptive) &
+$\Delta$ vs never: {trip(fz_full)} (seeds 3001--3030; descriptive)\newline validation: point $-$ naive {trip(fz_gate_full)} (same block; descriptive) &
 not evaluated under a registered protocol \\
 \addlinespace
 Frozen incumbent-owned preprocessing (historical), zero drift &
-$\Delta$ vs never: {trip(fz_zero)}\newline validation: point $-$ naive {trip(fz_gate_zero)} (descriptive) &
-$\Delta$ vs never: {trip(fz2k_zero)}\newline validation: point $-$ naive {trip(fz2k_gate)} (descriptive; seeds 104--133) \\
+$\Delta$ vs never: {trip(fz_zero)} (seeds 3001--3030; descriptive)\newline validation: point $-$ naive {trip(fz_gate_zero)} (same block; descriptive) &
+$\Delta$ vs never: {trip(fz2k_zero)} (seeds 104--133; descriptive)\newline validation: point $-$ naive {trip(fz2k_gate)} (same block; descriptive) \\
 \addlinespace
 Self-contained challenger, zero drift &
-$\Delta$ vs never: {trip(own0_512)}\newline validation: {n_sig_own0_512}/6 gate contrasts Holm-significant gains &
-$\Delta$ vs never: {trip(own0_2k)} (CI90 within $\pm0.5$ in 3/3)\newline validation: {n_sig_own0_2k}/6 Holm-significant gains \\
+$\Delta$ vs never: {trip(own0_512)} (seeds 4001--4030; descriptive)\newline validation: {n_sig_own0_512}/6 gate contrasts Holm-significant gains ({SYM_BLK}) &
+$\Delta$ vs never: {trip(own0_2k)} (seeds 4001--4030; registered F1; CI90 within $\pm0.5$ in 3/3)\newline validation: {n_sig_own0_2k}/6 Holm-significant gains (same block; registered F3) \\
 \addlinespace
 Self-contained challenger, full drift &
-$\Delta$ vs never: {trip(own1_512)}\newline validation: {n_sig_own1_512}/6 Holm-significant gain, {n_cost_own1_512} resolved cost &
-$\Delta$ vs never: {trip(own1_2k)}\newline validation: {n_sig_own1_2k}/6 Holm-significant gains, {n_cost_own1_2k} resolved cost (strict, UNSW {tex(f2(strict_unsw))}) \\
+$\Delta$ vs never: {trip(own1_512)} (seeds 6001--6030; registered G1)\newline validation: {n_sig_own1_512}/6 Holm-significant gain, {n_cost_own1_512} resolved cost ({SYM_BLK}) &
+$\Delta$ vs never: {trip(own1_2k)} (seeds 6001--6030; registered G1)\newline validation: {n_sig_own1_2k}/6 Holm-significant gains, {n_cost_own1_2k} resolved cost (strict, UNSW {tex(f2(strict_unsw))}; same block; registered G3) \\
 \bottomrule
 \end{{tabular}}
 \end{{table*}}

@@ -11,12 +11,15 @@ We submit the manuscript *Candidate Comparability Before Promotion: Conditional 
 Adaptive Network Intrusion Detection* for consideration as an original research article in the
 *International Journal of Information Security*.
 
-**The scientific proposition.** Published conclusions about adaptive network intrusion
-detection — whether promoting a retrained challenger harms the deployed detector, and which
-update policy is preferable — can change materially when the incumbent and the challenger are
-not comparable in how they were constructed or in how much evidence supports them. The
-manuscript isolates two such asymmetries under preregistered controls and shows that
-controlling them changes those conclusions on three public NIDS benchmarks. The contribution
+**The scientific proposition.** Conclusions drawn from adaptive-NIDS evaluations — whether
+promoting a retrained challenger harms the deployed detector, and which update policy is
+preferable — can change materially when the incumbent and the challenger are not comparable in
+how they were constructed or in how much evidence supports them. The manuscript isolates two
+such asymmetries under preregistered controls and shows, on three public NIDS benchmarks, that
+the conclusions of our own earlier experimental configuration changed materially once candidate
+construction and evidence were made comparable. In a deployed NIDS, promotion is a
+security-relevant integrity decision — it replaces the model responsible for subsequent attack
+detection — which is why the work is addressed to this journal. The contribution
 is a methodological result about how adaptive security systems must be evaluated before a
 promotion decision is interpreted or automated; it is not a new detector, a new drift monitor
 or an incremental application of an existing learner to standard datasets.
@@ -43,7 +46,7 @@ operation of deployed network-security systems; it belongs to the evaluation-dis
 lineage the journal's readership knows (TESSERACT, "dos and don'ts" of ML in security) and it
 addresses a decision — when to replace a deployed detector — that security operators face
 directly. The manuscript follows the journal's format: Springer two-column LaTeX template,
-numbered references with DOI links, a 212-word abstract, six keywords, and a complete
+numbered references with DOI links, a 229-word abstract, six keywords, and a complete
 Statements and Declarations section. A 46-page supplement (Online Resource 1) carries the
 full tables, protocols and robustness analyses.
 

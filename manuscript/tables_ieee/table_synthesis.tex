@@ -3,14 +3,18 @@
 \caption{\textbf{Central evidence matrix: how the apparent value of promotion depends on
 challenger construction and evidence.} Each cell reports always-deploy minus never-adapt in
 balanced-accuracy points (PortScan / UNSW-Recon / ToN-IoT) and whether point/strict validation
-adds Holm-significant average value over always-deploy in that configuration. Row 1 is the
-historical frozen incumbent-owned preprocessing configuration (descriptive; sealed symmetric
-replication, seeds 3001--3030; its 2{,}000/class zero-drift cell is the sealed amendment-008
-control on seeds 104--133). Rows 2--3 are self-contained challengers: the zero-drift cells are
-the sealed size-matched control (seeds 4001--4030; 512 column descriptive, 2{,}000 column
-registered F1), the full-drift cells are the registered post-v1.22 size-matched-under-drift
-control (seeds 6001--6030; both registered G1). ``not evaluated'' cells were never run under a
-registered protocol.}
+adds Holm-significant average value over always-deploy in that configuration; every value
+names the 30-seed block it was estimated in, and where a cell's validation summary comes from
+a different registered block than its $\Delta$, that block is named in the cell. Rows 1--2 are
+the historical frozen incumbent-owned preprocessing configuration (descriptive; the frozen arm
+of the symmetric replication, seeds 3001--3030, and, for the 2{,}000/class zero-drift cell,
+the registered frozen size-matched control on seeds 104--133). Rows 3--4 are self-contained
+challengers: zero-drift $\Delta$s from the registered size-matched control (seeds 4001--4030;
+512 column descriptive, 2{,}000 column registered F1), full-drift $\Delta$s from the
+registered size-matched control under drift (seeds 6001--6030; registered G1). Absolute
+frozen-configuration magnitudes differ between seed blocks (\S\ref{sec:historical}); only
+within-block contrasts are paired. ``not evaluated'' cells were never run under a registered
+protocol.}
 \label{tab:synthesis}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
@@ -20,20 +24,20 @@ registered protocol.}
 Configuration & 512/class challenger & 2{,}000/class challenger \\
 \midrule
 Frozen incumbent-owned preprocessing (historical), full drift &
-$\Delta$ vs never: $+6.31$ / $+1.39$ / $-4.95$\newline validation: point $-$ naive $+0.33$ / $-0.00$ / $+5.56$ (descriptive) &
+$\Delta$ vs never: $+6.31$ / $+1.39$ / $-4.95$ (seeds 3001--3030; descriptive)\newline validation: point $-$ naive $+0.33$ / $-0.00$ / $+5.56$ (same block; descriptive) &
 not evaluated under a registered protocol \\
 \addlinespace
 Frozen incumbent-owned preprocessing (historical), zero drift &
-$\Delta$ vs never: $-4.09$ / $-0.68$ / $-5.87$\newline validation: point $-$ naive $+2.93$ / $+0.21$ / $+5.47$ (descriptive) &
-$\Delta$ vs never: $-4.81$ / $-0.13$ / $-5.76$\newline validation: point $-$ naive $+4.46$ / $+0.03$ / $+5.35$ (descriptive; seeds 104--133) \\
+$\Delta$ vs never: $-4.09$ / $-0.68$ / $-5.87$ (seeds 3001--3030; descriptive)\newline validation: point $-$ naive $+2.93$ / $+0.21$ / $+5.47$ (same block; descriptive) &
+$\Delta$ vs never: $-4.81$ / $-0.13$ / $-5.76$ (seeds 104--133; descriptive)\newline validation: point $-$ naive $+4.46$ / $+0.03$ / $+5.35$ (same block; descriptive) \\
 \addlinespace
 Self-contained challenger, zero drift &
-$\Delta$ vs never: $-1.70$ / $-0.65$ / $-0.24$\newline validation: 6/6 gate contrasts Holm-significant gains &
-$\Delta$ vs never: $+0.19$ / $-0.02$ / $-0.01$ (CI90 within $\pm0.5$ in 3/3)\newline validation: 0/6 Holm-significant gains \\
+$\Delta$ vs never: $-1.70$ / $-0.65$ / $-0.24$ (seeds 4001--4030; descriptive)\newline validation: 6/6 gate contrasts Holm-significant gains (seeds 3001--3030, Table~\ref{tab:symmetric_pipeline}) &
+$\Delta$ vs never: $+0.19$ / $-0.02$ / $-0.01$ (seeds 4001--4030; registered F1; CI90 within $\pm0.5$ in 3/3)\newline validation: 0/6 Holm-significant gains (same block; registered F3) \\
 \addlinespace
 Self-contained challenger, full drift &
-$\Delta$ vs never: $+8.90$ / $+2.13$ / $+1.44$\newline validation: 1/6 Holm-significant gain, 1 resolved cost &
-$\Delta$ vs never: $+9.72$ / $+3.79$ / $+2.44$\newline validation: 0/6 Holm-significant gains, 1 resolved cost (strict, UNSW $-0.34$) \\
+$\Delta$ vs never: $+8.90$ / $+2.13$ / $+1.44$ (seeds 6001--6030; registered G1)\newline validation: 1/6 Holm-significant gain, 1 resolved cost (seeds 3001--3030, Table~\ref{tab:symmetric_pipeline}) &
+$\Delta$ vs never: $+9.72$ / $+3.79$ / $+2.44$ (seeds 6001--6030; registered G1)\newline validation: 0/6 Holm-significant gains, 1 resolved cost (strict, UNSW $-0.34$; same block; registered G3) \\
 \bottomrule
 \end{tabular}
 \end{table*}

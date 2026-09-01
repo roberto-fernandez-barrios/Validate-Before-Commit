@@ -23,6 +23,18 @@ from pathlib import Path
 MS = Path(__file__).resolve().parents[2] / "manuscript"
 
 
+def _span_table(body: str, label: str) -> str:
+    """Turn the single-column ``table`` carrying ``\\label{label}`` into ``table*`` (layout only)."""
+    i = body.index("\\label{" + label + "}")
+    start = body.rfind("\\begin{table}", 0, i)
+    end = body.index("\\end{table}", i)
+    assert start != -1 and body.rfind("\\begin{table*}", 0, i) < start, label
+    block = body[start:end + len("\\end{table}")]
+    block = block.replace("\\begin{table}", "\\begin{table*}", 1)
+    block = block[: -len("\\end{table}")] + "\\end{table*}"
+    return body[:start] + block + body[end + len("\\end{table}"):]
+
+
 def main() -> None:
     cas = (MS / "main.tex").read_text(encoding="utf-8")
     ieee = (MS / "main_ieee.tex").read_text(encoding="utf-8")
@@ -50,16 +62,11 @@ def main() -> None:
     body = body.replace("\\begin{figure}", "\\begin{figure*}")
     body = body.replace("\\end{figure}", "\\end{figure*}")
     body = body.replace("width=\\linewidth]{docs/img", "width=\\textwidth]{docs/img")
-    # The single algorithm listing is readable at full text width but clips badly in one
-    # IEEE column. Keep its content verbatim and span it mechanically in the backup port.
-    body = body.replace(
-        "\\begin{verbatim}",
-        "\\begin{figure*}[t]\n\\small\n\\begin{verbatim}",
-    )
-    body = body.replace(
-        "\\end{verbatim}",
-        "\\end{verbatim}\n\\end{figure*}",
-    )
+    # The gated-update pseudocode is a captioned figure in main.tex (verbatim inside); the
+    # figure -> figure* replacement above already spans it across both IEEE columns.
+    assert "\\label{fig:algorithm}" in body, "main.tex must carry the captioned algorithm figure"
+    # The supporting-evidence map overflows a single two-column measure; span it.
+    body = _span_table(body, "tab:evidence_map")
 
     out = head + body + tail
     (MS / "main_ieee.tex").write_text(out, encoding="utf-8", newline="\n")

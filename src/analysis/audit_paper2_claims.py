@@ -1335,10 +1335,12 @@ def main():
     check("v121seal C1: no positive 'ownership explains all'/'sole cause' phrasing", 0.0,
           float(_hits(r"ownership explains all|all (?:the )?harm is caused by preprocessing|"
                       r"(?<!not the )sole cause of (?:the )?(?:full-drift )?harm")), 0.5)
+    # IJIS pass (2026-09-01): the main paper names the policy 'always-deploy' in prose and keeps
+    # 'naive' for estimand names and tables (section 3.4), so either wording carries the scope.
     check("v121seal C2: zero-drift gate claim carries the vs-naive scope", 2.0,
           float(sum(1 for _n, _t in _live.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
-                    and "improve over naive in all six zero-drift comparisons" in _t)), 0.5)
+                    and re.search(r"improve over (?:naive|always-deploy) in all six zero-drift comparisons", _t))), 0.5)
     check("v121seal C2b: no unscoped 'recover the loss in all six' claim", 0.0,
           float(_hits(r"recover(?:s|ing)? the (?:entire |full )?loss in all six")), 0.5)
     _spm = "results/tables/symmetric_pipeline_dynamic_001"

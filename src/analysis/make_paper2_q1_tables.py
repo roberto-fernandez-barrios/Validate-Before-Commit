@@ -55,7 +55,7 @@ def budget_frontier() -> None:
     body = "\n".join(rows[:-1])
     tex = f"""\\begin{{table}}[t]
 \\centering
-\\caption{{\\textbf{{The registered budget frontier for the deployment-long guarantee (final-q1).}}
+\\caption{{\\textbf{{The registered budget frontier for the deployment-long guarantee.}}
 Lifetime-budgeted risk gates ($\\alpha_{{\\mathrm{{life}}}}{{=}}0.10$, Bonferroni spending;
 $p$-series within $0.1$ points, in the artifact), seeds 501--530, balanced probes.
 \\emph{{Gain}}: balanced-accuracy points over never-adapting on CICIDS-PortScan at full
@@ -126,7 +126,7 @@ def ab_equivalence() -> None:
     tex = f"""\\begin{{table}}[t]
 \\centering
 \\caption{{\\textbf{{Confirmatory symmetric A/B with equivalence testing and a mechanism
-decomposition (final-q1).}} Role-randomized challenger$-$incumbent gap (balanced-accuracy
+decomposition.}} Role-randomized challenger$-$incumbent gap (balanced-accuracy
 points) on globally value-deduplicated, disjoint blocks, SVC-RBF, on 100 \\emph{{fresh}}
 confirmatory seeds (2001--2100); the original 30 seeds are re-labelled a pilot and excluded
 here. Equivalence is a bootstrap CI-based assessment at the pre-registered $\\pm1.0$-point
@@ -175,7 +175,7 @@ def chronological() -> None:
     body = "\n".join(rows)
     tex = f"""\\begin{{table}}[t]
 \\centering
-\\caption{{\\textbf{{The registered chronological matrix (final-q1).}} Seven pre-enumerated
+\\caption{{\\textbf{{The registered chronological matrix.}} Seven pre-enumerated
 time-ordered replays (CICIDS2017 train$\\to$future day pairs, two intra-day splits, UNSW-NB15
 at two training fractions), 200 windows of 256 flows in capture order, seeds 601--630.
 Columns: balanced-accuracy points over never-adapting; \\emph{{no-adapt}} is the frozen
@@ -220,7 +220,7 @@ def operational() -> None:
     body = "\n".join(rows[:-1])
     tex = f"""\\begin{{table}}[t]
 \\centering
-\\caption{{\\textbf{{Attack-label acquisition yield under operational prevalence (final-q1).}}
+\\caption{{\\textbf{{Attack-label acquisition yield under operational prevalence.}}
 Inspected flows per adjudicated \\emph{{attack}} label found in the auxiliary
 \\emph{{discovery}} queue (seeds 801--830; 701--730 a pilot). Adjudication candidates are
 drawn at operating prevalence $\\pi$ with five-window label latency; the evaluation stream,

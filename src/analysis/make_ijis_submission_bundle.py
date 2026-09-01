@@ -53,12 +53,26 @@ def _copy(src: Path, dst: Path) -> None:
     shutil.copy2(src, dst)
 
 
-def _tex_to_text(block: str) -> str:
+def _section_numbers(doc: str) -> dict[str, str]:
+    """label -> section number, read from the compiled document's .aux (\\newlabel entries)."""
+    aux = (MS / f"{doc}.aux").read_text(encoding="utf-8", errors="replace")
+    return {m.group(1): m.group(2)
+            for m in re.finditer(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}", aux)}
+
+
+def _tex_to_text(block: str, labels: dict[str, str]) -> str:
     t = block
     t = re.sub(r"\\paragraph\{([^}]*)\}", r"\n## \1\n", t)
     t = re.sub(r"\\href\{([^}]*)\}\{([^}]*)\}", r"\2 (\1)", t)
     t = re.sub(r"\\cite\{[^}]*\}", "", t)
-    t = re.sub(r"\\S\\ref\{[^}]*\}", "the corresponding sections", t)
+
+    def _ref(m: re.Match) -> str:
+        key = m.group(1)
+        if key not in labels:
+            sys.exit(f"declarations: unresolved \\ref{{{key}}} -- compile main_springer first")
+        return "\u00a7" + labels[key]
+
+    t = re.sub(r"\\S\\ref\{([^}]*)\}", _ref, t)
     t = re.sub(r"\\S\s*", "\u00a7", t)
     t = t.replace("~", " ").replace("---", "\u2014").replace("--", "\u2013").replace("\\&", "&")
     t = re.sub(r"\\emph\{([^}]*)\}", r"\1", t)
@@ -124,7 +138,7 @@ def main() -> None:
                tex.index("\\bibliographystyle")]
     (OUT / "declarations.md").write_text(
         "# Statements and Declarations (as typeset in main_springer.tex; paste into the submission form)\n"
-        + _tex_to_text(decl), encoding="utf-8", newline="\n")
+        + _tex_to_text(decl, _section_numbers(MAIN)), encoding="utf-8", newline="\n")
 
     (OUT / "README.md").write_text(f"""# Submission set -- International Journal of Information Security (Springer Nature)
 

@@ -13,7 +13,7 @@ pdflatex supplement_springer && bibtex supplement_springer && pdflatex supplemen
 cd ..
 python -m src.analysis.make_ijis_submission_bundle   # -> dist/submission_ijis/
 ```
-Expected: main_springer.pdf 26 pp., supplement_springer.pdf (= ESM_1.pdf) 46 pp., 0 undefined
+Expected: main_springer.pdf 27 pp., supplement_springer.pdf (= ESM_1.pdf) 46 pp., 0 undefined
 references/citations in both logs (the bundle script refuses otherwise).
 For byte-identical PDFs across rebuilds, export `SOURCE_DATE_EPOCH=1756684800 FORCE_SOURCE_DATE=1`
 before the pdflatex passes (pdfTeX then fixes the embedded dates and trailer ID); the zip inside the
@@ -30,7 +30,7 @@ bundle is already deterministic.
 ## 2. Metadata to enter in the submission system
 - Title: *Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection*
 - Article type: original research article.
-- Abstract: paste from `main_springer.tex` (212 words; limit 150–250; no undefined abbreviations).
+- Abstract: paste from `main_springer.tex` (229 words; limit 150–250; no undefined abbreviations).
 - Keywords (4–6 required; 6 provided): distribution drift; candidate comparability; risk-aware
   model updating; adaptive model updating; machine learning; intrusion detection.
 - Authors, in order, with affiliation *Faculty of Engineering, University of Deusto, Avda. de las
