@@ -97,11 +97,14 @@ def test_headline_numbers_match_frozen_csv():
 
 
 def test_scope_negations_present():
-    """VBC-SG / observed-data / full-drift size-matched are declared NOT evaluated."""
+    """VBC-SG and observed-data size-matching are declared NOT evaluated; the full-drift
+    size control IS evaluated after the post-KBS integration, so the old zero-drift-only
+    negation must be gone."""
     main = _texts()["manuscript/main.tex"]
     assert "vbc-sg was not re-run under size-matched own pipelines" in main
-    assert "only under zero drift" in main
-    assert re.search(r"full-drift size-matched[^.]{0,80}not run", main)
+    assert "only under zero drift" not in main
+    assert re.search(r"full-drift size-matched[^.]{0,80}not run", main) is None
+    assert "size-matched controls were not repeated in observed-data form" in main
 
 
 def test_v121_sealed_artifact_pointers_untouched():

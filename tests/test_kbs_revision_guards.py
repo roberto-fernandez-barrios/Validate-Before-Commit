@@ -101,21 +101,25 @@ def _nth(rows, label, n):
 
 
 def test_baselines_section_present_and_wired():
-    assert "\\label{sec:baselines}" in MAIN and "\\label{tab:baselines}" in MAIN
+    """Post-KBS final integration: section 5.6 is the registered common-harness comparison
+    (CSV-generated table in the body); the historical compact table left the main body and
+    the full historical matrix stays in S2.12."""
+    assert "\\label{sec:baselines}" in MAIN
+    assert "\\input{tables/table_common_harness.tex}" in MAIN
     assert MAIN.count("\\ref{sec:baselines}") >= 3
     f = _flat(MAIN)
-    assert "comparison with evaluated baselines and alternative update policies" in f
+    assert "registered common-harness comparison with published and reference baselines" in f
     assert "comparison with strong baselines" not in f, "SoTA-style title banned"
-    assert "cross-block comparisons are descriptive" in f
-    assert "supports no common ranking" in f
-    assert "\\label{tab:baselines}" in MAIN, "compact core table must stay in the body"
+    assert "cross-block comparisons remain descriptive" in f
+    assert "not a state-of-the-art ranking" in f
+    assert "\\label{tab:baselines}" not in MAIN, "historical compact table left the body"
     assert "\\label{tab:baselines_full}" in FULLTAB
     assert "\\input{tables/table_baselines_full.tex}" in SUPP
-    # the section is the last Results subsection so supplement '§5.5' pointers stay valid
     results = MAIN.split("\\section{Results}")[1].split("\\section{Discussion}")[0]
     subs = re.findall(r"\\subsection\{([^}]*)\}", results)
-    assert subs[-1].startswith("Comparison with evaluated baselines")
-    assert len(subs) == 6
+    assert subs[5].startswith("Registered common-harness comparison")
+    assert subs[-1].startswith("Mechanism, formal instruments and external boundaries")
+    assert len(subs) == 7
 
 
 def test_baselines_block_I_matches_policy_frontier_csv():
@@ -347,47 +351,39 @@ def test_readme_reviewer_quick_map_paths_exist():
             assert (REPO / p.rstrip("/")).exists(), p
 
 
-def test_baselines_compact_core_matches_csvs():
-    """The compact in-body table (paired v2 panel + exploratory ATC/DoC panel) matches the
-    sealed CSVs, and its two panels are explicitly labelled with their comparability."""
-    rows = _table_rows(src=MAIN, label="tab:baselines")
-    F = pd.read_csv(T / "paper2_policy_frontier_005" / "frontier.csv")
-
-    def g(policy, regime):
-        return float(F[(F.policy == policy) & (F.regime == regime)].gain.iloc[0])
-
-    core = {"Always-deploy (naive)": "naive",
-            "Sliding-window update": "sliding_window",
-            "Calibrated soft ensemble": "ensemble_cal",
-            "DDM trigger (\\texttt{river})": "ddm_river_b8",
-            "Point gate, $b{=}32$": "labeled_probe_b32",
-            "Two-stage split gate ($\\delta{=}0.05$)": "two_stage_split_d05"}
-    for label, pol in core.items():
-        cells = _nth(rows, label, 0)
-        for i, regime in ((4, "portscan"), (5, "unsw_recon"), (6, "ton_scanning")):
-            assert abs(_num(cells[i]) - g(pol, regime)) <= 0.006, (label, regime)
-    A6 = pd.read_csv(T / "paper2_amendment_006" / "summary.csv")
-    mc = _nth(rows, "Exact McNemar, $b{=}32$", 0)
-    R4 = pd.read_csv(T / "paper2_amendment_004" / "robustness.csv")
-    ad = _nth(rows, "ADWIN trigger (\\texttt{river})", 0)
-    LF = pd.read_csv(T / "paper2_phase2h_labelfree_gates_001"
-                     / "paper2_labelfree_gates_summary.csv")
-    LF = LF[LF.downstream == "svc_rbf"]
-
-    def lf(gate, regime):
-        return float(LF[(LF.gate == gate) & (LF.regime == regime)].gain_pts.iloc[0])
-
-    for i, regime in ((4, "portscan"), (5, "unsw_recon"), (6, "ton_scanning")):
-        v = float(A6[(A6.arm == "mcnemar32") & (A6.regime == regime)].gain.iloc[0])
-        assert abs(_num(mc[i]) - v) <= 0.006, ("mcnemar", regime)
-        v = float(R4[(R4.arm == "adwinriver_none") & (R4.regime == regime)].gain.iloc[0])
-        assert abs(_num(ad[i]) - v) <= 0.006, ("adwin", regime)
-        for label, key in (("Always-deploy (naive, v1)", "naive"),
-                           ("ATC gate \\cite{garg2022atc}", "atc"),
-                           ("DoC gate \\cite{guillory2021doc}", "doc"),
-                           ("Point gate, $b{=}32$ (v1)", "lp32")):
-            cells = _nth(rows, label, 0)
-            assert abs(_num(cells[i]) - lf(key, regime)) <= 0.006, (label, regime)
-    cap = MAIN.split("\\label{tab:baselines}")[0][-2200:]
-    fcap = _flat(cap)
-    assert "directly comparable" in fcap and "not comparable with the top panel" in fcap
+def test_common_harness_table_matches_csvs():
+    """Post-KBS final integration: the in-body common-harness table is generated from the
+    B1 CSVs -- every policy-minus-never cell equals the sealed per-arm means at 2,000/class
+    and every marker equals the registered per-cell classification."""
+    src = (REPO / "manuscript" / "tables" / "table_common_harness.tex").read_text(encoding="utf-8")
+    B1 = T / "post_kbs_common_harness_baselines_001"
+    S = pd.read_csv(B1 / "summary.csv", keep_default_na=False)
+    C = pd.read_csv(B1 / "cell_classification.csv").set_index("contrast")
+    mean = {(r.scenario, r.policy, str(r.candidate_size)): float(r.ba_mean) * 100
+            for _, r in S.iterrows()}
+    rows = {}
+    for line in src.splitlines():
+        if line.rstrip().endswith("\\\\") and "&" in line and not line.startswith(("Policy", " &")):
+            cells = [c.strip() for c in line.rstrip().rstrip("\\").split("&")]
+            rows[cells[0]] = cells
+    pol_of = {"Always-deploy (naive)": "naive", "Point gate, $b{=}32$": "point",
+              "Strict gate (reject ties), $b{=}32$": "strict",
+              "ATC \\cite{garg2022atc}": "atc", "DoC \\cite{guillory2021doc}": "doc",
+              "Calibrated soft ensemble": "enscal", "Replay 50/50 retraining": "replay",
+              "river-DDM trigger": "ddm", "river-ADWIN trigger": "adwin"}
+    mark = {"MATERIAL GAIN": "\\dagger", "MATERIAL COST": "\\ddagger",
+            "COMPATIBLE": "\\approx", "UNRESOLVED": "?"}
+    scen = ("ps_full", "unsw_full", "ton_full", "ps_zero", "unsw_zero", "ton_zero")
+    assert set(pol_of) <= set(rows), sorted(set(pol_of) - set(rows))
+    for label, pol in pol_of.items():
+        for i, sc in enumerate(scen):
+            cell = rows[label][3 + i]
+            v = mean[(sc, pol, "2000")] - mean[(sc, "never", "n/a")]
+            assert abs(_num(cell) - v) <= 0.006, (label, sc, cell, v)
+            name = f"{sc}: {pol}-2000 vs naive-2000"
+            if name in C.index:
+                assert mark[C.loc[name, "classification"]] in cell, (label, sc, cell)
+            else:
+                assert "^" not in cell, (label, sc, cell)
+    cap = _flat(src.split("\\label{tab:common_harness}")[0])
+    assert "none is an adaptive-nids system reproduced end to end" in cap

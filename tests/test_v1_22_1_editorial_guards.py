@@ -98,7 +98,8 @@ def test_no_unscoped_size_matched_generalizations():
 def test_size_matched_scope_limits_retained():
     for t in (MAIN, IEEE):
         f = _flat(t)
-        assert "only under zero drift" in f, "zero-drift-only limitation must stay"
+        assert "only under zero drift" not in f, "the full-drift size control is now evaluated"
+        assert "nominal evidence is not effective information" in f
         assert "sample-size parity" in f, "nominal parity terminology required"
         assert "temporal coverage, diversity, subtype support, label quality" in f, (
             "nominal-vs-effective evidence caveat required")

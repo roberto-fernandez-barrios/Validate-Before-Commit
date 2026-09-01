@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\caption{Size-matched-under-drift control: attack-recall and FPR non-inferiority guardrails
+for every gate cell vs naive at the same candidate size (paired $\Delta$ in pp; parentheses:
+one-sided 95\% bound tested against the preregistered margins recall $>-1.0$, FPR $<+0.5$).
+Guardrails restrict safety language only.}
+\label{tab:size_matched_drift_security}
+\scriptsize
+\begin{tabular}{l l r l l l l}
+\toprule
+Regime & Gate & Size & $\Delta$recall (lb$_{95}$) & NI & $\Delta$FPR (ub$_{95}$) & NI \\
+\midrule
+ps\_full & point & 512 & $+0.14$ (-0.12) & pass & $-0.19$ (+0.25) & pass \\
+ps\_full & strict & 512 & $-0.37$ (-1.01) & \textbf{fail} & $-0.13$ (+0.40) & pass \\
+ps\_full & point & 2000 & $+0.05$ (-0.21) & pass & $-0.25$ (+0.06) & pass \\
+ps\_full & strict & 2000 & $-0.02$ (-0.33) & pass & $-0.02$ (+0.32) & pass \\
+unsw\_full & point & 512 & $+0.00$ (-0.22) & pass & $-0.04$ (+0.41) & pass \\
+unsw\_full & strict & 512 & $+0.11$ (-0.11) & pass & $+0.18$ (+0.65) & \textbf{fail} \\
+unsw\_full & point & 2000 & $-0.02$ (-0.10) & pass & $+0.11$ (+0.31) & pass \\
+unsw\_full & strict & 2000 & $+0.19$ (+0.04) & pass & $+0.86$ (+1.28) & \textbf{fail} \\
+ton\_full & point & 512 & $-0.15$ (-0.32) & pass & $-1.07$ (-0.43) & pass \\
+ton\_full & strict & 512 & $-0.75$ (-1.02) & \textbf{fail} & $-1.45$ (-0.77) & pass \\
+ton\_full & point & 2000 & $-0.08$ (-0.26) & pass & $-0.10$ (+0.06) & pass \\
+ton\_full & strict & 2000 & $-0.55$ (-0.80) & pass & $-0.28$ (+0.44) & pass \\
+\bottomrule
+\end{tabular}
+\end{table}

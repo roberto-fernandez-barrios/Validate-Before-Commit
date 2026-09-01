@@ -15,19 +15,26 @@ import sys
 
 from tests.conftest import REPO
 
-# KBS final scope reduction: the main body keeps only the five primary/boundary result tables;
-# the eight secondary §5.5 tables move to the supplement (relocated main-paper result tables).
+# Post-KBS final integration: the main body keeps the central synthesis matrix, the three
+# comparability-control matrices, the evidence-validation trade-off, the registered
+# common-harness comparison and the chronological boundary; every secondary matrix,
+# guardrail panel and historical block lives in the supplement.
 FINAL_BODY_TABLES = {
-    # v1.21 Scenario-A rewrite: the symmetric-pipeline replication is the central new
-    # result (main matrix + security guardrail panel in the body; full matrices in S7)
-    "table_symmetric_pipeline", "table_symmetric_security",
-    # v1.22 size-matched rewrite: the decisive-control matrix (guardrail panel and full
-    # matrices in S8)
+    # post-KBS final integration: the CSV-generated central evidence matrix (5.0)
+    "table_synthesis",
+    # v1.21 Scenario-A rewrite: the symmetric-pipeline replication (5.2; guardrail panel
+    # relocated to S7 in the final integration)
+    "table_symmetric_pipeline",
+    # v1.22 size-matched rewrite: the zero-drift decisive-control matrix (5.3; S8)
     "table_size_matched",
-    # v1.22.1 editorial phase: nominal evidence-vs-validation trade-off, derived
+    # post-KBS B2: the registered full-drift size control (5.4; full matrices in S9)
+    "table_size_matched_drift",
+    # v1.22.1 editorial phase: nominal evidence-vs-validation trade-off (5.5), derived
     # exclusively from the sealed size-matched outputs (no new experiments)
     "table_evidence_validation_tradeoff",
-    # the pre-enumerated chronological matrix is the external boundary
+    # post-KBS B1: the registered common-harness comparison at 2,000/class (5.6; S10)
+    "table_common_harness",
+    # the pre-enumerated chronological matrix is the external boundary (5.7)
     "table_chronological_q1",
 }
 V1_SUPPLEMENT_TABLES = {
@@ -36,9 +43,16 @@ V1_SUPPLEMENT_TABLES = {
     "table7_mechanism_law_robustness", "table_temporal_streams",
     # final-q1: moved out of the body to hold it at 27 pages; the text keeps the summary
     "table_label_cost",
-    # v1.21: full symmetric-pipeline matrices (S7)
+    # v1.21: full symmetric-pipeline matrices (S7); the guardrail panel joined them in the
+    # post-KBS final integration
+    "table_symmetric_security",
     "table_symmetric_supp_contrasts", "table_symmetric_supp_harm",
     "table_symmetric_supp_interaction",
+    # post-KBS final integration: B2 full matrices + guardrails (S9), B1 families,
+    # statements and budgets (S10)
+    "table_size_matched_drift_supp", "table_size_matched_drift_security",
+    "table_common_harness_supp_primary", "table_common_harness_supp_secondary",
+    "table_common_harness_supp_statements",
     # v1.22: full size-matched matrices + guardrail panel (S8)
     "table_size_matched_security", "table_size_matched_supp_contrasts",
     "table_size_matched_supp_harm", "table_size_matched_supp_interaction",

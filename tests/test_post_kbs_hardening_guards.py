@@ -106,18 +106,25 @@ def test_baseline_comparison_not_presented_as_sota():
     for name, t in (("main.tex", MAIN), ("main_ieee.tex", IEEE)):
         f = _flat(t)
         assert "comparison with strong baselines" not in f, name
-        assert "comparison with evaluated baselines" in f, name
+        assert "registered common-harness comparison with published and reference baselines" in f, name
+        # final integration: the external-baseline gap is closed for generic/reference
+        # methods; the old 'not yet evaluated' scope sentence must be gone, and the
+        # end-to-end-system limitation must be stated explicitly instead
         assert ("no external method has yet been evaluated under the final "
-                "self-contained") in f, name
+                "self-contained") not in f, name
+        assert ("no faithfully reproducible end-to-end published adaptive-nids system") in f, name
         assert "not a state-of-the-art ranking" in f, name
     assert re.search(r"sota", _flat(README)) is None, "README must not advertise SoTA"
 
 
 def test_patterns_paragraph_reports_docs_and_ensemble_wins():
+    """Final integration: the exploratory DoC-beats-gate pattern is reported together with
+    its confirmatory reversal, and the ensemble/ATC results are scoped as compatibility."""
     f = _flat(MAIN)
-    assert "label-free rules are not uniformly harmful" in f
-    assert "exceeds} the point gate's" in MAIN.lower() or "exceeds" in f
-    assert "not global superiority" in f
+    assert "does not reproduce under the final harness at parity" in f
+    assert "the value of every evaluated safeguard" in f
+    assert "concentrates where candidate evidence is asymmetric" in f
+    assert "not a demonstration of equality" in f
 
 
 # ---------------------------------------------------------------- supplement consistency

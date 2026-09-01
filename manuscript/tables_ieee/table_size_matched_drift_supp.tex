@@ -1,0 +1,43 @@
+\begin{table}[t]
+\centering
+\caption{Size-matched-under-drift control (seeds 6001--6030): every registered contrast of
+families G1--G4 with CI95, CI90, Holm-adjusted $p$ and significance, plus the descriptive
+512-side gate cells. BA points; seed = inferential unit; deterministic centered paired
+bootstrap (100{,}000 resamples).}
+\label{tab:size_matched_drift_supp}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l l r l l r c l}
+\toprule
+Family & Contrast & Effect & CI95 & CI90 & $p_{\mathrm{Holm}}$ & Sig. & G2 class \\
+\midrule
+G1 value of updating & ps\_full: naive-512 vs never & $+8.90$ & [6.35, 11.57] & [6.74, 11.14] & 0.0001 & yes &  \\
+G1 value of updating & ps\_full: naive-2000 vs never & $+9.72$ & [7.10, 12.39] & [7.52, 11.97] & 0.0001 & yes &  \\
+G1 value of updating & unsw\_full: naive-512 vs never & $+2.13$ & [1.86, 2.36] & [1.90, 2.32] & 0.0001 & yes &  \\
+G1 value of updating & unsw\_full: naive-2000 vs never & $+3.79$ & [3.55, 4.00] & [3.59, 3.97] & 0.0001 & yes &  \\
+G1 value of updating & ton\_full: naive-512 vs never & $+1.44$ & [0.86, 2.09] & [0.95, 1.98] & 0.0001 & yes &  \\
+G1 value of updating & ton\_full: naive-2000 vs never & $+2.44$ & [1.88, 3.08] & [1.96, 2.97] & 0.0001 & yes &  \\
+G2 size effect & ps\_full: naive-2000 vs naive-512 & $+0.82$ & [0.67, 0.98] & [0.69, 0.96] & 0.0000 & yes & size benefit \\
+G2 size effect & unsw\_full: naive-2000 vs naive-512 & $+1.66$ & [1.51, 1.81] & [1.53, 1.79] & 0.0000 & yes & size benefit \\
+G2 size effect & ton\_full: naive-2000 vs naive-512 & $+1.00$ & [0.60, 1.39] & [0.67, 1.32] & 0.0000 & yes & size benefit \\
+G3 gate value at size 2000 & ps\_full: point-2000 vs naive-2000 & $+0.15$ & [-0.03, 0.39] & [-0.01, 0.35] & 0.8010 & no &  \\
+G3 gate value at size 2000 & ps\_full: strict-2000 vs naive-2000 & $-0.00$ & [-0.17, 0.23] & [-0.15, 0.18] & 1.0000 & no &  \\
+G3 gate value at size 2000 & unsw\_full: point-2000 vs naive-2000 & $-0.06$ & [-0.16, 0.03] & [-0.14, 0.02] & 0.8010 & no &  \\
+G3 gate value at size 2000 & unsw\_full: strict-2000 vs naive-2000 & $-0.34$ & [-0.53, -0.15] & [-0.50, -0.18] & 0.0045 & yes &  \\
+G3 gate value at size 2000 & ton\_full: point-2000 vs naive-2000 & $+0.01$ & [-0.06, 0.09] & [-0.05, 0.07] & 1.0000 & no &  \\
+G3 gate value at size 2000 & ton\_full: strict-2000 vs naive-2000 & $-0.14$ & [-0.56, 0.28] & [-0.49, 0.22] & 1.0000 & no &  \\
+G4 gate x size interaction & ps\_full: (point-naive)@2000 - (point-naive)@512 & $-0.02$ & [-0.19, 0.15] & [-0.16, 0.13] & 1.0000 & no &  \\
+G4 gate x size interaction & ps\_full: (strict-naive)@2000 - (strict-naive)@512 & $+0.12$ & [-0.18, 0.44] & [-0.13, 0.39] & 1.0000 & no &  \\
+G4 gate x size interaction & unsw\_full: (point-naive)@2000 - (point-naive)@512 & $-0.08$ & [-0.29, 0.10] & [-0.25, 0.08] & 1.0000 & no &  \\
+G4 gate x size interaction & unsw\_full: (strict-naive)@2000 - (strict-naive)@512 & $-0.31$ & [-0.52, -0.10] & [-0.48, -0.13] & 0.0231 & yes &  \\
+G4 gate x size interaction & ton\_full: (point-naive)@2000 - (point-naive)@512 & $-0.45$ & [-0.88, -0.06] & [-0.81, -0.12] & 0.1595 & no &  \\
+G4 gate x size interaction & ton\_full: (strict-naive)@2000 - (strict-naive)@512 & $-0.49$ & [-0.98, -0.01] & [-0.90, -0.08] & 0.1998 & no &  \\
+descriptive (uncorrected) & ps\_full: point-512 vs naive-512 & $+0.16$ & [-0.05, 0.42] & --- & --- & --- &  \\
+descriptive (uncorrected) & ps\_full: strict-512 vs naive-512 & $-0.12$ & [-0.49, 0.26] & --- & --- & --- &  \\
+descriptive (uncorrected) & unsw\_full: point-512 vs naive-512 & $+0.02$ & [-0.13, 0.19] & --- & --- & --- &  \\
+descriptive (uncorrected) & unsw\_full: strict-512 vs naive-512 & $-0.03$ & [-0.21, 0.17] & --- & --- & --- &  \\
+descriptive (uncorrected) & ton\_full: point-512 vs naive-512 & $+0.46$ & [0.09, 0.88] & --- & --- & --- &  \\
+descriptive (uncorrected) & ton\_full: strict-512 vs naive-512 & $+0.35$ & [-0.10, 0.80] & --- & --- & --- &  \\
+\bottomrule
+\end{tabular}
+\end{table}

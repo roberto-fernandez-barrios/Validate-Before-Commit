@@ -1,0 +1,61 @@
+\begin{table}[t]
+\centering
+\caption{Registered common-harness comparison (seeds 5001--5030): the primary families at 2{,}000/class --- PF1 zero-drift loss avoidance and PF2 full-drift benefit retention (policy $-$ naive) and PF3 published estimators $-$ point gate. BA points; seed = unit; Holm within family; per-cell registered classification.}
+\label{tab:common_harness_supp_primary}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l l r l r l}
+\toprule
+Family & Contrast & Effect & CI95 & $p_{\mathrm{Holm}}$ & Class \\
+\midrule
+PF1 & ps\_zero: atc-2000 vs naive-2000 & $+0.27$ & [0.11, 0.45] & 0.0309 & compatible \\
+PF1 & unsw\_zero: atc-2000 vs naive-2000 & $-0.04$ & [-0.08, 0.01] & 1.0000 & compatible \\
+PF1 & ton\_zero: atc-2000 vs naive-2000 & $-0.00$ & [-0.04, 0.03] & 1.0000 & compatible \\
+PF2 & ps\_full: atc-2000 vs naive-2000 & $-0.65$ & [-1.31, -0.10] & 0.1757 & unresolved \\
+PF2 & unsw\_full: atc-2000 vs naive-2000 & $-0.22$ & [-0.40, -0.05] & 0.0872 & compatible \\
+PF2 & ton\_full: atc-2000 vs naive-2000 & $+0.10$ & [0.01, 0.21] & 0.2114 & compatible \\
+PF1 & ps\_zero: doc-2000 vs naive-2000 & $+0.40$ & [0.22, 0.59] & 0.0010 & unresolved \\
+PF1 & unsw\_zero: doc-2000 vs naive-2000 & $-0.02$ & [-0.08, 0.05] & 1.0000 & compatible \\
+PF1 & ton\_zero: doc-2000 vs naive-2000 & $+0.03$ & [0.00, 0.05] & 0.5235 & compatible \\
+PF2 & ps\_full: doc-2000 vs naive-2000 & $-2.59$ & [-4.12, -1.21] & 0.0054 & material cost \\
+PF2 & unsw\_full: doc-2000 vs naive-2000 & $-0.59$ & [-0.85, -0.33] & 0.0002 & material cost \\
+PF2 & ton\_full: doc-2000 vs naive-2000 & $+0.21$ & [0.01, 0.47] & 0.2168 & compatible \\
+PF1 & ps\_zero: enscal-2000 vs naive-2000 & $+1.46$ & [1.25, 1.68] & 0.0002 & material gain \\
+PF1 & unsw\_zero: enscal-2000 vs naive-2000 & $+0.05$ & [0.01, 0.10] & 0.4378 & compatible \\
+PF1 & ton\_zero: enscal-2000 vs naive-2000 & $+0.02$ & [-0.02, 0.06] & 1.0000 & compatible \\
+PF2 & ps\_full: enscal-2000 vs naive-2000 & $-0.09$ & [-0.46, 0.28] & 0.6434 & compatible \\
+PF2 & unsw\_full: enscal-2000 vs naive-2000 & $-0.42$ & [-0.49, -0.36] & 0.0002 & compatible \\
+PF2 & ton\_full: enscal-2000 vs naive-2000 & $-0.23$ & [-0.50, 0.06] & 0.2168 & compatible \\
+PF1 & ps\_zero: replay-2000 vs naive-2000 & $+0.16$ & [-0.02, 0.35] & 0.9935 & compatible \\
+PF1 & unsw\_zero: replay-2000 vs naive-2000 & $-0.02$ & [-0.08, 0.04] & 1.0000 & compatible \\
+PF1 & ton\_zero: replay-2000 vs naive-2000 & $-0.01$ & [-0.06, 0.03] & 1.0000 & compatible \\
+PF2 & ps\_full: replay-2000 vs naive-2000 & $-0.89$ & [-1.22, -0.56] & 0.0002 & material cost \\
+PF2 & unsw\_full: replay-2000 vs naive-2000 & $-2.07$ & [-2.23, -1.90] & 0.0002 & material cost \\
+PF2 & ton\_full: replay-2000 vs naive-2000 & $-1.22$ & [-1.49, -0.96] & 0.0002 & material cost \\
+PF1 & ps\_zero: ddm-2000 vs naive-2000 & $+0.15$ & [-0.52, 0.75] & 1.0000 & unresolved \\
+PF1 & unsw\_zero: ddm-2000 vs naive-2000 & $-0.07$ & [-0.15, 0.00] & 0.6950 & compatible \\
+PF1 & ton\_zero: ddm-2000 vs naive-2000 & $-0.08$ & [-0.25, 0.02] & 1.0000 & compatible \\
+PF2 & ps\_full: ddm-2000 vs naive-2000 & $-0.78$ & [-1.32, -0.26] & 0.0292 & material cost \\
+PF2 & unsw\_full: ddm-2000 vs naive-2000 & $-2.67$ & [-3.22, -2.12] & 0.0002 & material cost \\
+PF2 & ton\_full: ddm-2000 vs naive-2000 & $-1.81$ & [-2.28, -1.37] & 0.0002 & material cost \\
+PF1 & ps\_zero: adwin-2000 vs naive-2000 & $-0.25$ & [-1.00, 0.35] & 1.0000 & unresolved \\
+PF1 & unsw\_zero: adwin-2000 vs naive-2000 & $-0.07$ & [-0.14, -0.00] & 0.4378 & compatible \\
+PF1 & ton\_zero: adwin-2000 vs naive-2000 & $-0.02$ & [-0.08, 0.03] & 1.0000 & compatible \\
+PF2 & ps\_full: adwin-2000 vs naive-2000 & $-8.73$ & [-10.68, -6.71] & 0.0002 & material cost \\
+PF2 & unsw\_full: adwin-2000 vs naive-2000 & $-4.06$ & [-4.25, -3.86] & 0.0002 & material cost \\
+PF2 & ton\_full: adwin-2000 vs naive-2000 & $-2.50$ & [-3.00, -2.03] & 0.0002 & material cost \\
+PF3 & ps\_full: atc-2000 vs point-2000 & $-0.73$ & [-1.40, -0.20] & 0.1439 & unresolved \\
+PF3 & unsw\_full: atc-2000 vs point-2000 & $-0.22$ & [-0.39, -0.05] & 0.0914 & compatible \\
+PF3 & ton\_full: atc-2000 vs point-2000 & $-0.10$ & [-0.37, 0.11] & 1.0000 & compatible \\
+PF3 & ps\_zero: atc-2000 vs point-2000 & $+0.03$ & [-0.06, 0.12] & 1.0000 & compatible \\
+PF3 & unsw\_zero: atc-2000 vs point-2000 & $-0.05$ & [-0.10, -0.01] & 0.1439 & compatible \\
+PF3 & ton\_zero: atc-2000 vs point-2000 & $-0.01$ & [-0.05, 0.02] & 1.0000 & compatible \\
+PF3 & ps\_full: doc-2000 vs point-2000 & $-2.67$ & [-4.23, -1.28] & 0.0053 & material cost \\
+PF3 & unsw\_full: doc-2000 vs point-2000 & $-0.58$ & [-0.85, -0.33] & 0.0001 & material cost \\
+PF3 & ton\_full: doc-2000 vs point-2000 & $+0.01$ & [-0.00, 0.04] & 1.0000 & compatible \\
+PF3 & ps\_zero: doc-2000 vs point-2000 & $+0.15$ & [0.05, 0.26] & 0.0333 & compatible \\
+PF3 & unsw\_zero: doc-2000 vs point-2000 & $-0.03$ & [-0.10, 0.04] & 1.0000 & compatible \\
+PF3 & ton\_zero: doc-2000 vs point-2000 & $+0.02$ & [-0.00, 0.04] & 0.6308 & compatible \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,37 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Registered common-harness comparison with published and reference baselines
+(primary condition: self-contained 2{,}000/class challengers; seeds 5001--5030).} Balanced-accuracy
+points over never-adapting (from the sealed per-arm means; the never-adapt row gives its absolute
+mean BA; all arms share bit-identical raw streams per seed). Markers record the registered per-cell classification of the policy$-$naive
+contrast (families PF1 zero drift / PF2 full drift; Holm within family): $\dagger$ material
+gain, $\ddagger$ material cost, $\approx$ compatible (CI90 within $\pm0.5$), $?$ unresolved.
+Anchor rows (naive, point, strict) are descriptive here by amendment. Labels = target labels
+per decision; ATC/DoC additionally use a 512-row labeled validation sample at each model's
+training time; DDM/ADWIN consume 8 monitoring labels per window. Origin: published generic
+method, reference implementation (\texttt{river} 0.25.0), standard baseline, or authors'
+policy --- none is an adaptive-NIDS system reproduced end to end. Full families, the 512/class
+sensitivity block and statements in Supplementary \S S10.}
+\label{tab:common_harness}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{l l l r r r r r r}
+\toprule
+ & & & \multicolumn{3}{c}{Full drift} & \multicolumn{3}{c}{Zero drift} \\
+\cmidrule(lr){4-6}\cmidrule(lr){7-9}
+Policy & Origin & Labels at decision & PortScan & UNSW & ToN-IoT & PortScan & UNSW & ToN-IoT \\
+\midrule
+Never-adapt & anchor & 0 & 86.0 & 83.1 & 91.9 & 95.1 & 89.0 & 92.5 \\
+Always-deploy (naive) & anchor & 0 & $+9.44$ & $+4.06$ & $+2.50$ & $+0.25$ & $+0.07$ & $+0.02$ \\
+Point gate, $b{=}32$ & authors' policy & 32 & $+9.53$ & $+4.05$ & $+2.70$ & $+0.49$ & $+0.09$ & $+0.03$ \\
+Strict gate (reject ties), $b{=}32$ & authors' policy & 32 & $+9.28$ & $+3.83$ & $+2.28$ & $+0.64$ & $+0.06$ & $-0.01$ \\
+ATC \cite{garg2022atc} & published generic & 0 ($+$512-row val.) & $+8.80$$^{?}$ & $+3.84$$^{\approx}$ & $+2.60$$^{\approx}$ & $+0.52$$^{\approx}$ & $+0.03$$^{\approx}$ & $+0.02$$^{\approx}$ \\
+DoC \cite{guillory2021doc} & published generic & 0 ($+$512-row val.) & $+6.85$$^{\ddagger}$ & $+3.47$$^{\ddagger}$ & $+2.71$$^{\approx}$ & $+0.64$$^{?}$ & $+0.06$$^{\approx}$ & $+0.05$$^{\approx}$ \\
+Calibrated soft ensemble & standard baseline & 0 & $+9.35$$^{\approx}$ & $+3.64$$^{\approx}$ & $+2.26$$^{\approx}$ & $+1.71$$^{\dagger}$ & $+0.12$$^{\approx}$ & $+0.04$$^{\approx}$ \\
+Replay 50/50 retraining & standard baseline & 0 & $+8.55$$^{\ddagger}$ & $+1.99$$^{\ddagger}$ & $+1.28$$^{\ddagger}$ & $+0.40$$^{\approx}$ & $+0.05$$^{\approx}$ & $+0.01$$^{\approx}$ \\
+river-DDM trigger & reference impl. & 0; 800/stream monitoring & $+8.66$$^{\ddagger}$ & $+1.39$$^{\ddagger}$ & $+0.69$$^{\ddagger}$ & $+0.40$$^{?}$ & $+0.00$$^{\approx}$ & $-0.06$$^{\approx}$ \\
+river-ADWIN trigger & reference impl. & 0; 800/stream monitoring & $+0.71$$^{\ddagger}$ & $+0.00$$^{\ddagger}$ & $+0.00$$^{\ddagger}$ & $+0.00$$^{?}$ & $+0.00$$^{\approx}$ & $+0.00$$^{\approx}$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

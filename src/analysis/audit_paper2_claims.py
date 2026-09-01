@@ -1081,8 +1081,9 @@ def main():
     # v1.21: the symmetric-pipeline supplement contrast table also names the test in its
     # caption (generated into tables/ and tables_ieee/); v1.22 adds the size-matched
     # supplement contrast table (both dirs), and v1.22.1 the evidence-validation
-    # trade-off table (both dirs), so the document count is 9.
-    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+6 tables)", 9.0,
+    # trade-off table (both dirs), so the document count was 9; the post-KBS final
+    # integration adds the B2 main and supplement tables (both dirs), so it is 13.
+    check("v121 B: manuscript names the centered paired bootstrap (main+ieee+supp+10 tables)", 13.0,
           float(sum(1 for _t in _texts.values()
                     if "centered paired bootstrap" in _t)), 0.5)
     if os.path.exists(f"{Q1}/multiplicity.csv"):
@@ -1498,7 +1499,11 @@ def main():
           float(_hits(r"no measurable value once sizes match")), 0.5)
     check("v1221 S: no 'when comparability is (already )?guaranteed' claim", 0.0,
           float(_hits(r"comparability is (already )?guaranteed")), 0.5)
-    check("v1221 S: size-matched transfer limits retained (zero drift only)", 2.0,
+    # post-KBS final integration: the full-drift size control is now evaluated (B2), so the
+    # retained transfer limit is the observed-data form, not the drift regime.
+    check("v1221 S: size-matched transfer limits retained (observed-data form not evaluated)", 2.0,
+          _in_mains("not repeated in observed-data form"), 0.5)
+    check("v1221 S: obsolete 'only under zero drift' limitation removed (main+ieee)", 0.0,
           _in_mains("only under zero drift"), 0.5)
     # README: conditional recommendation, no universal gating.
     check("v1221 R: README universal 'challenger should be validated before' gone", 0.0,
