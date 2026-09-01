@@ -1,0 +1,114 @@
+{
+  "outcome": "PARTIALLY ROBUST",
+  "predicates": {
+    "ATC_RETENTION": false,
+    "ENSEMBLE_RETENTION": false,
+    "COST_ALTERNATIVES": true,
+    "ATC_VS_POINT": true,
+    "SIZE_DEPENDENT_ORDERING": true,
+    "NO_GLOBAL_DOMINANCE": true
+  },
+  "predicates_holding": 4,
+  "direct_primary_material_reversals": [],
+  "detail": {
+    "atc_full_drift": [
+      "UNRESOLVED",
+      "UNRESOLVED",
+      "COMPATIBLE"
+    ],
+    "ensemble_full_drift": [
+      "UNRESOLVED",
+      "MATERIAL COST",
+      "COMPATIBLE"
+    ],
+    "cost_alternatives_full_drift": {
+      "doc": [
+        "MATERIAL COST",
+        "MATERIAL COST",
+        "COMPATIBLE"
+      ],
+      "replay": [
+        "COMPATIBLE",
+        "MATERIAL COST",
+        "COMPATIBLE"
+      ],
+      "ddm": [
+        "UNRESOLVED",
+        "MATERIAL COST",
+        "UNRESOLVED"
+      ],
+      "adwin": [
+        "MATERIAL COST",
+        "MATERIAL COST",
+        "MATERIAL COST"
+      ]
+    },
+    "atc_vs_point_all_scenarios": [
+      "UNRESOLVED",
+      "COMPATIBLE",
+      "COMPATIBLE",
+      "COMPATIBLE",
+      "COMPATIBLE",
+      "COMPATIBLE"
+    ],
+    "dominance_scope": "policies with registered PF1/PF2 comparisons: atc, doc, enscal, replay, ddm, adwin",
+    "dominance_cells": {
+      "atc": [
+        "UNRESOLVED",
+        "UNRESOLVED",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE"
+      ],
+      "doc": [
+        "MATERIAL COST",
+        "MATERIAL COST",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE"
+      ],
+      "enscal": [
+        "UNRESOLVED",
+        "MATERIAL COST",
+        "COMPATIBLE",
+        "MATERIAL GAIN",
+        "MATERIAL GAIN",
+        "COMPATIBLE"
+      ],
+      "replay": [
+        "COMPATIBLE",
+        "MATERIAL COST",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "COMPATIBLE"
+      ],
+      "ddm": [
+        "UNRESOLVED",
+        "MATERIAL COST",
+        "UNRESOLVED",
+        "COMPATIBLE",
+        "COMPATIBLE",
+        "UNRESOLVED"
+      ],
+      "adwin": [
+        "MATERIAL COST",
+        "MATERIAL COST",
+        "MATERIAL COST",
+        "UNRESOLVED",
+        "COMPATIBLE",
+        "COMPATIBLE"
+      ]
+    }
+  },
+  "protocol_file": "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+  "protocol_sha256": "ee559f802badd302f79c9371bfb4c194cef9df55b163afa3ee5d381c510bd699",
+  "config_file": "configs/ijis_exact_value_disjoint_b1_v1.json",
+  "config_sha256": "bd2c0e14b6c3bae2524749160300f1aa35ab6c508ee93883964b87d634b39815",
+  "confirmatory_seeds": "8001-8030",
+  "taxonomy": "protocol section 7.1, applied mechanically",
+  "numeric_replication_required": false,
+  "follow_up_authorized": false
+}

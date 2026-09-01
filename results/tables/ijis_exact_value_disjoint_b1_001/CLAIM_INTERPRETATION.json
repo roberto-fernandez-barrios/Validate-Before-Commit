@@ -1,0 +1,114 @@
+{
+  "outcome": "cell-classification map + statements S1-S4 (no single label; no ranking)",
+  "protocol_file": "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+  "amendment_file": "notes/post_kbs_common_harness_baselines_amendment_001.md",
+  "config_sha256": "bd2c0e14b6c3bae2524749160300f1aa35ab6c508ee93883964b87d634b39815",
+  "confirmatory_seeds": "8001-8030",
+  "statements": [
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "atc",
+      "holds": false
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "atc",
+      "holds": false
+    },
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "doc",
+      "holds": false
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "doc",
+      "holds": true
+    },
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "enscal",
+      "holds": true
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "enscal",
+      "holds": true
+    },
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "replay",
+      "holds": false
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "replay",
+      "holds": true
+    },
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "ddm",
+      "holds": false
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "ddm",
+      "holds": true
+    },
+    {
+      "statement": "S1 avoids zero-drift loss under final harness",
+      "policy": "adwin",
+      "holds": false
+    },
+    {
+      "statement": "S2 pays for it at full drift",
+      "policy": "adwin",
+      "holds": true
+    },
+    {
+      "statement": "S3 matches the point gate (all six COMPATIBLE)",
+      "policy": "atc",
+      "holds": false
+    },
+    {
+      "statement": "S3 matches the point gate (all six COMPATIBLE)",
+      "policy": "doc",
+      "holds": false
+    },
+    {
+      "statement": "S4 method ordering changes with candidate size",
+      "policy": "point",
+      "holds": false
+    },
+    {
+      "statement": "S4 method ordering changes with candidate size",
+      "policy": "strict",
+      "holds": false
+    },
+    {
+      "statement": "S4 method ordering changes with candidate size",
+      "policy": "atc",
+      "holds": true
+    },
+    {
+      "statement": "S4 method ordering changes with candidate size",
+      "policy": "doc",
+      "holds": true
+    },
+    {
+      "statement": "S4 method ordering changes with candidate size",
+      "policy": "enscal",
+      "holds": true
+    }
+  ],
+  "forbidden_claims": [
+    "Any 'SoTA comparison' or global-superiority claim (trade-off mapping only).",
+    "Any adaptive-NIDS SoTA label for any evaluated row.",
+    "Any inferential use of the descriptive anchor contrasts (registered hypotheses live in the sealed zero-drift control and in post_kbs_size_matched_drift).",
+    "Any proposal-coupling claim for cross-size contrasts (seed-paired only).",
+    "Any pooling of these results with other seed blocks or harnesses."
+  ],
+  "follow_up_authorized": false,
+  "exact_value_disjoint_robustness": "PARTIALLY ROBUST",
+  "robustness_file": "ROBUSTNESS_INTERPRETATION.json"
+}

@@ -1,0 +1,91 @@
+scenario,policy,candidate_size,origin,labels_probe_mean,labels_monitor_mean,labels_candidate_mean,labels_trainingtime_validation_analytic,note
+ps_full,naive,2000,anchor,0.0,0.0,9733.333333333334,0.0,
+ps_full,point,2000,anchor-ours,81.06666666666666,0.0,10133.333333333334,0.0,
+ps_full,strict,2000,anchor-ours,116.26666666666667,0.0,14533.333333333334,0.0,
+ps_full,atc,2000,published-generic,0.0,0.0,14933.333333333334,2423.5,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_full,doc,2000,published-generic,0.0,0.0,17466.666666666668,2747.7,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_full,enscal,2000,standard-baseline,0.0,0.0,9733.333333333334,0.0,
+ps_full,replay,2000,standard-baseline,0.0,0.0,9733.333333333334,0.0,
+ps_full,ddm,2000,reference-implementation,0.0,800.0,6933.333333333333,0.0,
+ps_full,adwin,2000,reference-implementation,0.0,800.0,1333.3333333333333,0.0,
+ps_full,naive,512,anchor,0.0,0.0,2491.733333333333,0.0,
+ps_full,point,512,anchor-ours,85.33333333333333,0.0,2730.6666666666665,0.0,
+ps_full,strict,512,anchor-ours,108.8,0.0,3481.6,0.0,
+ps_full,atc,512,published-generic,0.0,0.0,4164.266666666666,2594.1,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_full,doc,512,published-generic,0.0,0.0,4744.533333333334,2884.3,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_full,enscal,512,standard-baseline,0.0,0.0,2491.733333333333,0.0,
+unsw_full,naive,2000,anchor,0.0,0.0,8133.333333333333,0.0,
+unsw_full,point,2000,anchor-ours,74.66666666666667,0.0,9333.333333333334,0.0,
+unsw_full,strict,2000,anchor-ours,97.06666666666666,0.0,12133.333333333334,0.0,
+unsw_full,atc,2000,published-generic,0.0,0.0,13066.666666666666,2184.5,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_full,doc,2000,published-generic,0.0,0.0,17733.333333333332,2781.9,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_full,enscal,2000,standard-baseline,0.0,0.0,8133.333333333333,0.0,
+unsw_full,replay,2000,standard-baseline,0.0,0.0,8133.333333333333,0.0,
+unsw_full,ddm,2000,reference-implementation,0.0,800.0,2933.3333333333335,0.0,
+unsw_full,adwin,2000,reference-implementation,0.0,800.0,0.0,0.0,
+unsw_full,naive,512,anchor,0.0,0.0,2082.133333333333,0.0,
+unsw_full,point,512,anchor-ours,80.0,0.0,2560.0,0.0,
+unsw_full,strict,512,anchor-ours,104.53333333333333,0.0,3345.0666666666666,0.0,
+unsw_full,atc,512,published-generic,0.0,0.0,3891.2,2457.6,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_full,doc,512,published-generic,0.0,0.0,5632.0,3328.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_full,enscal,512,standard-baseline,0.0,0.0,2082.133333333333,0.0,
+ton_full,naive,2000,anchor,0.0,0.0,8666.666666666666,0.0,
+ton_full,point,2000,anchor-ours,70.4,0.0,8800.0,0.0,
+ton_full,strict,2000,anchor-ours,163.2,0.0,20400.0,0.0,
+ton_full,atc,2000,published-generic,0.0,0.0,10133.333333333334,1809.1,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_full,doc,2000,published-generic,0.0,0.0,9866.666666666666,1774.9,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_full,enscal,2000,standard-baseline,0.0,0.0,8666.666666666666,0.0,
+ton_full,replay,2000,standard-baseline,0.0,0.0,8666.666666666666,0.0,
+ton_full,ddm,2000,reference-implementation,0.0,800.0,4266.666666666667,0.0,
+ton_full,adwin,2000,reference-implementation,0.0,800.0,400.0,0.0,
+ton_full,naive,512,anchor,0.0,0.0,2218.6666666666665,0.0,
+ton_full,point,512,anchor-ours,84.26666666666667,0.0,2696.5333333333333,0.0,
+ton_full,strict,512,anchor-ours,172.8,0.0,5529.6,0.0,
+ton_full,atc,512,published-generic,0.0,0.0,2764.8,1894.4,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_full,doc,512,published-generic,0.0,0.0,2798.9333333333334,1911.5,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_full,enscal,512,standard-baseline,0.0,0.0,2218.6666666666665,0.0,
+ps_zero,naive,2000,anchor,0.0,0.0,14000.0,0.0,
+ps_zero,point,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+ps_zero,strict,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+ps_zero,atc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_zero,doc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_zero,enscal,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+ps_zero,replay,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+ps_zero,ddm,2000,reference-implementation,0.0,800.0,4933.333333333333,0.0,
+ps_zero,adwin,2000,reference-implementation,0.0,800.0,0.0,0.0,
+ps_zero,naive,512,anchor,0.0,0.0,3584.0,0.0,
+ps_zero,point,512,anchor-ours,112.0,0.0,3584.0,0.0,
+ps_zero,strict,512,anchor-ours,112.0,0.0,3584.0,0.0,
+ps_zero,atc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_zero,doc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ps_zero,enscal,512,standard-baseline,0.0,0.0,3584.0,0.0,
+unsw_zero,naive,2000,anchor,0.0,0.0,14000.0,0.0,
+unsw_zero,point,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+unsw_zero,strict,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+unsw_zero,atc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_zero,doc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_zero,enscal,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+unsw_zero,replay,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+unsw_zero,ddm,2000,reference-implementation,0.0,800.0,1866.6666666666667,0.0,
+unsw_zero,adwin,2000,reference-implementation,0.0,800.0,0.0,0.0,
+unsw_zero,naive,512,anchor,0.0,0.0,3584.0,0.0,
+unsw_zero,point,512,anchor-ours,112.0,0.0,3584.0,0.0,
+unsw_zero,strict,512,anchor-ours,112.0,0.0,3584.0,0.0,
+unsw_zero,atc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_zero,doc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+unsw_zero,enscal,512,standard-baseline,0.0,0.0,3584.0,0.0,
+ton_zero,naive,2000,anchor,0.0,0.0,14000.0,0.0,
+ton_zero,point,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+ton_zero,strict,2000,anchor-ours,112.0,0.0,14000.0,0.0,
+ton_zero,atc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_zero,doc,2000,published-generic,0.0,0.0,14000.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_zero,enscal,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+ton_zero,replay,2000,standard-baseline,0.0,0.0,14000.0,0.0,
+ton_zero,ddm,2000,reference-implementation,0.0,800.0,4800.0,0.0,
+ton_zero,adwin,2000,reference-implementation,0.0,800.0,0.0,0.0,
+ton_zero,naive,512,anchor,0.0,0.0,3584.0,0.0,
+ton_zero,point,512,anchor-ours,112.0,0.0,3584.0,0.0,
+ton_zero,strict,512,anchor-ours,112.0,0.0,3584.0,0.0,
+ton_zero,atc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_zero,doc,512,published-generic,0.0,0.0,3584.0,2304.0,ATC/DoC validation samples are drawn at training time and are not in the runner's counters; documented analytically (candidates x gate-val-size + one incumbent sample)
+ton_zero,enscal,512,standard-baseline,0.0,0.0,3584.0,0.0,
