@@ -9,7 +9,7 @@ identifiers. It is not a changelog and contains no project or editorial history.
 
 | Artifact | Location | Role |
 |---|---|---|
-| Sealed result CSVs | `results/tables/**`, pinned by `results/tables/MANIFEST.sha256` | 185 CSVs, byte-verifiable via `make verify-hashes` |
+| Sealed result CSVs | `results/tables/**`, pinned by `results/tables/MANIFEST.sha256` | 207 CSVs (185 historical + 22 post-KBS, sealed additively at v1.23.0), byte-verifiable via `make verify-hashes` |
 | Final machine-readable manifest | `results/final_manifest.json` | artifact manifest (arm counts, hashes, statistical families) |
 | Experiment ledger | `results/final_experiment_ledger.csv` (built by `src/analysis/make_final_experiment_ledger.py`) | maps each paper table to its registered protocol and config SHA-256 |
 | Registered protocols / amendments | `notes/*_protocol.md`, `notes/*_preregistration_*.md`, `notes/paper2_harness_v2_amendment_*.md`, `notes/q1_max_protocol.md` | experimental designs frozen before execution |
@@ -24,9 +24,13 @@ Reproduction entry points: `REPRODUCE.md` (experiment commands) and `make final-
 
 - **ATTENUATION**: the registered attenuation outcome under frozen P/A/E rules is retained in
   `main.tex`, `main_ieee.tex`, and `supplement.tex`, and is asserted by `audit_paper2_claims.py`.
-- **Manifest pinning**: the 185 sealed result CSVs match `MANIFEST.sha256` byte-for-byte. Post-KBS confirmatory tables (`results/tables/post_kbs_*`) live UNPINNED alongside them until a separately authorized release re-pins the manifest; `verify-hashes` lists them as warnings only and the sealed set is never re-pinned in this phase.
+- **Manifest pinning**: the 207 sealed result CSVs (185 historical entries, byte-identical to
+  every earlier v1.22.x pin, plus the 22 post-KBS confirmatory CSVs pinned additively at
+  v1.23.0) match `MANIFEST.sha256` byte-for-byte; `verify_results_manifest` reports 0
+  unpinned extras.
 - **Sealed science**: `results/raw/**` and the pinned CSVs are byte-stable; the v1.22 line is the
-  v1.22.0 science.
+  v1.22.0 science; the v1.23 line adds the two registered post-KBS blocks (B2 size-matched
+  drift, seeds 6001-6030; B1 common-harness baselines, seeds 5001-5030) sealed at v1.23.0.
 
 ## Version → registered design → experiment → outcome
 
@@ -54,8 +58,8 @@ sealed manifest/DOI that pins it. Values live in the CSVs pinned by `MANIFEST.sh
 | v1.20.x | budget-frontier driver committed (see below); `configs/q1_budget_frontier_v2.json` | corrected deferred-commit timing; reproduced frontier | frontier reproduced bit-for-bit on unaffected arms |
 | v1.21.0 | `paper2_symmetric_pipeline_dynamic_protocol_001.md`, `symmetric_pipeline_scenario_a_rewrite_protocol.md`; `configs/symmetric_pipeline_dynamic_v1.json` | symmetric-pipeline replication (seeds 3001–3030) | candidate-governance decomposition |
 | v1.22.0 | `paper2_size_matched_own_transformer_protocol_001.md`, `size_matched_final_rewrite_protocol.md`; `configs/size_matched_own_transformer_v1.json` | size-matched self-contained challenger control (seeds 4001–4030) | ATTENUATION under frozen P/A/E rules; gating is conditional, not universal |
-| post-v1.22 (B2; unsealed, pending release) | `post_kbs_size_matched_drift_protocol_001.md`; `configs/post_kbs_size_matched_drift_v1.json` (operational keys derived from the sealed size-matched config, SHA recorded) | size-matched self-contained challengers under full drift (seeds 6001–6030; 21 arms) | HOMOGENEOUS-SIZE BENEFIT (+0.82/+1.66/+1.00 BA points); 0/6 positive gate effects at 2,000/class; outputs `results/tables/post_kbs_size_matched_drift_001/` (not yet manifest-pinned) |
-| post-v1.22 (B1; unsealed, pending release) | `post_kbs_common_harness_baselines_protocol_001.md` + `post_kbs_common_harness_baselines_amendment_001.md`; `configs/post_kbs_common_harness_baselines_v2.json` | registered common-harness comparison: never/naive/point/strict, ATC, DoC, calibrated ensemble, replay, river-DDM, river-ADWIN at 2,000/class (+512 sensitivity); seeds 5001–5030; 96 arms | ATC and ensemble COMPATIBLE with always-deploy at full drift; DoC/replay/DDM/ADWIN MATERIAL COST; S4 ordering change for ATC and ensemble; outputs `results/tables/post_kbs_common_harness_baselines_001/` (not yet manifest-pinned) |
+| v1.23.0 (B2) | `post_kbs_size_matched_drift_protocol_001.md`; `configs/post_kbs_size_matched_drift_v1.json` (operational keys derived from the sealed size-matched config, SHA recorded) | size-matched self-contained challengers under full drift (seeds 6001–6030; 21 arms) | HOMOGENEOUS-SIZE BENEFIT (+0.82/+1.66/+1.00 BA points); 0/6 positive gate effects at 2,000/class; outputs `results/tables/post_kbs_size_matched_drift_001/` (manifest-pinned at v1.23.0) |
+| v1.23.0 (B1) | `post_kbs_common_harness_baselines_protocol_001.md` + `post_kbs_common_harness_baselines_amendment_001.md`; `configs/post_kbs_common_harness_baselines_v2.json` | registered common-harness comparison: never/naive/point/strict, ATC, DoC, calibrated ensemble, replay, river-DDM, river-ADWIN at 2,000/class (+512 sensitivity); seeds 5001–5030; 96 arms | ATC and ensemble COMPATIBLE with always-deploy at full drift; DoC/replay/DDM/ADWIN MATERIAL COST; S4 ordering change for ATC and ensemble; outputs `results/tables/post_kbs_common_harness_baselines_001/` (manifest-pinned at v1.23.0) |
 
 The full per-amendment result set (effect sizes, confidence intervals, seed ranges) is in the
 sealed CSVs pinned by `MANIFEST.sha256` and cross-indexed by

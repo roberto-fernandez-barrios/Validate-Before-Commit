@@ -40,7 +40,8 @@ def _pins() -> dict[str, str]:
 # ---------------------------------------------------------------- artifact self-containment
 def test_every_manifest_pin_is_tracked():
     pins = _pins()
-    assert len(pins) == 185
+    # v1.23.0 sealing: 185 historical + 22 post-KBS confirmatory CSVs (additive re-pin)
+    assert len(pins) == 207
     tracked = set(subprocess.run(["git", "ls-files"], cwd=REPO, capture_output=True,
                                  text=True).stdout.split("\n"))
     missing = [p for p in pins if p not in tracked]

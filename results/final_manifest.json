@@ -1,9 +1,9 @@
 {
-  "manifest_schema_version": "1.1.0",
-  "generated_at_utc": "2026-07-27T11:15:55Z",
-  "source_commit_sha": "9a4b685c69e458cf5ffe62b6814707193094d3b4",
+  "manifest_schema_version": "1.2.0",
+  "generated_at_utc": "2026-09-01T10:28:05Z",
+  "source_commit_sha": "19d5a8039d9122b0315fa15e27d8f1e00ce58d52",
   "source_commit_sha_note": "git HEAD when this manifest was generated -- the source commit it describes, and the parent of the sealing commit. The release SHA is stamped post-tag as release_commit_sha in release_manifest.json / the release notes, not in this file.",
-  "artifact_version": "1.22.9",
+  "artifact_version": "1.23.0",
   "datasets": {
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
     "data/raw/cicids2017/MachineLearningCVE/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
@@ -301,8 +301,8 @@
   },
   "experiment_ledger": {
     "path": "results/final_experiment_ledger.csv",
-    "n_blocks": 12,
-    "n_arm_dirs": 562,
+    "n_blocks": 14,
+    "n_arm_dirs": 679,
     "missing_blocks": [],
     "n_orphan_dirs": 0,
     "orphan_dirs": []
@@ -364,8 +364,8 @@
     "primary_results_changed": false,
     "scientific_csvs_changed": false,
     "article_word_count_before": 19413,
-    "article_word_count_after": 15035,
-    "article_word_reduction_pct": 22.6
+    "article_word_count_after": 17430,
+    "article_word_reduction_pct": 10.2
   },
   "symmetric_replication_v1_21": {
     "title": "Validate Before Commit: Candidate Governance for Drift-Triggered Classifier Pipelines in Network Intrusion Detection",
@@ -492,11 +492,7 @@
     "experiments_rerun_after_frozen_protocol": "exactly the registered 42-arm matrix, seeds 3001-3030",
     "unregistered_experiments": "none",
     "v1_20_2_raw_outputs": "unchanged (MANIFEST re-pin additive 164->173)",
-    "manuscript_pages": {
-      "main.pdf": 27,
-      "supplement.pdf": 36,
-      "main_ieee.pdf": 20
-    }
+    "manuscript_pages": "pypdf unavailable"
   },
   "size_matched_control_v1_22": {
     "title": "Validate Before Commit: A Controlled Study of Pipeline Construction, Evidence Asymmetry, and Candidate Promotion in Network Intrusion Detection",
@@ -601,6 +597,177 @@
     "experiments_added": "size-matched own-transformer control (21-arm registered matrix)",
     "unregistered_experiments": "none"
   },
+  "post_kbs_confirmatory_v1_23": {
+    "release_version": "1.23.0",
+    "final_manuscript_integration_commit": "19d5a80",
+    "protocols_frozen_before_implementation": "a68c90e (both blocks); B1 amendment 5a4ce6f before implementation",
+    "b2_size_matched_drift": {
+      "registered_outcome": "HOMOGENEOUS-SIZE BENEFIT",
+      "per_scenario_classification": {
+        "ps_full": "SIZE BENEFIT",
+        "unsw_full": "SIZE BENEFIT",
+        "ton_full": "SIZE BENEFIT"
+      },
+      "protocol_commits": {
+        "protocol": "a68c90e",
+        "implementation": "9f1159a",
+        "results": "61f5c5a"
+      },
+      "config_sha256": "2ca8f4d3679b034c644ee8131605836c9bc75f59096fe5dd57e9796a96a03ea9",
+      "confirmatory_seeds": "6001-6030",
+      "expected_arms": 21,
+      "completed_arms": 21,
+      "source_commits": [
+        "9f1159a817be"
+      ],
+      "naive_arms_proposal_coupled": 90,
+      "shared_prefix_severity_equal_all": true,
+      "size_effect_naive2000_vs_naive512": {
+        "ps_full": {
+          "effect_pp": 0.8224,
+          "ci95": [
+            0.6711,
+            0.9833
+          ]
+        },
+        "unsw_full": {
+          "effect_pp": 1.6617,
+          "ci95": [
+            1.5057,
+            1.8104
+          ]
+        },
+        "ton_full": {
+          "effect_pp": 0.9984,
+          "ci95": [
+            0.6047,
+            1.3883
+          ]
+        }
+      },
+      "value_of_updating_naive2000_vs_never": {
+        "ps_full": {
+          "effect_pp": 9.7195,
+          "ci95": [
+            7.1005,
+            12.3922
+          ]
+        },
+        "unsw_full": {
+          "effect_pp": 3.7872,
+          "ci95": [
+            3.5484,
+            4.001
+          ]
+        },
+        "ton_full": {
+          "effect_pp": 2.4424,
+          "ci95": [
+            1.8753,
+            3.0797
+          ]
+        }
+      },
+      "gate_value_at_2000": {
+        "n_positive_holm_significant": 0,
+        "resolved_costs": [
+          "unsw_full: strict-2000 vs naive-2000"
+        ]
+      },
+      "non_claims": [
+        "effective information parity",
+        "universal monotonic benefit",
+        "causal generality beyond the nested pool-based design",
+        "larger training windows help arbitrary adaptive systems"
+      ],
+      "historical_zero_drift_classification": "ATTENUATION (v1.22.0; unchanged, not retroactively reclassified)"
+    },
+    "b1_common_harness": {
+      "protocol_commits": {
+        "protocol": "a68c90e",
+        "amendment": "5a4ce6f",
+        "implementation": "9f58b6c",
+        "results": "8285b04"
+      },
+      "config_sha256": "b6e4e1f6682f328427617510ea968f60f479279441029708937960db944d90e7",
+      "confirmatory_seeds": "5001-5030",
+      "expected_arms": 96,
+      "completed_arms": 96,
+      "source_commits": [
+        "9f58b6cb47c2"
+      ],
+      "policies": [
+        "adwin_river",
+        "atc",
+        "ddm_river",
+        "detector",
+        "doc",
+        "labeled_probe",
+        "none",
+        "random"
+      ],
+      "primary_condition": "nominal 2,000/class evidence parity; 512/class secondary sensitivity block",
+      "pf2_full_drift_classification_vs_naive": {
+        "atc": {
+          "ps_full": "UNRESOLVED",
+          "unsw_full": "COMPATIBLE",
+          "ton_full": "COMPATIBLE"
+        },
+        "doc": {
+          "ps_full": "MATERIAL COST",
+          "unsw_full": "MATERIAL COST",
+          "ton_full": "COMPATIBLE"
+        },
+        "enscal": {
+          "ps_full": "COMPATIBLE",
+          "unsw_full": "COMPATIBLE",
+          "ton_full": "COMPATIBLE"
+        },
+        "replay": {
+          "ps_full": "MATERIAL COST",
+          "unsw_full": "MATERIAL COST",
+          "ton_full": "MATERIAL COST"
+        },
+        "ddm": {
+          "ps_full": "MATERIAL COST",
+          "unsw_full": "MATERIAL COST",
+          "ton_full": "MATERIAL COST"
+        },
+        "adwin": {
+          "ps_full": "MATERIAL COST",
+          "unsw_full": "MATERIAL COST",
+          "ton_full": "MATERIAL COST"
+        }
+      },
+      "statements_holding": {
+        "S2": [
+          "doc",
+          "replay",
+          "ddm",
+          "adwin"
+        ],
+        "S4": [
+          "atc",
+          "enscal"
+        ]
+      },
+      "sf5_significant_interactions": {
+        "n": 15,
+        "all_negative": true
+      },
+      "information_budgets": "documented, not equalized (ATC/DoC 512-row training-time validation, analytic; DDM/ADWIN 800 monitoring labels per stream; gates 32 target labels per decision)",
+      "end_to_end_adaptive_nids_system_reproduced": false,
+      "state_of_the_art_claim": false
+    },
+    "sealing": {
+      "historical_pinned_csvs": 185,
+      "post_kbs_pinned_csvs": 22,
+      "total_pinned_csvs": 207,
+      "historical_hashes_unchanged_vs_commit": "19d5a80"
+    },
+    "experiments_added": "B2 (21-arm registered matrix) + B1 (96-arm registered matrix)",
+    "unregistered_experiments": "none"
+  },
   "operational_arm_scope": {
     "evaluation_stream_prevalence": "balanced",
     "detector_calibration_prevalence": "balanced",
@@ -621,8 +788,8 @@
     "end_to_end_pipeline_cost_modeled": false
   },
   "outputs": {
-    "tables_manifest_sha256": "b4f0214303a1889312e87c5bd1a39744cacea47be59aaf026685ec76691ef739",
-    "n_table_csvs": 185,
+    "tables_manifest_sha256": "8ffad48045c63640485eff9a4bf5ba2700c9e8217e3334535bd48e21a33780ef",
+    "n_table_csvs": 207,
     "pdfs": [
       "manuscript/main.pdf",
       "manuscript/supplement.pdf",
@@ -631,7 +798,7 @@
   },
   "audit": {
     "status": "pass",
-    "checks_passed": 631,
-    "checks_total": 631
+    "checks_passed": 632,
+    "checks_total": 632
   }
 }

@@ -61,6 +61,37 @@ def compute_orphans() -> list:
 
 # block_id -> (evidence tier, glob, script, seeds, protocol note, manuscript target)
 BLOCKS = [
+    # v1.23.0: the two registered post-KBS blocks (protocols frozen a68c90e BEFORE any
+    # implementation; sealed additively, 185 -> 207 pinned CSVs).
+    ("post_kbs_size_matched_drift", "registered confirmatory control (post-KBS B2)",
+     "post_kbs_size_matched_drift/smd_*",
+     "src.experiments.run_symmetric_pipeline_replication", "6001-6030",
+     "notes/post_kbs_size_matched_drift_protocol_001.md (protocol frozen a68c90e BEFORE "
+     "implementation 9f1159a; config configs/post_kbs_size_matched_drift_v1.json, SHA-256 "
+     "2ca8f4d3 in every run_config.json, operational keys derived from "
+     "configs/symmetric_pipeline_dynamic_v1.json@sha256:52794778; analysis "
+     "src/analysis/make_post_kbs_size_matched_drift_001.py committed pre-run; nested "
+     "512-in-2000 candidate batches drawn at the proposal-time severity, prefix-hash and "
+     "severity equality verified at every coupled proposal; confirmatory results committed "
+     "61f5c5a; per-arm source commit, candidate size, nested-draw domain, raw-stream hash and "
+     "completion in results/tables/post_kbs_size_matched_drift_001/run_completion.csv; "
+     "registered outcome HOMOGENEOUS-SIZE BENEFIT; sealed at v1.23.0)",
+     "tab:synthesis, tab:size_matched_drift, tab:size_matched_drift_supp, "
+     "tab:size_matched_drift_security"),
+    ("post_kbs_common_harness_baselines", "registered confirmatory comparison (post-KBS B1)",
+     "post_kbs_common_harness_baselines/bh_*",
+     "src.experiments.run_symmetric_pipeline_replication", "5001-5030",
+     "notes/post_kbs_common_harness_baselines_protocol_001.md (protocol frozen a68c90e) + "
+     "notes/post_kbs_common_harness_baselines_amendment_001.md (5a4ce6f, BEFORE "
+     "implementation 9f58b6c; config configs/post_kbs_common_harness_baselines_v2.json, "
+     "SHA-256 b6e4e1f6 in every run_config.json; analysis "
+     "src/analysis/make_post_kbs_common_harness_001.py committed pre-run; confirmatory "
+     "results committed 8285b04; per-arm source commit, candidate size, trigger mode, gate and "
+     "completion in results/tables/post_kbs_common_harness_baselines_001/run_completion.csv; "
+     "statements S1-S4 evaluated literally; information budgets documented, not equalized; "
+     "sealed at v1.23.0)",
+     "tab:common_harness, tab:common_harness_supp_primary, tab:common_harness_supp_secondary, "
+     "tab:common_harness_supp_statements"),
     ("size_matched_own_transformer", "registered confirmatory control",
      "size_matched_own_transformer/sm_*",
      "src.experiments.run_symmetric_pipeline_replication", "4001-4030",

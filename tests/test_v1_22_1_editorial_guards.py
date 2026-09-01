@@ -255,7 +255,8 @@ def test_v1_22_1_manifest_pinning():
     two derived editorial CSVs (185 total)."""
     ms = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
     pinned = [ln for ln in ms.splitlines() if ln.strip()]
-    assert len(pinned) == 185, "185 pinned CSVs at v1.22.1 (183 + 2 editorial)"
+    # 185 at v1.22.1 (183 + 2 editorial); v1.23.0 adds the 22 post-KBS CSVs additively
+    assert len(pinned) == 207, "207 pinned CSVs at v1.23.0 (185 historical + 22 post-KBS)"
     editorial = [ln for ln in pinned if "v1_22_1_editorial/" in ln]
     assert len(editorial) == 2, "exactly the two editorial CSVs are the additive pins"
     for f in ("equivalence_margin_sensitivity.csv", "evidence_validation_tradeoff.csv"):

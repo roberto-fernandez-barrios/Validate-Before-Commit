@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "results" / "final_manifest.json"
 
 # Bump when the manifest's field layout changes so consumers can branch on it.
-MANIFEST_SCHEMA_VERSION = "1.1.0"
+MANIFEST_SCHEMA_VERSION = "1.2.0"
 
 CORE_DATASETS = [
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
@@ -213,6 +213,110 @@ def size_matched_control_v1_22_summary() -> dict:
                "size-matched own pipelines NOT evaluated"),
         v1_21_0_artifact="unchanged (sealed manifests byte-identical; 173/173 pinned)",
         experiments_added="size-matched own-transformer control (21-arm registered matrix)",
+        unregistered_experiments="none",
+    )
+
+
+def post_kbs_confirmatory_v1_23_summary() -> dict:
+    """v1.23.0: the two registered post-KBS blocks -- B2 (size-matched self-contained
+    challengers under full drift) and B1 (common-harness comparison with published and
+    reference baselines) -- read from the frozen analysis outputs so the manifest can never
+    drift from them. Both protocols were frozen (a68c90e) before any implementation."""
+    import json as _json
+    import pandas as pd
+    b2 = REPO / "results" / "tables" / "post_kbs_size_matched_drift_001"
+    b1 = REPO / "results" / "tables" / "post_kbs_common_harness_baselines_001"
+    con2 = pd.read_csv(b2 / "paired_contrasts.csv")
+    mult2 = pd.read_csv(b2 / "multiplicity.csv")
+    rc2 = pd.read_csv(b2 / "run_completion.csv")
+    coup = pd.read_csv(b2 / "coupling_audit.csv")
+    ci2 = _json.loads((b2 / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    cls1 = pd.read_csv(b1 / "cell_classification.csv")
+    st1 = pd.read_csv(b1 / "statements.csv")
+    mult1 = pd.read_csv(b1 / "multiplicity.csv")
+    rc1 = pd.read_csv(b1 / "run_completion.csv")
+    cfg2 = (REPO / "configs" / "post_kbs_size_matched_drift_v1.json").read_bytes()
+    cfg1 = (REPO / "configs" / "post_kbs_common_harness_baselines_v2.json").read_bytes()
+
+    def eff2(name):
+        r = con2[con2.contrast == name].iloc[0]
+        return dict(effect_pp=float(r.effect_pp), ci95=[float(r.ci95_lo), float(r.ci95_hi)])
+
+    g3 = mult2[mult2.contrast.str.contains("-2000 vs naive-2000")]
+    pf2 = cls1[cls1.family.str.startswith("PF2")]
+    pf2_map = {}
+    for _, r in pf2.iterrows():
+        pol = r.contrast.split(": ")[1].split("-2000")[0]
+        pf2_map.setdefault(pol, {})[r.scenario] = r.classification
+    holds = {}
+    for _, r in st1.iterrows():
+        if bool(r.holds):
+            holds.setdefault(r.statement.split(" ")[0], []).append(r.policy)
+    sf5 = mult1[mult1.family.str.startswith("SF5") & mult1.significant_holm.astype(bool)]
+    man = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
+    pins = [l for l in man.splitlines() if l.strip()]
+    n_post = sum(1 for l in pins if "/post_kbs_" in l)
+    return dict(
+        release_version="1.23.0",
+        final_manuscript_integration_commit="19d5a80",
+        protocols_frozen_before_implementation="a68c90e (both blocks); B1 amendment 5a4ce6f "
+                                               "before implementation",
+        b2_size_matched_drift=dict(
+            registered_outcome=ci2["outcome"],
+            per_scenario_classification={k: v["classification"]
+                                         for k, v in ci2["per_scenario"].items()},
+            protocol_commits=dict(protocol="a68c90e", implementation="9f1159a",
+                                  results="61f5c5a"),
+            config_sha256=hashlib.sha256(cfg2).hexdigest(),
+            confirmatory_seeds="6001-6030", expected_arms=21,
+            completed_arms=int(rc2.complete.sum()),
+            source_commits=sorted(set(rc2.source_commit)),
+            naive_arms_proposal_coupled=int(((coup.policy == "naive")
+                                             & (coup.coupling == "proposal-coupled")).sum()),
+            shared_prefix_severity_equal_all=bool(coup.shared_prefix_sev_equal.all()),
+            size_effect_naive2000_vs_naive512=dict(
+                ps_full=eff2("ps_full: naive-2000 vs naive-512"),
+                unsw_full=eff2("unsw_full: naive-2000 vs naive-512"),
+                ton_full=eff2("ton_full: naive-2000 vs naive-512")),
+            value_of_updating_naive2000_vs_never=dict(
+                ps_full=eff2("ps_full: naive-2000 vs never"),
+                unsw_full=eff2("unsw_full: naive-2000 vs never"),
+                ton_full=eff2("ton_full: naive-2000 vs never")),
+            gate_value_at_2000=dict(
+                n_positive_holm_significant=int(((g3.effect_pp > 0)
+                                                 & g3.significant_holm.astype(bool)).sum()),
+                resolved_costs=[c for c, s, e in zip(g3.contrast, g3.significant_holm, g3.effect_pp)
+                                if bool(s) and e < 0]),
+            non_claims=["effective information parity", "universal monotonic benefit",
+                        "causal generality beyond the nested pool-based design",
+                        "larger training windows help arbitrary adaptive systems"],
+            historical_zero_drift_classification="ATTENUATION (v1.22.0; unchanged, not "
+                                                 "retroactively reclassified)",
+        ),
+        b1_common_harness=dict(
+            protocol_commits=dict(protocol="a68c90e", amendment="5a4ce6f",
+                                  implementation="9f58b6c", results="8285b04"),
+            config_sha256=hashlib.sha256(cfg1).hexdigest(),
+            confirmatory_seeds="5001-5030", expected_arms=96,
+            completed_arms=int(rc1.complete.sum()),
+            source_commits=sorted(set(rc1.source_commit)),
+            policies=sorted(set(rc1.gate) | set(rc1.trigger_mode)),
+            primary_condition="nominal 2,000/class evidence parity; 512/class secondary "
+                              "sensitivity block",
+            pf2_full_drift_classification_vs_naive=pf2_map,
+            statements_holding=holds,
+            sf5_significant_interactions=dict(n=int(len(sf5)),
+                                              all_negative=bool((sf5.effect_pp < 0).all())),
+            information_budgets="documented, not equalized (ATC/DoC 512-row training-time "
+                                "validation, analytic; DDM/ADWIN 800 monitoring labels per "
+                                "stream; gates 32 target labels per decision)",
+            end_to_end_adaptive_nids_system_reproduced=False,
+            state_of_the_art_claim=False,
+        ),
+        sealing=dict(historical_pinned_csvs=185, post_kbs_pinned_csvs=n_post,
+                     total_pinned_csvs=len(pins),
+                     historical_hashes_unchanged_vs_commit="19d5a80"),
+        experiments_added="B2 (21-arm registered matrix) + B1 (96-arm registered matrix)",
         unregistered_experiments="none",
     )
 
@@ -464,6 +568,9 @@ def main(out: Path | None = None) -> None:
         symmetric_replication_v1_21=symmetric_replication_v1_21_summary(),
         # v1.22.0 candidate: the preregistered size-matched control (ATTENUATION).
         size_matched_control_v1_22=size_matched_control_v1_22_summary(),
+        # v1.23.0: the two registered post-KBS blocks (B2 size-matched drift; B1
+        # common-harness baselines) and the additive 185 -> 207 sealing.
+        post_kbs_confirmatory_v1_23=post_kbs_confirmatory_v1_23_summary(),
         # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
         # stated field by field so no claim can outrun what the simulation measures.
         operational_arm_scope=dict(

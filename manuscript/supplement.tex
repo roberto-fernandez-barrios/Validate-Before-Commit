@@ -650,8 +650,7 @@ nested-512 parity) before the confirmatory block. Seeds 6001--6030 (verified vir
 21 arms (never-adapt and \{naive, point, strict\} $\times$ \{512, 2{,}000\}/class in
 three full-drift scenarios); \texttt{own\_transformer\_per\_model} only; every other
 constant byte-identical to the symmetric replication. Every number traces to
-\path{results/tables/post_kbs_size_matched_drift_001/} (a post-v1.22 block, versioned in
-the public repository with its protocol and outputs, pending a subsequent sealed release);
+\path{results/tables/post_kbs_size_matched_drift_001/} (sealed in artifact version v1.23.0 together with its protocol and outputs);
 raw per-arm outputs are under \path{results/raw/post_kbs_size_matched_drift/}. Each arm's
 \texttt{run\_config.json} records authorized-mode execution on a clean source tree.
 
@@ -697,8 +696,7 @@ implementation or result. Seeds 5001--5030 (fresh; disjoint from every prior led
 arms (nine policies at 2{,}000/class plus the 512/class sensitivity block for \{naive,
 point, strict, ATC, DoC, ensemble\}) in six scenarios; \texttt{own\_transformer\_per\_model}
 only; bit-identical raw streams per seed across every arm. Every number traces to
-\path{results/tables/post_kbs_common_harness_baselines_001/} (a post-v1.22 block,
-versioned in the public repository pending a subsequent sealed release); raw per-arm
+\path{results/tables/post_kbs_common_harness_baselines_001/} (sealed in artifact version v1.23.0); raw per-arm
 outputs are under \path{results/raw/post_kbs_common_harness_baselines/}. Implementation-fidelity tests in the artifact
 check each policy against its reference definition (ATC/DoC thresholds and validation
 sampling; \texttt{river} 0.25.0 DDM/ADWIN semantics; calibrated-ensemble and replay
