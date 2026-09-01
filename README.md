@@ -326,8 +326,10 @@ populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.m
 
 ## Citation
 
-The paper is under review; cite it as below. To cite the **software artifact** itself, use the Zenodo DOI
-[10.5281/zenodo.21322256](https://doi.org/10.5281/zenodo.21322256) (metadata in `CITATION.cff`).
+The paper is under review; cite it as below. To cite the **software artifact** itself, use the
+exact v1.24.0 DOI [10.5281/zenodo.22239106](https://doi.org/10.5281/zenodo.22239106).
+The concept DOI [10.5281/zenodo.21322256](https://doi.org/10.5281/zenodo.21322256)
+resolves to the latest version (metadata in `CITATION.cff`).
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,

@@ -40,8 +40,8 @@ claiming a poisoning defense. Related work is current through September 2026 and
 the decision interface from recent systems including CARAVAN, SPIDER, NOCTOWL and ADAWU-IDS.
 
 **Reproducibility.** Every reported number is generated from hash-pinned result files in public
-artifact version v1.24.0 (concept DOI 10.5281/zenodo.21322256; exact version DOI recorded in the
-final submission metadata): frozen protocols/configs, the source-row overlap audit, the
+artifact version v1.24.0 (exact DOI 10.5281/zenodo.22239106; concept DOI
+10.5281/zenodo.21322256): frozen protocols/configs, the source-row overlap audit, the
 experiment runner, implementation tests, confirmatory checkpoints, analysis scripts, manifest
 and automated claim audit. The prior v1.23.0 release remains immutable. Public benchmark data
 are not redistributed; the pipeline regenerates the outputs from them.

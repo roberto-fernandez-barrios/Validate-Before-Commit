@@ -22,7 +22,11 @@ authors:
 license: MIT
 version: "1.24.0"
 date-released: "2026-09-02"
-doi: "10.5281/zenodo.21322256"
+doi: "10.5281/zenodo.22239106"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21322256"
+    description: "Concept DOI (resolves to the latest artifact version)"
 repository-code: "https://github.com/roberto-fernandez-barrios/Validate-Before-Commit"
 preferred-citation:
   type: unpublished
