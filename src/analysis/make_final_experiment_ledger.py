@@ -18,13 +18,13 @@ RAW = "results/raw"
 OUT = "results/final_experiment_ledger.csv"
 
 # --- M3: orphan detection ----------------------------------------------------------------
-# Every raw directory that belongs to a FINAL-q1 experiment family must be claimed by exactly
+# Every raw directory that belongs to a final experiment family must be claimed by exactly
 # one block. Scope is the `q1*` families created for this paper (the deliverable); the many
 # historical / sibling paper2_* experiments are out of scope by construction. Within scope, a
 # DECLARED exclusion list covers pilots, smokes and superseded runs, so the check fails loudly
 # on a genuine orphan -- a new family with no block, or a superseded run not declared as such --
 # instead of passing silently (the earlier ledger built a `claimed` set and never used it).
-FINAL_SCOPE_GLOBS = ["q1*"]
+FINAL_SCOPE_GLOBS = ["q1*", "ijis_exact_value_disjoint_b1/*", "ijis_exact_value_disjoint_b2/*"]
 SUPERSEDED_GLOBS = [
     "q1fd5_*",        # pre-blocker-D operational pilot (seeds 701-730), superseded by q1fd5b_*
     "*_superseded*",  # explicitly archived runs
@@ -61,6 +61,28 @@ def compute_orphans() -> list:
 
 # block_id -> (evidence tier, glob, script, seeds, protocol note, manuscript target)
 BLOCKS = [
+    # v1.24.0: final integrity sensitivity. The feature-group splitter and both
+    # confirmatory blocks were frozen at f8a02d4 before implementation 48e6f70.
+    ("ijis_exact_value_disjoint_b2", "registered final integrity sensitivity (B2)",
+     "ijis_exact_value_disjoint_b2/xvd_b2_*",
+     "src.experiments.run_symmetric_pipeline_replication", "7001-7030",
+     "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md (protocol frozen "
+     "f8a02d4 BEFORE implementation 48e6f70; config "
+     "configs/ijis_exact_value_disjoint_b2_v1.json, SHA-256 330e73d7 in every "
+     "run_config.json; exact cleaned raw X groups assigned wholly to window/train/probe; "
+     "all rows, labels and multiplicity retained; result commit 93967ca; registered "
+     "outcome PARTIAL ROBUSTNESS; no follow-up authorized)",
+     "tab:value_disjoint_main, tab:value_disjoint_b2_supp"),
+    ("ijis_exact_value_disjoint_b1", "registered final integrity sensitivity (B1)",
+     "ijis_exact_value_disjoint_b1/xvd_b1_*",
+     "src.experiments.run_symmetric_pipeline_replication", "8001-8030",
+     "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md (protocol frozen "
+     "f8a02d4 BEFORE implementation 48e6f70; config "
+     "configs/ijis_exact_value_disjoint_b1_v1.json, SHA-256 bd2c0e14 in every "
+     "run_config.json; exact cleaned raw X groups assigned wholly to window/train/probe; "
+     "all rows, labels and multiplicity retained; result commit e19ac3f; registered "
+     "robustness verdict PARTIALLY ROBUST; no follow-up authorized)",
+     "tab:value_disjoint_b1_summary, tab:value_disjoint_b1_robustness"),
     # v1.23.0: the two registered post-KBS blocks (protocols frozen a68c90e BEFORE any
     # implementation; sealed additively, 185 -> 207 pinned CSVs).
     ("post_kbs_size_matched_drift", "registered confirmatory control (post-KBS B2)",

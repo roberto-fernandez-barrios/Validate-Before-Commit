@@ -23,9 +23,9 @@ import pandas as pd
 
 RAW = "results/raw"
 OUT = "docs/img"
-REGIMES = [("portscan", "PortScan (benefit)", "#2a9d8f"),
-           ("unsw_recon", "UNSW Recon (marginal)", "#e9c46a"),
-           ("ton_scanning", "ToN-IoT (harm)", "#e76f51")]
+REGIMES = [("portscan", "PortScan (benefit)", "#2a9d8f", "o"),
+           ("unsw_recon", "UNSW Recon (marginal)", "#e9c46a", "^"),
+           ("ton_scanning", "ToN-IoT (harm)", "#e76f51", "s")]
 SEEDS = set(range(104, 134))
 
 
@@ -44,16 +44,17 @@ def main():
     fig, axes = plt.subplots(2, 2, figsize=(11.5, 7.9))
     panel = iter("abcd")
     for i, (det, dname) in enumerate([("ks", "KS-max (classical)"), ("qk", "QK-ZZ (quantum)")]):
-        data = {r: load(r, det) for r, _, _ in REGIMES}
+        data = {r: load(r, det) for r, _, _, _ in REGIMES}
         allr = pd.concat(data.values())
         for j, (xcol, xlabel) in enumerate([
                 ("deg_pre5", "Incumbent BA over the 5 windows BEFORE the trigger"),
                 ("score", f"{dname.split()[0]} detector score at the trigger")]):
             ax = axes[i, j]
-            for reg, label, color in REGIMES:
+            for reg, label, color, marker in REGIMES:
                 d = data[reg]
                 ax.scatter(d[xcol], d["delta_future5"] * 100, s=16, alpha=0.55,
-                           color=color, label=label if (i == 0 and j == 0) else None)
+                           color=color, marker=marker, edgecolor="none",
+                           label=label if (i == 0 and j == 0) else None)
             r = float(np.corrcoef(allr[xcol], allr["delta_future5"])[0, 1])
             ax.axhline(0, color="#495057", lw=1, ls="--")
             ax.set_xlabel(xlabel, fontsize=9.5)

@@ -11,51 +11,40 @@ We submit the manuscript *Candidate Comparability Before Promotion: Conditional 
 Adaptive Network Intrusion Detection* for consideration as an original research article in the
 *International Journal of Information Security*.
 
-**The scientific proposition.** Conclusions drawn from adaptive-NIDS evaluations — whether
-promoting a retrained challenger harms the deployed detector, and which update policy is
-preferable — can change materially when the incumbent and the challenger are not comparable in
-how they were constructed or in how much evidence supports them. The manuscript isolates two
-such asymmetries under preregistered controls and shows, on three public NIDS benchmarks, that
-the conclusions of our own earlier experimental configuration changed materially once candidate
-construction and evidence were made comparable. In a deployed NIDS, promotion is a
-security-relevant integrity decision — it replaces the model responsible for subsequent attack
-detection — which is why the work is addressed to this journal. The contribution
-is a methodological result about how adaptive security systems must be evaluated before a
-promotion decision is interpreted or automated; it is not a new detector, a new drift monitor
-or an incremental application of an existing learner to standard datasets.
+**The scientific proposition.** Promoting an adaptive network-intrusion-detection challenger is
+a security-relevant integrity decision because it changes the model responsible for subsequent
+attack detection. Conclusions about that decision — and rankings of promotion policies — are
+conditional on how the challenger is constructed and how much evidence supports it. The
+manuscript isolates those conditions with registered controls on three public benchmarks and
+offers evaluation discipline and design guidance, not a universally validated deployment stack.
 
-**What the paper establishes.** Using a common bit-identical harness on CICIDS2017, UNSW-NB15
-and ToN-IoT, with protocols frozen in version control before each block ran, we find that
-(i) incumbent-owned frozen preprocessing amplified the apparent harm of promotion: with
-self-contained challenger pipelines the mean full-drift harm does not persist; (ii) nominal
-candidate-evidence size matters in both regimes: at zero drift the mean deficit of
-512-per-class challengers disappears at 2,000-per-class parity, and under real drift the same
-nested intervention improves promotion outcomes by +0.82, +1.66 and +1.00 balanced-accuracy
-points across the three benchmarks (a registered, homogeneous effect); (iii) a registered
-common-harness comparison of published label-free accuracy estimators (ATC, DoC), reference
-drift monitors (river DDM and ADWIN), a calibrated ensemble, replay retraining and labeled-probe
-validation finds that no policy dominates and that the apparent ordering of policies itself
-depends on whether the candidate generator is comparable. Validation therefore emerges as
-conditional: labeled-probe gates help when challengers are evidence-disadvantaged, add no
-average benefit at evidence parity, and can impose a measurable cost. We do not claim that any
-evaluated policy is state of the art, and we state explicitly that no end-to-end published
-adaptive-NIDS system matched the decision problem closely enough to be reproduced faithfully.
+**What the paper establishes.** Using a bit-identical harness on CICIDS2017, UNSW-NB15 and
+ToN-IoT, with protocols and magnitude-aware rules frozen before each block, we find that
+(i) incumbent-owned frozen preprocessing amplified apparent promotion harm; with self-contained
+challenger pipelines the mean full-drift harm did not persist; (ii) at zero drift the mean
+deficit of 512-per-class challengers disappeared at nominal 2,000-per-class parity; and
+(iii) under pool-constructed progressive drift, the final exact-cleaned-feature-disjoint
+sensitivity retained positive, statistically resolved 512→2,000 effects of +0.53, +1.67 and
++0.38 balanced-accuracy points. The last effect is sub-material under the registered 0.5-point
+rule, so the defensible result is benchmark-dependent, not homogeneous. The policy sensitivity
+was partially robust: size-dependent ordering and absence of a globally dominant policy
+survived, while earlier compatibility statements for one label-free estimator and the
+calibrated ensemble required narrowing. No rescue experiment followed. Validation remains
+conditional rather than universally beneficial.
 
-**Fit with the journal.** The work is technical information-security research on the
-operation of deployed network-security systems; it belongs to the evaluation-discipline
-lineage the journal's readership knows (TESSERACT, "dos and don'ts" of ML in security) and it
-addresses a decision — when to replace a deployed detector — that security operators face
-directly. The manuscript follows the journal's format: Springer two-column LaTeX template,
-numbered references with DOI links, a 229-word abstract, six keywords, and a complete
-Statements and Declarations section. A 46-page supplement (Online Resource 1) carries the
-full tables, protocols and robustness analyses.
+**Fit with the journal.** The work is technical information-security research about evaluation
+of adaptive network-security systems. It addresses when evidence supports replacing a deployed
+detector, retains explicit attack-recall and false-positive-rate guardrails, and scopes
+adversarial manipulation of candidate data, alarms and probes as future work rather than
+claiming a poisoning defense. Related work is current through September 2026 and distinguishes
+the decision interface from recent systems including CARAVAN, SPIDER, NOCTOWL and ADAWU-IDS.
 
-**Reproducibility.** Every number in the manuscript is generated from sealed result files in
-a public artifact (concept DOI 10.5281/zenodo.21322256; version 1.23.0): frozen protocols and
-amendments, the experiment runner and analysis scripts, 207 hash-pinned result CSVs, an
-experiment ledger and an automated claim audit that re-checks the manuscript against the
-artifact. The public benchmark datasets are not redistributed; the pipeline regenerates all
-outputs from them. The Data Availability Statement in the manuscript gives the identifiers.
+**Reproducibility.** Every reported number is generated from hash-pinned result files in public
+artifact version v1.24.0 (concept DOI 10.5281/zenodo.21322256; exact version DOI recorded in the
+final submission metadata): frozen protocols/configs, the source-row overlap audit, the
+experiment runner, implementation tests, confirmatory checkpoints, analysis scripts, manifest
+and automated claim audit. The prior v1.23.0 release remains immutable. Public benchmark data
+are not redistributed; the pipeline regenerates the outputs from them.
 
 **Declarations.** The manuscript has not been published previously and is not under
 consideration elsewhere; it is not an extension of a conference paper. All authors approved

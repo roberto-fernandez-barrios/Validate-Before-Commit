@@ -40,8 +40,8 @@ def _pins() -> dict[str, str]:
 # ---------------------------------------------------------------- artifact self-containment
 def test_every_manifest_pin_is_tracked():
     pins = _pins()
-    # v1.23.0 sealing: 185 historical + 22 post-KBS confirmatory CSVs (additive re-pin)
-    assert len(pins) == 207
+    # v1.24.0 sealing: immutable 207 v1.23.0 CSVs + 23 final-sensitivity CSVs.
+    assert len(pins) == 230
     tracked = set(subprocess.run(["git", "ls-files"], cwd=REPO, capture_output=True,
                                  text=True).stdout.split("\n"))
     missing = [p for p in pins if p not in tracked]
@@ -107,7 +107,7 @@ def test_baseline_comparison_not_presented_as_sota():
     for name, t in (("main.tex", MAIN), ("main_ieee.tex", IEEE)):
         f = _flat(t)
         assert "comparison with strong baselines" not in f, name
-        assert "registered common-harness comparison with published and reference baselines" in f, name
+        assert "source-row-disjoint common-harness comparison with published and reference baselines" in f, name
         # final integration: the external-baseline gap is closed for generic/reference
         # methods; the old 'not yet evaluated' scope sentence must be gone, and the
         # end-to-end-system limitation must be stated explicitly instead

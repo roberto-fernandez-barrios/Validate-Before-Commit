@@ -108,7 +108,7 @@ def test_baselines_section_present_and_wired():
     assert "\\input{tables/table_common_harness.tex}" in MAIN
     assert MAIN.count("\\ref{sec:baselines}") >= 3
     f = _flat(MAIN)
-    assert "registered common-harness comparison with published and reference baselines" in f
+    assert "source-row-disjoint common-harness comparison with published and reference baselines" in f
     assert "comparison with strong baselines" not in f, "SoTA-style title banned"
     assert "cross-block comparisons remain descriptive" in f
     assert "not a state-of-the-art ranking" in f
@@ -117,9 +117,10 @@ def test_baselines_section_present_and_wired():
     assert "\\input{tables/table_baselines_full.tex}" in SUPP
     results = MAIN.split("\\section{Results}")[1].split("\\section{Discussion}")[0]
     subs = re.findall(r"\\subsection\{([^}]*)\}", results)
-    assert subs[5].startswith("Registered common-harness comparison")
+    assert subs[5].startswith("Source-row-disjoint common-harness comparison")
     assert subs[-1].startswith("Mechanism, formal instruments and external boundaries")
-    assert len(subs) == 7
+    assert subs[6].startswith("Final exact-feature-disjoint sensitivity")
+    assert len(subs) == 8
 
 
 def test_baselines_block_I_matches_policy_frontier_csv():
@@ -333,7 +334,8 @@ def test_every_supplementary_pointer_in_main_resolves():
         if m.group(2):
             assert int(m.group(2)) <= len(secs[n][1]), m.group(0)
     # the BH block is in S6, the ownership A/B and budget-frontier tables in S2.12
-    bh = MAIN[MAIN.index("Benjamini--Hochberg \\cite"):][:300]
+    i = MAIN.index("Benjamini--Hochberg \\cite")
+    bh = MAIN[max(0, i - 350):i + 300]
     assert "\\S S6" in bh
     assert "Ownership A/B & Support & role-randomized transformer & 2001--2100 & " \
            "Feature scaling owns the effect & \\S S2.12" in SUPP

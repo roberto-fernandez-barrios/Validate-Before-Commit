@@ -17,7 +17,8 @@ def main() -> None:
         h = hashlib.sha256(f.read_bytes()).hexdigest()
         lines.append(f"{h}  {f.as_posix()}")
     out = ROOT / "MANIFEST.sha256"
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Keep the checksum ledger byte-stable across Windows and POSIX checkouts.
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {out} ({len(lines)} files)")
 
 

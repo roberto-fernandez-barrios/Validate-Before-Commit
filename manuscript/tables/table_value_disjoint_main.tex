@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Exact-feature-disjoint sensitivity of the full-drift size effect.}
+Always-deploy with 2{,}000/class minus always-deploy with 512/class, balanced-accuracy
+points, 30 fresh seeds (7001--7030). Exact cleaned raw feature groups are assigned wholly
+to window, candidate-training or probe roles; multiplicity and original labels are retained.
+CI95 and Holm-adjusted $p$ are from the registered deterministic paired bootstrap. The
+historical source-row-disjoint estimate is shown for context; ``change'' is sensitivity
+minus historical, estimated between independent seed blocks and is not a causal duplicate-
+leakage effect.}
+\label{tab:value_disjoint_main}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l r l r l l l}
+\toprule
+Benchmark & Historical & Exact-feature-disjoint [CI95] & $p_{\mathrm{Holm}}$ & Class & Change [CI95] & Change class \\
+\midrule
+PortScan & $+0.82$ & $+0.53$ [0.2745, 0.7862] & 0.00018 & material benefit & $-0.29$ [-0.60, 0.01] & unresolved \\
+UNSW-Recon & $+1.66$ & $+1.67$ [1.4703, 1.8867] & 0.00003 & material benefit & $+0.01$ [-0.24, 0.28] & compatible \\
+ToN-IoT & $+1.00$ & $+0.38$ [0.2068, 0.5695] & 0.00018 & resolved sub-material & $-0.62$ [-1.04, -0.19] & material attenuation \\
+\bottomrule
+\end{tabular}
+\end{table*}

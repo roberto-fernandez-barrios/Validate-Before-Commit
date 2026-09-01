@@ -62,8 +62,10 @@ def main():
     if len(ton):
         fig, ax = plt.subplots(figsize=(6, 3.6))
         x = np.arange(len(ton)); w = 0.38
-        ax.bar(x - w / 2, ton["naive_gain"], w, label="naive", color="#adb5bd")
-        ax.bar(x + w / 2, ton["gate_gain"], w, label="gate-32", color="#2a9d8f")
+        ax.bar(x - w / 2, ton["naive_gain"], w, label="naive", color="#adb5bd",
+               hatch="", edgecolor="0.25", linewidth=0.5)
+        ax.bar(x + w / 2, ton["gate_gain"], w, label="gate-32", color="#2a9d8f",
+               hatch="//", edgecolor="0.25", linewidth=0.5)
         ax.axhline(0, color="k", lw=0.8)
         ax.set_xticks(x); ax.set_xticklabels([DLABEL[d] for d in ton["downstream"]], fontsize=9)
         ax.set_ylabel("Gain vs no-adaptation (BA pts)")

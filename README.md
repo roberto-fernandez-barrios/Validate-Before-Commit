@@ -2,7 +2,7 @@
 
 **Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection**
 
-*Validate Before Commit* is the name of this repository and of the gate family it releases. The paper's central contribution is the requirement that incumbent–challenger comparability precede promotion; VBC-SG is an optional formalization for promotion under uncertainty, and validation is a conditional safeguard, not a universal requirement.
+*Validate Before Commit* is the name of this repository and of the gate family it releases. The paper's central contribution is evaluation discipline: promotion conclusions are conditional on challenger construction and evidence, so those factors should be controlled, reported and interpreted explicitly. VBC-SG is an optional formalization for promotion under uncertainty; validation is conditional, not universal.
 
 ![status](https://img.shields.io/badge/status-under%20review-blue)
 ![reproducible](https://img.shields.io/badge/results-reproducible-success)
@@ -22,20 +22,20 @@ In the preregistered zero-drift control, with both asymmetries removed (own prep
 2,000-per-class sample-size parity), all three mean effects are compatible with the ±0.5-pp margin and
 point/strict validation gates add no measurable value. PortScan is boundary-close and the comparison does not
 demonstrate absence of an effect; where construction or evidence is asymmetric, a small commit-time check
-recovers the loss. Two registered post-v1.22 blocks complete the design: under real drift the same nested
-512→2,000 intervention improves promotion outcomes by +0.82/+1.66/+1.00 BA points (HOMOGENEOUS-SIZE BENEFIT;
-0/6 positive gate effects at parity, one resolved strict-gate cost), and a registered common-harness comparison
-finds the published estimator ATC and a calibrated ensemble compatible with always-deploy at parity while DoC,
-replay and the river DDM/ADWIN triggers pay material costs — no evaluated policy dominates, and the apparent
-ordering of policies itself depends on candidate comparability (sealed in artifact v1.23.0).
+recovers the loss. The original source-row-disjoint blocks found a homogeneous size benefit and a conditional
+policy ordering. A final preregistered integrity sensitivity assigns every exact cleaned raw feature group wholly
+to evaluation, training or probe roles while preserving multiplicity and original labels. Under pool-constructed
+progressive drift, the 512→2,000 effect remains positive and resolved at +0.53/+1.67/+0.38 BA points, but is
+material in only two of three benchmarks (PARTIAL ROBUSTNESS). The full common-harness policy interpretation is
+also PARTIALLY ROBUST: size-dependent ordering and no global dominance survive, while the historical ATC and
+calibrated-ensemble retention statements narrow. Scientific development is closed after this sensitivity.
 
 Here, **preregistered** refers to each stage-specific protocol being specified and sealed in version control
 before that stage ran; it does not imply one external registry covering the sequential program as a whole.
 
 > **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
-> Candidate construction, nominal evidence parity and promotion testing are sequential controls: validate the
-> challenger when its construction or evidence conditions remain asymmetric or uncertain, not as a substitute
-> for building a comparably constructed, comparably evidenced challenger.**
+> Challenger construction, nominal evidence and promotion testing are distinct controls. Their assumptions and
+> information interfaces should be stated before a promotion result or policy ranking is interpreted.**
 
 ---
 
@@ -47,7 +47,7 @@ Where to find each piece of evidence without reading the whole repository. Secti
 | # | What | Where |
 |---|---|---|
 | 1 | Main manuscript (Elsevier CAS source; the single source of truth) | [`manuscript/main.tex`](manuscript/main.tex) — compile with `cd manuscript && latexmk -pdf main.tex`; IEEE port `manuscript/main_ieee.tex` is regenerated from it by `python -m src.analysis.port_ieee` |
-| 2 | Supplement | [`manuscript/supplement.tex`](manuscript/supplement.tex) — S0 evidence hierarchy and provenance table; S1 initial exploratory study; S2 relocated registered-extension details (S2.12 full result tables, S2.13 VBC-SG definitions); S4 proof of Proposition 1; S5 label ledger; S6 multiplicity; S7–S8 full replication matrices; S9 size-matched-under-drift matrices; S10 registered common-harness comparison (families, statements, budgets) |
+| 2 | Supplement | [`manuscript/supplement.tex`](manuscript/supplement.tex) — S0 evidence hierarchy; S1–S6 historical/supporting evidence; S7–S8 comparability replications; S9–S10 source-row-disjoint size/policy blocks; S11 exact-feature-disjoint integrity sensitivity and current adaptive-system interface table |
 | 3 | Preregistered protocols and amendments | index in [`docs/SCIENTIFIC_PROVENANCE.md`](docs/SCIENTIFIC_PROVENANCE.md); symmetric pipeline: [`notes/paper2_symmetric_pipeline_dynamic_protocol_001.md`](notes/paper2_symmetric_pipeline_dynamic_protocol_001.md) + [`notes/symmetric_pipeline_scenario_a_rewrite_protocol.md`](notes/symmetric_pipeline_scenario_a_rewrite_protocol.md); size-matched: [`notes/paper2_size_matched_own_transformer_protocol_001.md`](notes/paper2_size_matched_own_transformer_protocol_001.md) + [`notes/size_matched_final_rewrite_protocol.md`](notes/size_matched_final_rewrite_protocol.md); harness v2: [`notes/paper2_harness_v2_registered_replication_protocol_001.md`](notes/paper2_harness_v2_registered_replication_protocol_001.md) + `notes/paper2_harness_v2_amendment_002…014.md`; final-q1: [`notes/q1_max_protocol.md`](notes/q1_max_protocol.md) |
 | 4 | Result tables | sealed CSVs under `results/tables/`, byte-pinned by `results/tables/MANIFEST.sha256` (`make verify-hashes`); LaTeX tables `manuscript/tables/`; table → protocol → config ledger `results/final_experiment_ledger.csv`; machine-readable manifest `results/final_manifest.json` |
 | 5 | Reproduction commands | [`REPRODUCE.md`](REPRODUCE.md); one command: `make final-paper` (hash verification → analysis → tables/figures → manifests → tests → PDF compilation → claim audit) |
@@ -57,7 +57,9 @@ Where to find each piece of evidence without reading the whole repository. Secti
 | 9 | Historical baseline blocks (full all-block matrix Supp. S2.12; superseded by row 11 wherever the same method and question are evaluated under the final harness) | policy frontier `results/tables/paper2_policy_frontier_005/frontier.csv`; ATC/DoC `results/tables/paper2_phase2h_labelfree_gates_001/`; replay `results/tables/paper2_phase2i_replay_baseline_001/`; DDM/ADWIN vs `river` `results/tables/paper2_monitor_validation_004.csv`, `paper2_amendment_004/robustness.csv`, `paper2_amendment_005/twostage_and_monitors.csv`; zero-drift risk gates `results/tables/paper2_amendment_008/`; VBC-SG frontier `results/tables/paper2_final_q1/budget_frontier.csv` |
 | 10 | Size-matched control under drift — B2 (§5.4, S9; registered block, sealed in v1.23.0) | protocol `notes/post_kbs_size_matched_drift_protocol_001.md` (frozen before implementation); config `configs/post_kbs_size_matched_drift_v1.json`; `python -m src.experiments.run_symmetric_pipeline_replication --config configs/post_kbs_size_matched_drift_v1.json --run --confirmatory-authorized`; analysis `python -m src.analysis.make_post_kbs_size_matched_drift_001`; outputs `results/tables/post_kbs_size_matched_drift_001/` (`CLAIM_INTERPRETATION.json`: HOMOGENEOUS-SIZE BENEFIT; seeds 6001–6030); checkpoints `notes/post_kbs_size_matched_drift_implementation_checkpoint.md`, `notes/post_kbs_size_matched_drift_confirmatory_checkpoint.md` |
 | 11 | Registered common-harness comparison with published and reference baselines — B1 (§5.6, S10; registered block, sealed in v1.23.0) | protocol `notes/post_kbs_common_harness_baselines_protocol_001.md` + pre-implementation amendment `notes/post_kbs_common_harness_baselines_amendment_001.md`; config `configs/post_kbs_common_harness_baselines_v2.json`; analysis `python -m src.analysis.make_post_kbs_common_harness_001`; outputs `results/tables/post_kbs_common_harness_baselines_001/` (seeds 5001–5030; ATC, DoC, calibrated ensemble, replay, river-DDM, river-ADWIN vs never/naive/point/strict at 2,000/class + 512 sensitivity); checkpoints `notes/post_kbs_common_harness_baselines_implementation_checkpoint.md`, `notes/post_kbs_common_harness_baselines_confirmatory_checkpoint.md`; cross-experiment hostile audit `audits/post_kbs_strengthening_results_hostile_audit.md` |
-| 12 | Final-integration tables (synthesis matrix, B2/B1 main and supplement tables) | generated only from the CSVs above by `python -m src.analysis.make_post_kbs_final_tables` into `manuscript/tables/` and `manuscript/tables_ieee/`; final hostile manuscript review `audits/post_kbs_final_manuscript_hostile_review.md` |
+| 12 | Exact-feature-overlap forensic audit | `audits/exact_feature_overlap_audit.md` and `audits/exact_feature_overlap_summary.csv`; all seeds 3001–3030, 4001–4030, 5001–5030 and 6001–6030; exact cleaned raw float64 features, collision-safe verification |
+| 13 | Exact-feature-disjoint B2/B1 sensitivity (§5.7, S11) | protocol `notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md`; configs `configs/ijis_exact_value_disjoint_b2_v1.json`, `configs/ijis_exact_value_disjoint_b1_v1.json`; B2 seeds 7001–7030, outputs `results/tables/ijis_exact_value_disjoint_b2_001/` (PARTIAL ROBUSTNESS); B1 seeds 8001–8030, outputs `results/tables/ijis_exact_value_disjoint_b1_001/` (PARTIALLY ROBUST) |
+| 14 | Manuscript tables | historical integration tables generated by `python -m src.analysis.make_post_kbs_final_tables`; integrity-sensitivity tables generated by `python -m src.analysis.make_ijis_value_disjoint_tables`; identical canonical/IEEE copies |
 
 The editorial audit trail for the post-KBS revision (what changed, why, and the response to reviewers) is in
 [`audits/`](audits/).

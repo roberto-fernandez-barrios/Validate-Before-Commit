@@ -228,12 +228,13 @@ def test_abstract_without_bare_atc_and_with_security_clause():
     n = len(a.split())
     assert 200 <= n <= 235, n
     assert "ATC" not in a and "DoC" not in a
-    assert "one published label-free accuracy estimator" in a
-    assert "Promotion is a security-relevant decision" in a
+    assert "label-free estimator" in a
+    assert "Promotion is security-relevant" in a
     f = _flat(a)
     for s in ("threat model", "adversar", "poison", "attacker"):
         assert s not in f, s
-    for s in ("homogeneous size benefit", "validation is conditional", "no evaluated policy dominates"):
+    for s in ("materially benchmark-dependent rather than homogeneous",
+              "policy conclusions were partially robust", "no policy globally dominated"):
         assert s in f, s
 
 
@@ -268,7 +269,8 @@ def test_internal_artifact_identifiers_out_of_main_paper():
         assert tag not in body, tag
     # the Data-availability statement names artifact versions by necessity, but not with the
     # internal 'post-v1.22' shorthand
-    assert "post-v1.22" not in MAIN and "artifact version v1.23.0" in MAIN
+    assert "post-v1.22" not in MAIN and "artifact version v1.24.0" in MAIN
+    assert "previous v1.23.0 release remains immutable" in MAIN
     for t in (SYN, CHRONO):
         assert "final-q1" not in t and "amendment-008" not in t
     # a single reader-facing name per policy in the gate definitions
@@ -306,8 +308,8 @@ def test_springer_port_format_fixes():
     assert "the corresponding sections" not in bundle and "_section_numbers" in bundle
     cover = (REPO / "notes" / "ijis_cover_letter.md").read_text(encoding="utf-8")
     assert "Published conclusions about adaptive" not in cover
-    assert "including our earlier experimental configuration" in cover.replace("\n", " ") or \
-        "our own earlier experimental configuration" in cover.replace("\n", " ")
+    assert "exact-cleaned-feature-disjoint sensitivity" in cover.replace("\n", " ")
+    assert "simulated reviewer" not in cover.lower() and "KBS" not in cover
 
 
 # ---------------------------------------------------------------- registered outcomes unchanged

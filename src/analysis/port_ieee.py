@@ -43,11 +43,13 @@ def main() -> None:
                cas.index("\\section*{Declaration of competing interest}")]
     head = ieee[:ieee.index("\\section{Introduction}")]
     ieee_bibliography = ieee[ieee.index("\\bibliographystyle{IEEEtran}"):]
+    data_heading = "\\section*{Data and code availability}"
+    ai_heading = "\\section*{Declaration of generative AI and AI-assisted technologies}"
     data_availability = cas[
-        cas.index("\\section*{Data availability}"):
-        cas.index("\\section*{Declaration of generative AI")
-    ].replace("\\section*{Data availability}", "\\section*{Data Availability}", 1)
-    tail = data_availability + "\n" + ieee_bibliography
+        cas.index(data_heading):cas.index(ai_heading)
+    ].replace(data_heading, "\\section*{Data and Code Availability}", 1)
+    ai_use = cas[cas.index(ai_heading):cas.index("% CRediT roles are declared")]
+    tail = data_availability + "\n" + ai_use + "\n" + ieee_bibliography
 
     new_abs = re.search(r"\\begin\{abstract\}\n(.*?)\n\\end\{abstract\}", cas, re.S).group(1)
     head = re.sub(r"(\\begin\{abstract\}\n).*?(\n\\end\{abstract\})",

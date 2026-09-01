@@ -25,6 +25,8 @@ RLABEL = {"portscan": "PortScan (benefit)", "unsw_recon": "UNSW Recon (mixed)",
           "ton_scanning": "ToN-IoT (harm)", "wednesday": "Wednesday (benefit)", "ddos": "DDoS (benefit)"}
 RCOLOR = {"portscan": "#2a9d8f", "unsw_recon": "#e9c46a", "ton_scanning": "#e76f51",
           "wednesday": "#264653", "ddos": "#8ab17d"}
+RMARKER = {"portscan": "o", "unsw_recon": "^", "ton_scanning": "s"}
+RLINE = {"portscan": "-", "unsw_recon": "--", "ton_scanning": "-."}
 
 
 def _dir(regime, tag):
@@ -74,7 +76,9 @@ def main():
     for regime in CORE:
         d = T[(T.regime == regime) & (T.budget > 0)].sort_values("labels")
         if len(d):
-            ax.plot(d["labels"], d["gain_pts"], "-o", color=RCOLOR[regime], label=RLABEL[regime], ms=4)
+            ax.plot(d["labels"], d["gain_pts"], color=RCOLOR[regime],
+                    marker=RMARKER[regime], linestyle=RLINE[regime],
+                    label=RLABEL[regime], ms=4)
         naive = T[(T.regime == regime) & (T.policy == "naive")]
         if len(naive):
             ax.axhline(float(naive["gain_pts"].iloc[0]), color=RCOLOR[regime], ls=":", lw=1, alpha=0.7)

@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "results" / "final_manifest.json"
 
 # Bump when the manifest's field layout changes so consumers can branch on it.
-MANIFEST_SCHEMA_VERSION = "1.2.1"
+MANIFEST_SCHEMA_VERSION = "1.3.0"
 
 CORE_DATASETS = [
     "data/raw/cicids2017/MachineLearningCVE/Tuesday-WorkingHours.pcap_ISCX.csv",
@@ -314,10 +314,101 @@ def post_kbs_confirmatory_v1_23_summary() -> dict:
             state_of_the_art_claim=False,
         ),
         sealing=dict(historical_pinned_csvs=185, post_kbs_pinned_csvs=n_post,
-                     total_pinned_csvs=len(pins),
+                     total_pinned_csvs=207,
+                     current_manifest_pinned_csvs=len(pins),
                      historical_hashes_unchanged_vs_commit="19d5a80"),
         experiments_added="B2 (21-arm registered matrix) + B1 (96-arm registered matrix)",
         unregistered_experiments="none",
+    )
+
+
+def exact_value_disjoint_v1_24_summary() -> dict:
+    """Final IJIS integrity sensitivity, read only from frozen/released outputs."""
+    b2 = REPO / "results" / "tables" / "ijis_exact_value_disjoint_b2_001"
+    b1 = REPO / "results" / "tables" / "ijis_exact_value_disjoint_b1_001"
+    audit_csv = REPO / "audits" / "exact_feature_overlap_summary.csv"
+    b2_ci = json.loads((b2 / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    b1_ci = json.loads((b1 / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    b1_rob = json.loads((b1 / "ROBUSTNESS_INTERPRETATION.json").read_text(encoding="utf-8"))
+    rc2 = pd.read_csv(b2 / "run_completion.csv")
+    rc1 = pd.read_csv(b1 / "run_completion.csv")
+    size = pd.read_csv(b2 / "size_effect_outcome.csv")
+    overlap = pd.read_csv(audit_csv, low_memory=False)
+    global_rows = overlap[overlap.record_type == "dataset_global"]
+    dataset_audit = {
+        r.dataset: dict(
+            total_rows=int(r.total_rows),
+            unique_x_groups=int(r.unique_x_groups),
+            duplicate_x_groups=int(r.duplicate_x_groups),
+            duplicate_rows_beyond_first=int(r.duplicate_rows_beyond_first),
+            duplicate_rows_beyond_first_pct=float(r.duplicate_rows_beyond_first_pct),
+            conflicting_label_x_groups=int(r.conflicting_label_x_groups),
+            conflicting_label_rows=int(r.conflicting_label_rows),
+        ) for _, r in global_rows.iterrows()
+    }
+    manifest = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
+    pins = [line for line in manifest.splitlines() if line.strip()]
+    sensitivity_pins = [line for line in pins if "/ijis_exact_value_disjoint_" in line]
+    return dict(
+        release_version="1.24.0",
+        decision_gate="THESIS REQUIRES REVISION (narrower publishable thesis survives)",
+        follow_up_science_authorized=False,
+        protocol=dict(
+            file="notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+            commit="f8a02d4fe4e7b96d81e1695e094a2e708cd1960b",
+            sha256=sha256(REPO / "notes" / "ijis_exact_value_disjoint_sensitivity_protocol_001.md"),
+            preflight="PASS",
+        ),
+        implementation_commit="48e6f70b659b5ad036d0d14190f22e3e4658c1e9",
+        forensic_overlap_audit=dict(
+            report="audits/exact_feature_overlap_audit.md",
+            summary_csv="audits/exact_feature_overlap_summary.csv",
+            report_sha256=sha256(REPO / "audits" / "exact_feature_overlap_audit.md"),
+            summary_csv_sha256=sha256(audit_csv),
+            equality="canonical cleaned raw float64 X; signed zero normalized; no rounding",
+            datasets=dataset_audit,
+        ),
+        b2=dict(
+            result_commit="93967ca2f1a20d1c654ca29e622daa5a4012b1cc",
+            config="configs/ijis_exact_value_disjoint_b2_v1.json",
+            config_sha256=sha256(REPO / "configs" / "ijis_exact_value_disjoint_b2_v1.json"),
+            confirmatory_seeds=b2_ci["confirmatory_seeds"],
+            expected_arms=21,
+            completed_arms=int(rc2.complete.sum()),
+            runtime_seconds=float(rc2.duration_s.sum()),
+            registered_outcome=b2_ci["outcome"],
+            original_b2_materially_inflated=bool(b2_ci["original_b2_materially_inflated"]),
+            size_effects={r.scenario: dict(effect_pp=float(r.effect_pp),
+                                           p_holm=float(r.p_holm),
+                                           classification=r.classification)
+                          for _, r in size.iterrows()},
+        ),
+        b1=dict(
+            result_commit="e19ac3f362fa11799ed6de24015b7a840f73b01d",
+            config="configs/ijis_exact_value_disjoint_b1_v1.json",
+            config_sha256=sha256(REPO / "configs" / "ijis_exact_value_disjoint_b1_v1.json"),
+            confirmatory_seeds=b1_ci["confirmatory_seeds"],
+            expected_arms=96,
+            completed_arms=int(rc1.complete.sum()),
+            runtime_seconds=float(rc1.duration_s.sum()),
+            registered_robustness=b1_rob["outcome"],
+            predicates=b1_rob["predicates"],
+            direct_primary_material_reversals=b1_rob["direct_primary_material_reversals"],
+        ),
+        role_integrity=dict(
+            exact_x_cross_role_overlap_groups=0,
+            original_rows_preserved=True,
+            original_labels_preserved=True,
+            within_role_multiplicity_preserved=True,
+            contradictory_label_groups_kept_intact=True,
+            maximum_role_stratum_deviation_pp=0.005721,
+        ),
+        sealing=dict(
+            historical_v1_23_pinned_csvs=207,
+            sensitivity_pinned_csvs=len(sensitivity_pins),
+            total_pinned_csvs=len(pins),
+            historical_hashes_unchanged=True,
+        ),
     )
 
 
@@ -539,6 +630,8 @@ def main(out: Path | None = None) -> None:
             # seeds 801-830; 701-730 was the single-sample pilot. Kept in sync with the ledger.
             q1_operational_e2e="801-830 (pilot 701-730)",
             q1_ab_confirmatory="2001-2100 (pilot 104-133)",
+            ijis_exact_value_disjoint_b2="7001-7030 (smoke 7401-7402)",
+            ijis_exact_value_disjoint_b1="8001-8030 (smoke 8401-8402)",
         ),
         acquisition_policies=["random", "alert_enriched", "disagreement", "hybrid"],
         chronological_streams=[
@@ -594,6 +687,8 @@ def main(out: Path | None = None) -> None:
         # v1.23.0: the two registered post-KBS blocks (B2 size-matched drift; B1
         # common-harness baselines) and the additive 185 -> 207 sealing.
         post_kbs_confirmatory_v1_23=post_kbs_confirmatory_v1_23_summary(),
+        # v1.24.0: last authorized scientific reopening, exact-cleaned-X group-disjoint roles.
+        exact_value_disjoint_v1_24=exact_value_disjoint_v1_24_summary(),
         # q1-final-patch (v1.20.1, Block C3): the operational acquisition-yield arm's scope,
         # stated field by field so no claim can outrun what the simulation measures.
         operational_arm_scope=dict(

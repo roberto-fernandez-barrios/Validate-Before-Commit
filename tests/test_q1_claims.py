@@ -18,10 +18,10 @@ def test_evidence_tier_labels():
     # hierarchy and provenance); the main body keeps a single "Evidence stages" paragraph
     # pointing to it. The taxonomy and its markers are pinned in the supplement.
     text = SUPP.read_text(encoding="utf-8")
-    assert "Six tiers of evidence" in text
-    for marker in ("Registered confirmatory core", "Registered symmetric-pipeline replication",
-                   "Registered follow-ups",
-                   "Feasibility, of two kinds", "External boundary", "Exploratory"):
+    for marker in ("Symmetric-pipeline replication", "Size-matched control (zero drift)",
+                   "Exact-feature-disjoint B2 sensitivity",
+                   "Exact-feature-disjoint B1 sensitivity", "Chronological matrix",
+                   "Observed-data arm", "Historical baseline-policy blocks"):
         assert marker in text, f"evidence tier missing: {marker}"
     # the confirmatory replications must be labeled internal; "external replication" may only
     # appear negated ("not an external replication"/"not external validations")

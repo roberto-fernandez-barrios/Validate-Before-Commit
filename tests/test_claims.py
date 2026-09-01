@@ -34,6 +34,8 @@ FINAL_BODY_TABLES = {
     "table_evidence_validation_tradeoff",
     # post-KBS B1: the registered common-harness comparison at 2,000/class (5.6; S10)
     "table_common_harness",
+    # v1.24 final integrity sensitivity: governing B2/B1 synthesis.
+    "table_value_disjoint_main",
     # the pre-enumerated chronological matrix is the external boundary (5.7)
     "table_chronological_q1",
 }
@@ -53,6 +55,9 @@ V1_SUPPLEMENT_TABLES = {
     "table_size_matched_drift_supp", "table_size_matched_drift_security",
     "table_common_harness_supp_primary", "table_common_harness_supp_secondary",
     "table_common_harness_supp_statements",
+    # v1.24 forensic and confirmatory detail (S11)
+    "table_value_disjoint_overlap", "table_value_disjoint_b2_supp",
+    "table_value_disjoint_b1_summary", "table_value_disjoint_b1_robustness",
     # v1.22: full size-matched matrices + guardrail panel (S8)
     "table_size_matched_security", "table_size_matched_supp_contrasts",
     "table_size_matched_supp_harm", "table_size_matched_supp_interaction",

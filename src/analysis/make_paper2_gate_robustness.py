@@ -22,6 +22,8 @@ OUTF = "results/figures/paper2"
 CORE = ["portscan", "unsw_recon", "ton_scanning"]
 RLABEL = {"portscan": "PortScan (benefit)", "unsw_recon": "UNSW Recon (mixed)", "ton_scanning": "ToN-IoT (harm)"}
 RCOLOR = {"portscan": "#2a9d8f", "unsw_recon": "#e9c46a", "ton_scanning": "#e76f51"}
+RMARKER = {"portscan": "o", "unsw_recon": "^", "ton_scanning": "s"}
+RLINE = {"portscan": "-", "unsw_recon": "--", "ton_scanning": "-."}
 EPS = 0.005
 
 
@@ -107,7 +109,8 @@ def main():
         for reg in CORE:
             d = A[A.regime == reg].sort_values("probe_lag")
             if len(d):
-                ax.plot(d["probe_lag"], d["gate_gain"], "-o", color=RCOLOR[reg], label=RLABEL[reg], ms=5)
+                ax.plot(d["probe_lag"], d["gate_gain"], color=RCOLOR[reg],
+                        marker=RMARKER[reg], linestyle=RLINE[reg], label=RLABEL[reg], ms=5)
         ax.axhline(0, color="k", lw=0.8)
         ax.set_xlabel("Probe label lag (windows)")
         ax.set_ylabel("Gate gain vs no-adaptation (BA pts)")
@@ -140,7 +143,8 @@ def main():
         for reg in CORE:
             d = D[D.regime == reg].sort_values("probe_poison")
             if len(d):
-                ax.plot(d["probe_poison"] * 100, d["gate_gain"], "-o", color=RCOLOR[reg], label=RLABEL[reg], ms=5)
+                ax.plot(d["probe_poison"] * 100, d["gate_gain"], color=RCOLOR[reg],
+                        marker=RMARKER[reg], linestyle=RLINE[reg], label=RLABEL[reg], ms=5)
                 nv = D[(D.regime == reg) & (D.probe_poison == 0)]["naive_gain"]
                 if len(nv):
                     ax.axhline(float(nv.iloc[0]), color=RCOLOR[reg], ls=":", lw=1, alpha=0.6)

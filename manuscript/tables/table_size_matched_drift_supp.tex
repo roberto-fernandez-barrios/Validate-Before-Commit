@@ -1,16 +1,20 @@
-\begin{table}[t]
-\centering
+{\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{p{0.12\linewidth} p{0.27\linewidth} r p{0.11\linewidth} p{0.11\linewidth} r c p{0.10\linewidth}}
 \caption{Size-matched-under-drift control (seeds 6001--6030): every registered contrast of
 families G1--G4 with CI95, CI90, Holm-adjusted $p$ and significance, plus the descriptive
 512-side gate cells. BA points; seed = inferential unit; deterministic centered paired
-bootstrap (100{,}000 resamples).}
-\label{tab:size_matched_drift_supp}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{l l r l l r c l}
+bootstrap (100{,}000 resamples).}\label{tab:size_matched_drift_supp}\\
 \toprule
 Family & Contrast & Effect & CI95 & CI90 & $p_{\mathrm{Holm}}$ & Sig. & G2 class \\
 \midrule
+\endfirsthead
+\multicolumn{8}{l}{\small Table~\ref{tab:size_matched_drift_supp} continued}\\
+\toprule
+Family & Contrast & Effect & CI95 & CI90 & $p_{\mathrm{Holm}}$ & Sig. & G2 class \\
+\midrule
+\endhead
 G1 value of updating & ps\_full: naive-512 vs never & $+8.90$ & [6.35, 11.57] & [6.74, 11.14] & 0.0001 & yes &  \\
 G1 value of updating & ps\_full: naive-2000 vs never & $+9.72$ & [7.10, 12.39] & [7.52, 11.97] & 0.0001 & yes &  \\
 G1 value of updating & unsw\_full: naive-512 vs never & $+2.13$ & [1.86, 2.36] & [1.90, 2.32] & 0.0001 & yes &  \\
@@ -39,5 +43,5 @@ descriptive (uncorrected) & unsw\_full: strict-512 vs naive-512 & $-0.03$ & [-0.
 descriptive (uncorrected) & ton\_full: point-512 vs naive-512 & $+0.46$ & [0.09, 0.88] & --- & --- & --- &  \\
 descriptive (uncorrected) & ton\_full: strict-512 vs naive-512 & $+0.35$ & [-0.10, 0.80] & --- & --- & --- &  \\
 \bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+}

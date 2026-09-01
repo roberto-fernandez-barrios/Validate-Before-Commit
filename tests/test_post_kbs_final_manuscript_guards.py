@@ -16,14 +16,19 @@ from tests.conftest import REPO
 T = REPO / "results" / "tables"
 B2 = T / "post_kbs_size_matched_drift_001"
 B1 = T / "post_kbs_common_harness_baselines_001"
+B2X = T / "ijis_exact_value_disjoint_b2_001"
+B1X = T / "ijis_exact_value_disjoint_b1_001"
 MAIN = (REPO / "manuscript" / "main.tex").read_text(encoding="utf-8")
 IEEE = (REPO / "manuscript" / "main_ieee.tex").read_text(encoding="utf-8")
 SUPP = (REPO / "manuscript" / "supplement.tex").read_text(encoding="utf-8")
 README = (REPO / "README.md").read_text(encoding="utf-8")
 NEW_TABLES = ("table_synthesis", "table_size_matched_drift", "table_common_harness",
+              "table_value_disjoint_main",
               "table_size_matched_drift_supp", "table_size_matched_drift_security",
               "table_common_harness_supp_primary", "table_common_harness_supp_secondary",
-              "table_common_harness_supp_statements")
+              "table_common_harness_supp_statements", "table_value_disjoint_overlap",
+              "table_value_disjoint_b2_supp", "table_value_disjoint_b1_summary",
+              "table_value_disjoint_b1_robustness")
 
 
 def _flat(t: str) -> str:
@@ -40,9 +45,10 @@ def test_abstract_rewritten_length_and_thesis():
     n = len(a.split())
     assert 185 <= n <= 235, f"abstract has {n} words (target 190-220, audit cap 250)"
     f = _flat(a)
-    for s in ("drift alarm only detects change", "comparability", "+0.82", "+1.66", "+1.00",
-              "homogeneous size benefit", "validation is conditional",
-              "no evaluated policy dominates", "should therefore precede"):
+    for s in ("an alarm detects change", "challenger construction", "+0.53", "+1.67", "+0.38",
+              "materially benchmark-dependent rather than homogeneous",
+              "policy conclusions were partially robust", "no policy globally dominated",
+              "should be controlled, reported and interpreted explicitly"):
         assert s in f, s
     for s in ("boundary-close", "vbc-sg", "quantum", "attenuation", "cohort", "chronolog",
               "protocol", "e-process", "supermartingale"):
@@ -51,28 +57,21 @@ def test_abstract_rewritten_length_and_thesis():
 
 # ---------------------------------------------------------------- B2 numbers sourced from CSVs
 def test_b2_numbers_and_outcome_match_csvs():
-    con = pd.read_csv(B2 / "paired_contrasts.csv").set_index("contrast")
-    mult = pd.read_csv(B2 / "multiplicity.csv").set_index("contrast")
-    interp = json.loads((B2 / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
-    assert interp["outcome"] == "HOMOGENEOUS-SIZE BENEFIT"
+    historical = json.loads((B2 / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    current = json.loads((B2X / "CLAIM_INTERPRETATION.json").read_text(encoding="utf-8"))
+    size = pd.read_csv(B2X / "size_effect_outcome.csv").set_index("scenario")
+    assert historical["outcome"] == "HOMOGENEOUS-SIZE BENEFIT"
+    assert current["outcome"] == "PARTIAL ROBUSTNESS"
+    assert current["original_b2_materially_inflated"] is False
     for t in (MAIN, IEEE):
         f = _flat(t)
-        assert "homogeneous-size benefit" in f
-        for sc in ("ps", "unsw", "ton"):
-            r = con.loc[f"{sc}_full: naive-2000 vs naive-512"]
+        assert "historical confirmatory design separated roles by source row" in f
+        assert "partial robustness" in f
+        for sc in ("ps_full", "unsw_full", "ton_full"):
+            r = size.loc[sc]
             assert f"{float(r.effect_pp):+.2f}" in t, (sc, r.effect_pp)
-            assert interp["per_scenario"][f"{sc}_full"]["classification"] == "SIZE BENEFIT"
-            for arm in ("512", "2000"):
-                r1 = con.loc[f"{sc}_full: naive-{arm} vs never"]
-                assert f"{float(r1.effect_pp):+.2f}" in t, (sc, arm)
-        g3 = mult[mult.index.str.contains(r"-2000 vs naive-2000")]
-        assert len(g3) == 6
-        assert int(((g3.effect_pp > 0) & g3.significant_holm).sum()) == 0
-        assert "0/6" in f
-        strict = con.loc["unsw_full: strict-2000 vs naive-2000"]
-        assert bool(mult.loc["unsw_full: strict-2000 vs naive-2000", "significant_holm"])
-        assert f"{float(strict.effect_pp):+.2f}" in t
-        assert "resolved cost" in f
+        assert "positive and statistically resolved in all three" in f
+        assert "material benefit in two of three" in f
 
 
 def test_b2_claim_guards():
@@ -83,9 +82,9 @@ def test_b2_claim_guards():
         assert "does not retroactively change" in f
         assert "attenuation" in f, "the historical zero-drift registered outcome must stay"
         assert "effective information parity" in f and "not" in f
-        for s in ("universal monotonic benefit", "larger training windows improve arbitrary"):
-            assert s in f, f"B2 non-claim {s!r} must be stated"
-        assert "always help" in f  # 'no claim that larger candidate batches always help'
+        assert "universal monotonic benefit" in f
+        assert "no claim that larger candidates always help" in f
+        assert "exact duplicate-value exposure only" in f
 
 
 # ---------------------------------------------------------------- B1 numbers and framing
@@ -106,14 +105,21 @@ def test_b1_framing_and_statements_match_csvs():
     mult = pd.read_csv(B1 / "multiplicity.csv")
     sf5 = mult[mult.family.str.startswith("SF5") & mult.significant_holm.astype(bool)]
     assert len(sf5) == 15 and (sf5.effect_pp < 0).all()
+    robust = json.loads((B1X / "ROBUSTNESS_INTERPRETATION.json").read_text(encoding="utf-8"))
+    assert robust["outcome"] == "PARTIALLY ROBUST"
+    assert robust["predicates_holding"] == 4
+    assert robust["predicates"]["SIZE_DEPENDENT_ORDERING"]
+    assert robust["predicates"]["NO_GLOBAL_DOMINANCE"]
+    assert not robust["predicates"]["ATC_RETENTION"]
+    assert not robust["predicates"]["ENSEMBLE_RETENTION"]
     for t in (MAIN, IEEE):
         f = _flat(t)
-        for s in ("registered common-harness comparison with published and reference baselines",
+        for s in ("source-row-disjoint common-harness comparison with published and reference baselines",
                   "no faithfully reproducible end-to-end published adaptive-nids system",
                   "atc", "doc", "river-ddm", "river-adwin", "calibrated ensemble",
-                  "material cost", "compatible", "unresolved", "fifteen holm-significant",
-                  "fires for atc", "calibrated ensemble (portscan and ton-iot full drift",
-                  "budgets differ legitimately", "not a state-of-the-art ranking"):
+                  "material cost", "compatible", "unresolved", "partially robust",
+                  "size-dependent", "budgets differ legitimately",
+                  "not a state-of-the-art ranking"):
             assert s in f, s
         for s in ("state-of-the-art adaptive", "sota", "outperforms the state of the art",
                   "no prior work", "the first to", "beats all baselines"):
@@ -124,15 +130,14 @@ def test_b1_framing_and_statements_match_csvs():
 def test_validation_is_conditional_never_universal():
     for t in (MAIN, IEEE):
         f = _flat(t)
-        assert ("we do not call validation necessary, generally safer, superior, or the "
-                "recommended default") in f
+        assert "validation is conditional rather than universal" in f
         for s in ("validation is necessary", "validation is generally safer",
                   "validation is superior", "validation is the recommended default",
                   "we recommend validating", "always validate", "the gate rescues",
                   "rescued by the gate", "validation should always"):
             assert s not in f, s
-        assert "validate when upstream comparability cannot be established cheaply" in f
-        assert "extrapolates beyond the fixed-policy evidence" in f
+        assert "integrated operational stack remains future work" in f
+        assert "no learned meta-controller was evaluated" in f
         assert "0/6" in f
 
 
@@ -141,10 +146,11 @@ def test_results_structure_and_generated_tables():
     results = MAIN.split("\\section{Results}")[1].split("\\section{Discussion}")[0]
     subs = re.findall(r"\\subsection\{([^}]*)\}", results)
     prefixes = ["The historical frozen configuration", "Candidate construction",
-                "Candidate evidence at zero drift", "Candidate evidence under real drift",
+                "Candidate evidence at zero drift", "Candidate evidence under pool-constructed progressive drift",
                 "Validation has conditional average value",
-                "Registered common-harness comparison", "Mechanism, formal instruments"]
-    assert len(subs) == 7
+                "Source-row-disjoint common-harness comparison",
+                "Final exact-feature-disjoint sensitivity", "Mechanism, formal instruments"]
+    assert len(subs) == 8
     for s, p in zip(subs, prefixes):
         assert s.startswith(p), (s, p)
     assert "\\input{tables/table_synthesis.tex}" in MAIN
@@ -159,7 +165,9 @@ def test_results_structure_and_generated_tables():
         assert a == b, name
     assert "\\label{sec:supp_sizematched_drift}" in SUPP
     assert "\\label{sec:supp_common_harness}" in SUPP
-    for name in NEW_TABLES[3:]:
+    supp_names = set(NEW_TABLES) - {"table_synthesis", "table_size_matched_drift",
+                                   "table_common_harness", "table_value_disjoint_main"}
+    for name in supp_names:
         assert f"\\input{{tables/{name}.tex}}" in SUPP, name
     assert "\\input{tables/table_symmetric_security.tex}" in SUPP
     assert "\\input{tables/table_symmetric_security.tex}" not in MAIN

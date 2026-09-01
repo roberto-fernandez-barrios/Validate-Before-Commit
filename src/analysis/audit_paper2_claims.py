@@ -1196,16 +1196,13 @@ def main():
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
                     and "conditional on a comparable proposal" in _t)), 0.5)
-    # v1.22 rewrite: the conclusion's universal-safeguard sentence was replaced by the
-    # registered conditional formulation; v1.22.1 sharpens it further (editorial scope
-    # protocol): validate when construction/evidence conditions are asymmetric or
-    # uncertain -- never "valuable when comparability cannot be guaranteed".
+    # Current conclusion: evaluation/policy claims are conditional, and the unevaluated
+    # integrated deployment stack remains future work rather than a recommendation.
     check("v122 E2: conditional-validation conclusion present (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
-                    and "validate the challenger when its construction or evidence "
-                        "conditions remain asymmetric or uncertain" in _t
-                    and "substitute for building a comparably constructed" in _t)), 0.5)
+                    and "validation is conditional rather than universal" in _t
+                    and "integrated operational stack remains future work" in _t)), 0.5)
     check("v122 E2: chronological net-harm boundary retained (main+ieee)", 2.0,
           float(sum(1 for _n, _t in _texts.items()
                     if _n.endswith(("/main.tex", "/main_ieee.tex"))
@@ -1488,17 +1485,18 @@ def main():
                          if _n.endswith(("/main.tex", "/main_ieee.tex"))
                          and all(nd in _t for nd in needles)))
 
-    # Data availability: exact v1.22.0 DOI identity declared; mutable repository SHA omitted.
-    check("v1221 DA: exact version DOI 10.5281/zenodo.21517899 (main+ieee)", 2.0,
-          _in_mains("10.5281/zenodo.21517899"), 0.5)
+    # Data availability: current v1.24.0 release is named; its exact DOI is inserted after
+    # Zenodo minting, while the stable concept DOI and v1.23 immutability remain explicit.
+    check("v124 DA: current artifact version v1.24.0 (main+ieee)", 2.0,
+          _in_mains("artifact version v1.24.0"), 0.5)
     check("v1221 DA: concept DOI 10.5281/zenodo.21322256 (main+ieee)", 2.0,
           _in_mains("10.5281/zenodo.21322256"), 0.5)
-    check("v1221 DA: exact DOI identified as archived snapshot (main+ieee)", 2.0,
+    check("v124 DA: exact version DOI workflow stated (main+ieee)", 2.0,
           _in_mains("the exact version doi"), 0.5)
+    check("v124 DA: v1.23.0 immutability retained (main+ieee)", 2.0,
+          _in_mains("previous v1.23.0 release remains immutable"), 0.5)
     check("v1221 DA: stale repository SHA attribution absent", 0.0,
           float(_hits(r"43d9c255af48db9bcc3c6eb341a153381b18c8e8")), 0.5)
-    check("v1221 DA: artifact version v1.22.0 declared (main+ieee)", 2.0,
-          _in_mains("artifact version v1.22.0"), 0.5)
     check("v1221 DA: no 'artifact version v1.20.2' declaration anywhere", 0.0,
           float(_hits(r"artifact version\s*v?1\.20\.2")), 0.5)
     # Scope: zero-drift qualifier on the size-matched claims, everywhere it is claimed.
@@ -1536,7 +1534,7 @@ def main():
     check("v1221 T: nominal-vs-effective evidence caveat present (main+ieee)", 2.0,
           _in_mains("temporal coverage, diversity, subtype support, label quality"), 0.5)
     check("v1221 T: row-counts-alone disclaimer present (main+ieee)", 2.0,
-          _in_mains("not a consequence of equal row counts alone"), 0.5)
+          _in_mains("not equated by equal row counts"), 0.5)
     # Equivalence margin sensitivity: pinned against the derived CSV.
     _eqs = "results/tables/v1_22_1_editorial/equivalence_margin_sensitivity.csv"
     if os.path.exists(_eqs):

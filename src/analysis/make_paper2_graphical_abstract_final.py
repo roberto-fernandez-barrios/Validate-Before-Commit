@@ -64,7 +64,7 @@ box(34.5, 3, 31, 24,
     "Matched-size mean effects\ncompatible within 0.5 pp\n(ZERO-DRIFT CONTROL;\nPortScan boundary-close;\nnot absence of effect)",
     "#e8f5e9", "#1b5e20", fs=10.8)
 box(67.5, 3, 31, 24,
-    "Chronological replays:\nvalidation can protect a healthy\nincumbent but delay recovery\nafter incumbent collapse",
+    "Exact-feature-disjoint sensitivity:\n512 to 2,000 positive in 3/3;\nmaterial in 2/3; policy\nconclusions partially robust",
     "#eceff1", "#37474f", fs=12)
 
 fig.savefig("docs/img/graphical_abstract.png", dpi=300, bbox_inches="tight",

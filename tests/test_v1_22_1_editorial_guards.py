@@ -30,26 +30,25 @@ def _flat(s: str) -> str:
 
 
 # ---------------------------------------------------------------- data availability
-def test_data_availability_declares_exact_v1_22_0_identity():
+def test_data_availability_declares_current_v1_24_identity():
     for name, t in (("main.tex", MAIN), ("main_ieee.tex", IEEE)):
         f = _flat(t)
-        assert "10.5281/zenodo.21517899" in f, f"{name}: exact version DOI missing"
         assert "10.5281/zenodo.21322256" in f, f"{name}: concept DOI missing"
-        assert "artifact version v1.22.0" in f, f"{name}: artifact version declaration missing"
+        assert "artifact version v1.24.0" in f, f"{name}: artifact version declaration missing"
         assert "the exact version doi" in f, f"{name}: immutable snapshot identity missing"
+        assert "previous v1.23.0 release remains immutable" in f
         assert "43d9c255af48db9bcc3c6eb341a153381b18c8e8" not in f, (
             f"{name}: stale repository-SHA attribution must be absent")
         assert not re.search(r"artifact version\s*v?1\.20\.2", f), (
             f"{name}: stale v1.20.2 artifact declaration must be gone")
-        assert "v1.22.1" not in f, f"{name}: must not claim v1.22.1 exists yet"
 
 
 def test_version_doi_and_artifact_version_declared_together():
     for t in (MAIN, IEEE):
         f = _flat(t)
-        i = f.index("10.5281/zenodo.21517899")
+        i = f.index("the exact version doi")
         window = f[max(0, i - 400): i + 400]
-        assert "v1.22.0" in window, "version DOI must be declared alongside artifact version v1.22.0"
+        assert "v1.24.0" in window, "version DOI workflow must identify artifact version v1.24.0"
 
 
 # ---------------------------------------------------------------- highlights
@@ -103,7 +102,7 @@ def test_size_matched_scope_limits_retained():
         assert "sample-size parity" in f, "nominal parity terminology required"
         assert "temporal coverage, diversity, subtype support, label quality" in f, (
             "nominal-vs-effective evidence caveat required")
-        assert "not a consequence of equal row counts alone" in f
+        assert "not equated by equal row counts" in f
 
 
 # ---------------------------------------------------------------- README
@@ -255,8 +254,8 @@ def test_v1_22_1_manifest_pinning():
     two derived editorial CSVs (185 total)."""
     ms = (REPO / "results" / "tables" / "MANIFEST.sha256").read_text(encoding="utf-8")
     pinned = [ln for ln in ms.splitlines() if ln.strip()]
-    # 185 at v1.22.1 (183 + 2 editorial); v1.23.0 adds the 22 post-KBS CSVs additively
-    assert len(pinned) == 207, "207 pinned CSVs at v1.23.0 (185 historical + 22 post-KBS)"
+    # v1.24.0 adds 23 exact-feature-disjoint sensitivity CSVs to the immutable 207.
+    assert len(pinned) == 230, "230 pinned CSVs at v1.24.0 (207 historical + 23 sensitivity)"
     editorial = [ln for ln in pinned if "v1_22_1_editorial/" in ln]
     assert len(editorial) == 2, "exactly the two editorial CSVs are the additive pins"
     for f in ("equivalence_margin_sensitivity.csv", "evidence_validation_tradeoff.csv"):

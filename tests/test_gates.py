@@ -119,9 +119,11 @@ def test_manifest_generator_does_not_mutate_sealed(tmp_path):
     import subprocess
     from src.analysis import make_final_manifest
     sealed = (REPO / "results" / "final_manifest.json").read_bytes()
+    before = subprocess.run(["git", "status", "--porcelain", "results/final_manifest.json"],
+                            cwd=REPO, capture_output=True, text=True, timeout=60).stdout
     make_final_manifest.main(out=tmp_path / "m.json")
     assert (tmp_path / "m.json").exists()
     assert (REPO / "results" / "final_manifest.json").read_bytes() == sealed
     r = subprocess.run(["git", "status", "--porcelain", "results/final_manifest.json"],
                        cwd=REPO, capture_output=True, text=True, timeout=60)
-    assert r.stdout.strip() == "", f"sealed manifest modified in working tree: {r.stdout}"
+    assert r.stdout == before, f"generator changed sealed-manifest status: {before!r} -> {r.stdout!r}"

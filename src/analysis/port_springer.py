@@ -136,12 +136,13 @@ def main() -> None:
 
     # ---- declarations read from main.tex ------------------------------------------------
     competing = _between(cas, "\\section*{Declaration of competing interest}", "\\section*{Funding}")
-    funding = _between(cas, "\\section*{Funding}", "\\section*{Data availability}")
-    data = _between(cas, "\\section*{Data availability}",
-                    "\\section*{Declaration of generative AI")
+    data_heading = "\\section*{Data and code availability}"
+    ai_heading = "\\section*{Declaration of generative AI and AI-assisted technologies}"
+    funding = _between(cas, "\\section*{Funding}", data_heading)
+    data = _between(cas, data_heading, ai_heading)
     ai_use = _between(
         cas,
-        "\\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}",
+        ai_heading,
         "% CRediT roles are declared",
     )
     contributions = " ".join(f"{a['name']}: {a['credit']}." for a in authors)

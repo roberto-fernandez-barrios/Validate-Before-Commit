@@ -25,6 +25,8 @@ import matplotlib.pyplot as plt
 TAB = "results/tables"
 OUT = "results/figures/paper2"
 SIGN_COLORS = {"benefit": "#2a9d8f", "marginal": "#e9c46a", "mixed": "#e9c46a", "harmful": "#e76f51"}
+SIGN_HATCHES = {"benefit": "", "marginal": "//", "mixed": "//", "harmful": "xx"}
+SIGN_MARKERS = {"benefit": "o", "marginal": "^", "mixed": "^", "harmful": "s"}
 
 
 def save(fig, name):
@@ -42,7 +44,9 @@ def fig1_spectrum():
     d = pd.read_csv(f).sort_values("best_gain_BA_pts", ascending=False)
     colors = [SIGN_COLORS.get(k, "#999") for k in d["klass"]]
     fig, ax = plt.subplots(figsize=(7, 3.4))
-    ax.bar(range(len(d)), d["best_gain_BA_pts"], color=colors)
+    bars = ax.bar(range(len(d)), d["best_gain_BA_pts"], color=colors, edgecolor="0.25", linewidth=0.5)
+    for bar, klass in zip(bars, d["klass"]):
+        bar.set_hatch(SIGN_HATCHES.get(klass, ".."))
     ax.axhline(0, color="k", lw=0.8)
     ax.set_xticks(range(len(d)))
     ax.set_xticklabels(d["regime"], rotation=35, ha="right", fontsize=8)
@@ -60,7 +64,11 @@ def fig2_mechanism():
     y = d["best_gain_BA_pts"].values
     r = np.corrcoef(x, y)[0, 1]
     fig, ax = plt.subplots(figsize=(5, 4))
-    ax.scatter(x, y, c=[SIGN_COLORS.get(k, "#999") for k in d["klass"]], s=60, zorder=3)
+    for klass in d["klass"].unique():
+        s = d[d.klass == klass]
+        ax.scatter(s["noadapt_BA"] * 100, s["best_gain_BA_pts"],
+                   c=SIGN_COLORS.get(klass, "#999"), marker=SIGN_MARKERS.get(klass, "D"),
+                   edgecolor="k", linewidth=0.4, s=60, zorder=3, label=klass)
     m, b = np.polyfit(x, y, 1)
     xs = np.linspace(x.min(), x.max(), 50)
     ax.plot(xs, m * xs + b, "k--", lw=1)
@@ -76,6 +84,7 @@ def fig2_mechanism():
     ax.set_xlabel("Deployed-model BA without adaptation (%)")
     ax.set_ylabel("Adaptation benefit (BA pts)")
     ax.set_title(f"Adaptation helps only when the model has degraded (r = {r:.2f})")
+    ax.legend(title="observed regime", fontsize=7, title_fontsize=7)
     save(fig, "fig2_mechanism_law")
 
 
@@ -108,6 +117,7 @@ def fig4_phase2():
     gates = ["none", "lp32", "lp64", "unsup"]
     gate_lbl = {"none": "naive", "lp32": "gate-32", "lp64": "gate-64", "unsup": "unsup-0"}
     gate_c = {"none": "#adb5bd", "lp32": "#2a9d8f", "lp64": "#1d7870", "unsup": "#e76f51"}
+    gate_h = {"none": "", "lp32": "//", "lp64": "xx", "unsup": ".."}
     dets = sorted(d.detector.unique())
     fig, axes = plt.subplots(1, len(dets), figsize=(5.5 * len(dets), 3.6), sharey=True)
     if len(dets) == 1:
@@ -116,7 +126,8 @@ def fig4_phase2():
         w = 0.2
         for gi, g in enumerate(gates):
             vals = [d[(d.regime == r) & (d.detector == det) & (d.gate == g)]["gain_pts"].mean() for r in regimes]
-            ax.bar(np.arange(len(regimes)) + gi * w, vals, w, label=gate_lbl[g], color=gate_c[g])
+            ax.bar(np.arange(len(regimes)) + gi * w, vals, w, label=gate_lbl[g],
+                   color=gate_c[g], hatch=gate_h[g], edgecolor="0.25", linewidth=0.5)
         ax.axhline(0, color="k", lw=0.8)
         ax.set_xticks(np.arange(len(regimes)) + 1.5 * w)
         ax.set_xticklabels([reg_lbl[r] for r in regimes], fontsize=8)

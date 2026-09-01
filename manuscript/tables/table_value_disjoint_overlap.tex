@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Exact cleaned-raw-feature audit before the sensitivity. A duplicate row is a row
+beyond the first member of an exact feature group; signed zero is canonicalized and no
+feature is rounded. Conflicting-label groups retain every original row and label.}
+\label{tab:value_disjoint_overlap}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l r r r r r r r r}
+\toprule
+Dataset & Rows & Unique $X$ & Dup. groups & Dup. rows & Dup. rate & Max mult. & Conflict groups & Conflict rows \\
+\midrule
+PortScan & 732\,376 & 632\,537 & 45\,120 & 99\,839 & 13.63\% & 1\,551 & 0 & 0 \\
+UNSW-NB15 & 205\,346 & 130\,579 & 11\,061 & 74\,767 & 36.41\% & 277 & 403 & 1\,828 \\
+ToN-IoT & 140\,521 & 124\,746 & 4\,964 & 15\,775 & 11.23\% & 3\,361 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -226,13 +226,13 @@ def make_b2_main() -> None:
         ]) + r" \\")
     body = r"""\begin{table*}[t]
 \centering
-\caption{\textbf{Candidate evidence under real drift: the registered size-matched control
-(seeds 6001--6030, 21 arms).} Self-contained challengers, full progressive drift, nested
+\caption{\textbf{Candidate evidence under pool-constructed progressive drift: the registered
+source-row-disjoint size-matched control (seeds 6001--6030, 21 arms).} Self-contained challengers, nested
 candidate batches drawn at the proposal-time mixture (the 512 batch is the first 512 rows
 per class of the 2{,}000 batch). BA points; paired within seed, 30 seeds; CI95 from the
 deterministic centered paired bootstrap; $\dagger$ = Holm-significant within its registered
 family (G1: naive vs never at both sizes; G2: the primary size effect; G3: gate value at
-2{,}000). Registered classification of G2 per the frozen protocol; program outcome
+2{,}000). Historical registered classification of G2 per the frozen protocol; block outcome
 \textsc{""" + interp["outcome"].replace("-", "--").lower() + r"""}. Columns 3--4: always-deploy
 minus never-adapt at each size; column 5: the size effect; columns 7--8: gate minus
 always-deploy at 2{,}000/class. Full matrices in Supplementary \S S9.}
@@ -304,8 +304,8 @@ method, reference implementation (\texttt{river} 0.25.0), standard baseline, or 
 policy --- none is an adaptive-NIDS system reproduced end to end. Full families, the 512/class
 sensitivity block and statements in Supplementary \S S10.}
 \label{tab:common_harness}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{l l l r r r r r r}
 \toprule
@@ -339,23 +339,27 @@ def make_b2_supp() -> None:
         rows.append(" & ".join(["descriptive (uncorrected)", name.replace("_", r"\_"),
                                 tex(f2(float(r.effect_pp))),
                                 ci(float(r.ci95_lo), float(r.ci95_hi)), "---", "---", "---", ""]) + r" \\")
-    body = r"""\begin{table}[t]
-\centering
+    body = r"""{\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{p{0.12\linewidth} p{0.27\linewidth} r p{0.11\linewidth} p{0.11\linewidth} r c p{0.10\linewidth}}
 \caption{Size-matched-under-drift control (seeds 6001--6030): every registered contrast of
 families G1--G4 with CI95, CI90, Holm-adjusted $p$ and significance, plus the descriptive
 512-side gate cells. BA points; seed = inferential unit; deterministic centered paired
-bootstrap (100{,}000 resamples).}
-\label{tab:size_matched_drift_supp}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{l l r l l r c l}
+bootstrap (100{,}000 resamples).}\label{tab:size_matched_drift_supp}\\
 \toprule
 Family & Contrast & Effect & CI95 & CI90 & $p_{\mathrm{Holm}}$ & Sig. & G2 class \\
 \midrule
+\endfirsthead
+\multicolumn{8}{l}{\small Table~\ref{tab:size_matched_drift_supp} continued}\\
+\toprule
+Family & Contrast & Effect & CI95 & CI90 & $p_{\mathrm{Holm}}$ & Sig. & G2 class \\
+\midrule
+\endhead
 """ + "\n".join(rows) + r"""
 \bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+}
 """
     write("table_size_matched_drift_supp.tex", body)
 
@@ -465,7 +469,7 @@ Statement & Policy & Holds \\
 \medskip
 \begin{tabular}{l l r r r r}
 \toprule
-Policy & Origin & Candidate labels & Probe labels & Monitoring labels & Validation labels (analytic) \\
+Policy & Origin & Candidate & Probe & Monitoring & Training-time val. \\
 \midrule
 """ + "\n".join(brows) + r"""
 \bottomrule
