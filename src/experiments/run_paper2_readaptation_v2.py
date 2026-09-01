@@ -1,14 +1,16 @@
-"""Harness v2: common streams, role-disjoint partitions, separate RNGs, per-trigger logging.
+"""Harness v2: common streams, source-row-disjoint roles, separate RNGs, per-trigger logging.
 
 Fixes the three harness-level criticisms of the external review:
   1. COMMON STREAMS -- the evaluation stream (and calibration windows) are pre-generated from an
      environment RNG that depends only on the seed, before any policy runs. Every arm (gate,
      detector, baseline) with the same seed processes exactly the same windows in the same order;
      policy actions cannot perturb the environment.
-  2. ROLE-DISJOINT PARTITIONS -- each per-class pool is split once per seed into window (50%),
+  2. SOURCE-ROW-DISJOINT PARTITIONS -- each per-class pool is split once per seed into window (50%),
      train (30%) and probe (20%) partitions. Stream/calibration windows draw only from `window`,
      the initial model, candidates and detector references only from `train`, probes only from
-     `probe`. Train/probe/eval overlap is impossible by construction.
+     `probe`. The same source-row index cannot cross roles. Exact duplicate feature vectors can
+     cross roles when distinct source rows carry identical cleaned raw X values; the historical
+     splitter must not be described as exact-feature-value-disjoint.
   3. SEPARATE RNGs -- environment, initial training, detector calibration, candidate training,
      probe draws and post-commit recalibration each use their own generator, seeded by (seed) or
      (seed, t) only, never by the policy's history.
@@ -187,7 +189,9 @@ HEALTH_REF_PER_CLASS = 32     # two_stage: severity-0 health reference size per 
 
 
 def split_pools(pools: Pools, seed: int, fracs: dict | None = None) -> dict[str, Pools]:
-    """Deterministic per-seed split of every class pool into disjoint role partitions.
+    """Deterministic per-seed split into source-row-disjoint role partitions.
+
+    Distinct source rows with the same exact cleaned raw feature vector may cross roles.
 
     `fracs` overrides ROLE_FRACS (amendment 013): the exact-zero-collision disjoint stream needs a
     larger window share on the smaller benchmarks (the observed-data causal arm draws candidates

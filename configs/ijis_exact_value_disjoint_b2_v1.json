@@ -1,0 +1,40 @@
+{
+  "config_version": "1.0.0",
+  "matrix_kind": "ijis_exact_value_disjoint_b2",
+  "implementation_status": "FROZEN PRE-IMPLEMENTATION; no smoke or confirmatory seed executed",
+  "protocol": "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+  "base_config": "configs/post_kbs_size_matched_drift_v1.json",
+  "base_config_sha256": "2ca8f4d3679b034c644ee8131605836c9bc75f59096fe5dd57e9796a96a03ea9",
+  "fixed_flags_source": "configs/symmetric_pipeline_dynamic_v1.json",
+  "fixed_flags_source_sha256": "527947788e685e7f8cabf2989eb58aec8fbc8f948ea8e0d1f3640b52893d40e8",
+  "role_assignment": {
+    "mode": "exact_feature_group_disjoint",
+    "feature_group_disjoint_roles": true,
+    "fractions": {"window": 0.5, "train": 0.3, "probe": 0.2},
+    "max_abs_stratum_role_deviation_pp": 0.5,
+    "preserve_rows_labels_multiplicity": true
+  },
+  "confirmatory_seeds": {"start": 7001, "end": 7030, "status": "RESERVED VIRGIN AT FREEZE"},
+  "smoke_seeds": [7401, 7402],
+  "expected_arms": 21,
+  "scenarios": ["ps_full", "unsw_full", "ton_full"],
+  "policies": ["never", "naive", "point", "strict"],
+  "candidate_sizes_per_class": [512, 2000],
+  "nested_draw_domain": "drift",
+  "families": {
+    "G1": {"n": 6, "correction": "Holm"},
+    "G2_primary_size": {"n": 3, "correction": "Holm"},
+    "G3_gate_at_2000": {"n": 6, "correction": "Holm"},
+    "G4_gate_x_size": {"n": 6, "correction": "Holm"},
+    "G5_vs_historical_B2": {"n": 3, "correction": "Holm", "independent_seed_blocks": true}
+  },
+  "margins": {"ba_materiality_pp": 0.5, "sensitivities_pp": [0.2, 1.0], "recall_ni_pp": -1.0, "fpr_ni_pp": 0.5},
+  "output_paths": {
+    "confirmatory_outroot": "results/raw/ijis_exact_value_disjoint_b2",
+    "smoke_outroot": "results/smoke/ijis_exact_value_disjoint_b2",
+    "tables_outdir": "results/tables/ijis_exact_value_disjoint_b2_001"
+  },
+  "smoke_arms": ["xvd_b2_ps_full_naive_512", "xvd_b2_ps_full_naive_2000", "xvd_b2_ton_full_strict_2000"],
+  "stop_rule": "one complete pass; no extension, tuning, substituted seeds or rescue experiments"
+}
+

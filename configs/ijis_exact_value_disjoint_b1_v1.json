@@ -1,0 +1,45 @@
+{
+  "config_version": "1.0.0",
+  "matrix_kind": "ijis_exact_value_disjoint_b1",
+  "implementation_status": "FROZEN PRE-IMPLEMENTATION; no smoke or confirmatory seed executed",
+  "protocol": "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+  "base_config": "configs/post_kbs_common_harness_baselines_v2.json",
+  "base_config_sha256": "b6e4e1f6682f328427617510ea968f60f479279441029708937960db944d90e7",
+  "role_assignment": {
+    "mode": "exact_feature_group_disjoint",
+    "feature_group_disjoint_roles": true,
+    "fractions": {"window": 0.5, "train": 0.3, "probe": 0.2},
+    "max_abs_stratum_role_deviation_pp": 0.5,
+    "preserve_rows_labels_multiplicity": true
+  },
+  "confirmatory_seeds": {"start": 8001, "end": 8030, "status": "RESERVED VIRGIN AT FREEZE"},
+  "smoke_seeds": [8401, 8402],
+  "expected_arms": 96,
+  "scenarios": ["ps_full", "unsw_full", "ton_full", "ps_zero", "unsw_zero", "ton_zero"],
+  "primary_candidate_size_per_class": 2000,
+  "secondary_candidate_size_per_class": 512,
+  "primary_policies": ["naive", "point", "strict", "atc", "doc", "enscal", "replay", "ddm", "adwin"],
+  "secondary_policies_512": ["naive", "point", "strict", "atc", "doc", "enscal"],
+  "families": {
+    "PF1_zero_drift_2000": {"n": 18, "correction": "Holm"},
+    "PF2_full_drift_2000": {"n": 18, "correction": "Holm"},
+    "PF3_estimators_vs_point_2000": {"n": 12, "correction": "Holm"},
+    "SF4_512": {"n": 18, "correction": "Holm"},
+    "SF5_method_x_size": {"n": 30, "correction": "Holm"}
+  },
+  "margins": {"ba_materiality_pp": 0.5, "sensitivities_pp": [0.2, 1.0], "recall_ni_pp": -1.0, "fpr_ni_pp": 0.5},
+  "output_paths": {
+    "confirmatory_outroot": "results/raw/ijis_exact_value_disjoint_b1",
+    "smoke_outroot": "results/smoke/ijis_exact_value_disjoint_b1",
+    "tables_outdir": "results/tables/ijis_exact_value_disjoint_b1_001"
+  },
+  "smoke_arms": [
+    "xvd_b1_ps_zero_atc_2000",
+    "xvd_b1_ton_full_doc_2000",
+    "xvd_b1_ps_full_enscal_2000",
+    "xvd_b1_unsw_zero_ddm_2000",
+    "xvd_b1_ton_full_replay_2000",
+    "xvd_b1_ps_full_adwin_2000"
+  ],
+  "stop_rule": "one complete pass after B2; no policy removal, extension, tuning, substituted seeds or rescue experiments"
+}
