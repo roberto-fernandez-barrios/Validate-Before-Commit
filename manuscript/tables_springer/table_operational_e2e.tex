@@ -1,0 +1,34 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Attack-label acquisition yield under operational prevalence (final-q1).}
+Inspected flows per adjudicated \emph{attack} label found in the auxiliary
+\emph{discovery} queue (seeds 801--830; 701--730 a pilot). Adjudication candidates are
+drawn at operating prevalence $\pi$ with five-window label latency; the evaluation stream,
+detector calibration and candidate training batch remain balanced per class (candidate
+acquisition cost not modeled), so the arm measures acquisition yield and delay, not
+end-to-end pipeline cost. Discovery never decides: the commit rule sees only the independent
+\emph{uniform} validation half (32 adjudications, plain accuracy; at extreme prevalence it
+may be mostly or entirely benign, so no balanced-accuracy guarantee is claimed), and
+enrichment reduces neither those adjudications nor the decision's own cost. Alert-enriched
+inspection \emph{finds an attack} 5--8$\times$ more cheaply than random inspection,
+hybrid 3--6$\times$; candidate/incumbent \emph{disagreement} barely helps.}
+\label{tab:operational_e2e}
+\small
+\begin{tabular}{l l r r r r}
+\toprule
+ & & \multicolumn{4}{c}{flows inspected per attack label, at $\pi =$} \\
+\cmidrule(lr){3-6}
+Benchmark & Acquisition & 0.005 & 0.01 & 0.05 & 0.10 \\
+\midrule
+CICIDS-PortScan & Random inspection & 236 & 109 & 22 & 10 \\
+CICIDS-PortScan & Alert-enriched & 27 & 14 & 3 & 2 \\
+CICIDS-PortScan & Disagreement & 177 & 82 & 15 & 9 \\
+CICIDS-PortScan & Hybrid & 37 & 18 & 5 & 3 \\
+\addlinespace
+ToN-IoT & Random inspection & 142 & 92 & 20 & 10 \\
+ToN-IoT & Alert-enriched & 29 & 15 & 3 & 2 \\
+ToN-IoT & Disagreement & 136 & 78 & 15 & 9 \\
+ToN-IoT & Hybrid & 40 & 20 & 5 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,0 +1,51 @@
+\begin{table}[t]
+\centering
+\caption{Registered common-harness comparison: frozen statements S1--S4 evaluated literally
+(top) and the per-policy label budgets at 2{,}000/class, mean per stream across the six
+scenarios (bottom; ATC/DoC training-time validation labels are documented analytically, they
+are outside the runner's counters). Budgets are reported, not equalized.}
+\label{tab:common_harness_supp_statements}
+\scriptsize
+\begin{tabular}{p{0.55\linewidth} l l}
+\toprule
+Statement & Policy & Holds \\
+\midrule
+S1 avoids zero-drift loss under final harness & atc & no \\
+S2 pays for it at full drift & atc & no \\
+S1 avoids zero-drift loss under final harness & doc & no \\
+S2 pays for it at full drift & doc & \textbf{yes} \\
+S1 avoids zero-drift loss under final harness & enscal & no \\
+S2 pays for it at full drift & enscal & no \\
+S1 avoids zero-drift loss under final harness & replay & no \\
+S2 pays for it at full drift & replay & \textbf{yes} \\
+S1 avoids zero-drift loss under final harness & ddm & no \\
+S2 pays for it at full drift & ddm & \textbf{yes} \\
+S1 avoids zero-drift loss under final harness & adwin & no \\
+S2 pays for it at full drift & adwin & \textbf{yes} \\
+S3 matches the point gate (all six COMPATIBLE) & atc & no \\
+S3 matches the point gate (all six COMPATIBLE) & doc & no \\
+S4 method ordering changes with candidate size & point & no \\
+S4 method ordering changes with candidate size & strict & no \\
+S4 method ordering changes with candidate size & atc & \textbf{yes} \\
+S4 method ordering changes with candidate size & doc & no \\
+S4 method ordering changes with candidate size & enscal & \textbf{yes} \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\begin{tabular}{l l r r r r}
+\toprule
+Policy & Origin & Candidate labels & Probe labels & Monitoring labels & Validation labels (analytic) \\
+\midrule
+adwin & reference-implementation & 222 & 0 & 800 & 0 \\
+atc & published-generic & 13644 & 0 & 0 & 2258 \\
+ddm & reference-implementation & 3067 & 0 & 800 & 0 \\
+doc & published-generic & 14667 & 0 & 0 & 2389 \\
+enscal & standard-baseline & 12222 & 0 & 0 & 0 \\
+naive & anchor & 12222 & 0 & 0 & 0 \\
+point & anchor-ours & 12800 & 102 & 0 & 0 \\
+replay & standard-baseline & 12222 & 0 & 0 & 0 \\
+strict & anchor-ours & 14822 & 119 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}

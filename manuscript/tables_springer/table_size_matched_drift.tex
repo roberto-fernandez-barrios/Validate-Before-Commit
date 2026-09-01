@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{Candidate evidence under real drift: the registered size-matched control
+(seeds 6001--6030, 21 arms).} Self-contained challengers, full progressive drift, nested
+candidate batches drawn at the proposal-time mixture (the 512 batch is the first 512 rows
+per class of the 2{,}000 batch). BA points; paired within seed, 30 seeds; CI95 from the
+deterministic centered paired bootstrap; $\dagger$ = Holm-significant within its registered
+family (G1: naive vs never at both sizes; G2: the primary size effect; G3: gate value at
+2{,}000). Registered classification of G2 per the frozen protocol; program outcome
+\textsc{homogeneous--size benefit}. Columns 3--4: always-deploy
+minus never-adapt at each size; column 5: the size effect; columns 7--8: gate minus
+always-deploy at 2{,}000/class. Full matrices in Online Resource~1, \S S9.}
+\label{tab:size_matched_drift}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l r r r l l l l}
+\toprule
+Regime (full drift) & Never BA & Naive$_{512}$ & Naive$_{2000}$ &
+Size effect [CI95] & G2 class & Point$_{2000}$ [CI95] & Strict$_{2000}$ [CI95] \\
+\midrule
+PortScan & 85.58 & $+8.90$$^{\dagger}$ & $+9.72$$^{\dagger}$ & $+0.82$ [0.67, 0.98]$^{\dagger}$ & size benefit & $+0.15$ [-0.03, 0.39] & $-0.00$ [-0.17, 0.23] \\
+UNSW-Recon & 83.36 & $+2.13$$^{\dagger}$ & $+3.79$$^{\dagger}$ & $+1.66$ [1.51, 1.81]$^{\dagger}$ & size benefit & $-0.06$ [-0.16, 0.03] & $-0.34$ [-0.53, -0.15]$^{\dagger}$ \\
+ToN-IoT & 91.79 & $+1.44$$^{\dagger}$ & $+2.44$$^{\dagger}$ & $+1.00$ [0.60, 1.39]$^{\dagger}$ & size benefit & $+0.01$ [-0.06, 0.09] & $-0.14$ [-0.56, 0.28] \\
+\bottomrule
+\end{tabular}
+\end{table*}

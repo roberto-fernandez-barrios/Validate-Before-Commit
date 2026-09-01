@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\caption{Readaptation value is regime-dependent. Best detector-triggered gain vs. no-adaptation (30 seeds per regime).}
+\label{tab:table1_regime_taxonomy}
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
+\begin{tabular}{llllll}
+\toprule
+Dataset / regime & Class & No-adapt BA & Best gain (BA pts) & Best gain (F1 pts) & Best detector \\
+\midrule
+CICIDS DDoS & benefit & 69.8 & 19.5 & 32.3 & QK-ZZ \\
+CICIDS Wednesday & benefit & 76.6 & 11.9 & 18.3 & QK-ZZ \\
+CICIDS WebAttacks & benefit & 84.3 & 7.6 & 12.2 & QK-PauliXZ \\
+CICIDS PortScan & benefit & 87.7 & 6.2 & 7.8 & QK-ZZ \\
+UNSW-NB15 DoS & marginal & 83.7 & 1.5 & 0.5 & KS-max \\
+UNSW-NB15 Reconnaissance & marginal & 84.4 & 0.5 & 0.2 & QK-ZZ \\
+ToN-IoT Scanning & harmful & 92.2 & -0.5 & -0.2 & Energy \\
+\bottomrule
+\end{tabular}}
+\end{table*}

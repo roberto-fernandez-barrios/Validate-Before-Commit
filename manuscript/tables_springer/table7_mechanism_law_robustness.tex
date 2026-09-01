@@ -1,0 +1,30 @@
+% Generated from results/tables/paper2_mechanism_law_robustness_001/summary.csv
+% (src/analysis/make_paper2_mechanism_law_robustness.py, 2026-07-13). Re-aggregation only.
+\begin{table*}[t]
+\centering
+\caption{Robustness of the degradation--benefit law (re-aggregation of the 30-seed artifacts; no new experiments). The law survives disaggregation to individual streams, seed resampling, and removal of any one regime or dataset; removing all four CICIDS2017 benefit regimes at once restricts the range of deployed-model degradation and attenuates --- but does not invert --- the correlation.}
+\label{tab:table7_mechanism_law_robustness}
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
+\begin{tabular}{llrl}
+\toprule
+Analysis & Points & $n$ & $r$ \\
+\midrule
+Regime-level (as published, \S5.2) & SVC-RBF regime means & 7 & $-0.89$ \\
+Seed-resampling bootstrap & 30 seeds/regime, 5000 resamples & 7 & $-0.89$, CI95 $[-0.90, -0.88]$ \\
+Stream-level (no aggregation) & regime $\times$ seed points & 210 & $-0.91$ \\
+Leave-one-regime-out & each of the 7 regimes removed & 6 & $-0.72$ to $-0.92$ \\
+Pooled across downstream models & SVC taxonomy + RF/LogReg/MLP & 16 & $-0.81$ \\
+\quad without ToN-IoT & & 12 & $-0.81$ \\
+\quad without UNSW-NB15 & & 11 & $-0.95$ \\
+\quad without CICIDS2017 & range-restricted & 9 & $-0.52$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Coupling diagnostics (\S5.2): the substance is the compressed restored level, not $r$}}\\
+Restored-level dispersion & $\sigma$(post-adapt BA) vs.\ $\sigma$(deployed BA) & 7 & 3.5 vs.\ 7.4 pts \\
+Slope of gain on deployed BA & regime means & 7 & $-0.87$ \\
+Re-pairing null (exhaustive) & median $r$; $p$(observed more extreme) & 7 & $-0.91$; $p=0.80$ \\
+Within-regime: score vs.\ gain & median (min..max) over regimes & 30/regime & $+0.06$ ($+0.02$..$+0.13$) \\
+Within-regime: deployed BA vs.\ gain & median (min..max) over regimes & 30/regime & $-0.68$ ($-0.99$..$-0.35$) \\
+Cross-regime: classical score vs.\ gain & per-detector $r$ & 7 & $+0.75$..$+0.94$ \\
+\bottomrule
+\end{tabular}}
+\end{table*}

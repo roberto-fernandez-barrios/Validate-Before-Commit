@@ -1,0 +1,19 @@
+\begin{table*}[t]
+\centering
+\caption{\textbf{The zero-drift control: harmful updating is candidate governance, not drift.} Registered controls (amendment 008) fire triggers at a fixed rate \emph{independent of any drift signal} on streams with \textbf{no drift at all} ($\mathrm{sev}_{\max}{=}0$). Replacing a healthy incumbent is significantly net-harmful in all three benchmarks (row 1), and \textbf{under this arm's frozen incumbent-owned transformer, size-matching the candidate to the incumbent's 2{,}000 flows/class does not remove it} (row 2, often deeper) --- within the frozen representation the harm is not a small-candidate artifact. This is a frozen-policy result: the preregistered own-transformer control (main \S5.2) later shows that with self-contained preprocessing the same nominal size parity yields mean effects compatible with the registered $\pm0.5$-point margin, so these rows must not be read as contradicting that finding. The plain $\varepsilon{=}0$ gate reduces the harm but commits on ties, so it does not eliminate it (row 3). \textbf{A risk-controlled gate does}: requiring statistical evidence (exact McNemar, or the anytime-valid sequential test) makes the gate almost never commit when there is no real signal, recovering essentially all of the loss (rows 4--5). Finally, with the \emph{real} detector at zero drift the trigger fires only ${\sim}0.1$ times per stream (row 6), so a well-specified monitor mostly avoids the harm by not firing --- the monitor is not powerless, but any proposal that does reach deployment (a false alarm, a scheduled retrain) should be validated first. BA points vs no-adaptation, 30 seeds, KS-max, SVC-RBF; last column is the paired gate$-$naive contrast.}
+\label{tab:zero_drift}
+\resizebox{\ifdim\width>\textwidth \textwidth\else\width\fi}{!}{%
+\begin{tabular}{llrrr}
+\toprule
+\# & Zero-drift arm & PortScan & UNSW Recon & ToN-IoT \\
+\midrule
+1 & naive, random triggers & $-$2.76 [$-$3.71, $-$2.02] & $-$0.75 [$-$0.89, $-$0.62] & $-$4.75 [$-$8.17, $-$2.04] \\
+2 & naive, size-matched candidate (2{,}000/cl) & $-$4.81 [$-$7.68, $-$2.46] & $-$0.13 [$-$0.23, $-$0.04] & $-$5.76 [$-$9.11, $-$2.92] \\
+3 & commit gate, $\varepsilon{=}0$ & $-$1.11 [$-$1.55, $-$0.74] & $-$0.56 [$-$0.70, $-$0.42] & $-$0.25 [$-$0.43, $-$0.07] \\
+4 & commit gate, exact McNemar & $+$0.00 [0.00, 0.00] & $+$0.00 [0.00, 0.00] & $+$0.00 [0.00, 0.00] \\
+5 & commit gate, anytime-valid sequential & $-$0.00 [$-$0.01, 0.00] & $-$0.00 [$-$0.00, 0.00] & $+$0.00 [0.00, 0.00] \\
+\midrule
+6 & naive, \emph{real} detector (fires ${\sim}0.1\times$) & $-$0.23 [$-$0.63, 0.00] & $-$0.04 [$-$0.11, 0.00] & $-$1.03 [$-$3.00, $-$0.00] \\
+\bottomrule
+\end{tabular}}
+\end{table*}

@@ -1,0 +1,61 @@
+\begin{table}[t]
+\centering
+\caption{Registered common-harness comparison: the secondary families --- SF4 512/class sensitivity (policy $-$ naive at 512) and SF5 method$\times$size interactions ($(k-\mathrm{naive})_{2000}-(k-\mathrm{naive})_{512}$, seed-paired only). BA points; Holm within family.}
+\label{tab:common_harness_supp_secondary}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l l r l r l}
+\toprule
+Family & Contrast & Effect & CI95 & $p_{\mathrm{Holm}}$ & Class \\
+\midrule
+SF4 & ps\_full: atc-512 vs naive-512 & $-1.82$ & [-2.87, -0.92] & 0.0045 & material cost \\
+SF4 & unsw\_full: atc-512 vs naive-512 & $-0.08$ & [-0.33, 0.16] & 0.5178 & compatible \\
+SF4 & ton\_full: atc-512 vs naive-512 & $+0.48$ & [0.21, 0.79] & 0.0062 & unresolved \\
+SF4 & ps\_zero: atc-512 vs naive-512 & $+1.65$ & [1.18, 2.15] & 0.0002 & material gain \\
+SF4 & unsw\_zero: atc-512 vs naive-512 & $+0.25$ & [0.14, 0.36] & 0.0002 & compatible \\
+SF4 & ton\_zero: atc-512 vs naive-512 & $+0.26$ & [0.06, 0.52] & 0.0528 & compatible \\
+SF4 & ps\_full: doc-512 vs naive-512 & $-3.63$ & [-5.20, -2.08] & 0.0002 & material cost \\
+SF4 & unsw\_full: doc-512 vs naive-512 & $-0.49$ & [-0.76, -0.22] & 0.0027 & unresolved \\
+SF4 & ton\_full: doc-512 vs naive-512 & $+0.78$ & [0.46, 1.12] & 0.0002 & material gain \\
+SF4 & ps\_zero: doc-512 vs naive-512 & $+1.93$ & [1.46, 2.41] & 0.0002 & material gain \\
+SF4 & unsw\_zero: doc-512 vs naive-512 & $+0.40$ & [0.27, 0.53] & 0.0002 & unresolved \\
+SF4 & ton\_zero: doc-512 vs naive-512 & $+0.44$ & [0.24, 0.69] & 0.0045 & unresolved \\
+SF4 & ps\_full: enscal-512 vs naive-512 & $+0.51$ & [0.11, 0.90] & 0.0342 & material gain \\
+SF4 & unsw\_full: enscal-512 vs naive-512 & $+0.30$ & [0.18, 0.41] & 0.0002 & compatible \\
+SF4 & ton\_full: enscal-512 vs naive-512 & $+0.80$ & [0.52, 1.12] & 0.0002 & material gain \\
+SF4 & ps\_zero: enscal-512 vs naive-512 & $+2.93$ & [2.53, 3.35] & 0.0002 & material gain \\
+SF4 & unsw\_zero: enscal-512 vs naive-512 & $+0.20$ & [0.13, 0.27] & 0.0002 & compatible \\
+SF4 & ton\_zero: enscal-512 vs naive-512 & $+0.36$ & [0.20, 0.53] & 0.0004 & compatible \\
+SF5 & ps\_full: (point-naive)@2000 - (point-naive)@512 & $-0.13$ & [-0.37, 0.09] & 0.9753 & compatible \\
+SF5 & unsw\_full: (point-naive)@2000 - (point-naive)@512 & $-0.18$ & [-0.36, -0.02] & 0.3489 & compatible \\
+SF5 & ton\_full: (point-naive)@2000 - (point-naive)@512 & $-0.47$ & [-0.90, -0.03] & 0.3367 & unresolved \\
+SF5 & ps\_zero: (point-naive)@2000 - (point-naive)@512 & $-0.71$ & [-1.12, -0.33] & 0.0117 & material cost \\
+SF5 & unsw\_zero: (point-naive)@2000 - (point-naive)@512 & $-0.13$ & [-0.24, -0.02] & 0.2815 & compatible \\
+SF5 & ton\_zero: (point-naive)@2000 - (point-naive)@512 & $-0.14$ & [-0.29, -0.01] & 0.3489 & compatible \\
+SF5 & ps\_full: (strict-naive)@2000 - (strict-naive)@512 & $-0.14$ & [-0.48, 0.23] & 0.9753 & compatible \\
+SF5 & unsw\_full: (strict-naive)@2000 - (strict-naive)@512 & $-0.19$ & [-0.41, 0.03] & 0.4625 & compatible \\
+SF5 & ton\_full: (strict-naive)@2000 - (strict-naive)@512 & $-0.79$ & [-1.44, -0.15] & 0.2066 & unresolved \\
+SF5 & ps\_zero: (strict-naive)@2000 - (strict-naive)@512 & $-1.57$ & [-1.98, -1.19] & 0.0003 & material cost \\
+SF5 & unsw\_zero: (strict-naive)@2000 - (strict-naive)@512 & $-0.41$ & [-0.54, -0.30] & 0.0003 & unresolved \\
+SF5 & ton\_zero: (strict-naive)@2000 - (strict-naive)@512 & $-0.31$ & [-0.47, -0.16] & 0.0024 & compatible \\
+SF5 & ps\_full: (atc-naive)@2000 - (atc-naive)@512 & $+1.18$ & [0.10, 2.33] & 0.3489 & unresolved \\
+SF5 & unsw\_full: (atc-naive)@2000 - (atc-naive)@512 & $-0.14$ & [-0.39, 0.12] & 0.9753 & compatible \\
+SF5 & ton\_full: (atc-naive)@2000 - (atc-naive)@512 & $-0.38$ & [-0.68, -0.11] & 0.1253 & unresolved \\
+SF5 & ps\_zero: (atc-naive)@2000 - (atc-naive)@512 & $-1.38$ & [-1.88, -0.89] & 0.0003 & material cost \\
+SF5 & unsw\_zero: (atc-naive)@2000 - (atc-naive)@512 & $-0.28$ & [-0.40, -0.17] & 0.0003 & compatible \\
+SF5 & ton\_zero: (atc-naive)@2000 - (atc-naive)@512 & $-0.27$ & [-0.52, -0.06] & 0.2950 & compatible \\
+SF5 & ps\_full: (doc-naive)@2000 - (doc-naive)@512 & $+1.04$ & [0.03, 2.16] & 0.3489 & unresolved \\
+SF5 & unsw\_full: (doc-naive)@2000 - (doc-naive)@512 & $-0.10$ & [-0.40, 0.19] & 0.9753 & compatible \\
+SF5 & ton\_full: (doc-naive)@2000 - (doc-naive)@512 & $-0.57$ & [-0.98, -0.14] & 0.1222 & unresolved \\
+SF5 & ps\_zero: (doc-naive)@2000 - (doc-naive)@512 & $-1.54$ & [-1.99, -1.09] & 0.0003 & material cost \\
+SF5 & unsw\_zero: (doc-naive)@2000 - (doc-naive)@512 & $-0.42$ & [-0.55, -0.28] & 0.0003 & unresolved \\
+SF5 & ton\_zero: (doc-naive)@2000 - (doc-naive)@512 & $-0.42$ & [-0.67, -0.22] & 0.0200 & unresolved \\
+SF5 & ps\_full: (enscal-naive)@2000 - (enscal-naive)@512 & $-0.60$ & [-0.92, -0.25] & 0.0117 & material cost \\
+SF5 & unsw\_full: (enscal-naive)@2000 - (enscal-naive)@512 & $-0.72$ & [-0.83, -0.61] & 0.0003 & material cost \\
+SF5 & ton\_full: (enscal-naive)@2000 - (enscal-naive)@512 & $-1.04$ & [-1.44, -0.62] & 0.0003 & material cost \\
+SF5 & ps\_zero: (enscal-naive)@2000 - (enscal-naive)@512 & $-1.47$ & [-1.86, -1.12] & 0.0003 & material cost \\
+SF5 & unsw\_zero: (enscal-naive)@2000 - (enscal-naive)@512 & $-0.15$ & [-0.23, -0.07] & 0.0051 & compatible \\
+SF5 & ton\_zero: (enscal-naive)@2000 - (enscal-naive)@512 & $-0.33$ & [-0.50, -0.19] & 0.0015 & compatible \\
+\bottomrule
+\end{tabular}
+\end{table}
