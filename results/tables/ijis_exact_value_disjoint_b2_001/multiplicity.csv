@@ -1,0 +1,22 @@
+family,family_size,contrast,effect_pp,ci95_lo,ci95_hi,p_raw,p_holm,significant_holm,correction
+G1 value of updating,6,ps_full: naive-512 vs never,6.5729,4.714,8.4711,9.99990000099999e-06,5.999940000599994e-05,True,Holm FWER
+G1 value of updating,6,ps_full: naive-2000 vs never,7.1005,5.2617,8.9649,9.99990000099999e-06,5.999940000599994e-05,True,Holm FWER
+G1 value of updating,6,unsw_full: naive-512 vs never,2.2279,1.8836,2.5919,9.99990000099999e-06,5.999940000599994e-05,True,Holm FWER
+G1 value of updating,6,unsw_full: naive-2000 vs never,3.9013,3.5615,4.2615,9.99990000099999e-06,5.999940000599994e-05,True,Holm FWER
+G1 value of updating,6,ton_full: naive-512 vs never,0.6828,0.0057,1.5185,0.07358926410735893,0.07358926410735893,False,Holm FWER
+G1 value of updating,6,ton_full: naive-2000 vs never,1.0643,0.3719,1.9201,0.008439915600843992,0.016879831201687984,True,Holm FWER
+G2 size effect (primary),3,ps_full: naive-2000 vs naive-512,0.5276,0.2745,0.7862,8.99991000089999e-05,0.0001799982000179998,True,Holm FWER
+G2 size effect (primary),3,unsw_full: naive-2000 vs naive-512,1.6734,1.4703,1.8867,9.99990000099999e-06,2.999970000299997e-05,True,Holm FWER
+G2 size effect (primary),3,ton_full: naive-2000 vs naive-512,0.3815,0.2068,0.5695,0.00012999870001299986,0.0001799982000179998,True,Holm FWER
+G3 gate value at size 2000,6,ps_full: point-2000 vs naive-2000,0.0193,0.0013,0.0419,0.057599424005759944,0.28799712002879974,False,Holm FWER
+G3 gate value at size 2000,6,ps_full: strict-2000 vs naive-2000,-0.0414,-0.1878,0.0971,0.5679443205567944,1.0,False,Holm FWER
+G3 gate value at size 2000,6,unsw_full: point-2000 vs naive-2000,-0.0497,-0.2161,0.0865,0.5273347266527335,1.0,False,Holm FWER
+G3 gate value at size 2000,6,unsw_full: strict-2000 vs naive-2000,-0.4208,-0.7073,-0.1539,0.002999970000299997,0.01799982000179998,True,Holm FWER
+G3 gate value at size 2000,6,ton_full: point-2000 vs naive-2000,-0.0026,-0.0156,0.007,0.6885031149688503,1.0,False,Holm FWER
+G3 gate value at size 2000,6,ton_full: strict-2000 vs naive-2000,-0.2417,-0.5776,0.062,0.13920860791392087,0.5568344316556835,False,Holm FWER
+G4 gate x size interaction (secondary),6,ps_full: (point-naive)@2000 - (point-naive)@512,0.0846,0.0135,0.1805,0.04189958100418996,0.17839821601783984,False,Holm FWER
+G4 gate x size interaction (secondary),6,ps_full: (strict-naive)@2000 - (strict-naive)@512,0.0159,-0.1951,0.2268,0.8831511684883151,1.0,False,Holm FWER
+G4 gate x size interaction (secondary),6,unsw_full: (point-naive)@2000 - (point-naive)@512,-0.0581,-0.3008,0.1495,0.6101438985610144,1.0,False,Holm FWER
+G4 gate x size interaction (secondary),6,unsw_full: (strict-naive)@2000 - (strict-naive)@512,-0.4776,-0.8214,-0.1396,0.006099939000609994,0.03659963400365997,True,Holm FWER
+G4 gate x size interaction (secondary),6,ton_full: (point-naive)@2000 - (point-naive)@512,-0.3031,-0.6807,-0.0341,0.05510944890551094,0.17839821601783984,False,Holm FWER
+G4 gate x size interaction (secondary),6,ton_full: (strict-naive)@2000 - (strict-naive)@512,-0.4091,-0.8344,-0.076,0.035679643203567965,0.17839821601783984,False,Holm FWER

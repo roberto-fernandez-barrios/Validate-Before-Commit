@@ -1,0 +1,113 @@
+{
+  "outcome": "PARTIAL ROBUSTNESS",
+  "per_scenario": {
+    "ps_full": {
+      "contrast": "ps_full: naive-2000 vs naive-512",
+      "effect_pp": 0.5276,
+      "ci95": [
+        0.2745,
+        0.7862
+      ],
+      "ci90": [
+        0.3125,
+        0.7461
+      ],
+      "p_holm": 0.0001799982000179998,
+      "classification": "SIZE BENEFIT"
+    },
+    "unsw_full": {
+      "contrast": "unsw_full: naive-2000 vs naive-512",
+      "effect_pp": 1.6734,
+      "ci95": [
+        1.4703,
+        1.8867
+      ],
+      "ci90": [
+        1.5,
+        1.851
+      ],
+      "p_holm": 2.999970000299997e-05,
+      "classification": "SIZE BENEFIT"
+    },
+    "ton_full": {
+      "contrast": "ton_full: naive-2000 vs naive-512",
+      "effect_pp": 0.3815,
+      "ci95": [
+        0.2068,
+        0.5695
+      ],
+      "ci90": [
+        0.2341,
+        0.5367
+      ],
+      "p_holm": 0.0001799982000179998,
+      "classification": "RESOLVED SUB-MATERIAL"
+    }
+  },
+  "historical_comparison": [
+    {
+      "scenario": "ps_full",
+      "contrast": "value-disjoint G2 minus historical G2",
+      "historical_effect_pp": 0.8224,
+      "value_disjoint_effect_pp": 0.5276,
+      "effect_pp": -0.2948,
+      "ci95_lo": -0.5979,
+      "ci95_hi": 0.007,
+      "ci90_lo": -0.5477,
+      "ci90_hi": -0.0419,
+      "p_raw": 0.05582944170558295,
+      "p_holm": 0.1116588834111659,
+      "classification": "UNRESOLVED",
+      "n_value_disjoint_seeds": 30,
+      "n_historical_seeds": 30,
+      "correction": "Holm FWER, family size 3",
+      "p_method": "deterministic centered independent-block bootstrap (100000 resamples)"
+    },
+    {
+      "scenario": "unsw_full",
+      "contrast": "value-disjoint G2 minus historical G2",
+      "historical_effect_pp": 1.6617,
+      "value_disjoint_effect_pp": 1.6734,
+      "effect_pp": 0.0117,
+      "ci95_lo": -0.243,
+      "ci95_hi": 0.2763,
+      "ci90_lo": -0.2016,
+      "ci90_hi": 0.2315,
+      "p_raw": 0.9297107028929711,
+      "p_holm": 0.9297107028929711,
+      "classification": "COMPATIBLE",
+      "n_value_disjoint_seeds": 30,
+      "n_historical_seeds": 30,
+      "correction": "Holm FWER, family size 3",
+      "p_method": "deterministic centered independent-block bootstrap (100000 resamples)"
+    },
+    {
+      "scenario": "ton_full",
+      "contrast": "value-disjoint G2 minus historical G2",
+      "historical_effect_pp": 0.9984,
+      "value_disjoint_effect_pp": 0.3815,
+      "effect_pp": -0.6169,
+      "ci95_lo": -1.0435,
+      "ci95_hi": -0.1867,
+      "ci90_lo": -0.9742,
+      "ci90_hi": -0.2565,
+      "p_raw": 0.004949950500494995,
+      "p_holm": 0.014849851501484986,
+      "classification": "MATERIAL ATTENUATION",
+      "n_value_disjoint_seeds": 30,
+      "n_historical_seeds": 30,
+      "correction": "Holm FWER, family size 3",
+      "p_method": "deterministic centered independent-block bootstrap (100000 resamples)"
+    }
+  ],
+  "original_b2_materially_inflated": false,
+  "protocol_file": "notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md",
+  "protocol_sha256": "ee559f802badd302f79c9371bfb4c194cef9df55b163afa3ee5d381c510bd699",
+  "config_file": "configs/ijis_exact_value_disjoint_b2_v1.json",
+  "config_sha256": "330e73d77c017a369765927c53e84d59acac449c7c00eebdcba75d3931d4399e",
+  "confirmatory_seeds": "7001-7030",
+  "taxonomy": "protocol sections 6.1-6.2, applied mechanically",
+  "nesting_pairs_verified": 698,
+  "caveat": "G5 is an independent-block role-design contrast and is not a causal estimate of exact-duplicate leakage alone.",
+  "follow_up_authorized": false
+}

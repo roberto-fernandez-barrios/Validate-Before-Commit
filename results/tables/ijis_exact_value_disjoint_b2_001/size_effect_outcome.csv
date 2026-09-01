@@ -1,0 +1,4 @@
+scenario,contrast,effect_pp,ci95,ci90,p_holm,classification
+ps_full,ps_full: naive-2000 vs naive-512,0.5276,"[0.2745, 0.7862]","[0.3125, 0.7461]",0.0001799982000179998,SIZE BENEFIT
+unsw_full,unsw_full: naive-2000 vs naive-512,1.6734,"[1.4703, 1.8867]","[1.5, 1.851]",2.999970000299997e-05,SIZE BENEFIT
+ton_full,ton_full: naive-2000 vs naive-512,0.3815,"[0.2068, 0.5695]","[0.2341, 0.5367]",0.0001799982000179998,RESOLVED SUB-MATERIAL

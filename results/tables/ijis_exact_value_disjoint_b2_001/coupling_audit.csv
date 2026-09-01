@@ -1,0 +1,271 @@
+scenario,policy,seed,coupling,first_divergence_window,shared_prefix_sev_equal
+ps_full,naive,7001,proposal-coupled,-1,True
+ps_full,naive,7002,proposal-coupled,-1,True
+ps_full,naive,7003,proposal-coupled,-1,True
+ps_full,naive,7004,proposal-coupled,-1,True
+ps_full,naive,7005,proposal-coupled,-1,True
+ps_full,naive,7006,proposal-coupled,-1,True
+ps_full,naive,7007,proposal-coupled,-1,True
+ps_full,naive,7008,proposal-coupled,-1,True
+ps_full,naive,7009,proposal-coupled,-1,True
+ps_full,naive,7010,proposal-coupled,-1,True
+ps_full,naive,7011,proposal-coupled,-1,True
+ps_full,naive,7012,proposal-coupled,-1,True
+ps_full,naive,7013,proposal-coupled,-1,True
+ps_full,naive,7014,proposal-coupled,-1,True
+ps_full,naive,7015,proposal-coupled,-1,True
+ps_full,naive,7016,proposal-coupled,-1,True
+ps_full,naive,7017,proposal-coupled,-1,True
+ps_full,naive,7018,proposal-coupled,-1,True
+ps_full,naive,7019,proposal-coupled,-1,True
+ps_full,naive,7020,proposal-coupled,-1,True
+ps_full,naive,7021,proposal-coupled,-1,True
+ps_full,naive,7022,proposal-coupled,-1,True
+ps_full,naive,7023,proposal-coupled,-1,True
+ps_full,naive,7024,proposal-coupled,-1,True
+ps_full,naive,7025,proposal-coupled,-1,True
+ps_full,naive,7026,proposal-coupled,-1,True
+ps_full,naive,7027,proposal-coupled,-1,True
+ps_full,naive,7028,proposal-coupled,-1,True
+ps_full,naive,7029,proposal-coupled,-1,True
+ps_full,naive,7030,proposal-coupled,-1,True
+ps_full,point,7001,proposal-coupled,-1,True
+ps_full,point,7002,proposal-coupled,-1,True
+ps_full,point,7003,proposal-coupled,-1,True
+ps_full,point,7004,proposal-coupled,-1,True
+ps_full,point,7005,proposal-coupled,-1,True
+ps_full,point,7006,proposal-coupled,-1,True
+ps_full,point,7007,seed-paired (diverged),86,True
+ps_full,point,7008,proposal-coupled,-1,True
+ps_full,point,7009,seed-paired (diverged),27,True
+ps_full,point,7010,seed-paired (diverged),96,True
+ps_full,point,7011,proposal-coupled,-1,True
+ps_full,point,7012,proposal-coupled,-1,True
+ps_full,point,7013,seed-paired (diverged),85,True
+ps_full,point,7014,proposal-coupled,-1,True
+ps_full,point,7015,proposal-coupled,-1,True
+ps_full,point,7016,seed-paired (diverged),33,True
+ps_full,point,7017,proposal-coupled,-1,True
+ps_full,point,7018,proposal-coupled,-1,True
+ps_full,point,7019,seed-paired (diverged),63,True
+ps_full,point,7020,seed-paired (diverged),76,True
+ps_full,point,7021,proposal-coupled,-1,True
+ps_full,point,7022,proposal-coupled,-1,True
+ps_full,point,7023,proposal-coupled,-1,True
+ps_full,point,7024,seed-paired (diverged),75,True
+ps_full,point,7025,seed-paired (diverged),65,True
+ps_full,point,7026,seed-paired (diverged),74,True
+ps_full,point,7027,proposal-coupled,-1,True
+ps_full,point,7028,proposal-coupled,-1,True
+ps_full,point,7029,seed-paired (diverged),77,True
+ps_full,point,7030,proposal-coupled,-1,True
+ps_full,strict,7001,seed-paired (diverged),31,True
+ps_full,strict,7002,proposal-coupled,-1,True
+ps_full,strict,7003,proposal-coupled,-1,True
+ps_full,strict,7004,proposal-coupled,-1,True
+ps_full,strict,7005,proposal-coupled,-1,True
+ps_full,strict,7006,seed-paired (diverged),75,True
+ps_full,strict,7007,seed-paired (diverged),85,True
+ps_full,strict,7008,seed-paired (diverged),95,True
+ps_full,strict,7009,proposal-coupled,-1,True
+ps_full,strict,7010,proposal-coupled,-1,True
+ps_full,strict,7011,seed-paired (diverged),85,True
+ps_full,strict,7012,proposal-coupled,-1,True
+ps_full,strict,7013,seed-paired (diverged),96,True
+ps_full,strict,7014,seed-paired (diverged),52,True
+ps_full,strict,7015,proposal-coupled,-1,True
+ps_full,strict,7016,seed-paired (diverged),66,True
+ps_full,strict,7017,seed-paired (diverged),65,True
+ps_full,strict,7018,seed-paired (diverged),55,True
+ps_full,strict,7019,seed-paired (diverged),74,True
+ps_full,strict,7020,seed-paired (diverged),76,True
+ps_full,strict,7021,proposal-coupled,-1,True
+ps_full,strict,7022,proposal-coupled,-1,True
+ps_full,strict,7023,seed-paired (diverged),69,True
+ps_full,strict,7024,proposal-coupled,-1,True
+ps_full,strict,7025,proposal-coupled,-1,True
+ps_full,strict,7026,seed-paired (diverged),98,True
+ps_full,strict,7027,seed-paired (diverged),61,True
+ps_full,strict,7028,seed-paired (diverged),93,True
+ps_full,strict,7029,proposal-coupled,-1,True
+ps_full,strict,7030,seed-paired (diverged),33,True
+unsw_full,naive,7001,proposal-coupled,-1,True
+unsw_full,naive,7002,proposal-coupled,-1,True
+unsw_full,naive,7003,proposal-coupled,-1,True
+unsw_full,naive,7004,proposal-coupled,-1,True
+unsw_full,naive,7005,proposal-coupled,-1,True
+unsw_full,naive,7006,proposal-coupled,-1,True
+unsw_full,naive,7007,proposal-coupled,-1,True
+unsw_full,naive,7008,proposal-coupled,-1,True
+unsw_full,naive,7009,proposal-coupled,-1,True
+unsw_full,naive,7010,proposal-coupled,-1,True
+unsw_full,naive,7011,proposal-coupled,-1,True
+unsw_full,naive,7012,proposal-coupled,-1,True
+unsw_full,naive,7013,proposal-coupled,-1,True
+unsw_full,naive,7014,proposal-coupled,-1,True
+unsw_full,naive,7015,proposal-coupled,-1,True
+unsw_full,naive,7016,proposal-coupled,-1,True
+unsw_full,naive,7017,proposal-coupled,-1,True
+unsw_full,naive,7018,proposal-coupled,-1,True
+unsw_full,naive,7019,proposal-coupled,-1,True
+unsw_full,naive,7020,proposal-coupled,-1,True
+unsw_full,naive,7021,proposal-coupled,-1,True
+unsw_full,naive,7022,proposal-coupled,-1,True
+unsw_full,naive,7023,proposal-coupled,-1,True
+unsw_full,naive,7024,proposal-coupled,-1,True
+unsw_full,naive,7025,proposal-coupled,-1,True
+unsw_full,naive,7026,proposal-coupled,-1,True
+unsw_full,naive,7027,proposal-coupled,-1,True
+unsw_full,naive,7028,proposal-coupled,-1,True
+unsw_full,naive,7029,proposal-coupled,-1,True
+unsw_full,naive,7030,proposal-coupled,-1,True
+unsw_full,point,7001,proposal-coupled,-1,True
+unsw_full,point,7002,seed-paired (diverged),47,True
+unsw_full,point,7003,seed-paired (diverged),62,True
+unsw_full,point,7004,seed-paired (diverged),62,True
+unsw_full,point,7005,seed-paired (diverged),71,True
+unsw_full,point,7006,proposal-coupled,-1,True
+unsw_full,point,7007,proposal-coupled,-1,True
+unsw_full,point,7008,proposal-coupled,-1,True
+unsw_full,point,7009,proposal-coupled,-1,True
+unsw_full,point,7010,proposal-coupled,-1,True
+unsw_full,point,7011,seed-paired (diverged),34,True
+unsw_full,point,7012,seed-paired (diverged),91,True
+unsw_full,point,7013,seed-paired (diverged),43,True
+unsw_full,point,7014,proposal-coupled,-1,True
+unsw_full,point,7015,proposal-coupled,-1,True
+unsw_full,point,7016,proposal-coupled,-1,True
+unsw_full,point,7017,proposal-coupled,-1,True
+unsw_full,point,7018,seed-paired (diverged),62,True
+unsw_full,point,7019,seed-paired (diverged),72,True
+unsw_full,point,7020,seed-paired (diverged),41,True
+unsw_full,point,7021,proposal-coupled,-1,True
+unsw_full,point,7022,proposal-coupled,-1,True
+unsw_full,point,7023,proposal-coupled,-1,True
+unsw_full,point,7024,seed-paired (diverged),47,True
+unsw_full,point,7025,proposal-coupled,-1,True
+unsw_full,point,7026,proposal-coupled,-1,True
+unsw_full,point,7027,proposal-coupled,-1,True
+unsw_full,point,7028,seed-paired (diverged),89,True
+unsw_full,point,7029,seed-paired (diverged),40,True
+unsw_full,point,7030,proposal-coupled,-1,True
+unsw_full,strict,7001,seed-paired (diverged),44,True
+unsw_full,strict,7002,proposal-coupled,-1,True
+unsw_full,strict,7003,seed-paired (diverged),46,True
+unsw_full,strict,7004,seed-paired (diverged),84,True
+unsw_full,strict,7005,seed-paired (diverged),82,True
+unsw_full,strict,7006,seed-paired (diverged),63,True
+unsw_full,strict,7007,proposal-coupled,-1,True
+unsw_full,strict,7008,proposal-coupled,-1,True
+unsw_full,strict,7009,proposal-coupled,-1,True
+unsw_full,strict,7010,seed-paired (diverged),42,True
+unsw_full,strict,7011,seed-paired (diverged),45,True
+unsw_full,strict,7012,seed-paired (diverged),65,True
+unsw_full,strict,7013,seed-paired (diverged),54,True
+unsw_full,strict,7014,seed-paired (diverged),55,True
+unsw_full,strict,7015,seed-paired (diverged),34,True
+unsw_full,strict,7016,proposal-coupled,-1,True
+unsw_full,strict,7017,proposal-coupled,-1,True
+unsw_full,strict,7018,seed-paired (diverged),62,True
+unsw_full,strict,7019,seed-paired (diverged),36,True
+unsw_full,strict,7020,proposal-coupled,-1,True
+unsw_full,strict,7021,proposal-coupled,-1,True
+unsw_full,strict,7022,seed-paired (diverged),58,True
+unsw_full,strict,7023,proposal-coupled,-1,True
+unsw_full,strict,7024,seed-paired (diverged),58,True
+unsw_full,strict,7025,seed-paired (diverged),56,True
+unsw_full,strict,7026,seed-paired (diverged),53,True
+unsw_full,strict,7027,seed-paired (diverged),44,True
+unsw_full,strict,7028,seed-paired (diverged),89,True
+unsw_full,strict,7029,seed-paired (diverged),51,True
+unsw_full,strict,7030,proposal-coupled,-1,True
+ton_full,naive,7001,proposal-coupled,-1,True
+ton_full,naive,7002,proposal-coupled,-1,True
+ton_full,naive,7003,proposal-coupled,-1,True
+ton_full,naive,7004,proposal-coupled,-1,True
+ton_full,naive,7005,proposal-coupled,-1,True
+ton_full,naive,7006,proposal-coupled,-1,True
+ton_full,naive,7007,proposal-coupled,-1,True
+ton_full,naive,7008,proposal-coupled,-1,True
+ton_full,naive,7009,proposal-coupled,-1,True
+ton_full,naive,7010,proposal-coupled,-1,True
+ton_full,naive,7011,proposal-coupled,-1,True
+ton_full,naive,7012,proposal-coupled,-1,True
+ton_full,naive,7013,proposal-coupled,-1,True
+ton_full,naive,7014,proposal-coupled,-1,True
+ton_full,naive,7015,proposal-coupled,-1,True
+ton_full,naive,7016,proposal-coupled,-1,True
+ton_full,naive,7017,proposal-coupled,-1,True
+ton_full,naive,7018,proposal-coupled,-1,True
+ton_full,naive,7019,proposal-coupled,-1,True
+ton_full,naive,7020,proposal-coupled,-1,True
+ton_full,naive,7021,proposal-coupled,-1,True
+ton_full,naive,7022,proposal-coupled,-1,True
+ton_full,naive,7023,proposal-coupled,-1,True
+ton_full,naive,7024,proposal-coupled,-1,True
+ton_full,naive,7025,proposal-coupled,-1,True
+ton_full,naive,7026,proposal-coupled,-1,True
+ton_full,naive,7027,proposal-coupled,-1,True
+ton_full,naive,7028,proposal-coupled,-1,True
+ton_full,naive,7029,proposal-coupled,-1,True
+ton_full,naive,7030,proposal-coupled,-1,True
+ton_full,point,7001,proposal-coupled,-1,True
+ton_full,point,7002,proposal-coupled,-1,True
+ton_full,point,7003,seed-paired (diverged),65,True
+ton_full,point,7004,proposal-coupled,-1,True
+ton_full,point,7005,proposal-coupled,-1,True
+ton_full,point,7006,proposal-coupled,-1,True
+ton_full,point,7007,proposal-coupled,-1,True
+ton_full,point,7008,proposal-coupled,-1,True
+ton_full,point,7009,proposal-coupled,-1,True
+ton_full,point,7010,proposal-coupled,-1,True
+ton_full,point,7011,proposal-coupled,-1,True
+ton_full,point,7012,proposal-coupled,-1,True
+ton_full,point,7013,proposal-coupled,-1,True
+ton_full,point,7014,proposal-coupled,-1,True
+ton_full,point,7015,seed-paired (diverged),82,True
+ton_full,point,7016,proposal-coupled,-1,True
+ton_full,point,7017,proposal-coupled,-1,True
+ton_full,point,7018,seed-paired (diverged),51,True
+ton_full,point,7019,proposal-coupled,-1,True
+ton_full,point,7020,proposal-coupled,-1,True
+ton_full,point,7021,seed-paired (diverged),35,True
+ton_full,point,7022,proposal-coupled,-1,True
+ton_full,point,7023,proposal-coupled,-1,True
+ton_full,point,7024,proposal-coupled,-1,True
+ton_full,point,7025,seed-paired (diverged),76,True
+ton_full,point,7026,proposal-coupled,-1,True
+ton_full,point,7027,seed-paired (diverged),46,True
+ton_full,point,7028,proposal-coupled,-1,True
+ton_full,point,7029,proposal-coupled,-1,True
+ton_full,point,7030,seed-paired (diverged),59,True
+ton_full,strict,7001,proposal-coupled,-1,True
+ton_full,strict,7002,seed-paired (diverged),84,True
+ton_full,strict,7003,seed-paired (diverged),87,True
+ton_full,strict,7004,proposal-coupled,-1,True
+ton_full,strict,7005,seed-paired (diverged),84,True
+ton_full,strict,7006,proposal-coupled,-1,True
+ton_full,strict,7007,proposal-coupled,-1,True
+ton_full,strict,7008,proposal-coupled,-1,True
+ton_full,strict,7009,seed-paired (diverged),72,True
+ton_full,strict,7010,proposal-coupled,-1,True
+ton_full,strict,7011,proposal-coupled,-1,True
+ton_full,strict,7012,proposal-coupled,-1,True
+ton_full,strict,7013,proposal-coupled,-1,True
+ton_full,strict,7014,seed-paired (diverged),42,True
+ton_full,strict,7015,proposal-coupled,-1,True
+ton_full,strict,7016,proposal-coupled,-1,True
+ton_full,strict,7017,seed-paired (diverged),47,True
+ton_full,strict,7018,proposal-coupled,-1,True
+ton_full,strict,7019,proposal-coupled,-1,True
+ton_full,strict,7020,proposal-coupled,-1,True
+ton_full,strict,7021,proposal-coupled,-1,True
+ton_full,strict,7022,proposal-coupled,-1,True
+ton_full,strict,7023,proposal-coupled,-1,True
+ton_full,strict,7024,proposal-coupled,-1,True
+ton_full,strict,7025,proposal-coupled,-1,True
+ton_full,strict,7026,proposal-coupled,-1,True
+ton_full,strict,7027,proposal-coupled,-1,True
+ton_full,strict,7028,proposal-coupled,-1,True
+ton_full,strict,7029,proposal-coupled,-1,True
+ton_full,strict,7030,proposal-coupled,-1,True

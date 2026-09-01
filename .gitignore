@@ -54,6 +54,8 @@ results/**
 !results/tables/**/*.csv
 !results/tables/symmetric_pipeline_dynamic_001/*.json
 !results/tables/size_matched_own_transformer_001/*.json
+!results/tables/ijis_exact_value_disjoint_b2_001/*.json
+!results/tables/ijis_exact_value_disjoint_b1_001/*.json
 !results/tables/MANIFEST.sha256
 # final-kbs P10: the machine-readable final manifest ships with the artifact
 !results/final_manifest.json

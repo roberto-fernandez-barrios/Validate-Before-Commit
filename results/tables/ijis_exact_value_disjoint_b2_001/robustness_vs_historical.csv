@@ -1,0 +1,4 @@
+scenario,contrast,historical_effect_pp,value_disjoint_effect_pp,effect_pp,ci95_lo,ci95_hi,ci90_lo,ci90_hi,p_raw,p_holm,classification,n_value_disjoint_seeds,n_historical_seeds,correction,p_method
+ps_full,value-disjoint G2 minus historical G2,0.8224,0.5276,-0.2948,-0.5979,0.007,-0.5477,-0.0419,0.05582944170558295,0.1116588834111659,UNRESOLVED,30,30,"Holm FWER, family size 3",deterministic centered independent-block bootstrap (100000 resamples)
+unsw_full,value-disjoint G2 minus historical G2,1.6617,1.6734,0.0117,-0.243,0.2763,-0.2016,0.2315,0.9297107028929711,0.9297107028929711,COMPATIBLE,30,30,"Holm FWER, family size 3",deterministic centered independent-block bootstrap (100000 resamples)
+ton_full,value-disjoint G2 minus historical G2,0.9984,0.3815,-0.6169,-1.0435,-0.1867,-0.9742,-0.2565,0.004949950500494995,0.014849851501484986,MATERIAL ATTENUATION,30,30,"Holm FWER, family size 3",deterministic centered independent-block bootstrap (100000 resamples)
