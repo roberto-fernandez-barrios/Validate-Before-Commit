@@ -39,3 +39,21 @@ deleted and recreated from scratch after the fix; the table above is that second
 Fresh clone of `main` at `fc73b8e`: clean tree, 207/207 hashes, 224/224 tests, 632/632 claim
 checks, 0 undefined references/citations. The tagged checkout is validated separately
 (Step 11 record appended below once the tag exists).
+
+## Step 11 — clean checkout of the exact tag `v1.23.0` (appended post-tag, documentation only)
+A second fresh clone in another new temporary directory (`vbc_clone_tag`), `git checkout
+v1.23.0` (`git describe --tags --exact-match` = v1.23.0; commit
+`f225e5e92432a963646a65c011870f97630f6cad`; tag object `1c5d2490074d00bc085c7ddc1178c2985a46b46c`):
+clean tree; `verify_results_manifest` 207/207 (0 unpinned extras); claim audit 632/632; IEEE
+port + PDFs main 30 pp. / supplement 45 pp. / IEEE 23 pp. with 0 undefined references/citations;
+`pytest` 224 passed in the `paper2` environment. The tag was created only after this run and the
+hostile release audit were green, and was never moved.
+
+## Public artifact check (after publication)
+GitHub release v1.23.0 assets downloaded from the public URL are byte-identical to the local
+builds; the public `v1.23.0_post_kbs_confirmatory_artifacts.zip` contains the manuscript
+sources, supplement, B1/B2 protocols, amendment and configs, all 207 sealed CSVs (every hash
+equal to `MANIFEST.sha256`), `final_manifest.json`, the experiment ledger, README, REPRODUCE
+and the provenance documentation. The Zenodo archive of version 1.23.0 (record 22229253) is
+byte-identical to GitHub's zipball of the tag (MD5 `650e9fb963ac10360710771d2f033612`) and its
+207 sealed CSVs hash exactly to the manifest.
