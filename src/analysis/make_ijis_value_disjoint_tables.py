@@ -86,23 +86,37 @@ Dataset & Rows & Unique $X$ & Dup. groups & Dup. rows & Dup. rate & Max mult. & 
     _write("table_value_disjoint_overlap.tex", body)
 
 
+def _security_cells(scenario: str) -> tuple[str, str]:
+    """Always-deploy attack recall and FPR at 512 -> 2,000 per class (sealed B2 security_metrics)."""
+    sec = pd.read_csv(B2 / "security_metrics.csv")
+    sec = sec[(sec.scenario == scenario) & (sec.policy == "naive")].set_index("candidate_size")
+    r512, r2000 = float(sec.loc[512, "attack_recall"]), float(sec.loc[2000, "attack_recall"])
+    f512, f2000 = float(sec.loc[512, "fpr"]), float(sec.loc[2000, "fpr"])
+    return (f"{r512:.2f}$\\to${r2000:.2f}", f"{f512:.2f}$\\to${f2000:.2f}")
+
+
 def make_b2_main() -> None:
     outcome = pd.read_csv(B2 / "size_effect_outcome.csv").set_index("scenario")
+    contrasts = pd.read_csv(B2 / "paired_contrasts.csv").set_index("contrast")
     historical = pd.read_csv(B2 / "robustness_vs_historical.csv").set_index("scenario")
     rows = []
     for scenario in SCENARIOS:
         new = outcome.loc[scenario]
         old = historical.loc[scenario]
+        con = contrasts.loc[f"{scenario}: naive-2000 vs naive-512"]
+        recall, fpr = _security_cells(scenario)
         rows.append(
             " & ".join(
                 [
                     SC_NAME[scenario],
                     _tex(_f2(float(old.historical_effect_pp))),
-                    _tex(_f2(float(new.effect_pp))) + " " + str(new.ci95),
+                    _tex(_f2(float(new.effect_pp))) + " " + _ci(float(con.ci95_lo), float(con.ci95_hi)),
                     f"{float(new.p_holm):.5f}",
                     str(new.classification).lower().replace("size benefit", "material benefit"),
                     _tex(_f2(float(old.effect_pp))) + " " + _ci(float(old.ci95_lo), float(old.ci95_hi)),
                     str(old.classification).lower(),
+                    recall,
+                    fpr,
                 ]
             )
             + r" \\"
@@ -116,13 +130,16 @@ to window, candidate-training or probe roles; multiplicity and original labels a
 CI95 and Holm-adjusted $p$ are from the registered deterministic paired bootstrap. The
 historical source-row-disjoint estimate is shown for context; ``change'' is sensitivity
 minus historical, estimated between independent seed blocks and is not a causal duplicate-
-leakage effect.}
+leakage effect. The last two columns give always-deploy attack recall and false-positive
+rate (\%) at 512 $\to$ 2{,}000 per class from the same sealed cells: the balanced-accuracy
+advantage is driven mainly by the lower false-positive rate, with recall approximately
+stable and slightly lower on UNSW-Recon.}
 \label{tab:value_disjoint_main}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{l r l r l l l}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{l r l r l l l l l}
 \toprule
-Benchmark & Historical & Exact-feature-disjoint [CI95] & $p_{\mathrm{Holm}}$ & Class & Change [CI95] & Change class \\
+Benchmark & Historical & Exact-feature-disjoint [CI95] & $p_{\mathrm{Holm}}$ & Class & Change [CI95] & Change class & Recall 512$\to$2{,}000 & FPR 512$\to$2{,}000 \\
 \midrule
 """ + "\n".join(rows) + r"""
 \bottomrule

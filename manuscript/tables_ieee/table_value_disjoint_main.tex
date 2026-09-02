@@ -7,17 +7,20 @@ to window, candidate-training or probe roles; multiplicity and original labels a
 CI95 and Holm-adjusted $p$ are from the registered deterministic paired bootstrap. The
 historical source-row-disjoint estimate is shown for context; ``change'' is sensitivity
 minus historical, estimated between independent seed blocks and is not a causal duplicate-
-leakage effect.}
+leakage effect. The last two columns give always-deploy attack recall and false-positive
+rate (\%) at 512 $\to$ 2{,}000 per class from the same sealed cells: the balanced-accuracy
+advantage is driven mainly by the lower false-positive rate, with recall approximately
+stable and slightly lower on UNSW-Recon.}
 \label{tab:value_disjoint_main}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{l r l r l l l}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{l r l r l l l l l}
 \toprule
-Benchmark & Historical & Exact-feature-disjoint [CI95] & $p_{\mathrm{Holm}}$ & Class & Change [CI95] & Change class \\
+Benchmark & Historical & Exact-feature-disjoint [CI95] & $p_{\mathrm{Holm}}$ & Class & Change [CI95] & Change class & Recall 512$\to$2{,}000 & FPR 512$\to$2{,}000 \\
 \midrule
-PortScan & $+0.82$ & $+0.53$ [0.2745, 0.7862] & 0.00018 & material benefit & $-0.29$ [-0.60, 0.01] & unresolved \\
-UNSW-Recon & $+1.66$ & $+1.67$ [1.4703, 1.8867] & 0.00003 & material benefit & $+0.01$ [-0.24, 0.28] & compatible \\
-ToN-IoT & $+1.00$ & $+0.38$ [0.2068, 0.5695] & 0.00018 & resolved sub-material & $-0.62$ [-1.04, -0.19] & material attenuation \\
+PortScan & $+0.82$ & $+0.53$ [0.27, 0.79] & 0.00018 & material benefit & $-0.29$ [-0.60, 0.01] & unresolved & 89.82$\to$90.13 & 5.44$\to$4.70 \\
+UNSW-Recon & $+1.66$ & $+1.67$ [1.47, 1.89] & 0.00003 & material benefit & $+0.01$ [-0.24, 0.28] & compatible & 97.86$\to$97.51 & 31.20$\to$27.51 \\
+ToN-IoT & $+1.00$ & $+0.38$ [0.21, 0.57] & 0.00018 & resolved sub-material & $-0.62$ [-1.04, -0.19] & material attenuation & 97.16$\to$97.34 & 28.39$\to$27.81 \\
 \bottomrule
 \end{tabular}
 \end{table*}

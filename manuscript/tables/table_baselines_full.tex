@@ -1,6 +1,7 @@
-\begin{table*}[t]
+\begin{landscape}
+\begin{table}[p]
 \centering
-\caption{\textbf{Complete matrix of evaluated baselines and update policies, by registered
+\caption{\textbf{Complete matrix of evaluated baselines and update policies, by evidence
 block.} Balanced-accuracy points over never adapting, taken from the sealed outputs of the
 block named in each header; no new experiments. \emph{Origin} (first bracket in each Policy
 cell): [std] standard baseline; [pub] published method instantiated in this harness; [ref]
@@ -19,12 +20,11 @@ seed-matched but unpaired realizations); cross-block differences reflect differe
 harnesses, seeds and configurations --- descriptive only, no common ranking. Blocks I--IV
 use the historical frozen-transformer policy at 512/class; Block~V is the self-contained
 evidence of the main paper. Confidence intervals and multiplicity adjustments for every
-cell are in the cited tables and in Supplementary \S S2.12 and \S S6--\S S8.}
+cell are in the cited tables and in \S S2.12 and \S S6--\S S8.}
 \label{tab:baselines_full}
 \scriptsize
 \setlength{\tabcolsep}{2pt}
 \renewcommand{\arraystretch}{1.08}
-\resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{l l c c l r r r r}
 \toprule
 Policy & Labels at decision & $h'$ vs $h$ & Reject & Probe-level guarantee & PortScan & UNSW-Recon & ToN-IoT & Labels \\
@@ -71,5 +71,6 @@ Always-deploy, 512/class, zero drift [std] & 0 & no & no & none & $-1.70$ & $-0.
 Strict gate, 512/class, zero drift [ours] & 32 & yes & yes & none & $-0.03$ & $-0.19$ & $+0.00$ & --- \\
 Always-deploy, 2{,}000/class, zero drift [std] & 0 & no & no & none & $+0.19$ & $-0.02$ & $-0.01$ & --- \\
 \bottomrule
-\end{tabular}}
-\end{table*}
+\end{tabular}
+\end{table}
+\end{landscape}

@@ -11,47 +11,49 @@ We submit the manuscript *Candidate Comparability Before Promotion: Conditional 
 Adaptive Network Intrusion Detection* for consideration as an original research article in the
 *International Journal of Information Security*.
 
-**The scientific proposition.** Promoting an adaptive network-intrusion-detection challenger is
-a security-relevant integrity decision because it changes the model responsible for subsequent
-attack detection. Conclusions about that decision — and rankings of promotion policies — are
-conditional on how the challenger is constructed and how much evidence supports it. The
-manuscript isolates those conditions with registered controls on three public benchmarks and
-offers evaluation discipline and design guidance, not a universally validated deployment stack.
+**The question.** A drift alarm identifies change; it does not establish that the challenger it
+triggers should replace the deployed network intrusion detector. Promotion is a security-relevant
+integrity decision, because it changes the model that will face the next attack, and we show that
+conclusions about it are conditional on two upstream conditions: how the challenger is constructed
+and how much training evidence supports it.
 
-**What the paper establishes.** Using a bit-identical harness on CICIDS2017, UNSW-NB15 and
-ToN-IoT, with protocols and magnitude-aware rules frozen before each block, we find that
-(i) incumbent-owned frozen preprocessing amplified apparent promotion harm; with self-contained
-challenger pipelines the mean full-drift harm did not persist; (ii) at zero drift the mean
-deficit of 512-per-class challengers disappeared at nominal 2,000-per-class parity; and
-(iii) under pool-constructed progressive drift, the final exact-cleaned-feature-disjoint
-sensitivity retained positive, statistically resolved 512→2,000 effects of +0.53, +1.67 and
-+0.38 balanced-accuracy points. The last effect is sub-material under the registered 0.5-point
-rule, so the defensible result is benchmark-dependent, not homogeneous. The policy sensitivity
-was partially robust: size-dependent ordering and absence of a globally dominant policy
-survived, while earlier compatibility statements for one label-free estimator and the
-calibrated ensemble required narrowing. No rescue experiment followed. Validation remains
-conditional rather than universally beneficial.
+**What the paper establishes.** On CICIDS2017, UNSW-NB15 and ToN-IoT, with bit-identical streams
+and protocols frozen in version control before each confirmatory block, we find that
+(i) incumbent-owned frozen preprocessing amplified apparent promotion harm, and the mean full-drift
+harm did not persist with self-contained challenger pipelines; (ii) an exact-cleaned-feature-disjoint
+sensitivity, which confines every identical feature vector to a single evaluation, training or probe
+role, preserved a positive 512→2,000-per-class evidence effect in all three benchmarks (+0.53, +1.67
+and +0.38 balanced-accuracy points) while showing that its materiality is benchmark-dependent and
+that the gain is mainly a lower false-positive rate at approximately unchanged attack recall;
+(iii) in a common-harness comparison of nine update policies, including label-free accuracy
+estimators, a calibrated ensemble, replay and reference drift monitors, the apparent policy ranking
+changed with candidate comparability and no policy globally dominated; and (iv) validation had
+conditional value, helping evidence-disadvantaged challengers and adding no average benefit at
+parity. Thirteen replays on real, chronologically ordered traffic showed no net harm from always
+deploying, which delimits the external support of the controlled results without estimating harm
+frequency.
 
-**Fit with the journal.** The work is technical information-security research about evaluation
-of adaptive network-security systems. It addresses when evidence supports replacing a deployed
-detector, retains explicit attack-recall and false-positive-rate guardrails, and scopes
-adversarial manipulation of candidate data, alarms and probes as future work rather than
-claiming a poisoning defense. Related work is current through September 2026 and distinguishes
-the decision interface from recent systems including CARAVAN, SPIDER, NOCTOWL and ADAWU-IDS.
+**Contribution and fit.** The contribution is evaluation methodology for adaptive network-security
+systems: challenger construction, training evidence and exact-value role separation should be
+controlled and reported before harm, benefit or a policy ranking is attributed. Attack recall and
+false-positive rate are carried as guardrails throughout, the trust assumptions of the evaluation are
+stated explicitly, and adversarial manipulation of candidate data, alarms and probes is scoped as
+future work rather than claimed as a defense. Related work covers recent adaptive NIDS
+(CARAVAN, SPIDER, NOCTOWL, ADAWU-IDS) and the security literature on pragmatic NIDS assessment,
+benchmark dataset artifacts and continuous model updating.
 
-**Reproducibility.** Every reported number is generated from hash-pinned result files in public
-artifact version v1.24.0 (exact DOI 10.5281/zenodo.22239106; concept DOI
-10.5281/zenodo.21322256): frozen protocols/configs, the source-row overlap audit, the
-experiment runner, implementation tests, confirmatory checkpoints, analysis scripts, manifest
-and automated claim audit. The prior v1.23.0 release remains immutable. Public benchmark data
-are not redistributed; the pipeline regenerates the outputs from them.
+**Reproducibility.** Every reported number is generated from hash-pinned result files in the public
+artifact, version v1.24.0 (exact DOI 10.5281/zenodo.22239106; concept DOI 10.5281/zenodo.21322256):
+frozen protocols and configurations, the experiment runner, implementation tests, analysis scripts,
+the sealed manifest and an automated claim audit. Public benchmark data are not redistributed; the
+pipeline regenerates all outputs from them.
 
-**Declarations.** The manuscript has not been published previously and is not under
-consideration elsewhere; it is not an extension of a conference paper. All authors approved
-the submission and have no competing interests. No funding was received for this study. The
-use of an AI assistant for drafting/editing support and for analysis-script implementation is
-disclosed in the manuscript's declarations, as the journal's policy requires; all content was
-verified by the authors, who take full responsibility for it.
+**Declarations.** The manuscript has not been published previously and is not under consideration
+elsewhere; it is not an extension of a conference paper. All authors approved the submission and
+have no competing interests. No funding was received for this study. The use of generative-AI
+tools for drafting and editing support and for implementation and review of analysis scripts is
+disclosed in the manuscript's declarations; all content was verified by the authors, who take full
+responsibility for it.
 
 We would be glad to suggest independent reviewers if useful to the editorial office.
 

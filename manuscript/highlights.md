@@ -6,7 +6,7 @@ Elsevier format: 3–5 bullet points, each ≤ 85 characters (including spaces).
 - Incumbent-owned frozen preprocessing amplified apparent promotion harm
 - Under zero drift the 512/class deficit vanishes at 2,000/class parity (±0.5 margin)
 - Under pool-constructed drift, exact-feature-disjoint effects stay positive in 3/3
-- Material size effects and policy rankings vary; no evaluated policy dominates
+- Policy rankings change with candidate comparability; no evaluated policy dominates
 
 ## Graphical abstract
 
