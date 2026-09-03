@@ -2,40 +2,69 @@
 
 **Candidate Comparability Before Promotion: Conditional Validation in Adaptive Network Intrusion Detection**
 
-*Validate Before Commit* is the name of this repository and of the gate family it releases. The paper's central contribution is evaluation discipline: promotion conclusions are conditional on challenger construction and evidence, so those factors should be controlled, reported and interpreted explicitly. VBC-SG is an optional formalization for promotion under uncertainty; validation is conditional, not universal.
+Reproducibility artifact of the paper: experiment runners, pre-specified protocols, frozen configurations,
+230 sealed result files, the analysis that regenerates every table and figure, the manuscript sources, and an
+automated audit that re-verifies every number the manuscript states. *Validate Before Commit* names the
+repository and the gate family it evaluates; the paper's contribution is evaluation discipline, not a gate.
 
-![status](https://img.shields.io/badge/status-under%20review-blue)
-![reproducible](https://img.shields.io/badge/results-reproducible-success)
-![pre-specified](https://img.shields.io/badge/protocol-pre--specified-important)
-![python](https://img.shields.io/badge/python-3.11-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21322256.svg)](https://doi.org/10.5281/zenodo.21322256)
+[![Version DOI](https://img.shields.io/badge/artifact-v1.24.0-2a4d72)](https://doi.org/10.5281/zenodo.22239106)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22239106.svg)](https://doi.org/10.5281/zenodo.22239106)
+[![Concept DOI](https://img.shields.io/badge/concept%20DOI-10.5281%2Fzenodo.21322256-6c757d)](https://doi.org/10.5281/zenodo.21322256)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![Tests](https://img.shields.io/badge/invariant%20tests-245%20passing-success)
+![Sealed CSVs](https://img.shields.io/badge/sealed%20CSVs-230%2F230-success)
+![Claim audit](https://img.shields.io/badge/claim%20audit-632%2F632-success)
+![Manuscript](https://img.shields.io/badge/manuscript-IJIS%20submission%202026-lightgrey)
 
 ![Graphical abstract](docs/img/graphical_abstract.png)
 
-Machine-learning intrusion detectors degrade under network **concept drift**, so adaptive systems retrain their
-classifiers. The field treats model updating as a **drift-detection** problem: fire a monitor, retrain on the
-alarm, deploy. This repository decomposes what actually happens after the alarm: a trigger *proposes* a
-challenger, and whether promoting it helps depends on **how the challenger is constructed and evidenced**. Two
-preregistered controls trace the observed mean promotion harm to two construction asymmetries — frozen
-incumbent-owned preprocessing (full drift) and a 4× nominal candidate-training-size disadvantage (zero drift).
-In the preregistered zero-drift control, with both asymmetries removed (own preprocessing + nominal
-2,000-per-class sample-size parity), all three mean effects are compatible with the ±0.5-pp margin and
-point/strict validation gates add no measurable value. PortScan is boundary-close and the comparison does not
-demonstrate absence of an effect; where construction or evidence is asymmetric, a small commit-time check
-recovers the loss. The original source-row-disjoint blocks found a homogeneous size benefit and a conditional
-policy ordering. A final preregistered integrity sensitivity assigns every exact cleaned raw feature group wholly
-to evaluation, training or probe roles while preserving multiplicity and original labels. Under pool-constructed
-progressive drift, the 512→2,000 effect remains positive and resolved at +0.53/+1.67/+0.38 BA points, but is
-material in only two of three benchmarks (PARTIAL ROBUSTNESS). The full common-harness policy interpretation is
-also PARTIALLY ROBUST: size-dependent ordering and no global dominance survive, while the historical ATC and
-calibrated-ensemble retention statements narrow. Scientific development is closed after this sensitivity.
+Adaptive network intrusion detection systems retrain classifiers after drift alarms, but an alarm detects
+change; it does not establish that a challenger should replace the deployed incumbent. This study treats
+promotion as a decision conditional on **candidate comparability** — how the challenger was constructed and
+how much evidence supports it — and asks whether promotion conclusions and policy rankings survive when those
+two conditions are controlled. On CICIDS2017, UNSW-NB15 and ToN-IoT, with each confirmatory block's protocol
+frozen in version control before its seeds ran, incumbent-owned frozen preprocessing amplified apparent
+promotion harm, and the mean full-drift harm did not persist with self-contained challenger pipelines.
+Raising nominal candidate evidence from 512 to 2,000 samples per class under pool-constructed progressive
+drift improved promotion by +0.53, +1.67 and +0.38 balanced-accuracy points under exact-feature-disjoint
+roles: positive and statistically resolved in all three benchmarks, materially benchmark-dependent rather
+than homogeneous, and driven mainly by fewer false positives. In a common-harness comparison of nine update
+policies the apparent ranking changed with candidate comparability and no policy dominated; validation helped
+evidence-disadvantaged challengers and added no average benefit at parity; and thirteen replays on real,
+time-ordered traffic showed no net harm from always deploying. Challenger construction and evidence should
+therefore be controlled, reported and interpreted explicitly whenever promotion is evaluated.
 
-Here, **preregistered** refers to each stage-specific protocol being specified and sealed in version control
-before that stage ran; it does not imply one external registry covering the sequential program as a whole.
+| | |
+|---|---|
+| **Scientific artifact** | `v1.24.0`, sealed 2026-09-02 — version DOI [10.5281/zenodo.22239106](https://doi.org/10.5281/zenodo.22239106); concept DOI [10.5281/zenodo.21322256](https://doi.org/10.5281/zenodo.21322256) |
+| **Sealed evidence** | 230 result CSVs under `results/tables/`, byte-pinned by `results/tables/MANIFEST.sha256` (`make verify-hashes`) |
+| **Verification** | 245 invariant tests (`make test`); 632 claim checks re-deriving every manuscript number from the sealed CSVs (`make audit`) |
+| **Benchmarks** | CICIDS2017, UNSW-NB15, ToN-IoT (public; not redistributed) |
+| **Manuscript** | Springer *svjour3* main text (29 pp.) and Online Resource 1 (50 pp.), generated from the canonical `manuscript/main.tex` / `supplement.tex` |
+| **License** | MIT (code and analysis); see [`LICENSE`](LICENSE) and [`CITATION.cff`](CITATION.cff) |
 
 > **A drift alarm proposes a challenger — it does not establish that the challenger beats the incumbent.
 > Challenger construction, nominal evidence and promotion testing are distinct controls. Their assumptions and
 > information interfaces should be stated before a promotion result or policy ranking is interpreted.**
+
+Here, **preregistered** refers to each stage-specific protocol being specified and sealed in version control
+before that stage ran; it does not imply one external registry covering the sequential program as a whole.
+
+**Contents** —
+[Reviewer quick map](#reviewer-quick-map) ·
+[TL;DR](#tldr) ·
+[Key findings](#key-findings) ·
+[Results at a glance](#results-at-a-glance-ton-iot-harm-regime--registered-replication-harness-v2-pristine-seeds-104133-historical-frozen-transformer-configuration--the-symmetric-pipeline-replication-below-corrects-it-for-self-contained-pipelines) ·
+[The method](#the-method) ·
+[Repository structure](#repository-structure) ·
+[Verifying the sealed artifact](#verifying-the-sealed-artifact) ·
+[Reproducing the results](#reproducing-the-results) ·
+[Data availability](#data-availability) ·
+[Manuscript](#manuscript) ·
+[Versioning and archival](#versioning-and-archival) ·
+[Citation](#citation) ·
+[Authors](#authors)
 
 ---
 
@@ -46,7 +75,7 @@ Where to find each piece of evidence without reading the whole repository. Secti
 
 | # | What | Where |
 |---|---|---|
-| 1 | Main manuscript (Elsevier CAS source; the single source of truth) | [`manuscript/main.tex`](manuscript/main.tex) — compile with `cd manuscript && latexmk -pdf main.tex`; IEEE port `manuscript/main_ieee.tex` is regenerated from it by `python -m src.analysis.port_ieee` |
+| 1 | Main manuscript (Elsevier CAS source; the single source of truth) | [`manuscript/main.tex`](manuscript/main.tex) — compile with `cd manuscript && latexmk -pdf main.tex`; the IJIS submission files `manuscript/main_springer.tex` / `manuscript/supplement_springer.tex` and the IEEE port `manuscript/main_ieee.tex` are regenerated from it by `python -m src.analysis.port_springer` and `python -m src.analysis.port_ieee` |
 | 2 | Supplement | [`manuscript/supplement.tex`](manuscript/supplement.tex) — S0 evidence hierarchy; S1–S6 historical/supporting evidence; S7–S8 comparability replications; S9–S10 source-row-disjoint size/policy blocks; S11 exact-feature-disjoint integrity sensitivity and current adaptive-system interface table |
 | 3 | Preregistered protocols and amendments | index in [`docs/SCIENTIFIC_PROVENANCE.md`](docs/SCIENTIFIC_PROVENANCE.md); symmetric pipeline: [`notes/paper2_symmetric_pipeline_dynamic_protocol_001.md`](notes/paper2_symmetric_pipeline_dynamic_protocol_001.md) + [`notes/symmetric_pipeline_scenario_a_rewrite_protocol.md`](notes/symmetric_pipeline_scenario_a_rewrite_protocol.md); size-matched: [`notes/paper2_size_matched_own_transformer_protocol_001.md`](notes/paper2_size_matched_own_transformer_protocol_001.md) + [`notes/size_matched_final_rewrite_protocol.md`](notes/size_matched_final_rewrite_protocol.md); harness v2: [`notes/paper2_harness_v2_registered_replication_protocol_001.md`](notes/paper2_harness_v2_registered_replication_protocol_001.md) + `notes/paper2_harness_v2_amendment_002…014.md`; final-q1: [`notes/q1_max_protocol.md`](notes/q1_max_protocol.md) |
 | 4 | Result tables | sealed CSVs under `results/tables/`, byte-pinned by `results/tables/MANIFEST.sha256` (`make verify-hashes`); LaTeX tables `manuscript/tables/`; table → protocol → config ledger `results/final_experiment_ledger.csv`; machine-readable manifest `results/final_manifest.json` |
@@ -61,12 +90,19 @@ Where to find each piece of evidence without reading the whole repository. Secti
 | 13 | Exact-feature-disjoint B2/B1 sensitivity (§5.7, S11) | protocol `notes/ijis_exact_value_disjoint_sensitivity_protocol_001.md`; configs `configs/ijis_exact_value_disjoint_b2_v1.json`, `configs/ijis_exact_value_disjoint_b1_v1.json`; B2 seeds 7001–7030, outputs `results/tables/ijis_exact_value_disjoint_b2_001/` (PARTIAL ROBUSTNESS); B1 seeds 8001–8030, outputs `results/tables/ijis_exact_value_disjoint_b1_001/` (PARTIALLY ROBUST) |
 | 14 | Manuscript tables | historical integration tables generated by `python -m src.analysis.make_post_kbs_final_tables`; integrity-sensitivity tables generated by `python -m src.analysis.make_ijis_value_disjoint_tables`; identical canonical/IEEE copies |
 
-The editorial audit trail for the post-KBS revision (what changed, why, and the response to reviewers) is in
-[`audits/`](audits/).
+The forensic, integrity and editorial audit trail (exact-feature-overlap audit, protocol pre-flights, results audits,
+fresh-clone validation, the revision report and response to the earlier review) is in [`audits/`](audits/).
 
 ---
 
 ## TL;DR
+
+The condensed account of every evidence block, in the order the study produced it (historical frozen
+configuration → comparability controls → common harness → exact-feature-disjoint sensitivity → chronological
+boundary). The abstract above states the final thesis; expand for the block-by-block detail.
+
+<details>
+<summary><b>Block-by-block summary</b></summary>
 
 - Across **three public benchmarks** (CICIDS2017, UNSW-NB15, ToN-IoT) and multiple attack regimes, the value of
   drift-triggered retraining spans **+19.5 to −4.6 balanced-accuracy points**. For a fragile downstream model,
@@ -156,6 +192,9 @@ The editorial audit trail for the post-KBS revision (what changed, why, and the 
   every proposal, so harmful-commit rates cover commits that took effect several windows after they were raised,
   with end-of-stream cases declared censored rather than counted as harmless.
 
+
+</details>
+
 ---
 
 ## Key findings
@@ -222,6 +261,9 @@ distributional change rather than estimated model improvement. The named risk-co
 sequences driving commit/reject/defer, with an optional deployment-long alpha-spending budget. See
 `manuscript/` §3 (Algorithm 1, §3.5) for the full specification.
 
+<details>
+<summary><b>Runner flags (v2 harness)</b></summary>
+
 Enabled by flags on the v2 runner (`src/experiments/run_paper2_readaptation_v2.py`):
 `--adaptation-gate {none,labeled_probe,labeled_probe_holdout,labeled_probe_lcb,labeled_probe_mcnemar,labeled_probe_seq,labeled_probe_seqav,labeled_probe_cs,labeled_probe_ebcs,labeled_probe_strat,labeled_probe_ebcs_strat,labeled_probe_ebcs_defer,labeled_probe_exact_strat,vbc_sg,unsup_disagree,atc,doc,two_stage}`,
 `--probe-size`, `--probe-latency`, `--probe-flip-frac`, `--probe-source {pools,observed}`,
@@ -243,26 +285,48 @@ the **zero-drift control** is `--trigger-mode random --max-severity 0`; the **an
 `--adaptation-gate vbc_sg` (add `--lifetime-alpha 0.10 --alpha-spending {bonferroni,pseries}` for the
 deployment-long budget).
 
+
+</details>
+
 ---
 
 ## Repository structure
 
 ```
-manuscript/     Manuscript (main.tex, CAS) + supplement.tex + references.bib
-src/experiments/  Progressive-drift readaptation runner (detectors, gate, downstream models)
-src/analysis/     Reproducible aggregation, statistics, tables and figures
-results/          Generated tables/figures (raw outputs git-ignored; ALL 230 manifest-pinned
-                  CSVs of the current v1.24.0 artifact are committed under results/tables/,
-                  byte-exact, and pinned by MANIFEST.sha256 — `make verify-hashes` passes on a
-                  fresh clone; earlier releases pinned fewer CSVs and remain immutable)
-data/             Public benchmark datasets (git-ignored; see Data availability)
-docs/img/         Figures used in this README
-notes/            Protocols, pre-registrations, and checkpoints
-tests/            Invariant tests run by `make final-paper` (disjointness, gate validity, claims)
-audits/           Editorial audit trail (post-KBS revision report, response to reviewers, derived
-                  wall-clock summary); no experimental outputs live here
-REPRODUCE.md      One-command regeneration of every table and figure
+manuscript/       Canonical sources: main.tex (Elsevier CAS), supplement.tex, references.bib; generated
+                  ports main_springer.tex + supplement_springer.tex (IJIS) and main_ieee.tex; result tables
+src/experiments/  Progressive-drift readaptation runners: detectors, gates, update policies, downstream models
+src/analysis/     Aggregation, statistics, table/figure generators, manuscript ports, submission bundle,
+                  claim audit (audit_paper2_claims.py) and manifest verification
+configs/          Frozen configurations of the registered blocks (symmetric pipeline, size-matched controls,
+                  common harness, exact-feature-disjoint sensitivity, budget frontier)
+notes/            Pre-specified protocols, amendments, implementation/confirmatory checkpoints, release notes
+results/tables/   230 sealed result CSVs pinned by MANIFEST.sha256; final_manifest.json; experiment ledger
+                  (raw per-arm outputs under results/raw/ are regenerated, not versioned)
+audits/           Forensic, integrity and editorial audit trail; no experimental outputs live here
+docs/             SCIENTIFIC_PROVENANCE.md (version → protocol → config → outcome → DOI) and the figures above
+tests/            245 invariant tests: role disjointness, gate validity, claim/number consistency, release guards
+REPRODUCE.md      Experiment commands and the claim → artifact map
+Makefile          make verify-hashes · make test · make audit · make reproduce · make final-paper
 ```
+
+## Verifying the sealed artifact
+
+Everything a reviewer needs to check that the numbers in the manuscript are the numbers in the sealed files
+runs from a fresh clone without the datasets:
+
+```bash
+git clone https://github.com/roberto-fernandez-barrios/Validate-Before-Commit.git && cd Validate-Before-Commit
+pip install -r requirements.txt
+make verify-hashes   # 230 pinned CSVs match results/tables/MANIFEST.sha256 (0 unpinned extras)
+make test            # 245 invariant tests
+make audit           # 632/632 claim checks: every manuscript number re-derived from the sealed CSVs
+```
+
+`results/final_manifest.json` records, per block, the seeds, arms, configuration hashes and statistical
+families; `results/final_experiment_ledger.csv` maps every manuscript table to its registered protocol and
+configuration; [`docs/SCIENTIFIC_PROVENANCE.md`](docs/SCIENTIFIC_PROVENANCE.md) is the version-by-version map
+from protocol to outcome to DOI.
 
 ## Reproducing the results
 
@@ -320,17 +384,41 @@ those outputs from the public benchmarks.
 
 ## Manuscript
 
-The working manuscript (§1–§8) and its bibliography are in [`manuscript/`](manuscript/). Every derived
-table, figure and numeric claim regenerates from this repository (`make reproduce`, or the full
-`make final-paper`, whose audit re-verifies every pinned number); the experiment commands that
-populate `results/raw/` from the public datasets are enumerated in [`REPRODUCE.md`](REPRODUCE.md).
+[`manuscript/main.tex`](manuscript/main.tex) (Elsevier CAS, single column) and
+[`manuscript/supplement.tex`](manuscript/supplement.tex) are the canonical sources and the surfaces the claim
+audit verifies. The submission files are mechanical ports regenerated from them, so the three manuscripts
+cannot drift in content:
+
+```bash
+python -m src.analysis.port_springer               # main_springer.tex + supplement_springer.tex (IJIS, svjour3)
+python -m src.analysis.port_ieee                   # main_ieee.tex (IEEEtran backup)
+python -m src.analysis.build_pdfs                  # canonical CAS main, supplement and IEEE PDFs
+python -m src.analysis.make_ijis_submission_bundle # submission set under dist/ (local, not versioned)
+```
+
+Compilation notes, class files and the deterministic-build settings are in
+[`manuscript/README_latex.md`](manuscript/README_latex.md). Every derived table, figure and numeric claim
+regenerates from this repository (`make reproduce`, or the full `make final-paper`, whose audit re-verifies
+every pinned number); the experiment commands that populate `results/raw/` from the public datasets are
+enumerated in [`REPRODUCE.md`](REPRODUCE.md).
+
+## Versioning and archival
+
+- **`v1.24.0`** (2026-09-02) is the scientific artifact the manuscript cites: the 230 sealed CSVs, frozen
+  protocols and configurations, runners, tests and claim audit, archived on Zenodo under the version DOI
+  [10.5281/zenodo.22239106](https://doi.org/10.5281/zenodo.22239106). The concept DOI
+  [10.5281/zenodo.21322256](https://doi.org/10.5281/zenodo.21322256) resolves to the latest archived version.
+- Commits after `v1.24.0` are editorial (bibliography, wording, figure and table layout, this README) and
+  change no result file: `make verify-hashes` reports the same 230 hashes on every one of them. The manuscript
+  state prepared for submission is tagged **`ijis-submission-2026-09`**.
+- Earlier versions (v1.22.x KBS line, v1.23.0 post-review confirmatory blocks) remain immutable and are
+  listed on the concept record; [`notes/release_notes_v1.24.0.md`](notes/release_notes_v1.24.0.md) records
+  what the final release added and what it left unchanged.
 
 ## Citation
 
-The paper is under review; cite it as below. To cite the **software artifact** itself, use the
-exact v1.24.0 DOI [10.5281/zenodo.22239106](https://doi.org/10.5281/zenodo.22239106).
-The concept DOI [10.5281/zenodo.21322256](https://doi.org/10.5281/zenodo.21322256)
-resolves to the latest version (metadata in `CITATION.cff`).
+The manuscript has been prepared for submission to the *International Journal of Information Security*
+(Springer Nature). Cite the paper and, for the exact evidence used, the `v1.24.0` artifact:
 
 ```bibtex
 @unpublished{fernandezbarrios2026validate,
@@ -339,11 +427,34 @@ resolves to the latest version (metadata in `CITATION.cff`).
   author = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
             Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
   year   = {2026},
-  note   = {Under review}
+  note   = {Manuscript prepared for submission to the International Journal of Information Security}
+}
+
+@misc{fernandezbarrios2026artifact,
+  author       = {Fern{\'a}ndez-Barrios, Roberto and Pastor-L{\'o}pez, Iker and
+                  Pikatza-Huerga, Amaia and Garc{\'i}a Bringas, Pablo},
+  title        = {Validate Before Commit: reproducibility artifact (code and protocols)},
+  year         = {2026},
+  howpublished = {Zenodo [software], version 1.24.0},
+  doi          = {10.5281/zenodo.22239106},
+  url          = {https://github.com/roberto-fernandez-barrios/Validate-Before-Commit/tree/v1.24.0}
 }
 ```
 
+Machine-readable citation metadata: [`CITATION.cff`](CITATION.cff) and [`.zenodo.json`](.zenodo.json).
+
 ## License
 
-The code and analysis scripts are released under the **MIT License** (see [`LICENSE`](LICENSE)).
-Citation metadata for the artifact is provided in [`CITATION.cff`](CITATION.cff) and `.zenodo.json`.
+The code and analysis scripts are released under the **MIT License** (see [`LICENSE`](LICENSE)). The
+benchmark datasets keep their own licenses and are not redistributed.
+
+## Authors
+
+Faculty of Engineering, University of Deusto, Bilbao, Spain.
+
+- Roberto Fernández-Barrios — corresponding author, [roberto.fernandez.b@deusto.es](mailto:roberto.fernandez.b@deusto.es) — [ORCID 0009-0003-5312-2634](https://orcid.org/0009-0003-5312-2634)
+- Iker Pastor-López — [ORCID 0000-0002-3068-6248](https://orcid.org/0000-0002-3068-6248)
+- Amaia Pikatza-Huerga — [ORCID 0009-0003-9080-6242](https://orcid.org/0009-0003-9080-6242)
+- Pablo García Bringas — [ORCID 0000-0003-3594-9534](https://orcid.org/0000-0003-3594-9534)
+
+Author contributions (CRediT) and the generative-AI disclosure are stated in the manuscript's declarations.
