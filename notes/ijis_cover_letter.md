@@ -5,6 +5,8 @@ submission system; the manuscript files are listed in `notes/ijis_submission_che
 
 ---
 
+Bilbao, 3 September 2026
+
 Dear Editor-in-Chief,
 
 We submit the manuscript *Candidate Comparability Before Promotion: Conditional Validation in
