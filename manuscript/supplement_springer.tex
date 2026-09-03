@@ -3,8 +3,29 @@
 \documentclass[a4paper,11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx,booktabs,amsmath,amssymb,multirow,longtable,pdflscape}
+\usepackage{array}
 \usepackage[section]{placeins}
 \usepackage{float}
+% Float layout (editorial only): tables prefer the position where they are cited and are
+% flushed before every subsection; float pages start at the top instead of centring their
+% content; body text and floats are separated; caption and tabular no longer touch.
+\floatplacement{table}{!htbp}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+\setlength{\intextsep}{14pt plus 3pt minus 2pt}
+\setlength{\textfloatsep}{18pt plus 4pt minus 3pt}
+\setlength{\floatsep}{14pt plus 3pt minus 2pt}
+\setlength{\belowcaptionskip}{5pt}
+\setlength{\LTcapwidth}{\textwidth}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{12pt plus 2pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\let\supp@subsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\supp@subsection}
+\makeatother
 \graphicspath{{../}{./}}
 \usepackage[numbers]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
@@ -805,6 +826,14 @@ limited to their registered reference parameters, and no method was tuned after 
 \input{tables/table_value_disjoint_b1_robustness.tex}
 
 \subsection{Adaptive-system interface comparison (literature as of September 2026)}
+
+Table~\ref{tab:adaptive_interface} records, for the adaptive systems positioned as related
+work in the main paper and in the interface-scope paragraph of \S S10 (CARAVAN, SPIDER,
+NOCTOWL and ADAWU-IDS), the trigger and label interface, the update semantics, whether a
+concrete challenger is compared against the incumbent before replacement, the evaluation
+scope and the artifact availability verified from each paper or publisher page in
+September 2026. It documents the interface distinction that kept these systems out of the
+common harness and supports no superiority claim.
 
 \clearpage
 \begin{landscape}

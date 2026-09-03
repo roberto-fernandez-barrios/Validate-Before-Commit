@@ -13,7 +13,7 @@ pdflatex supplement_springer && bibtex supplement_springer && pdflatex supplemen
 cd ..
 python -m src.analysis.make_ijis_submission_bundle   # -> dist/submission_ijis/
 ```
-Expected: main_springer.pdf 29 pp., supplement_springer.pdf (= ESM_1.pdf) 48 pp., 0 undefined
+Expected: main_springer.pdf 29 pp., supplement_springer.pdf (= ESM_1.pdf) 50 pp., 0 undefined
 references/citations in both logs (the bundle script refuses otherwise).
 For byte-identical PDFs across rebuilds, export `SOURCE_DATE_EPOCH=1756684800 FORCE_SOURCE_DATE=1`
 before the pdflatex passes (pdfTeX then fixes the embedded dates and trailer ID); the zip inside the

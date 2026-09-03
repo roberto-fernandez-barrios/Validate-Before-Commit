@@ -1,6 +1,9 @@
 \begin{landscape}
-\begin{table}[p]
-\centering
+{\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\setlength{\LTcapwidth}{\linewidth}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.20\linewidth} >{\raggedright\arraybackslash}p{0.12\linewidth} c c >{\raggedright\arraybackslash}p{0.22\linewidth} r r r r}
 \caption{\textbf{Complete matrix of evaluated baselines and update policies, by evidence
 block.} Balanced-accuracy points over never adapting, taken from the sealed outputs of the
 block named in each header; no new experiments. \emph{Origin} (first bracket in each Policy
@@ -21,14 +24,21 @@ harnesses, seeds and configurations --- descriptive only, no common ranking. Blo
 use the historical frozen-transformer policy at 512/class; Block~V is the self-contained
 evidence of the main paper. Confidence intervals and multiplicity adjustments for every
 cell are in the cited tables and in \S S2.12 and \S S6--\S S8.}
-\label{tab:baselines_full}
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{l l c c l r r r r}
+\label{tab:baselines_full}\\
 \toprule
 Policy & Labels at decision & $h'$ vs $h$ & Reject & Probe-level guarantee & PortScan & UNSW-Recon & ToN-IoT & Labels \\
 \midrule
+\endfirsthead
+\multicolumn{9}{l}{\small Table~\ref{tab:baselines_full} continued}\\
+\toprule
+Policy & Labels at decision & $h'$ vs $h$ & Reject & Probe-level guarantee & PortScan & UNSW-Recon & ToN-IoT & Labels \\
+\midrule
+\endhead
+\midrule
+\multicolumn{9}{r}{\small continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
 \multicolumn{9}{l}{\emph{Block I --- frozen policy, full drift (harness v2, seeds 104--133, 512/class; registered; paired)}} \\
 Always-deploy (naive) [std] & 0 & no & no & none & $+8.25$ & $+1.21$ & $-1.64$ & 2{,}594 \\
 Sliding-window update, always deploy [std] & 0 & no & no & none & $+8.04$ & $+0.96$ & $-2.44$ & 2{,}594 \\
@@ -70,7 +80,5 @@ Always-deploy, 512/class, full drift [std] & 0 & no & no & none & $+7.21$ & $+2.
 Always-deploy, 512/class, zero drift [std] & 0 & no & no & none & $-1.70$ & $-0.65$ & $-0.24$ & --- \\
 Strict gate, 512/class, zero drift [ours] & 32 & yes & yes & none & $-0.03$ & $-0.19$ & $+0.00$ & --- \\
 Always-deploy, 2{,}000/class, zero drift [std] & 0 & no & no & none & $+0.19$ & $-0.02$ & $-0.01$ & --- \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}}
 \end{landscape}

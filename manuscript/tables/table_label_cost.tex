@@ -2,10 +2,12 @@
 \centering
 \caption{Total label and update accounting in the harm regime (ToN-IoT, harness v2, seeds 104--133; per-stream means; all three regimes in the artifact). Candidates are trained \emph{before} the commit decision in every policy except two-stage, so their 1{,}024 labels are spent whether or not the gate commits. The probe is a small fraction of total cost: ``label-efficient'' refers to the \emph{decision}, not the pipeline. The two-stage gate (split-probe version, amendment 005) is the only policy that reduces candidate construction itself.}
 \label{tab:label_cost}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
 \resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
 \begin{tabular}{lrrrrrrr}
 \toprule
-Policy & Triggers & Candidates & Commits & Monitor labels & Candidate labels & Probe labels & Total labels \\
+Policy & Triggers & Candidates & Commits & \begin{tabular}[b]{@{}r@{}}Monitor\\labels\end{tabular} & \begin{tabular}[b]{@{}r@{}}Candidate\\labels\end{tabular} & \begin{tabular}[b]{@{}r@{}}Probe\\labels\end{tabular} & \begin{tabular}[b]{@{}r@{}}Total\\labels\end{tabular} \\
 \midrule
 naive (always deploy) & 2.53 & 2.53 & 2.53 & 0 & 2{,}594 & 0 & 2{,}594 \\
 labeled probe $b{=}32$ & 3.43 & 3.43 & 2.07 & 0 & 3{,}516 & 110 & 3{,}626 \\

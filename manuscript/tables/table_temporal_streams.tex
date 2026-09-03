@@ -2,8 +2,10 @@
 \centering
 \caption{Real chronological streams (corrected runner, registered amendments 004/005; 30 fresh seeds each). CICIDS incumbents train on Tuesday; the UNSW incumbent trains on the first 30\% of the raw captures sorted by flow start time (an external, non-CICIDS temporal stream). Candidates retrain on the last eight \emph{observed} windows; probes come from the stream's own past. BA = mean balanced accuracy over two-class windows (headline); acc = plain accuracy over all windows. The premium is metric-dependent and concentrates on the fast, deep-benefit CICIDS collapses; where the incumbent stays healthy (UNSW, 82.3\% BA; 163/200 two-class windows, ${\sim}$21 triggers/stream) the gate pays nothing. A registered stratified-probe arm left every premium unchanged, rejecting the probe-composition explanation where testable.}
 \label{tab:temporal_streams}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
 \resizebox{\ifdim\width>\linewidth \linewidth\else\width\fi}{!}{%
-\begin{tabular}{lrrrrr}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.21\linewidth}rrrrr}
 \toprule
 Stream (chronology) & No-adapt BA & Naive recovery (BA) & Gate recovery (BA) & Gate $-$ naive (BA) & Gate $-$ naive (acc) \\
 \midrule
