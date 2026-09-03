@@ -283,7 +283,9 @@ python -m src.analysis.validate_monitors_vs_river           # DDM/ADWIN unit cro
 Or run the whole derived pipeline in one command (`make reproduce` = analysis + manifest + audit;
 `make final-paper` = hash verification + invariant tests (`tests/`) + analysis + final tables + figures +
 `results/final_manifest.json` + CAS/supplement/IEEE compilation + the claim audit (`src/analysis/audit_paper2_claims.py`) — the P10 workflow).
-All 185 manifest-pinned confirmatory CSVs are **committed** under `results/tables/`
+All 230 manifest-pinned CSVs of the current v1.24.0 artifact (207 sealed through v1.23.0 plus 23
+exact-feature-disjoint sensitivity CSVs; earlier releases pinned fewer and remain immutable) are
+**committed** under `results/tables/`
 (byte-exact; a `-text` git attribute prevents eol mangling) and pinned by
 `results/tables/MANIFEST.sha256`; `make verify-hashes` passes on a fresh clone, and
 regenerated outputs can be diffed against the committed values. The

@@ -251,9 +251,10 @@ deployment-long budget).
 manuscript/     Manuscript (main.tex, CAS) + supplement.tex + references.bib
 src/experiments/  Progressive-drift readaptation runner (detectors, gate, downstream models)
 src/analysis/     Reproducible aggregation, statistics, tables and figures
-results/          Generated tables/figures (raw outputs git-ignored; ALL 185 manifest-pinned
-                  confirmatory CSVs are committed under results/tables/, byte-exact, and
-                  pinned by MANIFEST.sha256 — `make verify-hashes` passes on a fresh clone)
+results/          Generated tables/figures (raw outputs git-ignored; ALL 230 manifest-pinned
+                  CSVs of the current v1.24.0 artifact are committed under results/tables/,
+                  byte-exact, and pinned by MANIFEST.sha256 — `make verify-hashes` passes on a
+                  fresh clone; earlier releases pinned fewer CSVs and remain immutable)
 data/             Public benchmark datasets (git-ignored; see Data availability)
 docs/img/         Figures used in this README
 notes/            Protocols, pre-registrations, and checkpoints

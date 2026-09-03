@@ -87,13 +87,20 @@ def _span_table(body: str, label: str) -> str:
     return body[:start] + block + body[end + len("\\end{table}"):]
 
 
-def port_supplement(authors: list[dict], affiliation: str, cor_email: str) -> None:
+def port_supplement(authors: list[dict], affiliation: str, cor_email: str,
+                    title: str, keywords: list[str]) -> None:
     """supplement_springer.tex: same body as supplement.tex, with the front page IJIS requires
     for every supplementary file (article title, journal name, author names, affiliation and
     e-mail of the corresponding author) and cross-references resolved against main_springer."""
     sup = (MS / "supplement.tex").read_text(encoding="utf-8")
     sup = _replace_once(sup, "\\externaldocument[][nocite]{main}",
                         "\\externaldocument[][nocite]{main_springer}")
+    # PDF document metadata for the Online Resource file (hyperref only).
+    sup = _replace_once(
+        sup, "\\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}\n",
+        "\\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}\n"
+        "\\hypersetup{pdftitle={Online Resource 1: Supplementary Material for " + title + "},"
+        "pdfauthor={" + "; ".join(a["name"] for a in authors) + "},pdfkeywords={" + "; ".join(keywords) + "}}\n")
     sup = _replace_once(sup, "\\title{Supplementary Material for\\\\``",
                         "\\title{Online Resource 1 --- Supplementary Material for\\\\``")
     names = [a["name"] for a in authors]
@@ -168,7 +175,7 @@ def main() -> None:
         (MS / "tables_springer" / src.name).write_text(
             _online_resource(src.read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
 
-    port_supplement(authors, affiliation, corresponding[0]["email"])
+    port_supplement(authors, affiliation, corresponding[0]["email"], title, keywords)
 
     # ---- Springer head ----------------------------------------------------------------------
     names = " \\and ".join(a["name"] for a in authors)
@@ -193,6 +200,9 @@ def main() -> None:
         "\\usepackage{multirow}",
         "\\usepackage{cite}",
         "\\usepackage[hidelinks]{hyperref}",
+        # PDF document metadata (title/author/keywords) for the submission file; hyperref only.
+        "\\hypersetup{pdftitle={" + title + "},pdfauthor={" + "; ".join(a["name"] for a in authors)
+        + "},pdfkeywords={" + "; ".join(keywords) + "}}",
         "\\urlstyle{same}",
         "% IJIS asks for DOIs as full links in the reference list; spmpsci's .bbl defines \\doi with",
         "% \\providecommand, so this earlier definition wins and every DOI becomes https://doi.org/...",
